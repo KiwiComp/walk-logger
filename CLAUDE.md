@@ -8,6 +8,37 @@
 * Never make commits or pushes on your own accord, only ever when explicitly asked (or prompted to use a skill that says so).
 
 
+# Communication
+
+* Be brief and concise in everything: answers, explanations, summaries, commit messages.
+  No preamble, no restating the question, no padding. If one sentence answers it, write one sentence.
+* Lead with the answer or recommendation. Add reasoning only where it changes the decision.
+
+
+# Comments
+
+* Comments must earn their place. Write one only when it says something the code cannot:
+  why a value is what it is, a non-obvious constraint, a link to a spec or mockup.
+* Never comment what the code already says (`// Timeline` above `TimelineGutter`, `/** 4. */` on `val xs = 4.dp`).
+* No section-divider comments, no commented-out code, no KDoc on private or self-explanatory declarations.
+
+
+# Git
+
+* Branch names: `<type>/<short-description>`, e.g. `feat/walk-detail-screen`, `chore/spacing-tokens`,
+  `docs/architecture`. Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`.
+* Commit messages: one short imperative line. Squash-and-merge is used, so the PR title and body
+  carry the history, not individual commits.
+* PR title: `<type>: <description>`, mirroring the branch name — branch `feat/walk-detail-screen`
+  → title `feat: walk detail screen`. This becomes the squash commit message on `main`.
+* PR body: brief and concise, using exactly these headers:
+  * **What** — one or two sentences on the change.
+  * **Issue** — linked issue, or `none`.
+  * **Notes** — decisions, trade-offs, follow-ups. Omit if there are none.
+  * **Verification** — what was run (`./gradlew :app:compileDebugKotlin :app:testDebugUnitTest`, manual checks).
+  * **Screenshots** — only when the UI changed; before/after if applicable.
+
+
 # Design system
 
 * Never come up with your own colors, always use the colors already in the project. If you want to use another color, you have to ask before.

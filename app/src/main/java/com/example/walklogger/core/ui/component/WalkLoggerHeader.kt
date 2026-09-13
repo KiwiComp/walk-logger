@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.Navy
 import com.example.walklogger.core.ui.theme.OnNavy
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -38,8 +39,8 @@ fun WalkLoggerHeader(
                 .fillMaxWidth()
                 .background(Navy)
                 .statusBarsPadding()
-                .padding(horizontal = 20.dp)
-                .padding(top = 12.dp, bottom = 20.dp),
+                .padding(horizontal = AppSpacing.xl)
+                .padding(top = AppSpacing.md, bottom = AppSpacing.xl),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
