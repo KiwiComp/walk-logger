@@ -20,17 +20,21 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.ui.component.SectionLabel
+import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.Navy
 import com.example.walklogger.core.ui.theme.OnNavy
 import com.example.walklogger.core.ui.theme.OutlineOnNavy
 import com.example.walklogger.core.ui.theme.SteelLight
+
+private val DayCellHeight = 76.dp
+private val DayDotSize = 6.dp
 
 /** Seven-day strip that lives inside the Log header. */
 @Composable
 internal fun WeekStrip(days: List<SampleDayCell>, modifier: Modifier = Modifier) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(8.dp),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) {
         days.forEach { day -> DayCell(day) }
     }
@@ -51,14 +55,14 @@ private fun RowScope.DayCell(day: SampleDayCell) {
     Column(
         modifier = Modifier
             .weight(1f)
-            .height(76.dp)
+            .height(DayCellHeight)
             .background(background)
             .border(1.dp, if (day.selected) OnNavy else OutlineOnNavy)
-            .padding(vertical = 12.dp),
+            .padding(vertical = AppSpacing.md),
         horizontalAlignment = Alignment.CenterHorizontally,
     ) {
         SectionLabel(text = day.label, color = foreground)
-        Spacer(Modifier.height(4.dp))
+        Spacer(Modifier.height(AppSpacing.xs))
         Text(
             text = day.number.toString(),
             style = MaterialTheme.typography.titleMedium,
@@ -67,7 +71,7 @@ private fun RowScope.DayCell(day: SampleDayCell) {
         Spacer(Modifier.weight(1f))
         Box(
             Modifier
-                .size(6.dp)
+                .size(DayDotSize)
                 .background(if (day.hasWalks) SteelLight else Color.Transparent),
         )
     }

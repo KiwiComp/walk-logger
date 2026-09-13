@@ -7,6 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.unit.dp
+import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.NavyLight
 import com.example.walklogger.core.ui.theme.OnNavy
 
@@ -19,6 +20,6 @@ fun DogBadge(name: String, modifier: Modifier = Modifier) {
         color = OnNavy,
         modifier = modifier
             .background(NavyLight)
-            .padding(horizontal = 14.dp, vertical = 8.dp),
+            .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
     )
 }

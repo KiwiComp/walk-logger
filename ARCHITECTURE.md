@@ -12,7 +12,8 @@ com.example.walklogger
 ├── navigation/                app-level NavHost, bottom bar, top-level destinations
 │
 ├── feature/                   one package per tab/screen (UI only so far – no ViewModels yet)
-│   ├── log/                   LogScreen + WeekStrip, static sample content
+│   ├── log/                   LogScreen composed from one file per piece (WeekStrip, WalkTimeline,
+│   │                          WalkCard, AddWalkPlaceholder); SampleData.kt holds static sample content
 │   ├── calendar/              placeholder
 │   ├── patterns/              placeholder
 │   ├── dog/                   the "Sixten" tab, placeholder
@@ -25,8 +26,8 @@ com.example.walklogger
 │   ├── data/                  WalkRepository interface + Room-backed implementation, mappers
 │   ├── database/              Room database, DAO, entities
 │   ├── common/di/             injectable coroutine dispatchers
-│   └── ui/                    theme (fixed palette, square shapes) + shared composables
-│                              (WalkLoggerHeader, DogBadge, SectionLabel, EmptyTabContent)
+│   └── ui/                    theme (fixed palette, square shapes, AppSpacing/AppRadius tokens)
+│                              + shared composables (WalkLoggerHeader, DogBadge, SectionLabel, EmptyTabContent)
 ```
 
 ## Rules of thumb
@@ -40,6 +41,13 @@ com.example.walklogger
   unit-testable on the JVM.
 - **Each feature owns its navigation.** Add a `@Serializable` route + `NavGraphBuilder.xxxScreen()`
   in `feature/<name>/navigation`, then register it in `WalkLoggerNavHost`.
+- **One file per composable piece, flat in the feature package.** A feature's building blocks
+  (`WalkCard.kt`, `WeekStrip.kt`, …) sit beside its `Screen`, each with its own `@Preview`.
+  The piece other files call is `internal`; helpers and size constants that only that file
+  needs are `private`. Only the `Screen`/`Route` and `core/ui` components are public.
+- **Dimensions come from tokens.** Padding and gaps use `AppSpacing`, corners use `AppRadius`.
+  Component-specific sizes (a dot, a cell height) are named `private val`s in the component's
+  file, not spacing tokens.
 
 ## Adding a feature
 
@@ -51,7 +59,7 @@ com.example.walklogger
 ## Next steps (not yet implemented)
 
 - Flesh out the `Walk` model (handler, equipment, rating, weather, notes).
-- Add ViewModels per feature and replace the static sample content in `LogScreen`.
+- Add ViewModels per feature and replace the static sample content in `feature/log/SampleData.kt`.
 - Bundle a condensed display font (see `Type.kt`).
 - Add `DataStore` for user preferences (units, update interval).
 - Split `core/*` and `feature/*` into Gradle modules once the app grows.
