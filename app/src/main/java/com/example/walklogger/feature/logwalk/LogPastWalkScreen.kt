@@ -118,6 +118,7 @@ fun LogPastWalkScreen(
             FormSection(label = stringResource(R.string.log_past_walk_when)) {
                 WhenSection(
                     date = uiState.date,
+                    maxDate = uiState.maxDate,
                     startTime = uiState.startTime,
                     endTime = uiState.endTime,
                     durationMinutes = uiState.durationMinutes,
@@ -177,7 +178,6 @@ fun LogPastWalkScreen(
                 AppTextField(
                     value = uiState.notes,
                     onValueChange = onNotesChange,
-                    label = "",
                     placeholder = stringResource(R.string.log_past_walk_notes_placeholder),
                     singleLine = false,
                     minLines = NotesMinLines,
@@ -220,6 +220,7 @@ private val SaveBlocker.messageRes: Int
         SaveBlocker.HANDLER -> R.string.log_past_walk_needs_handler
         SaveBlocker.TIMES -> R.string.log_past_walk_needs_times
         SaveBlocker.END_BEFORE_START -> R.string.log_past_walk_needs_end_after_start
+        SaveBlocker.IN_FUTURE -> R.string.log_past_walk_needs_past_end
         SaveBlocker.RATING -> R.string.log_past_walk_needs_rating
     }
 
@@ -274,7 +275,7 @@ private fun LogPastWalkScreenCompletePreview() {
 private fun LogPastWalkScreenEmptyPreview() {
     WalkLoggerTheme {
         LogPastWalkScreen(
-            uiState = LogPastWalkUiState(date = LocalDate.of(2026, 9, 12), dogName = "Sixten", handlers = LogWalkPreviewData.handlers),
+            uiState = LogWalkPreviewData.logPastWalk.copy(startTime = null, endTime = null, selectedHandlers = emptySet(), rain = null, temperature = null, wind = null),
             onClose = {},
             onDateChange = {},
             onStartTimeChange = {},

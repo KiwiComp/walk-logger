@@ -30,7 +30,8 @@ class LogPastWalkViewModelTest {
 
     private val date = LocalDate.of(2026, 9, 12)
     private val zone = ZoneOffset.ofHours(2)
-    private val clock = Clock.fixed(date.atStartOfDay().toInstant(zone), zone)
+    private val now = date.atTime(20, 0)
+    private val clock = Clock.fixed(now.toInstant(zone), zone)
     private val dogRepository = FakeDogRepository()
     private val handlerRepository = FakeHandlerRepository()
     private val walkRepository = FakeWalkRepository()
@@ -98,6 +99,37 @@ class LogPastWalkViewModelTest {
             val state = expectMostRecentItem()
             assertNull(state.saveBlocker)
             assertTrue(state.canSave)
+        }
+    }
+
+    @Test
+    fun `date picker is capped at today`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(date, expectMostRecentItem().maxDate)
+        }
+    }
+
+    @Test
+    fun `a walk ending after now is blocked`() = runTest {
+        handlerRepository.addHandlers("Anna")
+        viewModel.uiState.test {
+            fillInValidWalk()
+            viewModel.setEndTime(now.toLocalTime().plusMinutes(1))
+            assertEquals(SaveBlocker.IN_FUTURE, expectMostRecentItem().saveBlocker)
+            viewModel.setEndTime(now.toLocalTime())
+            assertNull(expectMostRecentItem().saveBlocker)
+        }
+    }
+
+    @Test
+    fun `a walk on a future day is blocked`() = runTest {
+        handlerRepository.addHandlers("Anna")
+        viewModel.uiState.test {
+            fillInValidWalk()
+            viewModel.setDate(date.plusDays(1))
+            assertEquals(SaveBlocker.IN_FUTURE, expectMostRecentItem().saveBlocker)
+            viewModel.setDate(date.minusDays(1))
+            assertNull(expectMostRecentItem().saveBlocker)
         }
     }
 

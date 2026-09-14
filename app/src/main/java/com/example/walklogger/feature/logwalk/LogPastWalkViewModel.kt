@@ -16,6 +16,7 @@ import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
 import java.time.LocalDate
+import java.time.LocalDateTime
 import java.time.LocalTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,7 +43,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
     }
 
     /** Everything the user enters; the dog and handler list are overlaid from their repositories. */
-    private val form = MutableStateFlow(LogPastWalkUiState(date = date))
+    private val form = MutableStateFlow(LogPastWalkUiState(date = date, now = LocalDateTime.now(clock)))
 
     val uiState: StateFlow<LogPastWalkUiState> =
         combine(
@@ -57,11 +58,15 @@ class LogPastWalkViewModel @AssistedInject constructor(
             initialValue = form.value,
         )
 
-    fun setDate(date: LocalDate) = form.update { it.copy(date = date) }
+    fun setDate(date: LocalDate) = updateWhen { it.copy(date = date) }
 
-    fun setStartTime(time: LocalTime) = form.update { it.copy(startTime = time) }
+    fun setStartTime(time: LocalTime) = updateWhen { it.copy(startTime = time) }
 
-    fun setEndTime(time: LocalTime) = form.update { it.copy(endTime = time) }
+    fun setEndTime(time: LocalTime) = updateWhen { it.copy(endTime = time) }
+
+    /** Re-reads the clock alongside the edit so a form left open still validates against the present. */
+    private fun updateWhen(edit: (LogPastWalkUiState) -> LogPastWalkUiState) =
+        form.update { edit(it).copy(now = LocalDateTime.now(clock)) }
 
     fun toggleHandler(handler: String) = form.update { state ->
         val selected = state.selectedHandlers
@@ -93,7 +98,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
         if (!state.canSave) return
         form.update { it.copy(isSaving = true) }
         viewModelScope.launch {
-            val dog = dogRepository.observeActiveDog().first() ?: return@launch
+            val dog = checkNotNull(dogRepository.observeActiveDog().first()) { "log past walk needs an active dog" }
             walkRepository.logWalk(
                 Walk(
                     id = 0,
@@ -113,7 +118,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
         }
     }
 
-    private fun java.time.LocalDateTime.toEpochMilli(): Long = atZone(clock.zone).toInstant().toEpochMilli()
+    private fun LocalDateTime.toEpochMilli(): Long = atZone(clock.zone).toInstant().toEpochMilli()
 
     companion object {
         const val MAX_NOTES_LENGTH = 500

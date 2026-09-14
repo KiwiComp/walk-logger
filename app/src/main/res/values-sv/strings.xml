@@ -105,5 +105,6 @@
     <string name="log_past_walk_needs_handler">Välj vem som gick innan promenaden kan sparas.</string>
     <string name="log_past_walk_needs_times">Ange start- och sluttid innan promenaden kan sparas.</string>
     <string name="log_past_walk_needs_end_after_start">Sluttiden måste vara efter starttiden.</string>
+    <string name="log_past_walk_needs_past_end">En tidigare promenad kan inte sluta i framtiden.</string>
     <string name="log_past_walk_needs_rating">Ett betyg behövs innan promenaden kan sparas.</string>
 </resources>

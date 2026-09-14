@@ -2,7 +2,9 @@ package com.example.walklogger.core.ui.component
 
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -27,7 +29,8 @@ import java.time.format.FormatStyle
 
 /**
  * [AppPickerField] that opens a [DatePickerDialog]. [onDateChange] receives null when the
- * dialog is confirmed with no day selected. [formatter] is applied with the current locale.
+ * dialog is confirmed with no day selected. [formatter] is applied with the current locale;
+ * days after [maxDate] are disabled in the picker.
  */
 @Composable
 fun AppDateField(
@@ -37,6 +40,7 @@ fun AppDateField(
     modifier: Modifier = Modifier,
     placeholder: String? = null,
     formatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG),
+    maxDate: LocalDate? = null,
 ) {
     val locale = LocalConfiguration.current.locales[0]
     val localizedFormatter = remember(formatter, locale) { formatter.withLocale(locale) }
@@ -51,6 +55,7 @@ fun AppDateField(
     if (showPicker) {
         val pickerState = rememberDatePickerState(
             initialSelectedDateMillis = date?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
+            selectableDates = remember(maxDate) { maxDate?.let(::UpToDate) ?: DatePickerDefaults.AllDates },
         )
         DatePickerDialog(
             onDismissRequest = { showPicker = false },
@@ -73,6 +78,11 @@ fun AppDateField(
             DatePicker(state = pickerState)
         }
     }
+}
+
+private class UpToDate(private val max: LocalDate) : SelectableDates {
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean = !utcTimeMillis.toLocalDate().isAfter(max)
+    override fun isSelectableYear(year: Int): Boolean = year <= max.year
 }
 
 // DatePicker reports UTC midnight of the chosen day.

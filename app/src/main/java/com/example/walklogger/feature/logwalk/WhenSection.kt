@@ -44,6 +44,7 @@ private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:m
 @Composable
 internal fun WhenSection(
     date: LocalDate,
+    maxDate: LocalDate,
     startTime: LocalTime?,
     endTime: LocalTime?,
     durationMinutes: Int?,
@@ -59,6 +60,7 @@ internal fun WhenSection(
                 onDateChange = { if (it != null) onDateChange(it) },
                 label = stringResource(R.string.log_past_walk_date),
                 formatter = DateFormatter,
+                maxDate = maxDate,
                 modifier = Modifier.weight(DateWeight),
             )
             TimeField(
@@ -156,6 +158,7 @@ private fun WhenSectionPreview() {
     WalkLoggerTheme {
         WhenSection(
             date = LocalDate.of(2026, 9, 12),
+            maxDate = LocalDate.of(2026, 9, 14),
             startTime = LocalTime.of(17, 40),
             endTime = LocalTime.of(18, 5),
             durationMinutes = 25,
@@ -173,6 +176,7 @@ private fun WhenSectionEmptyPreview() {
     WalkLoggerTheme {
         WhenSection(
             date = LocalDate.of(2026, 9, 12),
+            maxDate = LocalDate.of(2026, 9, 14),
             startTime = null,
             endTime = null,
             durationMinutes = null,

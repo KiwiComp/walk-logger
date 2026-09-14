@@ -21,13 +21,13 @@ import com.example.walklogger.core.ui.theme.SquareShape
 import com.example.walklogger.core.ui.theme.Steel
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
-/** Square, filled text field with its label above, as in the "Log a past walk" form. */
+/** Square, filled text field with an optional [label] above, as in the "Log a past walk" form. */
 @Composable
 fun AppTextField(
     value: String,
     onValueChange: (String) -> Unit,
-    label: String,
     modifier: Modifier = Modifier,
+    label: String? = null,
     placeholder: String? = null,
     suffix: String? = null,
     supportingText: String? = null,
@@ -39,12 +39,14 @@ fun AppTextField(
     interactionSource: MutableInteractionSource? = null,
 ) {
     Column(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = label,
-            style = MaterialTheme.typography.bodyMedium,
-            color = InkMuted,
-            modifier = Modifier.padding(bottom = AppSpacing.xs),
-        )
+        if (label != null) {
+            Text(
+                text = label,
+                style = MaterialTheme.typography.bodyMedium,
+                color = InkMuted,
+                modifier = Modifier.padding(bottom = AppSpacing.xs),
+            )
+        }
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,

@@ -107,5 +107,6 @@
     <string name="log_past_walk_needs_handler">Choose who walked before this walk can be saved.</string>
     <string name="log_past_walk_needs_times">Enter start and end times before this walk can be saved.</string>
     <string name="log_past_walk_needs_end_after_start">The end time must be after the start time.</string>
+    <string name="log_past_walk_needs_past_end">A past walk can\u2019t end in the future.</string>
     <string name="log_past_walk_needs_rating">A rating is needed before this walk can be saved.</string>
 </resources>
