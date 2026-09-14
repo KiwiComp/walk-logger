@@ -119,7 +119,8 @@ fun RegisterDogScreen(
         AppButton(
             text = stringResource(R.string.register_dog_save),
             onClick = onSave,
-            enabled = uiState.canSave,
+            enabled = uiState.canSave || uiState.isSaving,
+            loading = uiState.isSaving,
             modifier = Modifier
                 .padding(horizontal = AppSpacing.xl)
                 .padding(bottom = AppSpacing.xxl)
