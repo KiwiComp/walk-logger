@@ -1,0 +1,28 @@
+<resources>
+    <string name="tab_log">Logg</string>
+    <string name="tab_calendar">Kalender</string>
+    <string name="tab_patterns">Mönster</string>
+
+    <string name="log_title">Promenadlogg</string>
+    <string name="calendar_title">Kalender</string>
+    <string name="patterns_title">Mönster</string>
+
+    <string name="calendar_coming_soon">Kalender kommer snart</string>
+    <string name="patterns_coming_soon">Mönster kommer snart</string>
+    <string name="dog_profile_coming_soon">Hundprofil kommer snart</string>
+
+    <plurals name="walk_count">
+        <item quantity="one">%1$d promenad</item>
+        <item quantity="other">%1$d promenader</item>
+    </plurals>
+    <string name="summary_average">· snitt %1$.1f</string>
+    <string name="walk_duration_minutes">%1$d min</string>
+    <string name="add_walk_for_day">+ Lägg till en promenad för %1$s</string>
+
+    <string name="equipment_collar">Halsband</string>
+    <string name="equipment_harness">Sele</string>
+
+    <string name="day_today_description">Idag, %1$s</string>
+    <string name="day_has_walks">Har promenader</string>
+    <string name="day_no_walks">Inga promenader</string>
+</resources>

@@ -10,10 +10,15 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
@@ -21,7 +26,6 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
-import java.util.Locale
 
 @Composable
 fun LogRoute(modifier: Modifier = Modifier, viewModel: LogViewModel = hiltViewModel()) {
@@ -41,9 +45,11 @@ fun LogScreen(
     onAddWalk: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    val locale = LocalConfiguration.current.locales[0]
+    val dayHeadingFormatter = remember(locale) { DateTimeFormatter.ofPattern("EEEE d MMM", locale) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
-            title = "Walk log",
+            title = stringResource(R.string.log_title),
             actions = { DogBadge(name = "Sixten") },
         ) {
             Spacer(Modifier.height(AppSpacing.xl))
@@ -57,7 +63,7 @@ fun LogScreen(
                 .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
         ) {
             DayHeading(
-                title = uiState.selectedDate.format(DayHeadingFormatter),
+                title = uiState.selectedDate.format(dayHeadingFormatter).replaceFirstChar { it.titlecase(locale) },
                 summary = uiState.summary(),
             )
             Spacer(Modifier.height(AppSpacing.lg))
@@ -65,7 +71,7 @@ fun LogScreen(
                 WalkTimeline(walks = uiState.walks)
             }
             AddWalkButton(
-                dayLabel = uiState.selectedDate.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                dayLabel = uiState.selectedDate.dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
                 onClick = onAddWalk,
                 modifier = Modifier.padding(top = AppSpacing.lg)
             )
@@ -73,12 +79,11 @@ fun LogScreen(
     }
 }
 
-private val DayHeadingFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEEE d MMM")
-
+@Composable
 private fun LogUiState.summary(): String? {
     if (walks.isEmpty()) return null
-    val count = if (walks.size == 1) "1 walk" else "${walks.size} walks"
-    val average = averageRating?.let { " · avg %.1f".format(Locale.getDefault(), it) }.orEmpty()
+    val count = pluralStringResource(R.plurals.walk_count, walks.size, walks.size)
+    val average = averageRating?.let { " " + stringResource(R.string.summary_average, it) }.orEmpty()
     return count + average
 }
 

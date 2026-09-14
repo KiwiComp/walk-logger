@@ -16,15 +16,19 @@ import androidx.compose.foundation.layout.size
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.SectionLabel
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.Navy
@@ -36,12 +40,10 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
-import java.util.Locale
 
 private val DayCellHeight = 76.dp
 private val WalkDotSize = 6.dp
 private val TodayDotSize = 12.dp
-private val DayDescriptionFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEEE d MMMM")
 
 /** Seven-day strip that lives inside the Log header. */
 @Composable
@@ -66,6 +68,10 @@ private fun RowScope.DayCell(day: DayUiState, onClick: () -> Unit) {
         !day.isEnabled -> OnNavyMuted
         else -> OnNavy
     }
+    val locale = LocalConfiguration.current.locales[0]
+    val date = remember(locale, day.date) { day.date.format(DateTimeFormatter.ofPattern("EEEE d MMMM", locale)) }
+    val description = if (day.isToday) stringResource(R.string.day_today_description, date) else date
+    val walksState = stringResource(if (day.hasWalks) R.string.day_has_walks else R.string.day_no_walks)
     Column(
         modifier = Modifier
             .weight(1f)
@@ -79,9 +85,8 @@ private fun RowScope.DayCell(day: DayUiState, onClick: () -> Unit) {
                 onClick = onClick,
             )
             .semantics {
-                val date = day.date.format(DayDescriptionFormatter)
-                contentDescription = if (day.isToday) "Today, $date" else date
-                stateDescription = if (day.hasWalks) "Has walks" else "No walks"
+                contentDescription = description
+                stateDescription = walksState
             }
             .padding(vertical = AppSpacing.md),
         horizontalAlignment = Alignment.CenterHorizontally,
@@ -92,7 +97,7 @@ private fun RowScope.DayCell(day: DayUiState, onClick: () -> Unit) {
             }
         } else {
             SectionLabel(
-                text = day.date.dayOfWeek.getDisplayName(TextStyle.SHORT, Locale.getDefault()),
+                text = day.date.dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
                 color = foreground,
             )
             Spacer(Modifier.height(AppSpacing.xs))

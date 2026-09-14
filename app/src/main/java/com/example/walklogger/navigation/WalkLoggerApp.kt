@@ -16,6 +16,7 @@ import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -76,7 +77,7 @@ private fun WalkLoggerBottomBar(
                     icon = { Icon(painterResource(destination.icon), contentDescription = null) },
                     label = {
                         Text(
-                            text = destination.label.uppercase(),
+                            text = destination.label().uppercase(),
                             style = MaterialTheme.typography.labelSmall,
                         )
                     },
@@ -92,6 +93,9 @@ private fun WalkLoggerBottomBar(
         }
     }
 }
+
+@Composable
+private fun TopLevelDestination.label(): String = label?.let { stringResource(it) } ?: "Sixten"
 
 /** Standard tab-switch behaviour: one back-stack entry per tab, state saved and restored. */
 private fun NavHostController.navigateToTopLevel(destination: TopLevelDestination) {

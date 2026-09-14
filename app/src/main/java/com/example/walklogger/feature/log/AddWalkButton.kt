@@ -13,10 +13,12 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawscope.Stroke
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.Ink
 import com.example.walklogger.core.ui.theme.Outline
@@ -39,7 +41,7 @@ internal fun AddWalkButton(dayLabel: String, onClick: () -> Unit, modifier: Modi
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = "+ Add a walk for $dayLabel",
+            text = stringResource(R.string.add_walk_for_day, dayLabel),
             style = MaterialTheme.typography.titleSmall,
             color = Ink,
             textAlign = TextAlign.Center,
