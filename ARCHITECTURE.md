@@ -58,7 +58,6 @@ com.example.walklogger
 
 ## Next steps (not yet implemented)
 
-- Flesh out the `Walk` model (handler, equipment, rating, weather, notes).
 - Add ViewModels per feature and replace the static sample content in `feature/log/SampleData.kt`.
 - Bundle a condensed display font (see `Type.kt`).
 - Add `DataStore` for user preferences (units, update interval).

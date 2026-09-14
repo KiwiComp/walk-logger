@@ -10,13 +10,13 @@ import kotlinx.coroutines.flow.Flow
 @Dao
 interface WalkDao {
 
-    @Query("SELECT * FROM walks ORDER BY startedAtMillis DESC")
+    @Query("SELECT * FROM walks ORDER BY startTime DESC")
     fun observeWalks(): Flow<List<WalkEntity>>
 
     @Query("SELECT * FROM walks WHERE id = :id")
     fun observeWalk(id: Long): Flow<WalkEntity?>
 
-    @Query("SELECT * FROM walks WHERE endedAtMillis IS NULL LIMIT 1")
+    @Query("SELECT * FROM walks WHERE endTime IS NULL LIMIT 1")
     fun observeActiveWalk(): Flow<WalkEntity?>
 
     @Query("SELECT * FROM walks WHERE id = :id")

@@ -69,4 +69,6 @@ See ARCHITECTURE.md for the package tree and how to add a feature.
 * Local storage: Room for records, DataStore for preferences. No other persistence mechanisms.
 * Tests: ViewModel and use-case unit tests on the JVM (`src/test`) using the fakes in
   `src/test/.../testing`; Room and Compose UI tests in `src/androidTest`.
+* No deprecated APIs: never use anything marked `@Deprecated`, and fix deprecation warnings you
+  introduce or touch rather than suppressing them.
 * Verify before reporting: `./gradlew :app:compileDebugKotlin :app:testDebugUnitTest` must pass.

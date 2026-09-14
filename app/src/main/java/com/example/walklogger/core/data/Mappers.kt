@@ -7,6 +7,13 @@ import com.example.walklogger.core.model.Walk
 
 internal fun WalkEntity.toModel(): Walk = Walk(
     id = id,
-    startedAtMillis = startedAtMillis,
-    endedAtMillis = endedAtMillis,
+    handler = handler,
+    startTime = startTime,
+    endTime = endTime,
+    notes = notes,
+    equipment = equipment,
+    rating = rating,
+    rain = rain,
+    temperature = temperature,
+    wind = wind,
 )

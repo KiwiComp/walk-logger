@@ -29,12 +29,12 @@ class DefaultWalkRepository @Inject constructor(
         walkDao.observeActiveWalk().map { it?.toModel() }
 
     override suspend fun startWalk(): Long = withContext(ioDispatcher) {
-        walkDao.insertWalk(WalkEntity(startedAtMillis = System.currentTimeMillis()))
+        walkDao.insertWalk(WalkEntity(startTime = System.currentTimeMillis()))
     }
 
     override suspend fun finishWalk(walkId: Long) = withContext(ioDispatcher) {
         val walk = walkDao.getWalk(walkId) ?: return@withContext
-        walkDao.updateWalk(walk.copy(endedAtMillis = System.currentTimeMillis()))
+        walkDao.updateWalk(walk.copy(endTime = System.currentTimeMillis()))
     }
 
     override suspend fun deleteWalk(id: Long) = withContext(ioDispatcher) {
