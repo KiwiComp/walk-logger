@@ -21,30 +21,34 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.Steel
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+import java.time.format.DateTimeFormatter
 
 /** Width of the time column plus connector; content below the timeline aligns to it. */
 internal val TimelineGutter = 84.dp
 private val TimelineConnectorWidth = 16.dp
 private val TimelineDotSize = 8.dp
+private val StartTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 /** Day title with a muted summary hanging off its baseline. */
 @Composable
-internal fun DayHeading(title: String, summary: String) {
+internal fun DayHeading(title: String, summary: String?) {
     Row(verticalAlignment = Alignment.Bottom) {
         Text(text = title, style = MaterialTheme.typography.headlineMedium)
-        Spacer(Modifier.width(AppSpacing.md))
-        Text(
-            text = summary,
-            style = MaterialTheme.typography.bodySmall,
-            color = InkMuted,
-            modifier = Modifier.padding(bottom = 3.dp),
-        )
+        if (summary != null) {
+            Spacer(Modifier.width(AppSpacing.md))
+            Text(
+                text = summary,
+                style = MaterialTheme.typography.bodySmall,
+                color = InkMuted,
+                modifier = Modifier.padding(bottom = 3.dp),
+            )
+        }
     }
 }
 
 /** The day's walks, each with its start time and a connector dot leading to a [WalkCard]. */
 @Composable
-internal fun WalkTimeline(walks: List<SampleWalk>) {
+internal fun WalkTimeline(walks: List<WalkUiState>) {
     Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xl)) {
         walks.forEach { walk ->
             Row {
@@ -52,8 +56,12 @@ internal fun WalkTimeline(walks: List<SampleWalk>) {
                     modifier = Modifier.width(TimelineGutter - TimelineConnectorWidth),
                     horizontalAlignment = Alignment.End,
                 ) {
-                    Text(text = walk.startTime, style = MaterialTheme.typography.titleMedium)
-                    Text(text = walk.duration, style = MaterialTheme.typography.bodySmall, color = InkMuted)
+                    Text(text = walk.startTime.format(StartTimeFormatter), style = MaterialTheme.typography.titleMedium)
+                    Text(
+                        text = "${walk.duration.toMinutes()} min",
+                        style = MaterialTheme.typography.bodySmall,
+                        color = InkMuted,
+                    )
                 }
                 Box(
                     modifier = Modifier
@@ -77,7 +85,7 @@ private fun WalkTimelinePreview() {
         Column(modifier = Modifier.padding(AppSpacing.lg)) {
             DayHeading(title = "Saturday 12 Sep", summary = "2 walks · avg 5.0")
             Spacer(Modifier.height(AppSpacing.lg))
-            WalkTimeline(walks = sampleDay)
+            WalkTimeline(walks = LogPreviewData.walks)
         }
     }
 }
