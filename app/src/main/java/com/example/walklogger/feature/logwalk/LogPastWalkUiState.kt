@@ -31,6 +31,8 @@ data class LogPastWalkUiState(
     val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
+    val isDeleting: Boolean = false,
+    val isDeleted: Boolean = false,
 ) {
     /** Null until both times are set; zero or negative when the end is not after the start. */
     val durationMinutes: Int? =
@@ -49,7 +51,11 @@ data class LogPastWalkUiState(
         else -> null
     }
 
-    val canSave: Boolean = saveBlocker == null && !isLoading && !isSaving && !isSaved
+    private val isBusy: Boolean = isLoading || isSaving || isSaved || isDeleting || isDeleted
+
+    val canSave: Boolean = saveBlocker == null && !isBusy
+
+    val canDelete: Boolean = isEditing && !isBusy
 }
 
 enum class SaveBlocker { HANDLER, TIMES, END_BEFORE_START, IN_FUTURE, RATING }

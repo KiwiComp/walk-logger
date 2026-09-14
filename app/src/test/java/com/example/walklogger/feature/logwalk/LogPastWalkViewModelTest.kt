@@ -260,6 +260,28 @@ class LogPastWalkViewModelTest {
     }
 
     @Test
+    fun `delete removes the edited walk and flags completion`() = runTest {
+        seedLoggedWalk()
+        viewModel.uiState.test {
+            assertTrue(expectMostRecentItem().canDelete)
+            viewModel.delete()
+            val state = expectMostRecentItem()
+            assertTrue(state.isDeleted)
+            assertFalse(state.canSave)
+        }
+        assertTrue(walkRepository.observeWalks().first().isEmpty())
+    }
+
+    @Test
+    fun `delete is not offered when logging a new walk`() = runTest {
+        viewModel.uiState.test {
+            assertFalse(expectMostRecentItem().canDelete)
+            viewModel.delete()
+            assertFalse(viewModel.uiState.value.isDeleted)
+        }
+    }
+
+    @Test
     fun `save does nothing while the form is incomplete`() = runTest {
         dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         viewModel.uiState.test {

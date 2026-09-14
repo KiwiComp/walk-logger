@@ -74,6 +74,10 @@
 
     <string name="log_past_walk_title">Log a past walk</string>
     <string name="edit_walk_title">Edit walk</string>
+    <string name="edit_walk_delete">Delete walk</string>
+    <string name="edit_walk_delete_confirm_title">Delete this walk?</string>
+    <string name="edit_walk_delete_confirm_message">The walk is removed from the log. This can\'t be undone.</string>
+    <string name="edit_walk_delete_confirm">Delete</string>
     <string name="log_past_walk_when">When</string>
     <string name="log_past_walk_date">Date</string>
     <string name="log_past_walk_start">Start</string>
