@@ -1,5 +1,8 @@
 package com.example.walklogger.core.ui.component
 
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.semantics.ProgressBarRangeInfo
 import androidx.compose.ui.test.assertIsEnabled
 import androidx.compose.ui.test.assertIsNotEnabled
@@ -41,6 +44,24 @@ class AppButtonTest {
 
         assertEquals(1, clicks)
         spinner().assertDoesNotExist()
+    }
+
+    @Test
+    fun everyStyleShowsLabelAndReportsClicks() {
+        var style by mutableStateOf(AppButtonStyle.Primary)
+        var clicks = 0
+        composeRule.setContent {
+            WalkLoggerTheme { AppButton(text = label, onClick = { clicks++ }, style = style) }
+        }
+
+        AppButtonStyle.entries.forEach { entry ->
+            composeRule.runOnIdle { style = entry }
+            clicks = 0
+
+            button().assertIsEnabled().performClick()
+
+            assertEquals("style $entry", 1, clicks)
+        }
     }
 
     @Test
