@@ -73,6 +73,7 @@
     <string name="close">Close</string>
 
     <string name="log_past_walk_title">Log a past walk</string>
+    <string name="edit_walk_title">Edit walk</string>
     <string name="log_past_walk_when">When</string>
     <string name="log_past_walk_date">Date</string>
     <string name="log_past_walk_start">Start</string>

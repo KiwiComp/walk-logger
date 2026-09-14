@@ -38,6 +38,11 @@ class FakeWalkRepository : WalkRepository {
         return id
     }
 
+    override suspend fun updateWalk(walk: Walk) {
+        require(!walk.isActive) { "a logged walk needs an end time" }
+        walks.update { list -> list.map { if (it.id == walk.id) walk else it } }
+    }
+
     override suspend fun finishWalk(walkId: Long) {
         walks.update { list ->
             list.map { if (it.id == walkId) it.copy(endTime = 1) else it }

@@ -21,6 +21,9 @@ interface WalkRepository {
      * [Walk.id] is ignored; the assigned id is returned.
      */
     suspend fun logWalk(walk: Walk): Long
+
+    /** Replaces the stored walk with [Walk.id]; like [logWalk], it must have an end time. */
+    suspend fun updateWalk(walk: Walk)
     suspend fun finishWalk(walkId: Long)
     suspend fun deleteWalk(id: Long)
 }

@@ -15,6 +15,7 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
+import java.time.Instant
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -27,10 +28,14 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/** [date] is the day chosen on the log screen; passed in directly so tests need no SavedStateHandle. */
+/**
+ * [date] is the day chosen on the log screen; passed in directly so tests need no SavedStateHandle.
+ * With a [walkId] the form is prefilled from that walk and saving updates it instead of inserting.
+ */
 @HiltViewModel(assistedFactory = LogPastWalkViewModel.Factory::class)
 class LogPastWalkViewModel @AssistedInject constructor(
     @Assisted date: LocalDate,
+    @Assisted private val walkId: Long?,
     private val dogRepository: DogRepository,
     private val handlerRepository: HandlerRepository,
     private val walkRepository: WalkRepository,
@@ -39,11 +44,31 @@ class LogPastWalkViewModel @AssistedInject constructor(
 
     @AssistedFactory
     interface Factory {
-        fun create(date: LocalDate): LogPastWalkViewModel
+        fun create(date: LocalDate, walkId: Long?): LogPastWalkViewModel
     }
 
     /** Everything the user enters; the dog and handler list are overlaid from their repositories. */
-    private val form = MutableStateFlow(LogPastWalkUiState(date = date, now = LocalDateTime.now(clock)))
+    private val form = MutableStateFlow(
+        LogPastWalkUiState(
+            date = date,
+            now = LocalDateTime.now(clock),
+            isEditing = walkId != null,
+            isLoading = walkId != null,
+        ),
+    )
+
+    /** The walk being edited, kept so saving preserves its id and dog. */
+    private var editedWalk: Walk? = null
+
+    init {
+        if (walkId != null) {
+            viewModelScope.launch {
+                val walk = checkNotNull(walkRepository.observeWalk(walkId).first()) { "walk $walkId not found" }
+                editedWalk = walk
+                form.update { it.prefilledFrom(walk) }
+            }
+        }
+    }
 
     val uiState: StateFlow<LogPastWalkUiState> =
         combine(
@@ -98,27 +123,48 @@ class LogPastWalkViewModel @AssistedInject constructor(
         if (!state.canSave) return
         form.update { it.copy(isSaving = true) }
         viewModelScope.launch {
-            val dog = checkNotNull(dogRepository.observeActiveDog().first()) { "log past walk needs an active dog" }
-            walkRepository.logWalk(
-                Walk(
-                    id = 0,
-                    dogId = dog.id,
-                    handlers = state.handlers.filter { it in state.selectedHandlers },
-                    startTime = state.date.atTime(state.startTime!!).toEpochMilli(),
-                    endTime = state.date.atTime(state.endTime!!).toEpochMilli(),
-                    notes = state.notes.trim(),
-                    equipment = state.equipment,
-                    rating = state.rating,
-                    rain = state.rain,
-                    temperature = state.temperature,
-                    wind = state.wind,
-                ),
+            val edited = editedWalk
+            val dogId = edited?.dogId
+                ?: checkNotNull(dogRepository.observeActiveDog().first()) { "log past walk needs an active dog" }.id
+            val walk = Walk(
+                id = edited?.id ?: 0,
+                dogId = dogId,
+                handlers = state.handlers.filter { it in state.selectedHandlers },
+                startTime = state.date.atTime(state.startTime!!).toEpochMilli(),
+                endTime = state.date.atTime(state.endTime!!).toEpochMilli(),
+                notes = state.notes.trim(),
+                equipment = state.equipment,
+                rating = state.rating,
+                rain = state.rain,
+                temperature = state.temperature,
+                wind = state.wind,
             )
+            if (edited != null) walkRepository.updateWalk(walk) else walkRepository.logWalk(walk)
             form.update { it.copy(isSaving = false, isSaved = true) }
         }
     }
 
     private fun LocalDateTime.toEpochMilli(): Long = atZone(clock.zone).toInstant().toEpochMilli()
+
+    private fun LogPastWalkUiState.prefilledFrom(walk: Walk): LogPastWalkUiState {
+        val start = walk.startTime.toLocalDateTime()
+        val end = checkNotNull(walk.endTime) { "walk ${walk.id} has not finished" }.toLocalDateTime()
+        return copy(
+            date = start.toLocalDate(),
+            startTime = start.toLocalTime(),
+            endTime = end.toLocalTime(),
+            selectedHandlers = walk.handlers.toSet(),
+            rating = walk.rating,
+            equipment = walk.equipment ?: equipment,
+            rain = walk.rain,
+            temperature = walk.temperature,
+            wind = walk.wind,
+            notes = walk.notes,
+            isLoading = false,
+        )
+    }
+
+    private fun Long.toLocalDateTime(): LocalDateTime = Instant.ofEpochMilli(this).atZone(clock.zone).toLocalDateTime()
 
     companion object {
         const val MAX_NOTES_LENGTH = 500
