@@ -50,7 +50,7 @@ fun LogScreen(
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(R.string.log_title),
-            actions = { DogBadge(name = "Sixten") },
+            actions = { DogBadge(name = uiState.activeDogName) },
         ) {
             Spacer(Modifier.height(AppSpacing.xl))
             WeekStrip(days = uiState.week, onDaySelected = onDaySelected)

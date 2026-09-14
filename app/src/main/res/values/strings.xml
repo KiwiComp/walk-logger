@@ -4,6 +4,7 @@
     <string name="tab_log">Log</string>
     <string name="tab_calendar">Calendar</string>
     <string name="tab_patterns">Patterns</string>
+    <string name="tab_dogs">Dogs</string>
 
     <string name="log_title">Walk log</string>
     <string name="calendar_title">Calendar</string>
@@ -11,7 +12,31 @@
 
     <string name="calendar_coming_soon">Calendar coming soon</string>
     <string name="patterns_coming_soon">Patterns coming soon</string>
-    <string name="dog_profile_coming_soon">Dog profile coming soon</string>
+    <string name="dog_title">Your dog</string>
+    <string name="dog_none_registered">No dog registered yet. Add one to start logging walks.</string>
+    <string name="dog_add_first">+ Add your dog</string>
+    <string name="dog_add_another">+ Add another dog</string>
+    <string name="dog_section_dogs">Dogs</string>
+    <string name="dog_active">Active</string>
+    <string name="dog_switch">Switch</string>
+    <string name="dog_switch_to">Switch to %1$s</string>
+    <plurals name="dog_age_years">
+        <item quantity="one">%1$d year</item>
+        <item quantity="other">%1$d years</item>
+    </plurals>
+    <string name="dog_weight_kg">%1$s kg</string>
+
+    <string name="register_dog_title">New dog</string>
+    <string name="register_dog_cancel">Cancel</string>
+    <string name="register_dog_ok">OK</string>
+    <string name="register_dog_name">Name</string>
+    <string name="register_dog_breed">Breed</string>
+    <string name="register_dog_birth_date">Birth date</string>
+    <string name="register_dog_birth_date_none">Not set</string>
+    <string name="register_dog_weight">Weight</string>
+    <string name="register_dog_weight_unit">kg</string>
+    <string name="register_dog_weight_error">Enter a number</string>
+    <string name="register_dog_save">Save dog</string>
 
     <plurals name="walk_count">
         <item quantity="one">%1$d walk</item>

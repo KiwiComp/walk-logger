@@ -11,6 +11,8 @@ data class LogUiState(
     val week: List<DayUiState>,
     /** Completed walks on [selectedDate], earliest first. */
     val walks: List<WalkUiState>,
+    /** Null until a dog has been registered. */
+    val activeDogName: String? = null,
 ) {
     val averageRating: Double? =
         walks.mapNotNull { it.rating }.takeIf { it.isNotEmpty() }?.average()

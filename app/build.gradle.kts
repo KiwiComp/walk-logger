@@ -79,6 +79,7 @@ dependencies {
     implementation(libs.androidx.room.runtime)
     implementation(libs.androidx.room.ktx)
     ksp(libs.androidx.room.compiler)
+    implementation(libs.androidx.datastore.preferences)
 
     implementation(libs.kotlinx.coroutines.android)
 
@@ -93,6 +94,7 @@ dependencies {
     androidTestImplementation(libs.androidx.espresso.core)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.room.testing)
+    androidTestImplementation(libs.androidx.navigation.testing)
     debugImplementation(libs.androidx.compose.ui.test.manifest)
     debugImplementation(libs.androidx.compose.ui.tooling)
 }

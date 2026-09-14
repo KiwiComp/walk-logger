@@ -36,6 +36,28 @@ class WalkLoggerDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migrate2To3_addsDogsTableAndKeepsWalks() {
+        helper.createDatabase(DB_NAME, 2).use { db ->
+            db.execSQL("INSERT INTO walks (id, startTime) VALUES (1, 100)")
+        }
+
+        val db = helper.runMigrationsAndValidate(DB_NAME, 3, true)
+
+        db.execSQL("INSERT INTO dogs (name) VALUES ('Sixten')")
+        db.query("SELECT COUNT(*) FROM walks").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+        db.query("SELECT name, breed, birthDate, weightKg FROM dogs").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Sixten", cursor.getString(0))
+            assertEquals("", cursor.getString(1))
+            assertTrue(cursor.isNull(2))
+            assertTrue(cursor.isNull(3))
+        }
+    }
+
     private companion object {
         const val DB_NAME = "migration-test.db"
     }

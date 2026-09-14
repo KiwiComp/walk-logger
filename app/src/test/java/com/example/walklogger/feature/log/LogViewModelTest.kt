@@ -1,9 +1,11 @@
 package com.example.walklogger.feature.log
 
 import app.cash.turbine.test
+import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.domain.ObserveWalkHistoryUseCase
+import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.Clock
@@ -26,9 +28,10 @@ class LogViewModelTest {
     private val today = LocalDate.of(2026, 9, 12)
     private val clock = Clock.fixed(today.atTime(15, 0).toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
     private val repository = FakeWalkRepository()
+    private val dogRepository = FakeDogRepository()
 
     /** Lazy so viewModelScope picks up the rule's Main dispatcher. */
-    private val viewModel by lazy { LogViewModel(ObserveWalkHistoryUseCase(repository), clock) }
+    private val viewModel by lazy { LogViewModel(ObserveWalkHistoryUseCase(repository), dogRepository, clock) }
 
     private fun walk(id: Long, start: LocalDateTime, minutes: Long = 30, rating: Int? = null, finished: Boolean = true) =
         Walk(
@@ -52,6 +55,15 @@ class LogViewModelTest {
             assertEquals(today, state.week.single { it.isToday }.date)
             assertEquals(emptyList<WalkUiState>(), state.walks)
             assertNull(state.averageRating)
+            assertNull(state.activeDogName)
+        }
+    }
+
+    @Test
+    fun `active dog name is shown once a dog is registered`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"))
+        viewModel.uiState.test {
+            assertEquals("Mira", expectMostRecentItem().activeDogName)
         }
     }
 

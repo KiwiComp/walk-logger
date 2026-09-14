@@ -1,6 +1,8 @@
 package com.example.walklogger.core.data.di
 
+import com.example.walklogger.core.data.DefaultDogRepository
 import com.example.walklogger.core.data.DefaultWalkRepository
+import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
 import dagger.Binds
 import dagger.Module
@@ -12,4 +14,7 @@ import dagger.hilt.components.SingletonComponent
 abstract class DataModule {
     @Binds
     abstract fun bindsWalkRepository(impl: DefaultWalkRepository): WalkRepository
+
+    @Binds
+    abstract fun bindsDogRepository(impl: DefaultDogRepository): DogRepository
 }

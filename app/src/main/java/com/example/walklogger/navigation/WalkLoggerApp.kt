@@ -18,6 +18,7 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
 import androidx.navigation.NavGraph.Companion.findStartDestination
@@ -77,7 +78,7 @@ private fun WalkLoggerBottomBar(
                     icon = { Icon(painterResource(destination.icon), contentDescription = null) },
                     label = {
                         Text(
-                            text = destination.label().uppercase(),
+                            text = stringResource(destination.label).uppercase(),
                             style = MaterialTheme.typography.labelSmall,
                         )
                     },
@@ -94,11 +95,13 @@ private fun WalkLoggerBottomBar(
     }
 }
 
-@Composable
-private fun TopLevelDestination.label(): String = label?.let { stringResource(it) } ?: "Sixten"
-
-/** Standard tab-switch behaviour: one back-stack entry per tab, state saved and restored. */
-private fun NavHostController.navigateToTopLevel(destination: TopLevelDestination) {
+/**
+ * Standard tab-switch behaviour: one back-stack entry per tab, state saved and restored.
+ * Screens pushed on top of a tab (e.g. register dog) are dropped first so they are not
+ * restored when the user comes back to that tab.
+ */
+internal fun NavHostController.navigateToTopLevel(destination: TopLevelDestination) {
+    while (currentDestination?.isTopLevel() == false) popBackStack()
     val options = navOptions {
         popUpTo(graph.findStartDestination().id) { saveState = true }
         launchSingleTop = true
@@ -111,3 +114,6 @@ private fun NavHostController.navigateToTopLevel(destination: TopLevelDestinatio
         TopLevelDestination.DOG -> navigateToDog(options)
     }
 }
+
+private fun NavDestination.isTopLevel(): Boolean =
+    TopLevelDestination.entries.any { hasRoute(it.route) }
