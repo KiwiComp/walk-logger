@@ -15,8 +15,10 @@ import androidx.compose.runtime.CompositionLocalProvider
 import androidx.compose.material3.LocalContentColor
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.Navy
 import com.example.walklogger.core.ui.theme.OnNavy
@@ -62,6 +64,9 @@ fun WalkLoggerHeader(
 @Composable
 private fun WalkLoggerHeaderPreview() {
     WalkLoggerTheme {
-        WalkLoggerHeader(title = "Walk log", actions = { DogBadge(name = "Sixten") })
+        WalkLoggerHeader(
+            title = stringResource(R.string.log_title),
+            actions = { DogBadge(name = "Sixten") },
+        )
     }
 }

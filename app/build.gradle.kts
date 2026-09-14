@@ -36,6 +36,9 @@ android {
     buildFeatures {
         compose = true
     }
+    androidResources {
+        localeFilters += listOf("en", "sv")
+    }
     sourceSets {
         // Exposes exported Room schemas to MigrationTestHelper.
         getByName("androidTest").assets.directories.add("schemas")

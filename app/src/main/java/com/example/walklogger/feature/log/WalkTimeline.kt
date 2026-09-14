@@ -15,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.Steel
@@ -58,7 +60,7 @@ internal fun WalkTimeline(walks: List<WalkUiState>) {
                 ) {
                     Text(text = walk.startTime.format(StartTimeFormatter), style = MaterialTheme.typography.titleMedium)
                     Text(
-                        text = "${walk.duration.toMinutes()} min",
+                        text = stringResource(R.string.walk_duration_minutes, walk.duration.toMinutes()),
                         style = MaterialTheme.typography.bodySmall,
                         color = InkMuted,
                     )

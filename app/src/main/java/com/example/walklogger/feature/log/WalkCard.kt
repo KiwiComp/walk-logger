@@ -15,8 +15,10 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.walklogger.R
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.CardSurface
@@ -59,10 +61,13 @@ internal fun WalkCard(walk: WalkUiState, modifier: Modifier = Modifier) {
     }
 }
 
-private fun Equipment.label() = when (this) {
-    Equipment.COLLAR -> "Collar"
-    Equipment.HARNESS -> "Harness"
-}
+@Composable
+private fun Equipment.label() = stringResource(
+    when (this) {
+        Equipment.COLLAR -> R.string.equipment_collar
+        Equipment.HARNESS -> R.string.equipment_harness
+    },
+)
 
 @Composable
 private fun RatingBar(rating: Int, max: Int = 7) {
