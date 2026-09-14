@@ -1,5 +1,7 @@
 package com.example.walklogger.core.ui.component
 
+import androidx.compose.foundation.BorderStroke
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
@@ -17,13 +19,20 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
+import com.example.walklogger.core.ui.theme.CardSurface
 import com.example.walklogger.core.ui.theme.ChipSurface
+import com.example.walklogger.core.ui.theme.Ink
 import com.example.walklogger.core.ui.theme.InkMuted
+import com.example.walklogger.core.ui.theme.Navy
 import com.example.walklogger.core.ui.theme.OnNavy
+import com.example.walklogger.core.ui.theme.OnNavyMuted
+import com.example.walklogger.core.ui.theme.Outline
+import com.example.walklogger.core.ui.theme.OutlineOnNavy
 import com.example.walklogger.core.ui.theme.Steel
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
@@ -38,8 +47,19 @@ enum class AppButtonWidth {
     Wrap,
 }
 
+enum class AppButtonStyle {
+    /** Solid Steel; the one action the screen is for ("Save walk"). */
+    Primary,
+
+    /** Light fill; an alternative to the primary action ("This walk already happened", "End walk"). */
+    Secondary,
+
+    /** Border only, for navy surfaces; the least emphasised action ("Pause"). */
+    Tertiary,
+}
+
 /**
- * The solid primary action button ("Save walk").
+ * The app's action button.
  *
  * While [loading] the label is replaced by a spinner and clicks are ignored; the label
  * stays laid out (invisible) so the button keeps its width.
@@ -49,6 +69,7 @@ fun AppButton(
     text: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    style: AppButtonStyle = AppButtonStyle.Primary,
     width: AppButtonWidth = AppButtonWidth.Fill,
     enabled: Boolean = true,
     loading: Boolean = false,
@@ -57,12 +78,31 @@ fun AppButton(
         onClick = { if (!loading) onClick() },
         enabled = enabled,
         shape = MaterialTheme.shapes.extraSmall,
-        colors = ButtonDefaults.buttonColors(
-            containerColor = Steel,
-            contentColor = OnNavy,
-            disabledContainerColor = ChipSurface,
-            disabledContentColor = InkMuted,
-        ),
+        colors = when (style) {
+            AppButtonStyle.Primary -> ButtonDefaults.buttonColors(
+                containerColor = Steel,
+                contentColor = OnNavy,
+                disabledContainerColor = ChipSurface,
+                disabledContentColor = InkMuted,
+            )
+            AppButtonStyle.Secondary -> ButtonDefaults.buttonColors(
+                containerColor = CardSurface,
+                contentColor = Ink,
+                disabledContainerColor = ChipSurface,
+                disabledContentColor = InkMuted,
+            )
+            AppButtonStyle.Tertiary -> ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = OnNavy,
+                disabledContainerColor = Color.Transparent,
+                disabledContentColor = OnNavyMuted,
+            )
+        },
+        border = when (style) {
+            AppButtonStyle.Primary -> null
+            AppButtonStyle.Secondary -> BorderStroke(1.dp, Outline)
+            AppButtonStyle.Tertiary -> BorderStroke(1.dp, if (enabled) OutlineOnNavy else OnNavyMuted)
+        },
         contentPadding = PaddingValues(horizontal = AppSpacing.xxl, vertical = AppSpacing.md),
         modifier = modifier
             .then(if (width == AppButtonWidth.Fill) Modifier.fillMaxWidth() else Modifier)
@@ -97,6 +137,36 @@ private fun AppButtonPreview() {
                 text = "Save walk",
                 onClick = {},
                 width = AppButtonWidth.Wrap,
+                modifier = Modifier.padding(top = AppSpacing.lg),
+            )
+            AppButton(
+                text = "This walk already happened",
+                onClick = {},
+                style = AppButtonStyle.Secondary,
+                modifier = Modifier.padding(top = AppSpacing.lg),
+            )
+            AppButton(
+                text = "This walk already happened",
+                onClick = {},
+                style = AppButtonStyle.Secondary,
+                enabled = false,
+                modifier = Modifier.padding(top = AppSpacing.lg),
+            )
+        }
+    }
+}
+
+@Preview
+@Composable
+private fun AppButtonTertiaryPreview() {
+    WalkLoggerTheme {
+        Column(modifier = Modifier.background(Navy).padding(AppSpacing.lg)) {
+            AppButton(text = "Pause", onClick = {}, style = AppButtonStyle.Tertiary)
+            AppButton(
+                text = "Pause",
+                onClick = {},
+                style = AppButtonStyle.Tertiary,
+                enabled = false,
                 modifier = Modifier.padding(top = AppSpacing.lg),
             )
         }
