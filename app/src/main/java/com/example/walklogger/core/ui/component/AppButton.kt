@@ -1,25 +1,34 @@
 package com.example.walklogger.core.ui.component
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
+import androidx.compose.material3.CircularProgressIndicator
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.ChipSurface
 import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.SquareShape
 import com.example.walklogger.core.ui.theme.Steel
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+
+private val SpinnerSize = 20.dp
+private val SpinnerStroke = 2.dp
 
 enum class AppButtonWidth {
     /** Fills the available width. */
@@ -29,7 +38,12 @@ enum class AppButtonWidth {
     Wrap,
 }
 
-/** The solid primary action button ("Save walk"). */
+/**
+ * The solid primary action button ("Save walk").
+ *
+ * While [loading] the label is replaced by a spinner and clicks are ignored; the label
+ * stays laid out (invisible) so the button keeps its width.
+ */
 @Composable
 fun AppButton(
     text: String,
@@ -37,9 +51,10 @@ fun AppButton(
     modifier: Modifier = Modifier,
     width: AppButtonWidth = AppButtonWidth.Fill,
     enabled: Boolean = true,
+    loading: Boolean = false,
 ) {
     Button(
-        onClick = onClick,
+        onClick = { if (!loading) onClick() },
         enabled = enabled,
         shape = MaterialTheme.shapes.extraSmall,
         colors = ButtonDefaults.buttonColors(
@@ -53,7 +68,20 @@ fun AppButton(
             .then(if (width == AppButtonWidth.Fill) Modifier.fillMaxWidth() else Modifier)
             .heightIn(min = AppSize.buttonHeight),
     ) {
-        Text(text = text, style = MaterialTheme.typography.titleSmall)
+        Box(contentAlignment = Alignment.Center) {
+            Text(
+                text = text,
+                style = MaterialTheme.typography.titleSmall,
+                modifier = Modifier.alpha(if (loading) 0f else 1f),
+            )
+            if (loading) {
+                CircularProgressIndicator(
+                    color = LocalContentColor.current,
+                    strokeWidth = SpinnerStroke,
+                    modifier = Modifier.size(SpinnerSize),
+                )
+            }
+        }
     }
 }
 
@@ -64,6 +92,7 @@ private fun AppButtonPreview() {
         Column(modifier = Modifier.padding(AppSpacing.lg)) {
             AppButton(text = "Save walk", onClick = {})
             AppButton(text = "Save walk", onClick = {}, enabled = false, modifier = Modifier.padding(top = AppSpacing.lg))
+            AppButton(text = "Save walk", onClick = {}, loading = true, modifier = Modifier.padding(top = AppSpacing.lg))
             AppButton(
                 text = "Save walk",
                 onClick = {},
