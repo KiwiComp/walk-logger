@@ -34,6 +34,7 @@ fun AppTextField(
     isError: Boolean = false,
     readOnly: Boolean = false,
     singleLine: Boolean = true,
+    minLines: Int = 1,
     keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
     interactionSource: MutableInteractionSource? = null,
 ) {
@@ -53,6 +54,7 @@ fun AppTextField(
             isError = isError,
             readOnly = readOnly,
             singleLine = singleLine,
+            minLines = minLines,
             keyboardOptions = keyboardOptions,
             interactionSource = interactionSource,
             shape = MaterialTheme.shapes.extraSmall,
