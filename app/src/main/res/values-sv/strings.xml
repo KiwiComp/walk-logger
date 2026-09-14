@@ -42,6 +42,8 @@
     </plurals>
     <string name="summary_average">· snitt %1$.1f</string>
     <string name="walk_duration_minutes">%1$d min</string>
+    <string name="log_no_dog_message">Registrera en hund under fliken Hundar innan du loggar promenader.</string>
+    <string name="log_no_dog_action">Hundar</string>
     <string name="add_walk_for_day">+ Lägg till en promenad för %1$s</string>
 
     <string name="equipment_collar">Halsband</string>
@@ -50,4 +52,21 @@
     <string name="day_today_description">Idag, %1$s</string>
     <string name="day_has_walks">Har promenader</string>
     <string name="day_no_walks">Inga promenader</string>
+
+    <string name="back">Tillbaka</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Avbryt</string>
+
+    <string name="new_walk_title">Ny promenad</string>
+    <string name="new_walk_who_is_walking">Vem går</string>
+    <string name="new_walk_equipment">Utrustning</string>
+    <string name="new_walk_someone_else">+ Någon annan</string>
+    <string name="new_walk_after_note">Betyg, väder och anteckningar fylls i efter promenaden. Starttiden sätts när du trycker.</string>
+    <string name="new_walk_timer_starts_now">Timern startar nu</string>
+    <string name="new_walk_start">Starta promenad</string>
+    <string name="new_walk_summary">%1$s · %2$s</string>
+    <string name="new_walk_choose_handler">Välj först vem som går.</string>
+    <string name="new_walk_already_happened">Promenaden har redan skett</string>
+    <string name="new_walk_add_handler_title">Vem mer går?</string>
+    <string name="new_walk_add_handler_name">Namn</string>
 </resources>

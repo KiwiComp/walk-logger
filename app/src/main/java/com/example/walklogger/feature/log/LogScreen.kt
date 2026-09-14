@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.log
 
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -8,9 +9,16 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.Snackbar
+import androidx.compose.material3.SnackbarHost
+import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
@@ -22,18 +30,41 @@ import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
+import com.example.walklogger.core.ui.theme.Navy
+import com.example.walklogger.core.ui.theme.OnNavy
+import com.example.walklogger.core.ui.theme.SteelLight
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
+import kotlinx.coroutines.launch
 
 @Composable
-fun LogRoute(modifier: Modifier = Modifier, viewModel: LogViewModel = hiltViewModel()) {
+fun LogRoute(
+    onAddWalk: (LocalDate) -> Unit,
+    onGoToDogs: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: LogViewModel = hiltViewModel(),
+) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val snackbarHostState = remember { SnackbarHostState() }
+    val scope = rememberCoroutineScope()
+    val noDogMessage = stringResource(R.string.log_no_dog_message)
+    val noDogAction = stringResource(R.string.log_no_dog_action)
     LogScreen(
         uiState = uiState,
+        snackbarHostState = snackbarHostState,
         onDaySelected = viewModel::selectDay,
-        onAddWalk = viewModel::addWalk,
+        onAddWalk = {
+            if (uiState.canAddWalk) {
+                onAddWalk(uiState.selectedDate)
+            } else {
+                scope.launch {
+                    val result = snackbarHostState.showSnackbar(message = noDogMessage, actionLabel = noDogAction)
+                    if (result == SnackbarResult.ActionPerformed) onGoToDogs()
+                }
+            }
+        },
         modifier = modifier,
     )
 }
@@ -41,13 +72,37 @@ fun LogRoute(modifier: Modifier = Modifier, viewModel: LogViewModel = hiltViewMo
 @Composable
 fun LogScreen(
     uiState: LogUiState,
+    snackbarHostState: SnackbarHostState,
     onDaySelected: (LocalDate) -> Unit,
     onAddWalk: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    Box(modifier = modifier.fillMaxSize()) {
+        LogContent(uiState = uiState, onDaySelected = onDaySelected, onAddWalk = onAddWalk)
+        SnackbarHost(
+            hostState = snackbarHostState,
+            modifier = Modifier.align(Alignment.BottomCenter),
+        ) { data ->
+            Snackbar(
+                snackbarData = data,
+                shape = MaterialTheme.shapes.extraSmall,
+                containerColor = Navy,
+                contentColor = OnNavy,
+                actionColor = SteelLight,
+            )
+        }
+    }
+}
+
+@Composable
+private fun LogContent(
+    uiState: LogUiState,
+    onDaySelected: (LocalDate) -> Unit,
+    onAddWalk: () -> Unit,
+) {
     val locale = LocalConfiguration.current.locales[0]
     val dayHeadingFormatter = remember(locale) { DateTimeFormatter.ofPattern("EEEE d MMM", locale) }
-    Column(modifier = modifier.fillMaxSize()) {
+    Column(modifier = Modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(R.string.log_title),
             actions = { DogBadge(name = uiState.activeDogName) },
@@ -91,7 +146,12 @@ private fun LogUiState.summary(): String? {
 @Composable
 private fun LogScreenPreview() {
     WalkLoggerTheme {
-        LogScreen(uiState = LogPreviewData.uiState, onDaySelected = {}, onAddWalk = {})
+        LogScreen(
+            uiState = LogPreviewData.uiState,
+            snackbarHostState = SnackbarHostState(),
+            onDaySelected = {},
+            onAddWalk = {},
+        )
     }
 }
 
@@ -99,6 +159,11 @@ private fun LogScreenPreview() {
 @Composable
 private fun LogScreenEmptyPreview() {
     WalkLoggerTheme {
-        LogScreen(uiState = LogPreviewData.uiState.copy(walks = emptyList()), onDaySelected = {}, onAddWalk = {})
+        LogScreen(
+            uiState = LogPreviewData.uiState.copy(walks = emptyList()),
+            snackbarHostState = SnackbarHostState(),
+            onDaySelected = {},
+            onAddWalk = {},
+        )
     }
 }

@@ -15,6 +15,9 @@ com.example.walklogger
 │   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from one file per
 │   │                          piece (WeekStrip, WalkTimeline, WalkCard, AddWalkButton);
 │   │                          LogPreviewData.kt holds fixed content for @Previews only
+│   ├── logwalk/               the flow behind AddWalkButton, one package for all its screens.
+│   │                          NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
+│   │                          the chosen day travels as a route argument into the ViewModel
 │   ├── calendar/              placeholder; ViewModel only feeds the active dog's name to the header badge
 │   ├── patterns/              placeholder, same shape as calendar
 │   ├── dog/                   DogViewModel + DogUiState (profile header, dog list, add-dog CTA);
@@ -25,12 +28,14 @@ com.example.walklogger
 │
 ├── core/
 │   ├── model/                 domain models (Walk, Dog) – no Android deps
-│   ├── data/                  WalkRepository / DogRepository interfaces + Room-backed implementations, mappers
-│   ├── database/              Room database, DAOs, entities
+│   ├── data/                  WalkRepository / DogRepository / HandlerRepository interfaces
+│   │                          + Room-backed implementations, mappers
+│   ├── database/              Room database, DAOs, entities, type converters
 │   ├── datastore/             Preferences DataStore (active dog id)
 │   ├── common/di/             injectable coroutine dispatchers and Clock
 │   └── ui/                    theme (fixed palette, AppSpacing/AppRadius/AppSize tokens)
-│                              + shared composables (WalkLoggerHeader, DogBadge, SectionLabel, DashedButton, EmptyTabContent)
+│                              + shared composables (WalkLoggerHeader, HeaderIconButton, DogBadge, SectionLabel,
+│                              SegmentedToggle, DashedButton, AppButton, AppTextField, EmptyTabContent)
 ```
 
 ## Rules of thumb
@@ -40,8 +45,13 @@ com.example.walklogger
 - **`*Route` vs `*Screen`.** `Route` composables obtain the ViewModel and collect state; `Screen`
   composables are stateless so they can be previewed and UI-tested without Hilt.
 - **Repository is the single source of truth.** ViewModels never touch Room or DataStore directly.
-- **Depend on interfaces.** `WalkRepository` has a fake in `src/test` so ViewModels are
+- **Depend on interfaces.** Every repository has a fake in `src/test` so ViewModels are
   unit-testable on the JVM.
+- **Route arguments reach the ViewModel by assisted injection.** `NewWalkViewModel` takes its
+  `date` through an `@AssistedFactory` rather than `SavedStateHandle.toRoute()`, because
+  `SavedStateHandle` needs Android's `Bundle` and would push ViewModel tests off the JVM.
+- **Pushed screens hide the bottom bar.** Anything that is not a `TopLevelDestination`
+  (new walk, register dog) is a full-screen task with a leading back chevron in the header.
 - **Each feature owns its navigation.** Add a `@Serializable` route + `NavGraphBuilder.xxxScreen()`
   in `feature/<name>/navigation`, then register it in `WalkLoggerNavHost`.
 - **One file per composable piece, flat in the feature package.** A feature's building blocks
@@ -56,11 +66,14 @@ com.example.walklogger
 
 1. `feature/<name>/` → `UiState`, `ViewModel` (`@HiltViewModel`), `Route`/`Screen`, `navigation/`.
 2. If it needs new data, add methods to a repository interface in `core/data` and implement them.
+   A schema change bumps the Room version with an `AutoMigration`, exports a new `app/schemas/*.json`
+   and gets a case in `WalkLoggerDatabaseMigrationTest`.
 3. Register the destination in `WalkLoggerNavHost` (and `TopLevelDestination` if it gets a tab).
 4. Write a ViewModel test using the fakes in `src/test/.../testing`.
 
 ## Next steps (not yet implemented)
 
-- Wire `AddWalkButton` to start a walk (currently just logs the press).
+- `NewWalkScreen`: "Start walk" (timer screen) and "This walk already happened" (past-walk form)
+  are still no-ops; `WalkRepository.startWalk(dogId, handlers, equipment)` is ready for them.
 - Bundle a condensed display font (see `Type.kt`).
 - Split `core/*` and `feature/*` into Gradle modules once the app grows.

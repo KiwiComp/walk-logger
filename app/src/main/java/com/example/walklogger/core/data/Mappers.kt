@@ -10,7 +10,8 @@ import java.time.LocalDate
 
 internal fun WalkEntity.toModel(): Walk = Walk(
     id = id,
-    handler = handler,
+    dogId = dogId,
+    handlers = handlers,
     startTime = startTime,
     endTime = endTime,
     notes = notes,

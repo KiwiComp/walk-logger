@@ -4,6 +4,7 @@ import com.example.walklogger.core.common.di.Dispatcher
 import com.example.walklogger.core.common.di.WalkLoggerDispatchers
 import com.example.walklogger.core.database.WalkDao
 import com.example.walklogger.core.database.entity.WalkEntity
+import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Walk
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -28,9 +29,17 @@ class DefaultWalkRepository @Inject constructor(
     override fun observeActiveWalk(): Flow<Walk?> =
         walkDao.observeActiveWalk().map { it?.toModel() }
 
-    override suspend fun startWalk(): Long = withContext(ioDispatcher) {
-        walkDao.insertWalk(WalkEntity(startTime = System.currentTimeMillis()))
-    }
+    override suspend fun startWalk(dogId: Long, handlers: List<String>, equipment: Equipment): Long =
+        withContext(ioDispatcher) {
+            walkDao.insertWalk(
+                WalkEntity(
+                    dogId = dogId,
+                    handlers = handlers,
+                    equipment = equipment,
+                    startTime = System.currentTimeMillis(),
+                ),
+            )
+        }
 
     override suspend fun finishWalk(walkId: Long) = withContext(ioDispatcher) {
         val walk = walkDao.getWalk(walkId) ?: return@withContext

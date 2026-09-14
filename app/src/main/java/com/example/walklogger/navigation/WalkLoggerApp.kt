@@ -46,12 +46,15 @@ fun WalkLoggerApp() {
         modifier = Modifier.fillMaxSize(),
         containerColor = Canvas,
         bottomBar = {
-            WalkLoggerBottomBar(
-                isSelected = { destination ->
-                    currentDestination?.hierarchy?.any { it.hasRoute(destination.route) } == true
-                },
-                onSelect = { destination -> navController.navigateToTopLevel(destination) },
-            )
+            // Pushed screens (new walk, register dog) are full-screen tasks without the tab bar.
+            if (currentDestination?.isTopLevel() != false) {
+                WalkLoggerBottomBar(
+                    isSelected = { destination ->
+                        currentDestination?.hierarchy?.any { it.hasRoute(destination.route) } == true
+                    },
+                    onSelect = { destination -> navController.navigateToTopLevel(destination) },
+                )
+            }
         },
     ) { innerPadding ->
         // Only the bottom inset is consumed here; headers handle the status bar themselves

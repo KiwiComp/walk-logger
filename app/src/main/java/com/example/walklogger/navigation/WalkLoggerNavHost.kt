@@ -10,6 +10,8 @@ import com.example.walklogger.feature.dog.navigation.navigateToRegisterDog
 import com.example.walklogger.feature.dog.navigation.registerDogScreen
 import com.example.walklogger.feature.log.navigation.LogDestination
 import com.example.walklogger.feature.log.navigation.logScreen
+import com.example.walklogger.feature.logwalk.navigation.navigateToNewWalk
+import com.example.walklogger.feature.logwalk.navigation.newWalkScreen
 import com.example.walklogger.feature.patterns.navigation.patternsScreen
 
 /** App-level graph. Features contribute their destinations via extension functions. */
@@ -23,10 +25,14 @@ fun WalkLoggerNavHost(
         startDestination = LogDestination,
         modifier = modifier,
     ) {
-        logScreen()
+        logScreen(
+            onAddWalk = navController::navigateToNewWalk,
+            onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
+        )
         calendarScreen()
         patternsScreen()
         dogScreen(onAddDog = navController::navigateToRegisterDog)
         registerDogScreen(onDone = { navController.popBackStack() })
+        newWalkScreen(onBack = { navController.popBackStack() })
     }
 }

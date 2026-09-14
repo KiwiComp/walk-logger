@@ -1,5 +1,6 @@
 package com.example.walklogger.core.data
 
+import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Walk
 import kotlinx.coroutines.flow.Flow
 
@@ -12,8 +13,8 @@ interface WalkRepository {
     fun observeWalk(id: Long): Flow<Walk?>
     fun observeActiveWalk(): Flow<Walk?>
 
-    /** Creates a new in-progress walk and returns its id. */
-    suspend fun startWalk(): Long
+    /** Creates a new in-progress walk starting now and returns its id. */
+    suspend fun startWalk(dogId: Long, handlers: List<String>, equipment: Equipment): Long
     suspend fun finishWalk(walkId: Long)
     suspend fun deleteWalk(id: Long)
 }

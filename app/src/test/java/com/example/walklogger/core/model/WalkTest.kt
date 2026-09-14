@@ -6,8 +6,8 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class WalkTest {
-    private fun walk(endTime: Long? = null, rating: Int? = null) =
-        Walk(id = 1, handler = "Kim", startTime = 0, endTime = endTime, rating = rating)
+    private fun walk(endTime: Long? = null, rating: Int? = null, handlers: List<String> = listOf("Kim")) =
+        Walk(id = 1, dogId = 1, handlers = handlers, startTime = 0, endTime = endTime, rating = rating)
 
     @Test
     fun `walk without end time is active`() {
@@ -29,5 +29,10 @@ class WalkTest {
     fun `rating outside 1 to 7 is rejected`() {
         assertThrows(IllegalArgumentException::class.java) { walk(rating = 0) }
         assertThrows(IllegalArgumentException::class.java) { walk(rating = 8) }
+    }
+
+    @Test
+    fun `walk without handlers is rejected`() {
+        assertThrows(IllegalArgumentException::class.java) { walk(handlers = emptyList()) }
     }
 }

@@ -16,6 +16,9 @@ data class LogUiState(
 ) {
     val averageRating: Double? =
         walks.mapNotNull { it.rating }.takeIf { it.isNotEmpty() }?.average()
+
+    /** Walks can only be logged for a registered dog. */
+    val canAddWalk: Boolean get() = activeDogName != null
 }
 
 data class DayUiState(

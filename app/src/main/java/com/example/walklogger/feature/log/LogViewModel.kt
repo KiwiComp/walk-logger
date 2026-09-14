@@ -42,10 +42,6 @@ class LogViewModel @Inject constructor(
 
     fun selectDay(date: LocalDate) = selectedDate.update { date }
 
-    fun addWalk() {
-        println("Add walk pressed for ${selectedDate.value}")
-    }
-
     private fun buildState(date: LocalDate, walks: List<Walk>, activeDog: Dog?): LogUiState {
         val walksByDate = walks.groupBy { it.startDate(clock.zone) }
         val today = LocalDate.now(clock)
