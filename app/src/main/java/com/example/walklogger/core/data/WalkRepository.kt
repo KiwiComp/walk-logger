@@ -15,6 +15,12 @@ interface WalkRepository {
 
     /** Creates a new in-progress walk starting now and returns its id. */
     suspend fun startWalk(dogId: Long, handlers: List<String>, equipment: Equipment): Long
+
+    /**
+     * Stores a walk that already happened, so it must have an end time.
+     * [Walk.id] is ignored; the assigned id is returned.
+     */
+    suspend fun logWalk(walk: Walk): Long
     suspend fun finishWalk(walkId: Long)
     suspend fun deleteWalk(id: Long)
 }

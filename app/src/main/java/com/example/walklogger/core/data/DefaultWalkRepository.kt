@@ -41,6 +41,11 @@ class DefaultWalkRepository @Inject constructor(
             )
         }
 
+    override suspend fun logWalk(walk: Walk): Long {
+        require(!walk.isActive) { "a logged walk needs an end time" }
+        return withContext(ioDispatcher) { walkDao.insertWalk(walk.copy(id = 0).toEntity()) }
+    }
+
     override suspend fun finishWalk(walkId: Long) = withContext(ioDispatcher) {
         val walk = walkDao.getWalk(walkId) ?: return@withContext
         walkDao.updateWalk(walk.copy(endTime = System.currentTimeMillis()))
