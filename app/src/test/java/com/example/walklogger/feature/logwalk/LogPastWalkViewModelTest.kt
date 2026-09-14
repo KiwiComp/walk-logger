@@ -5,6 +5,7 @@ import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Temperature
+import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeHandlerRepository
@@ -35,9 +36,11 @@ class LogPastWalkViewModelTest {
     private val dogRepository = FakeDogRepository()
     private val handlerRepository = FakeHandlerRepository()
     private val walkRepository = FakeWalkRepository()
+    private var walkId: Long? = null
     private val viewModel by lazy {
         LogPastWalkViewModel(
             date = date,
+            walkId = walkId,
             dogRepository = dogRepository,
             handlerRepository = handlerRepository,
             walkRepository = walkRepository,
@@ -191,6 +194,69 @@ class LogPastWalkViewModelTest {
             viewModel.setNotes("x".repeat(LogPastWalkViewModel.MAX_NOTES_LENGTH + 1))
             assertEquals(LogPastWalkViewModel.MAX_NOTES_LENGTH, expectMostRecentItem().notes.length)
         }
+    }
+
+    private fun seedLoggedWalk(): Walk {
+        val walk = Walk(
+            id = 42,
+            dogId = 7,
+            handlers = listOf("Jonas"),
+            startTime = date.minusDays(2).atTime(8, 15).toInstant(zone).toEpochMilli(),
+            endTime = date.minusDays(2).atTime(8, 50).toInstant(zone).toEpochMilli(),
+            notes = "Muddy",
+            equipment = Equipment.COLLAR,
+            rating = 3,
+            rain = Rain.HEAVY,
+            temperature = Temperature.COOL,
+            wind = Wind.BREEZE,
+        )
+        walkRepository.addWalks(walk)
+        walkId = walk.id
+        return walk
+    }
+
+    @Test
+    fun `editing prefills the form from the stored walk`() = runTest {
+        seedLoggedWalk()
+        handlerRepository.addHandlers("Anna", "Jonas")
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertTrue(state.isEditing)
+            assertFalse(state.isLoading)
+            assertEquals(date.minusDays(2), state.date)
+            assertEquals(LocalTime.of(8, 15), state.startTime)
+            assertEquals(LocalTime.of(8, 50), state.endTime)
+            assertEquals(setOf("Jonas"), state.selectedHandlers)
+            assertEquals(3, state.rating)
+            assertEquals(Equipment.COLLAR, state.equipment)
+            assertEquals(Rain.HEAVY, state.rain)
+            assertEquals(Temperature.COOL, state.temperature)
+            assertEquals(Wind.BREEZE, state.wind)
+            assertEquals("Muddy", state.notes)
+            assertTrue(state.canSave)
+        }
+    }
+
+    @Test
+    fun `saving an edit updates the walk and keeps its id and dog`() = runTest {
+        val original = seedLoggedWalk()
+        dogRepository.addDogs(Dog(id = 1, name = "Other"))
+        handlerRepository.addHandlers("Anna", "Jonas")
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.setRating(6)
+            viewModel.setNotes("Dry after all")
+            viewModel.toggleHandler("Anna")
+            viewModel.save()
+            assertTrue(expectMostRecentItem().isSaved)
+        }
+        val walk = walkRepository.observeWalks().first().single()
+        assertEquals(original.id, walk.id)
+        assertEquals(original.dogId, walk.dogId)
+        assertEquals(original.startTime, walk.startTime)
+        assertEquals(6, walk.rating)
+        assertEquals("Dry after all", walk.notes)
+        assertEquals(listOf("Anna", "Jonas"), walk.handlers)
     }
 
     @Test

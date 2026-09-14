@@ -13,6 +13,12 @@ data object LogDestination
 
 fun NavController.navigateToLog(navOptions: NavOptions? = null) = navigate(LogDestination, navOptions)
 
-fun NavGraphBuilder.logScreen(onAddWalk: (LocalDate) -> Unit, onGoToDogs: () -> Unit) {
-    composable<LogDestination> { LogRoute(onAddWalk = onAddWalk, onGoToDogs = onGoToDogs) }
+fun NavGraphBuilder.logScreen(
+    onAddWalk: (LocalDate) -> Unit,
+    onEditWalk: (LocalDate, Long) -> Unit,
+    onGoToDogs: () -> Unit,
+) {
+    composable<LogDestination> {
+        LogRoute(onAddWalk = onAddWalk, onEditWalk = onEditWalk, onGoToDogs = onGoToDogs)
+    }
 }

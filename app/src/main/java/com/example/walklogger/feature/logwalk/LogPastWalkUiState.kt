@@ -25,6 +25,10 @@ data class LogPastWalkUiState(
     val temperature: Temperature? = null,
     val wind: Wind? = null,
     val notes: String = "",
+    /** True when the form changes an existing walk rather than logging a new one. */
+    val isEditing: Boolean = false,
+    /** True while the walk being edited is still being read; the form is not editable until it arrives. */
+    val isLoading: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
 ) {
@@ -45,7 +49,7 @@ data class LogPastWalkUiState(
         else -> null
     }
 
-    val canSave: Boolean = saveBlocker == null && !isSaving && !isSaved
+    val canSave: Boolean = saveBlocker == null && !isLoading && !isSaving && !isSaved
 }
 
 enum class SaveBlocker { HANDLER, TIMES, END_BEFORE_START, IN_FUTURE, RATING }

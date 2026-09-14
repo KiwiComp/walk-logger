@@ -2,6 +2,7 @@ package com.example.walklogger.feature.log
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
@@ -30,13 +31,14 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 private val RatingBarWidth = 9.dp
 private val RatingBarHeight = 16.dp
 
-/** One walk in the day's timeline: equipment chip, rating and note. */
+/** One walk in the day's timeline: equipment chip, rating and note. Tapping it opens the walk for editing. */
 @Composable
-internal fun WalkCard(walk: WalkUiState, modifier: Modifier = Modifier) {
+internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .background(CardSurface)
             .border(1.dp, Outline)
+            .clickable(onClick = onClick)
             .padding(AppSpacing.lg),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
     ) {
@@ -88,6 +90,6 @@ private fun RatingBar(rating: Int, max: Int = 7) {
 @Composable
 private fun WalkCardPreview() {
     WalkLoggerTheme {
-        WalkCard(walk = LogPreviewData.walk, modifier = Modifier.padding(AppSpacing.lg))
+        WalkCard(walk = LogPreviewData.walk, onClick = {}, modifier = Modifier.padding(AppSpacing.lg))
     }
 }

@@ -50,7 +50,7 @@ internal fun DayHeading(title: String, summary: String?) {
 
 /** The day's walks, each with its start time and a connector dot leading to a [WalkCard]. */
 @Composable
-internal fun WalkTimeline(walks: List<WalkUiState>) {
+internal fun WalkTimeline(walks: List<WalkUiState>, onWalkClick: (Long) -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xl)) {
         walks.forEach { walk ->
             Row {
@@ -73,7 +73,7 @@ internal fun WalkTimeline(walks: List<WalkUiState>) {
                 ) {
                     Box(Modifier.size(TimelineDotSize).background(Steel))
                 }
-                WalkCard(walk = walk, modifier = Modifier.weight(1f))
+                WalkCard(walk = walk, onClick = { onWalkClick(walk.id) }, modifier = Modifier.weight(1f))
             }
         }
     }
@@ -87,7 +87,7 @@ private fun WalkTimelinePreview() {
         Column(modifier = Modifier.padding(AppSpacing.lg)) {
             DayHeading(title = "Saturday 12 Sep", summary = "2 walks · avg 5.0")
             Spacer(Modifier.height(AppSpacing.lg))
-            WalkTimeline(walks = LogPreviewData.walks)
+            WalkTimeline(walks = LogPreviewData.walks, onWalkClick = {})
         }
     }
 }

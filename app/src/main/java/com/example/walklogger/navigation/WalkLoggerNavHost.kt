@@ -11,6 +11,7 @@ import com.example.walklogger.feature.dog.navigation.registerDogScreen
 import com.example.walklogger.feature.log.navigation.LogDestination
 import com.example.walklogger.feature.log.navigation.logScreen
 import com.example.walklogger.feature.logwalk.navigation.logPastWalkScreen
+import com.example.walklogger.feature.logwalk.navigation.navigateToEditWalk
 import com.example.walklogger.feature.logwalk.navigation.navigateToLogPastWalk
 import com.example.walklogger.feature.logwalk.navigation.navigateToNewWalk
 import com.example.walklogger.feature.logwalk.navigation.newWalkScreen
@@ -29,6 +30,7 @@ fun WalkLoggerNavHost(
     ) {
         logScreen(
             onAddWalk = navController::navigateToNewWalk,
+            onEditWalk = navController::navigateToEditWalk,
             onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
         )
         calendarScreen()

@@ -47,11 +47,12 @@ private const val NotesMinLines = 3
 @Composable
 fun LogPastWalkRoute(
     date: LocalDate,
+    walkId: Long?,
     onClose: () -> Unit,
     onSaved: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LogPastWalkViewModel =
-        hiltViewModel<LogPastWalkViewModel, LogPastWalkViewModel.Factory> { it.create(date) },
+        hiltViewModel<LogPastWalkViewModel, LogPastWalkViewModel.Factory> { it.create(date, walkId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     LaunchedEffect(uiState.isSaved) {
@@ -97,7 +98,7 @@ fun LogPastWalkScreen(
     var showAddHandler by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
-            title = stringResource(R.string.log_past_walk_title),
+            title = stringResource(if (uiState.isEditing) R.string.edit_walk_title else R.string.log_past_walk_title),
             navigationIcon = {
                 HeaderIconButton(
                     icon = Icons.Filled.Close,
@@ -253,6 +254,29 @@ private fun LogPastWalkScreenCompletePreview() {
     WalkLoggerTheme {
         LogPastWalkScreen(
             uiState = LogWalkPreviewData.logPastWalk.copy(rating = 5, notes = "Calm on the lead, one barking dog at the gate."),
+            onClose = {},
+            onDateChange = {},
+            onStartTimeChange = {},
+            onEndTimeChange = {},
+            onHandlerToggled = {},
+            onAddHandler = {},
+            onRatingChange = {},
+            onEquipmentSelected = {},
+            onRainSelected = {},
+            onTemperatureSelected = {},
+            onWindSelected = {},
+            onNotesChange = {},
+            onSave = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, heightDp = 1200)
+@Composable
+private fun LogPastWalkScreenEditPreview() {
+    WalkLoggerTheme {
+        LogPastWalkScreen(
+            uiState = LogWalkPreviewData.logPastWalk.copy(isEditing = true, rating = 5, notes = "Calm on the lead."),
             onClose = {},
             onDateChange = {},
             onStartTimeChange = {},

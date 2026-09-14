@@ -13,14 +13,20 @@ import kotlinx.serialization.Serializable
 @Serializable
 data class NewWalkDestination(val epochDay: Long)
 
-/** [epochDay] prefills the form's date; the user can still change it. */
+/**
+ * [epochDay] prefills the form's date; the user can still change it.
+ * With a [walkId] the form edits that walk instead of logging a new one.
+ */
 @Serializable
-data class LogPastWalkDestination(val epochDay: Long)
+data class LogPastWalkDestination(val epochDay: Long, val walkId: Long? = null)
 
 fun NavController.navigateToNewWalk(date: LocalDate) = navigate(NewWalkDestination(epochDay = date.toEpochDay()))
 
 fun NavController.navigateToLogPastWalk(date: LocalDate) =
     navigate(LogPastWalkDestination(epochDay = date.toEpochDay()))
+
+fun NavController.navigateToEditWalk(date: LocalDate, walkId: Long) =
+    navigate(LogPastWalkDestination(epochDay = date.toEpochDay(), walkId = walkId))
 
 fun NavGraphBuilder.newWalkScreen(onBack: () -> Unit, onLogPastWalk: (LocalDate) -> Unit) {
     composable<NewWalkDestination> { entry ->
@@ -34,8 +40,10 @@ fun NavGraphBuilder.newWalkScreen(onBack: () -> Unit, onLogPastWalk: (LocalDate)
 
 fun NavGraphBuilder.logPastWalkScreen(onClose: () -> Unit, onSaved: () -> Unit) {
     composable<LogPastWalkDestination> { entry ->
+        val destination = entry.toRoute<LogPastWalkDestination>()
         LogPastWalkRoute(
-            date = LocalDate.ofEpochDay(entry.toRoute<LogPastWalkDestination>().epochDay),
+            date = LocalDate.ofEpochDay(destination.epochDay),
+            walkId = destination.walkId,
             onClose = onClose,
             onSaved = onSaved,
         )

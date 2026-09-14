@@ -42,6 +42,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun LogRoute(
     onAddWalk: (LocalDate) -> Unit,
+    onEditWalk: (LocalDate, Long) -> Unit,
     onGoToDogs: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LogViewModel = hiltViewModel(),
@@ -65,6 +66,7 @@ fun LogRoute(
                 }
             }
         },
+        onWalkClick = { walkId -> onEditWalk(uiState.selectedDate, walkId) },
         modifier = modifier,
     )
 }
@@ -75,10 +77,16 @@ fun LogScreen(
     snackbarHostState: SnackbarHostState,
     onDaySelected: (LocalDate) -> Unit,
     onAddWalk: () -> Unit,
+    onWalkClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Box(modifier = modifier.fillMaxSize()) {
-        LogContent(uiState = uiState, onDaySelected = onDaySelected, onAddWalk = onAddWalk)
+        LogContent(
+            uiState = uiState,
+            onDaySelected = onDaySelected,
+            onAddWalk = onAddWalk,
+            onWalkClick = onWalkClick,
+        )
         SnackbarHost(
             hostState = snackbarHostState,
             modifier = Modifier.align(Alignment.BottomCenter),
@@ -99,6 +107,7 @@ private fun LogContent(
     uiState: LogUiState,
     onDaySelected: (LocalDate) -> Unit,
     onAddWalk: () -> Unit,
+    onWalkClick: (Long) -> Unit,
 ) {
     val locale = LocalConfiguration.current.locales[0]
     val dayHeadingFormatter = remember(locale) { DateTimeFormatter.ofPattern("EEEE d MMM", locale) }
@@ -123,7 +132,7 @@ private fun LogContent(
             )
             Spacer(Modifier.height(AppSpacing.lg))
             if (uiState.walks.isNotEmpty()) {
-                WalkTimeline(walks = uiState.walks)
+                WalkTimeline(walks = uiState.walks, onWalkClick = onWalkClick)
             }
             AddWalkButton(
                 dayLabel = uiState.selectedDate.dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
@@ -151,6 +160,7 @@ private fun LogScreenPreview() {
             snackbarHostState = SnackbarHostState(),
             onDaySelected = {},
             onAddWalk = {},
+            onWalkClick = {},
         )
     }
 }
@@ -164,6 +174,7 @@ private fun LogScreenEmptyPreview() {
             snackbarHostState = SnackbarHostState(),
             onDaySelected = {},
             onAddWalk = {},
+            onWalkClick = {},
         )
     }
 }
