@@ -28,6 +28,9 @@ interface WalkDao {
     @Update
     suspend fun updateWalk(walk: WalkEntity)
 
+    @Query("UPDATE walks SET notes = :notes WHERE id = :id")
+    suspend fun updateNotes(id: Long, notes: String)
+
     @Query("DELETE FROM walks WHERE id = :id")
     suspend fun deleteWalk(id: Long)
 }

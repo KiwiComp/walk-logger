@@ -10,6 +10,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -30,23 +31,26 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import java.time.LocalDate
 
-/** Start walk is a no-op until the timer flow exists. */
 @Composable
 fun NewWalkRoute(
     date: LocalDate,
     onBack: () -> Unit,
+    onWalkStarted: (walkId: Long) -> Unit,
     onLogPastWalk: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: NewWalkViewModel = hiltViewModel<NewWalkViewModel, NewWalkViewModel.Factory> { it.create(date) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(uiState.startedWalkId) {
+        uiState.startedWalkId?.let(onWalkStarted)
+    }
     NewWalkScreen(
         uiState = uiState,
         onBack = onBack,
         onHandlerToggled = viewModel::toggleHandler,
         onAddHandler = viewModel::addHandler,
         onEquipmentSelected = viewModel::selectEquipment,
-        onStartWalk = {},
+        onStartWalk = viewModel::startWalk,
         onLogPastWalk = { onLogPastWalk(uiState.date) },
         modifier = modifier,
     )
@@ -120,7 +124,7 @@ fun NewWalkScreen(
 /** Selected handlers and equipment, or why the walk can't start yet. */
 @Composable
 private fun NewWalkUiState.summary(): String {
-    if (!canStart) return stringResource(R.string.new_walk_choose_handler)
+    if (selectedHandlers.isEmpty()) return stringResource(R.string.new_walk_choose_handler)
     val locale = LocalConfiguration.current.locales[0]
     val equipmentLabel = stringResource(equipment.labelRes).lowercase(locale)
     val handlers = handlers.filter { it in selectedHandlers }

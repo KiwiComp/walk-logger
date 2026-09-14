@@ -51,6 +51,10 @@ class DefaultWalkRepository @Inject constructor(
         withContext(ioDispatcher) { walkDao.updateWalk(walk.toEntity()) }
     }
 
+    override suspend fun updateNotes(walkId: Long, notes: String) = withContext(ioDispatcher) {
+        walkDao.updateNotes(walkId, notes)
+    }
+
     override suspend fun finishWalk(walkId: Long) = withContext(ioDispatcher) {
         val walk = walkDao.getWalk(walkId) ?: return@withContext
         walkDao.updateWalk(walk.copy(endTime = System.currentTimeMillis()))

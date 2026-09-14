@@ -5,10 +5,12 @@ import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeHandlerRepository
+import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneOffset
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -26,12 +28,14 @@ class NewWalkViewModelTest {
     private val clock = Clock.fixed(today.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
     private val dogRepository = FakeDogRepository()
     private val handlerRepository = FakeHandlerRepository()
+    private val walkRepository = FakeWalkRepository()
     private var date = today
     private val viewModel by lazy {
         NewWalkViewModel(
             date = date,
             dogRepository = dogRepository,
             handlerRepository = handlerRepository,
+            walkRepository = walkRepository,
             clock = clock,
         )
     }
@@ -127,6 +131,35 @@ class NewWalkViewModelTest {
             assertEquals(Equipment.HARNESS, expectMostRecentItem().equipment)
             viewModel.selectEquipment(Equipment.COLLAR)
             assertEquals(Equipment.COLLAR, expectMostRecentItem().equipment)
+        }
+    }
+
+    @Test
+    fun `starting stores the walk for the active dog and reports its id`() = runTest {
+        dogRepository.addDogs(Dog(id = 3, name = "Sixten"))
+        handlerRepository.addHandlers("Anna", "Jonas")
+        viewModel.uiState.test {
+            viewModel.toggleHandler("Jonas")
+            viewModel.selectEquipment(Equipment.COLLAR)
+            viewModel.startWalk()
+
+            val state = expectMostRecentItem()
+            val walk = walkRepository.observeActiveWalk().first()!!
+            assertEquals(walk.id, state.startedWalkId)
+            assertEquals(3L, walk.dogId)
+            assertEquals(listOf("Jonas"), walk.handlers)
+            assertEquals(Equipment.COLLAR, walk.equipment)
+            assertFalse(state.canStart)
+        }
+    }
+
+    @Test
+    fun `starting without a handler does nothing`() = runTest {
+        dogRepository.addDogs(Dog(id = 3, name = "Sixten"))
+        viewModel.uiState.test {
+            viewModel.startWalk()
+            assertNull(expectMostRecentItem().startedWalkId)
+            assertNull(walkRepository.observeActiveWalk().first())
         }
     }
 }

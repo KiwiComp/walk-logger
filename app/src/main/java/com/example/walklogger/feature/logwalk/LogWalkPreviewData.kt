@@ -4,6 +4,7 @@ import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
+import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
@@ -33,5 +34,30 @@ internal object LogWalkPreviewData {
         rain = Rain.LIGHT,
         temperature = Temperature.COLD,
         wind = Wind.WINDY,
+    )
+
+    val activeWalk = ActiveWalkUiState(
+        dogName = "Sixten",
+        handlers = listOf("Anna"),
+        equipment = Equipment.HARNESS,
+        startTime = LocalTime.of(7, 5),
+        elapsed = Duration.ofMinutes(34).plusSeconds(12),
+        note = "Barked at the bin lorry",
+    )
+
+    val finishWalk = FinishWalkUiState(
+        now = LocalDateTime.of(2026, 9, 12, 7, 39),
+        date = LocalDate.of(2026, 9, 12),
+        startTime = LocalTime.of(7, 5),
+        endTime = LocalTime.of(7, 39),
+        dogName = "Sixten",
+        handlers = listOf("Anna"),
+        rating = 6,
+        equipment = Equipment.HARNESS,
+        rain = Rain.NONE,
+        temperature = Temperature.COOL,
+        wind = Wind.BREEZE,
+        notes = "Barked at the bin lorry, otherwise steady. Off-lead in the field for ten minutes.",
+        isLoading = false,
     )
 }

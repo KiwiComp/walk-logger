@@ -12,6 +12,7 @@ import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -26,6 +27,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.core.ui.theme.Canvas
 import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.Outline
@@ -33,14 +36,23 @@ import com.example.walklogger.core.ui.theme.Steel
 import com.example.walklogger.feature.calendar.navigation.navigateToCalendar
 import com.example.walklogger.feature.dog.navigation.navigateToDog
 import com.example.walklogger.feature.log.navigation.navigateToLog
+import com.example.walklogger.feature.logwalk.navigation.navigateToActiveWalk
 import com.example.walklogger.feature.patterns.navigation.navigateToPatterns
 
 /** Root composable: scaffold + bottom bar + nav host. Each tab draws its own header. */
 @Composable
-fun WalkLoggerApp() {
+fun WalkLoggerApp(viewModel: WalkLoggerAppViewModel = hiltViewModel()) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
+
+    val walkToResume by viewModel.walkToResume.collectAsStateWithLifecycle()
+    LaunchedEffect(walkToResume) {
+        walkToResume?.let { walkId ->
+            navController.navigateToActiveWalk(walkId)
+            viewModel.onWalkResumed()
+        }
+    }
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),

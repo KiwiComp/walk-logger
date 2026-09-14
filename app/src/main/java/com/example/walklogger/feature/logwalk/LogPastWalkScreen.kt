@@ -243,15 +243,6 @@ fun LogPastWalkScreen(
     }
 }
 
-private val SaveBlocker.messageRes: Int
-    get() = when (this) {
-        SaveBlocker.HANDLER -> R.string.log_past_walk_needs_handler
-        SaveBlocker.TIMES -> R.string.log_past_walk_needs_times
-        SaveBlocker.END_BEFORE_START -> R.string.log_past_walk_needs_end_after_start
-        SaveBlocker.IN_FUTURE -> R.string.log_past_walk_needs_past_end
-        SaveBlocker.RATING -> R.string.log_past_walk_needs_rating
-    }
-
 @Preview(showBackground = true, heightDp = 1200)
 @Composable
 private fun LogPastWalkScreenPreview() {

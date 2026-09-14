@@ -9,7 +9,8 @@ com.example.walklogger
 ├── WalkLoggerApplication.kt   @HiltAndroidApp – root of the DI graph
 ├── MainActivity.kt            single activity, hosts WalkLoggerApp()
 │
-├── navigation/                app-level NavHost, bottom bar, top-level destinations
+├── navigation/                app-level NavHost, bottom bar, top-level destinations;
+│                              WalkLoggerAppViewModel reopens the timer when the app starts mid-walk
 │
 ├── feature/                   one package per tab/screen
 │   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from one file per
@@ -17,11 +18,15 @@ com.example.walklogger
 │   │                          LogPreviewData.kt holds fixed content for @Previews only
 │   ├── logwalk/               the flow behind AddWalkButton, one package for all its screens.
 │   │                          NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
+│   │                          ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
+│   │                          stored start, quick note, end walk; system back is swallowed);
+│   │                          FinishWalkViewModel + FinishWalkScreen (rating, equipment, weather, notes
+│   │                          for the just-finished walk, with an "Edit times" toggle);
 │   │                          LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating,
 │   │                          equipment, weather, notes) composed from WhenSection, RatingScale, WeatherRow;
 │   │                          the same screen edits a logged walk when the route carries a walkId,
 │   │                          and can delete it (DeleteWalkDialog confirms first);
-│   │                          the chosen day travels as a route argument into both ViewModels
+│   │                          the chosen day travels as a route argument into both form ViewModels
 │   ├── calendar/              placeholder; ViewModel only feeds the active dog's name to the header badge
 │   ├── patterns/              placeholder, same shape as calendar
 │   ├── dog/                   DogViewModel + DogUiState (profile header, dog list, add-dog CTA);
@@ -53,11 +58,13 @@ com.example.walklogger
 - **Depend on interfaces.** Every repository has a fake in `src/test` so ViewModels are
   unit-testable on the JVM.
 - **Route arguments reach the ViewModel by assisted injection.** `NewWalkViewModel` and
-  `LogPastWalkViewModel` take their `date` through an `@AssistedFactory` rather than `SavedStateHandle.toRoute()`, because
+  `LogPastWalkViewModel` take their `date` (and the walk screens their `walkId`) through an `@AssistedFactory` rather than `SavedStateHandle.toRoute()`, because
   `SavedStateHandle` needs Android's `Bundle` and would push ViewModel tests off the JVM.
 - **Pushed screens hide the bottom bar.** Anything that is not a `TopLevelDestination`
   (new walk, log past walk, register dog) is a full-screen task with a leading back chevron
-  (or close cross for forms) in the header.
+  (or close cross for forms) in the header. The timer and after-walk screens have neither: a
+  timed walk is stored the moment it starts, ended by "End walk" and already logged before the
+  form opens, so there is nothing to cancel.
 - **Each feature owns its navigation.** Add a `@Serializable` route + `NavGraphBuilder.xxxScreen()`
   in `feature/<name>/navigation`, then register it in `WalkLoggerNavHost`.
 - **One file per composable piece, flat in the feature package.** A feature's building blocks
@@ -79,7 +86,8 @@ com.example.walklogger
 
 ## Next steps (not yet implemented)
 
-- `NewWalkScreen`: "Start walk" (timer screen) is still a no-op;
-  `WalkRepository.startWalk(dogId, handlers, equipment)` is ready for it.
+- Pausing a timed walk; the timer screen only ends it.
+- A foreground service so the walk survives the process being killed with a notification to end it
+  from (elapsed time is already derived from the stored start, so the timer itself is correct after a restart).
 - Bundle a condensed display font (see `Type.kt`).
 - Split `core/*` and `feature/*` into Gradle modules once the app grows.

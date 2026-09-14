@@ -4,6 +4,9 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
+import com.example.walklogger.feature.log.navigation.LogDestination
+import com.example.walklogger.feature.logwalk.ActiveWalkRoute
+import com.example.walklogger.feature.logwalk.FinishWalkRoute
 import com.example.walklogger.feature.logwalk.LogPastWalkRoute
 import com.example.walklogger.feature.logwalk.NewWalkRoute
 import java.time.LocalDate
@@ -20,7 +23,26 @@ data class NewWalkDestination(val epochDay: Long)
 @Serializable
 data class LogPastWalkDestination(val epochDay: Long, val walkId: Long? = null)
 
+/** The timer for the in-progress walk [walkId]. */
+@Serializable
+data class ActiveWalkDestination(val walkId: Long)
+
+/** The after-walk form for the just-finished walk [walkId]. */
+@Serializable
+data class FinishWalkDestination(val walkId: Long)
+
 fun NavController.navigateToNewWalk(date: LocalDate) = navigate(NewWalkDestination(epochDay = date.toEpochDay()))
+
+/** Replaces everything above the log, so back from the timer never lands on the new-walk form. */
+fun NavController.navigateToActiveWalk(walkId: Long) = navigate(ActiveWalkDestination(walkId)) {
+    popUpTo<LogDestination>()
+    launchSingleTop = true
+}
+
+/** Replaces the timer screen; the walk is already finished so there is nothing to go back to. */
+fun NavController.navigateToFinishWalk(walkId: Long) = navigate(FinishWalkDestination(walkId)) {
+    popUpTo<ActiveWalkDestination> { inclusive = true }
+}
 
 fun NavController.navigateToLogPastWalk(date: LocalDate) =
     navigate(LogPastWalkDestination(epochDay = date.toEpochDay()))
@@ -28,13 +50,30 @@ fun NavController.navigateToLogPastWalk(date: LocalDate) =
 fun NavController.navigateToEditWalk(date: LocalDate, walkId: Long) =
     navigate(LogPastWalkDestination(epochDay = date.toEpochDay(), walkId = walkId))
 
-fun NavGraphBuilder.newWalkScreen(onBack: () -> Unit, onLogPastWalk: (LocalDate) -> Unit) {
+fun NavGraphBuilder.newWalkScreen(
+    onBack: () -> Unit,
+    onWalkStarted: (walkId: Long) -> Unit,
+    onLogPastWalk: (LocalDate) -> Unit,
+) {
     composable<NewWalkDestination> { entry ->
         NewWalkRoute(
             date = LocalDate.ofEpochDay(entry.toRoute<NewWalkDestination>().epochDay),
             onBack = onBack,
+            onWalkStarted = onWalkStarted,
             onLogPastWalk = onLogPastWalk,
         )
+    }
+}
+
+fun NavGraphBuilder.activeWalkScreen(onWalkEnded: (walkId: Long) -> Unit) {
+    composable<ActiveWalkDestination> { entry ->
+        ActiveWalkRoute(walkId = entry.toRoute<ActiveWalkDestination>().walkId, onWalkEnded = onWalkEnded)
+    }
+}
+
+fun NavGraphBuilder.finishWalkScreen(onSaved: () -> Unit) {
+    composable<FinishWalkDestination> { entry ->
+        FinishWalkRoute(walkId = entry.toRoute<FinishWalkDestination>().walkId, onSaved = onSaved)
     }
 }
 

@@ -70,6 +70,18 @@
 
     <string name="close">Stäng</string>
 
+    <string name="active_walk_title">Promenad pågår</string>
+    <string name="active_walk_out_with">Ute med %1$s</string>
+    <string name="active_walk_started_at">Startade %1$s</string>
+    <string name="active_walk_quick_note">Snabbanteckning under promenaden</string>
+    <string name="active_walk_quick_note_placeholder">Skällde på sopbilen…</string>
+    <string name="active_walk_end">Avsluta promenad</string>
+
+    <string name="finish_walk_title">Hur gick det?</string>
+    <string name="finish_walk_edit_times">Ändra tider</string>
+    <string name="finish_walk_times_summary">%1$s → %2$s · %3$s · loggad automatiskt</string>
+    <string name="finish_walk_walked_by">Gick med %1$s</string>
+
     <string name="log_past_walk_title">Logga en tidigare promenad</string>
     <string name="log_past_walk_when">När</string>
     <string name="log_past_walk_date">Datum</string>
