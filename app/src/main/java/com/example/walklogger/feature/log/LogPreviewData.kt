@@ -43,5 +43,6 @@ internal object LogPreviewData {
             )
         },
         walks = walks,
+        activeDogName = "Sixten",
     )
 }

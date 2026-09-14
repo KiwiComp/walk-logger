@@ -2,6 +2,8 @@ package com.example.walklogger.feature.log
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.walklogger.core.data.DogRepository
+import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.domain.ObserveWalkHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
@@ -23,18 +25,20 @@ import kotlinx.coroutines.flow.update
 @HiltViewModel
 class LogViewModel @Inject constructor(
     observeWalkHistory: ObserveWalkHistoryUseCase,
+    dogRepository: DogRepository,
     private val clock: Clock,
 ) : ViewModel() {
 
     private val selectedDate = MutableStateFlow(LocalDate.now(clock))
 
     val uiState: StateFlow<LogUiState> =
-        combine(selectedDate, observeWalkHistory()) { date, walks -> buildState(date, walks) }
-            .stateIn(
-                scope = viewModelScope,
-                started = SharingStarted.WhileSubscribed(5_000),
-                initialValue = buildState(selectedDate.value, emptyList()),
-            )
+        combine(selectedDate, observeWalkHistory(), dogRepository.observeActiveDog()) { date, walks, dog ->
+            buildState(date, walks, dog)
+        }.stateIn(
+            scope = viewModelScope,
+            started = SharingStarted.WhileSubscribed(5_000),
+            initialValue = buildState(selectedDate.value, emptyList(), activeDog = null),
+        )
 
     fun selectDay(date: LocalDate) = selectedDate.update { date }
 
@@ -42,7 +46,7 @@ class LogViewModel @Inject constructor(
         println("Add walk pressed for ${selectedDate.value}")
     }
 
-    private fun buildState(date: LocalDate, walks: List<Walk>): LogUiState {
+    private fun buildState(date: LocalDate, walks: List<Walk>, activeDog: Dog?): LogUiState {
         val walksByDate = walks.groupBy { it.startDate(clock.zone) }
         val today = LocalDate.now(clock)
         val monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
@@ -60,6 +64,7 @@ class LogViewModel @Inject constructor(
             walks = walksByDate[date].orEmpty()
                 .sortedBy { it.startTime }
                 .map { it.toUiState(clock.zone) },
+            activeDogName = activeDog?.name,
         )
     }
 }

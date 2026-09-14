@@ -6,6 +6,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
 import com.example.walklogger.feature.calendar.navigation.calendarScreen
 import com.example.walklogger.feature.dog.navigation.dogScreen
+import com.example.walklogger.feature.dog.navigation.navigateToRegisterDog
+import com.example.walklogger.feature.dog.navigation.registerDogScreen
 import com.example.walklogger.feature.log.navigation.LogDestination
 import com.example.walklogger.feature.log.navigation.logScreen
 import com.example.walklogger.feature.patterns.navigation.patternsScreen
@@ -24,6 +26,7 @@ fun WalkLoggerNavHost(
         logScreen()
         calendarScreen()
         patternsScreen()
-        dogScreen()
+        dogScreen(onAddDog = navController::navigateToRegisterDog)
+        registerDogScreen(onDone = { navController.popBackStack() })
     }
 }

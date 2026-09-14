@@ -2,13 +2,14 @@ package com.example.walklogger.core.ui.theme
 
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.Shapes
-import androidx.compose.ui.unit.dp
 
-// The design is deliberately square-cornered.
 val Shapes = Shapes(
-    extraSmall = RoundedCornerShape(0.dp),
-    small = RoundedCornerShape(0.dp),
-    medium = RoundedCornerShape(0.dp),
-    large = RoundedCornerShape(0.dp),
-    extraLarge = RoundedCornerShape(0.dp),
+    extraSmall = RoundedCornerShape(AppRadius.xs),
+    small = RoundedCornerShape(AppRadius.sm),
+    medium = RoundedCornerShape(AppRadius.md),
+    large = RoundedCornerShape(AppRadius.lg),
+    extraLarge = RoundedCornerShape(AppRadius.xl),
 )
+
+/** Material's scale has no zero-radius slot, so the square shape lives beside it. */
+val SquareShape = RoundedCornerShape(AppRadius.none)

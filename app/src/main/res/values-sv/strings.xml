@@ -2,6 +2,7 @@
     <string name="tab_log">Logg</string>
     <string name="tab_calendar">Kalender</string>
     <string name="tab_patterns">Mönster</string>
+    <string name="tab_dogs">Hundar</string>
 
     <string name="log_title">Promenadlogg</string>
     <string name="calendar_title">Kalender</string>
@@ -9,7 +10,31 @@
 
     <string name="calendar_coming_soon">Kalender kommer snart</string>
     <string name="patterns_coming_soon">Mönster kommer snart</string>
-    <string name="dog_profile_coming_soon">Hundprofil kommer snart</string>
+    <string name="dog_title">Din hund</string>
+    <string name="dog_none_registered">Ingen hund registrerad än. Lägg till en för att börja logga promenader.</string>
+    <string name="dog_add_first">+ Lägg till din hund</string>
+    <string name="dog_add_another">+ Lägg till en hund till</string>
+    <string name="dog_section_dogs">Hundar</string>
+    <string name="dog_active">Aktiv</string>
+    <string name="dog_switch">Byt</string>
+    <string name="dog_switch_to">Byt till %1$s</string>
+    <plurals name="dog_age_years">
+        <item quantity="one">%1$d år</item>
+        <item quantity="other">%1$d år</item>
+    </plurals>
+    <string name="dog_weight_kg">%1$s kg</string>
+
+    <string name="register_dog_title">Ny hund</string>
+    <string name="register_dog_cancel">Avbryt</string>
+    <string name="register_dog_ok">OK</string>
+    <string name="register_dog_name">Namn</string>
+    <string name="register_dog_breed">Ras</string>
+    <string name="register_dog_birth_date">Födelsedatum</string>
+    <string name="register_dog_birth_date_none">Inte angivet</string>
+    <string name="register_dog_weight">Vikt</string>
+    <string name="register_dog_weight_unit">kg</string>
+    <string name="register_dog_weight_error">Ange ett tal</string>
+    <string name="register_dog_save">Spara hund</string>
 
     <plurals name="walk_count">
         <item quantity="one">%1$d promenad</item>

@@ -4,7 +4,7 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
-import com.example.walklogger.feature.calendar.CalendarScreen
+import com.example.walklogger.feature.calendar.CalendarRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
@@ -14,5 +14,5 @@ fun NavController.navigateToCalendar(navOptions: NavOptions? = null) =
     navigate(CalendarDestination, navOptions)
 
 fun NavGraphBuilder.calendarScreen() {
-    composable<CalendarDestination> { CalendarScreen() }
+    composable<CalendarDestination> { CalendarRoute() }
 }

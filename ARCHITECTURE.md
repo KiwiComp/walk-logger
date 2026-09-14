@@ -15,20 +15,22 @@ com.example.walklogger
 │   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from one file per
 │   │                          piece (WeekStrip, WalkTimeline, WalkCard, AddWalkButton);
 │   │                          LogPreviewData.kt holds fixed content for @Previews only
-│   ├── calendar/              placeholder
-│   ├── patterns/              placeholder
-│   ├── dog/                   the "Sixten" tab, placeholder
+│   ├── calendar/              placeholder; ViewModel only feeds the active dog's name to the header badge
+│   ├── patterns/              placeholder, same shape as calendar
+│   ├── dog/                   DogViewModel + DogUiState (profile header, dog list, add-dog CTA);
+│   │                          RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight)
 │   └── */navigation/          type-safe @Serializable route + NavGraphBuilder extension
 │
 ├── domain/                    optional use cases (pure Kotlin, injectable)
 │
 ├── core/
-│   ├── model/                 domain models (Walk) – no Android deps
-│   ├── data/                  WalkRepository interface + Room-backed implementation, mappers
-│   ├── database/              Room database, DAO, entities
+│   ├── model/                 domain models (Walk, Dog) – no Android deps
+│   ├── data/                  WalkRepository / DogRepository interfaces + Room-backed implementations, mappers
+│   ├── database/              Room database, DAOs, entities
+│   ├── datastore/             Preferences DataStore (active dog id)
 │   ├── common/di/             injectable coroutine dispatchers and Clock
-│   └── ui/                    theme (fixed palette, square shapes, AppSpacing/AppRadius tokens)
-│                              + shared composables (WalkLoggerHeader, DogBadge, SectionLabel, EmptyTabContent)
+│   └── ui/                    theme (fixed palette, AppSpacing/AppRadius/AppSize tokens)
+│                              + shared composables (WalkLoggerHeader, DogBadge, SectionLabel, DashedButton, EmptyTabContent)
 ```
 
 ## Rules of thumb
@@ -46,9 +48,9 @@ com.example.walklogger
   (`WalkCard.kt`, `WeekStrip.kt`, …) sit beside its `Screen`, each with its own `@Preview`.
   The piece other files call is `internal`; helpers and size constants that only that file
   needs are `private`. Only the `Screen`/`Route` and `core/ui` components are public.
-- **Dimensions come from tokens.** Padding and gaps use `AppSpacing`, corners use `AppRadius`.
-  Component-specific sizes (a dot, a cell height) are named `private val`s in the component's
-  file, not spacing tokens.
+- **Dimensions come from tokens.** Padding and gaps use `AppSpacing`, corners use `AppRadius`,
+  sizes shared by several components use `AppSize`. Component-specific sizes (a dot, a cell
+  height) are named `private val`s in the component's file, not tokens.
 
 ## Adding a feature
 
@@ -61,5 +63,4 @@ com.example.walklogger
 
 - Wire `AddWalkButton` to start a walk (currently just logs the press).
 - Bundle a condensed display font (see `Type.kt`).
-- Add `DataStore` for user preferences (units, update interval).
 - Split `core/*` and `feature/*` into Gradle modules once the app grows.

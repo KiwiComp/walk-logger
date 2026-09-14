@@ -9,14 +9,14 @@ import com.example.walklogger.feature.log.navigation.LogDestination
 import com.example.walklogger.feature.patterns.navigation.PatternsDestination
 import kotlin.reflect.KClass
 
-/** The four bottom-bar tabs, in display order. A null [label] means the tab shows the dog's name. */
+/** The four bottom-bar tabs, in display order. */
 enum class TopLevelDestination(
-    @param:StringRes val label: Int?,
+    @param:StringRes val label: Int,
     @param:DrawableRes val icon: Int,
     val route: KClass<*>,
 ) {
     LOG(label = R.string.tab_log, icon = R.drawable.ic_tab_log, route = LogDestination::class),
     CALENDAR(label = R.string.tab_calendar, icon = R.drawable.ic_tab_calendar, route = CalendarDestination::class),
     PATTERNS(label = R.string.tab_patterns, icon = R.drawable.ic_tab_patterns, route = PatternsDestination::class),
-    DOG(label = null, icon = R.drawable.ic_tab_dog, route = DogDestination::class),
+    DOG(label = R.string.tab_dogs, icon = R.drawable.ic_tab_dog, route = DogDestination::class),
 }
