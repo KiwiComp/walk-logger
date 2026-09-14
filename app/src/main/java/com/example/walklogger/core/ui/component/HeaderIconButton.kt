@@ -21,17 +21,19 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val ButtonSize = 44.dp
 
-/** Bordered square icon button for the header's navigation slot (back, close). */
+/** Bordered square icon button for the header's navigation and action slots (back, close, delete). */
 @Composable
 fun HeaderIconButton(
     icon: ImageVector,
     contentDescription: String,
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
+    enabled: Boolean = true,
 ) {
     val shape = MaterialTheme.shapes.extraSmall
     IconButton(
         onClick = onClick,
+        enabled = enabled,
         shape = shape,
         colors = IconButtonDefaults.iconButtonColors(contentColor = OnNavy),
         modifier = modifier

@@ -38,7 +38,7 @@ fun NavGraphBuilder.newWalkScreen(onBack: () -> Unit, onLogPastWalk: (LocalDate)
     }
 }
 
-fun NavGraphBuilder.logPastWalkScreen(onClose: () -> Unit, onSaved: () -> Unit) {
+fun NavGraphBuilder.logPastWalkScreen(onClose: () -> Unit, onSaved: () -> Unit, onDeleted: () -> Unit) {
     composable<LogPastWalkDestination> { entry ->
         val destination = entry.toRoute<LogPastWalkDestination>()
         LogPastWalkRoute(
@@ -46,6 +46,7 @@ fun NavGraphBuilder.logPastWalkScreen(onClose: () -> Unit, onSaved: () -> Unit) 
             walkId = destination.walkId,
             onClose = onClose,
             onSaved = onSaved,
+            onDeleted = onDeleted,
         )
     }
 }

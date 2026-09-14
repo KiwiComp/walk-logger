@@ -19,7 +19,8 @@ com.example.walklogger
 │   │                          NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
 │   │                          LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating,
 │   │                          equipment, weather, notes) composed from WhenSection, RatingScale, WeatherRow;
-│   │                          the same screen edits a logged walk when the route carries a walkId;
+│   │                          the same screen edits a logged walk when the route carries a walkId,
+│   │                          and can delete it (DeleteWalkDialog confirms first);
 │   │                          the chosen day travels as a route argument into both ViewModels
 │   ├── calendar/              placeholder; ViewModel only feeds the active dog's name to the header badge
 │   ├── patterns/              placeholder, same shape as calendar

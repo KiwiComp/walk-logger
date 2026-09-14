@@ -44,6 +44,7 @@ fun WalkLoggerNavHost(
         logPastWalkScreen(
             onClose = { navController.popBackStack() },
             onSaved = { navController.popBackStack<LogDestination>(inclusive = false) },
+            onDeleted = { navController.popBackStack<LogDestination>(inclusive = false) },
         )
     }
 }
