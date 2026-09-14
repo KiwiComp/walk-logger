@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
@@ -30,6 +31,8 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val RatingBarWidth = 9.dp
 private val RatingBarHeight = 16.dp
+/** Every card reserves this many note lines so the timeline stays even; longer notes are cut with an ellipsis. */
+private const val NoteLines = 2
 
 /** One walk in the day's timeline: equipment chip, rating and note. Tapping it opens the walk for editing. */
 @Composable
@@ -57,9 +60,13 @@ internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier
                 RatingBar(rating = walk.rating)
             }
         }
-        if (walk.note.isNotBlank()) {
-            Text(text = walk.note, style = MaterialTheme.typography.bodyLarge)
-        }
+        Text(
+            text = walk.note,
+            style = MaterialTheme.typography.bodyLarge,
+            minLines = NoteLines,
+            maxLines = NoteLines,
+            overflow = TextOverflow.Ellipsis,
+        )
     }
 }
 
