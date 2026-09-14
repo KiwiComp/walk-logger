@@ -17,6 +17,7 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.CardSurface
 import com.example.walklogger.core.ui.theme.ChipSurface
@@ -29,7 +30,7 @@ private val RatingBarHeight = 16.dp
 
 /** One walk in the day's timeline: equipment chip, rating and note. */
 @Composable
-internal fun WalkCard(walk: SampleWalk, modifier: Modifier = Modifier) {
+internal fun WalkCard(walk: WalkUiState, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
             .background(CardSurface)
@@ -38,18 +39,29 @@ internal fun WalkCard(walk: SampleWalk, modifier: Modifier = Modifier) {
         verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
-            Text(
-                text = walk.equipment,
-                style = MaterialTheme.typography.bodyMedium,
-                modifier = Modifier
-                    .background(ChipSurface)
-                    .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
-            )
+            if (walk.equipment != null) {
+                Text(
+                    text = walk.equipment.label(),
+                    style = MaterialTheme.typography.bodyMedium,
+                    modifier = Modifier
+                        .background(ChipSurface)
+                        .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
+                )
+            }
             Spacer(Modifier.weight(1f))
-            RatingBar(rating = walk.rating)
+            if (walk.rating != null) {
+                RatingBar(rating = walk.rating)
+            }
         }
-        Text(text = walk.note, style = MaterialTheme.typography.bodyLarge)
+        if (walk.note.isNotBlank()) {
+            Text(text = walk.note, style = MaterialTheme.typography.bodyLarge)
+        }
     }
+}
+
+private fun Equipment.label() = when (this) {
+    Equipment.COLLAR -> "Collar"
+    Equipment.HARNESS -> "Harness"
 }
 
 @Composable
@@ -71,9 +83,6 @@ private fun RatingBar(rating: Int, max: Int = 7) {
 @Composable
 private fun WalkCardPreview() {
     WalkLoggerTheme {
-        WalkCard(
-            walk = SampleWalk("07:05", "38 min", "Harness", 6, "Long morning loop, calm the whole way."),
-            modifier = Modifier.padding(AppSpacing.lg),
-        )
+        WalkCard(walk = LogPreviewData.walk, modifier = Modifier.padding(AppSpacing.lg))
     }
 }

@@ -11,9 +11,10 @@ com.example.walklogger
 │
 ├── navigation/                app-level NavHost, bottom bar, top-level destinations
 │
-├── feature/                   one package per tab/screen (UI only so far – no ViewModels yet)
-│   ├── log/                   LogScreen composed from one file per piece (WeekStrip, WalkTimeline,
-│   │                          WalkCard, AddWalkPlaceholder); SampleData.kt holds static sample content
+├── feature/                   one package per tab/screen
+│   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from one file per
+│   │                          piece (WeekStrip, WalkTimeline, WalkCard, AddWalkButton);
+│   │                          LogPreviewData.kt holds fixed content for @Previews only
 │   ├── calendar/              placeholder
 │   ├── patterns/              placeholder
 │   ├── dog/                   the "Sixten" tab, placeholder
@@ -25,7 +26,7 @@ com.example.walklogger
 │   ├── model/                 domain models (Walk) – no Android deps
 │   ├── data/                  WalkRepository interface + Room-backed implementation, mappers
 │   ├── database/              Room database, DAO, entities
-│   ├── common/di/             injectable coroutine dispatchers
+│   ├── common/di/             injectable coroutine dispatchers and Clock
 │   └── ui/                    theme (fixed palette, square shapes, AppSpacing/AppRadius tokens)
 │                              + shared composables (WalkLoggerHeader, DogBadge, SectionLabel, EmptyTabContent)
 ```
@@ -58,7 +59,7 @@ com.example.walklogger
 
 ## Next steps (not yet implemented)
 
-- Add ViewModels per feature and replace the static sample content in `feature/log/SampleData.kt`.
+- Wire `AddWalkButton` to start a walk (currently just logs the press).
 - Bundle a condensed display font (see `Type.kt`).
 - Add `DataStore` for user preferences (units, update interval).
 - Split `core/*` and `feature/*` into Gradle modules once the app grows.

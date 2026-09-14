@@ -13,6 +13,9 @@ class FakeWalkRepository : WalkRepository {
     private val walks = MutableStateFlow<List<Walk>>(emptyList())
     private var nextId = 1L
 
+    /** Seeds walks directly, bypassing [startWalk]'s fixed timestamps. */
+    fun addWalks(vararg newWalks: Walk) = walks.update { it + newWalks }
+
     override fun observeWalks(): Flow<List<Walk>> = walks
 
     override fun observeWalk(id: Long): Flow<Walk?> = walks.map { list -> list.find { it.id == id } }
