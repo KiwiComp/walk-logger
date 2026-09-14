@@ -21,13 +21,13 @@ class FakeWalkRepository : WalkRepository {
 
     override suspend fun startWalk(): Long {
         val id = nextId++
-        walks.update { it + Walk(id = id, startedAtMillis = 0, endedAtMillis = null) }
+        walks.update { it + Walk(id = id, handler = "", startTime = 0, endTime = null) }
         return id
     }
 
     override suspend fun finishWalk(walkId: Long) {
         walks.update { list ->
-            list.map { if (it.id == walkId) it.copy(endedAtMillis = 1) else it }
+            list.map { if (it.id == walkId) it.copy(endTime = 1) else it }
         }
     }
 
