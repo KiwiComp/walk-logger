@@ -36,7 +36,8 @@ class LogViewModelTest {
     private fun walk(id: Long, start: LocalDateTime, minutes: Long = 30, rating: Int? = null, finished: Boolean = true) =
         Walk(
             id = id,
-            handler = "Kim",
+            dogId = 1,
+            handlers = listOf("Kim"),
             startTime = start.toEpochSecond(ZoneOffset.UTC) * 1000,
             endTime = if (finished) start.plusMinutes(minutes).toEpochSecond(ZoneOffset.UTC) * 1000 else null,
             equipment = Equipment.HARNESS,

@@ -58,6 +58,26 @@ class WalkLoggerDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migrate3To4_replacesHandlerWithHandlersListAndAddsDogIdAndHandlersTable() {
+        helper.createDatabase(DB_NAME, 3).use { db ->
+            db.execSQL("INSERT INTO walks (id, startTime, handler) VALUES (1, 100, 'Kim')")
+        }
+
+        val db = helper.runMigrationsAndValidate(DB_NAME, 4, true)
+
+        db.query("SELECT dogId, handlers FROM walks WHERE id = 1").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(0L, cursor.getLong(0))
+            assertEquals("[]", cursor.getString(1))
+        }
+        db.execSQL("INSERT INTO handlers (name) VALUES ('Anna')")
+        db.query("SELECT name FROM handlers").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Anna", cursor.getString(0))
+        }
+    }
+
     private companion object {
         const val DB_NAME = "migration-test.db"
     }

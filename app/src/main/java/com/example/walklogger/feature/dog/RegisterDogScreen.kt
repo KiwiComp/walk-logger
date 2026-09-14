@@ -13,9 +13,10 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
 import androidx.compose.material3.rememberDatePickerState
@@ -36,6 +37,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.AppButton
 import com.example.walklogger.core.ui.component.AppTextField
+import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -81,10 +83,12 @@ fun RegisterDogScreen(
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(R.string.register_dog_title),
-            actions = {
-                TextButton(onClick = onCancel) {
-                    Text(text = stringResource(R.string.register_dog_cancel), style = MaterialTheme.typography.titleSmall)
-                }
+            navigationIcon = {
+                HeaderIconButton(
+                    icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
+                    contentDescription = stringResource(R.string.back),
+                    onClick = onCancel,
+                )
             },
         )
         Column(

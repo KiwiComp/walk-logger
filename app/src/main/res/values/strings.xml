@@ -44,6 +44,8 @@
     </plurals>
     <string name="summary_average">· avg %1$.1f</string>
     <string name="walk_duration_minutes">%1$d min</string>
+    <string name="log_no_dog_message">Register a dog on the Dogs tab before logging walks.</string>
+    <string name="log_no_dog_action">Dogs</string>
     <string name="add_walk_for_day">+ Add a walk for %1$s</string>
 
     <string name="equipment_collar">Collar</string>
@@ -52,4 +54,21 @@
     <string name="day_today_description">Today, %1$s</string>
     <string name="day_has_walks">Has walks</string>
     <string name="day_no_walks">No walks</string>
+
+    <string name="back">Back</string>
+    <string name="dialog_ok">OK</string>
+    <string name="dialog_cancel">Cancel</string>
+
+    <string name="new_walk_title">New walk</string>
+    <string name="new_walk_who_is_walking">Who is walking</string>
+    <string name="new_walk_equipment">Equipment</string>
+    <string name="new_walk_someone_else">+ Someone else</string>
+    <string name="new_walk_after_note">Rating, weather and notes come after the walk. Start time is set when you tap.</string>
+    <string name="new_walk_timer_starts_now">Timer starts now</string>
+    <string name="new_walk_start">Start walk</string>
+    <string name="new_walk_summary">%1$s · %2$s</string>
+    <string name="new_walk_choose_handler">Choose who is walking first.</string>
+    <string name="new_walk_already_happened">This walk already happened</string>
+    <string name="new_walk_add_handler_title">Who else is walking?</string>
+    <string name="new_walk_add_handler_name">Name</string>
 </resources>

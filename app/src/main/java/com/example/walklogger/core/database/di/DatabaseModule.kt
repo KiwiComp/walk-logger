@@ -3,6 +3,7 @@ package com.example.walklogger.core.database.di
 import android.content.Context
 import androidx.room.Room
 import com.example.walklogger.core.database.DogDao
+import com.example.walklogger.core.database.HandlerDao
 import com.example.walklogger.core.database.WalkDao
 import com.example.walklogger.core.database.WalkLoggerDatabase
 import dagger.Module
@@ -27,4 +28,7 @@ object DatabaseModule {
 
     @Provides
     fun providesDogDao(database: WalkLoggerDatabase): DogDao = database.dogDao()
+
+    @Provides
+    fun providesHandlerDao(database: WalkLoggerDatabase): HandlerDao = database.handlerDao()
 }

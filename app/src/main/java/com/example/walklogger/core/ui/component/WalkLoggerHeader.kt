@@ -1,6 +1,7 @@
 package com.example.walklogger.core.ui.component
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.ColumnScope
 import androidx.compose.foundation.layout.Row
@@ -25,13 +26,14 @@ import com.example.walklogger.core.ui.theme.OnNavy
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /**
- * The dark header every tab shares. [title] and [actions] sit on the first row;
+ * The dark header every tab shares. [navigationIcon], [title] and [actions] sit on the first row;
  * [content] is an optional slot below it for tab-specific chrome such as the week strip.
  */
 @Composable
 fun WalkLoggerHeader(
     title: String,
     modifier: Modifier = Modifier,
+    navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit = {},
 ) {
@@ -47,7 +49,9 @@ fun WalkLoggerHeader(
             Row(
                 modifier = Modifier.fillMaxWidth(),
                 verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.lg),
             ) {
+                navigationIcon?.invoke()
                 Text(
                     text = title,
                     style = MaterialTheme.typography.headlineLarge,

@@ -1,6 +1,7 @@
 package com.example.walklogger.testing
 
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Walk
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -22,9 +23,11 @@ class FakeWalkRepository : WalkRepository {
 
     override fun observeActiveWalk(): Flow<Walk?> = walks.map { list -> list.find { it.isActive } }
 
-    override suspend fun startWalk(): Long {
+    override suspend fun startWalk(dogId: Long, handlers: List<String>, equipment: Equipment): Long {
         val id = nextId++
-        walks.update { it + Walk(id = id, handler = "", startTime = 0, endTime = null) }
+        walks.update {
+            it + Walk(id = id, dogId = dogId, handlers = handlers, equipment = equipment, startTime = 0, endTime = null)
+        }
         return id
     }
 

@@ -6,7 +6,9 @@ package com.example.walklogger.core.model
  */
 data class Walk(
     val id: Long,
-    val handler: String,
+    val dogId: Long,
+    /** Who walked the dog; at least one name. */
+    val handlers: List<String>,
     val startTime: Long,
     val endTime: Long?,
     val notes: String = "",
@@ -17,6 +19,7 @@ data class Walk(
     val wind: Wind? = null,
 ) {
     init {
+        require(handlers.isNotEmpty()) { "a walk needs at least one handler" }
         require(rating == null || rating in RATING_RANGE) { "rating must be in $RATING_RANGE, was $rating" }
     }
 
