@@ -1,7 +1,5 @@
 package com.example.walklogger.feature.dog
 
-import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
@@ -15,20 +13,10 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material3.DatePicker
-import androidx.compose.material3.DatePickerDialog
-import androidx.compose.material3.Text
-import androidx.compose.material3.TextButton
-import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
-import androidx.compose.runtime.mutableStateOf
-import androidx.compose.runtime.remember
-import androidx.compose.runtime.saveable.rememberSaveable
-import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
@@ -36,16 +24,13 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.AppButton
+import com.example.walklogger.core.ui.component.AppDateField
 import com.example.walklogger.core.ui.component.AppTextField
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
-import java.time.Instant
 import java.time.LocalDate
-import java.time.ZoneOffset
-import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
 
 @Composable
 fun RegisterDogRoute(
@@ -109,7 +94,12 @@ fun RegisterDogScreen(
                 onValueChange = onBreedChange,
                 label = stringResource(R.string.register_dog_breed),
             )
-            BirthDateField(birthDate = uiState.birthDate, onBirthDateChange = onBirthDateChange)
+            AppDateField(
+                date = uiState.birthDate,
+                onDateChange = onBirthDateChange,
+                label = stringResource(R.string.register_dog_birth_date),
+                placeholder = stringResource(R.string.register_dog_birth_date_none),
+            )
             AppTextField(
                 value = uiState.weight,
                 onValueChange = onWeightChange,
@@ -132,54 +122,6 @@ fun RegisterDogScreen(
         )
     }
 }
-
-/** Read-only text field that opens a date picker when pressed. */
-@Composable
-private fun BirthDateField(birthDate: LocalDate?, onBirthDateChange: (LocalDate?) -> Unit) {
-    val locale = LocalConfiguration.current.locales[0]
-    val formatter = remember(locale) { DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG).withLocale(locale) }
-    var showPicker by rememberSaveable { mutableStateOf(false) }
-    val interactionSource = remember { MutableInteractionSource() }
-    LaunchedEffect(interactionSource) {
-        interactionSource.interactions.collect { if (it is PressInteraction.Release) showPicker = true }
-    }
-    AppTextField(
-        value = birthDate?.format(formatter).orEmpty(),
-        onValueChange = {},
-        label = stringResource(R.string.register_dog_birth_date),
-        placeholder = stringResource(R.string.register_dog_birth_date_none),
-        readOnly = true,
-        interactionSource = interactionSource,
-    )
-    if (showPicker) {
-        val pickerState = rememberDatePickerState(
-            initialSelectedDateMillis = birthDate?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
-        )
-        DatePickerDialog(
-            onDismissRequest = { showPicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onBirthDateChange(pickerState.selectedDateMillis?.let { it.toLocalDate() })
-                        showPicker = false
-                    },
-                ) {
-                    Text(stringResource(R.string.register_dog_ok))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showPicker = false }) {
-                    Text(stringResource(R.string.register_dog_cancel))
-                }
-            },
-        ) {
-            DatePicker(state = pickerState)
-        }
-    }
-}
-
-// DatePicker reports UTC midnight of the chosen day.
-private fun Long.toLocalDate(): LocalDate = Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
 
 @Preview(showBackground = true, heightDp = 700)
 @Composable

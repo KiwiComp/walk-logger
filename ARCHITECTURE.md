@@ -17,7 +17,9 @@ com.example.walklogger
 │   │                          LogPreviewData.kt holds fixed content for @Previews only
 │   ├── logwalk/               the flow behind AddWalkButton, one package for all its screens.
 │   │                          NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
-│   │                          the chosen day travels as a route argument into the ViewModel
+│   │                          LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating,
+│   │                          equipment, weather, notes) composed from WhenSection, RatingScale, WeatherRow;
+│   │                          the chosen day travels as a route argument into both ViewModels
 │   ├── calendar/              placeholder; ViewModel only feeds the active dog's name to the header badge
 │   ├── patterns/              placeholder, same shape as calendar
 │   ├── dog/                   DogViewModel + DogUiState (profile header, dog list, add-dog CTA);
@@ -35,7 +37,8 @@ com.example.walklogger
 │   ├── common/di/             injectable coroutine dispatchers and Clock
 │   └── ui/                    theme (fixed palette, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, DogBadge, SectionLabel,
-│                              SegmentedToggle, DashedButton, AppButton, AppTextField, EmptyTabContent)
+│                              SegmentedToggle, DashedButton, AppButton, AppTextField, AppPickerField,
+│                              AppDateField, EmptyTabContent)
 ```
 
 ## Rules of thumb
@@ -47,11 +50,12 @@ com.example.walklogger
 - **Repository is the single source of truth.** ViewModels never touch Room or DataStore directly.
 - **Depend on interfaces.** Every repository has a fake in `src/test` so ViewModels are
   unit-testable on the JVM.
-- **Route arguments reach the ViewModel by assisted injection.** `NewWalkViewModel` takes its
-  `date` through an `@AssistedFactory` rather than `SavedStateHandle.toRoute()`, because
+- **Route arguments reach the ViewModel by assisted injection.** `NewWalkViewModel` and
+  `LogPastWalkViewModel` take their `date` through an `@AssistedFactory` rather than `SavedStateHandle.toRoute()`, because
   `SavedStateHandle` needs Android's `Bundle` and would push ViewModel tests off the JVM.
 - **Pushed screens hide the bottom bar.** Anything that is not a `TopLevelDestination`
-  (new walk, register dog) is a full-screen task with a leading back chevron in the header.
+  (new walk, log past walk, register dog) is a full-screen task with a leading back chevron
+  (or close cross for forms) in the header.
 - **Each feature owns its navigation.** Add a `@Serializable` route + `NavGraphBuilder.xxxScreen()`
   in `feature/<name>/navigation`, then register it in `WalkLoggerNavHost`.
 - **One file per composable piece, flat in the feature package.** A feature's building blocks
@@ -73,7 +77,7 @@ com.example.walklogger
 
 ## Next steps (not yet implemented)
 
-- `NewWalkScreen`: "Start walk" (timer screen) and "This walk already happened" (past-walk form)
-  are still no-ops; `WalkRepository.startWalk(dogId, handlers, equipment)` is ready for them.
+- `NewWalkScreen`: "Start walk" (timer screen) is still a no-op;
+  `WalkRepository.startWalk(dogId, handlers, equipment)` is ready for it.
 - Bundle a condensed display font (see `Type.kt`).
 - Split `core/*` and `feature/*` into Gradle modules once the app grows.

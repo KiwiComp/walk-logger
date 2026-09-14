@@ -22,6 +22,20 @@ internal fun WalkEntity.toModel(): Walk = Walk(
     wind = wind,
 )
 
+internal fun Walk.toEntity(): WalkEntity = WalkEntity(
+    id = id,
+    dogId = dogId,
+    handlers = handlers,
+    startTime = startTime,
+    endTime = endTime,
+    notes = notes,
+    equipment = equipment,
+    rating = rating,
+    rain = rain,
+    temperature = temperature,
+    wind = wind,
+)
+
 internal fun DogEntity.toModel(): Dog = Dog(
     id = id,
     name = name,

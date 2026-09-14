@@ -25,8 +25,6 @@
     <string name="dog_weight_kg">%1$s kg</string>
 
     <string name="register_dog_title">Ny hund</string>
-    <string name="register_dog_cancel">Avbryt</string>
-    <string name="register_dog_ok">OK</string>
     <string name="register_dog_name">Namn</string>
     <string name="register_dog_breed">Ras</string>
     <string name="register_dog_birth_date">Födelsedatum</string>
@@ -69,4 +67,44 @@
     <string name="new_walk_already_happened">Promenaden har redan skett</string>
     <string name="new_walk_add_handler_title">Vem mer går?</string>
     <string name="new_walk_add_handler_name">Namn</string>
+
+    <string name="close">Stäng</string>
+
+    <string name="log_past_walk_title">Logga en tidigare promenad</string>
+    <string name="log_past_walk_when">När</string>
+    <string name="log_past_walk_date">Datum</string>
+    <string name="log_past_walk_start">Start</string>
+    <string name="log_past_walk_end">Slut</string>
+    <string name="log_past_walk_start_time">Starttid</string>
+    <string name="log_past_walk_end_time">Sluttid</string>
+    <plurals name="log_past_walk_duration_minutes">
+        <item quantity="one">%1$d minut</item>
+        <item quantity="other">%1$d minuter</item>
+    </plurals>
+    <string name="log_past_walk_handler">Vem gick</string>
+    <string name="log_past_walk_rating">Betyg</string>
+    <string name="log_past_walk_rating_scale">1 sämst · 7 bäst</string>
+    <string name="log_past_walk_weather">Väder</string>
+    <string name="weather_rain">Regn</string>
+    <string name="weather_temperature">Temp</string>
+    <string name="weather_wind">Vind</string>
+    <string name="rain_none">Inget</string>
+    <string name="rain_light">Lätt</string>
+    <string name="rain_heavy">Kraftigt</string>
+    <string name="temperature_cold">Kallt</string>
+    <string name="temperature_cool">Svalt</string>
+    <string name="temperature_neutral">Milt</string>
+    <string name="temperature_warm">Varmt</string>
+    <string name="temperature_hot">Hett</string>
+    <string name="wind_still">Stilla</string>
+    <string name="wind_breeze">Bris</string>
+    <string name="wind_windy">Blåsigt</string>
+    <string name="log_past_walk_notes">Anteckningar</string>
+    <string name="log_past_walk_notes_placeholder">Vad stack ut? Reaktioner, andra hundar, dragande, vart ni gick.</string>
+    <string name="log_past_walk_save">Spara promenad</string>
+    <string name="log_past_walk_needs_handler">Välj vem som gick innan promenaden kan sparas.</string>
+    <string name="log_past_walk_needs_times">Ange start- och sluttid innan promenaden kan sparas.</string>
+    <string name="log_past_walk_needs_end_after_start">Sluttiden måste vara efter starttiden.</string>
+    <string name="log_past_walk_needs_past_end">En tidigare promenad kan inte sluta i framtiden.</string>
+    <string name="log_past_walk_needs_rating">Ett betyg behövs innan promenaden kan sparas.</string>
 </resources>

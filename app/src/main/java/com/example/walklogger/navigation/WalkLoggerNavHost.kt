@@ -10,6 +10,8 @@ import com.example.walklogger.feature.dog.navigation.navigateToRegisterDog
 import com.example.walklogger.feature.dog.navigation.registerDogScreen
 import com.example.walklogger.feature.log.navigation.LogDestination
 import com.example.walklogger.feature.log.navigation.logScreen
+import com.example.walklogger.feature.logwalk.navigation.logPastWalkScreen
+import com.example.walklogger.feature.logwalk.navigation.navigateToLogPastWalk
 import com.example.walklogger.feature.logwalk.navigation.navigateToNewWalk
 import com.example.walklogger.feature.logwalk.navigation.newWalkScreen
 import com.example.walklogger.feature.patterns.navigation.patternsScreen
@@ -33,6 +35,13 @@ fun WalkLoggerNavHost(
         patternsScreen()
         dogScreen(onAddDog = navController::navigateToRegisterDog)
         registerDogScreen(onDone = { navController.popBackStack() })
-        newWalkScreen(onBack = { navController.popBackStack() })
+        newWalkScreen(
+            onBack = { navController.popBackStack() },
+            onLogPastWalk = navController::navigateToLogPastWalk,
+        )
+        logPastWalkScreen(
+            onClose = { navController.popBackStack() },
+            onSaved = { navController.popBackStack<LogDestination>(inclusive = false) },
+        )
     }
 }

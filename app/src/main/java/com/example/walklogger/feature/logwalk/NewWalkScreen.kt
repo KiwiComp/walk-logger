@@ -2,10 +2,8 @@ package com.example.walklogger.feature.logwalk
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
@@ -26,19 +24,18 @@ import com.example.walklogger.R
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.HeaderIconButton
-import com.example.walklogger.core.ui.component.SectionLabel
 import com.example.walklogger.core.ui.component.SegmentedToggle
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import java.time.LocalDate
 
-/** Start / log-past-walk are no-ops until those flows exist. */
+/** Start walk is a no-op until the timer flow exists. */
 @Composable
 fun NewWalkRoute(
     date: LocalDate,
     onBack: () -> Unit,
+    onLogPastWalk: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: NewWalkViewModel = hiltViewModel<NewWalkViewModel, NewWalkViewModel.Factory> { it.create(date) },
 ) {
@@ -50,7 +47,7 @@ fun NewWalkRoute(
         onAddHandler = viewModel::addHandler,
         onEquipmentSelected = viewModel::selectEquipment,
         onStartWalk = {},
-        onLogPastWalk = {},
+        onLogPastWalk = { onLogPastWalk(uiState.date) },
         modifier = modifier,
     )
 }
@@ -120,15 +117,6 @@ fun NewWalkScreen(
     }
 }
 
-@Composable
-private fun FormSection(label: String, content: @Composable () -> Unit) {
-    Column {
-        SectionLabel(text = label, color = InkMuted)
-        Spacer(Modifier.height(AppSpacing.sm))
-        content()
-    }
-}
-
 /** Selected handlers and equipment, or why the walk can't start yet. */
 @Composable
 private fun NewWalkUiState.summary(): String {
@@ -138,12 +126,6 @@ private fun NewWalkUiState.summary(): String {
     val handlers = handlers.filter { it in selectedHandlers }
     return stringResource(R.string.new_walk_summary, handlers.joinToString(), equipmentLabel)
 }
-
-private val Equipment.labelRes: Int
-    get() = when (this) {
-        Equipment.COLLAR -> R.string.equipment_collar
-        Equipment.HARNESS -> R.string.equipment_harness
-    }
 
 @Preview(showBackground = true, heightDp = 900)
 @Composable

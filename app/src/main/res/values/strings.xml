@@ -27,8 +27,6 @@
     <string name="dog_weight_kg">%1$s kg</string>
 
     <string name="register_dog_title">New dog</string>
-    <string name="register_dog_cancel">Cancel</string>
-    <string name="register_dog_ok">OK</string>
     <string name="register_dog_name">Name</string>
     <string name="register_dog_breed">Breed</string>
     <string name="register_dog_birth_date">Birth date</string>
@@ -71,4 +69,44 @@
     <string name="new_walk_already_happened">This walk already happened</string>
     <string name="new_walk_add_handler_title">Who else is walking?</string>
     <string name="new_walk_add_handler_name">Name</string>
+
+    <string name="close">Close</string>
+
+    <string name="log_past_walk_title">Log a past walk</string>
+    <string name="log_past_walk_when">When</string>
+    <string name="log_past_walk_date">Date</string>
+    <string name="log_past_walk_start">Start</string>
+    <string name="log_past_walk_end">End</string>
+    <string name="log_past_walk_start_time">Start time</string>
+    <string name="log_past_walk_end_time">End time</string>
+    <plurals name="log_past_walk_duration_minutes">
+        <item quantity="one">%1$d minute</item>
+        <item quantity="other">%1$d minutes</item>
+    </plurals>
+    <string name="log_past_walk_handler">Handler</string>
+    <string name="log_past_walk_rating">Rating</string>
+    <string name="log_past_walk_rating_scale">1 worst · 7 best</string>
+    <string name="log_past_walk_weather">Weather</string>
+    <string name="weather_rain">Rain</string>
+    <string name="weather_temperature">Temp</string>
+    <string name="weather_wind">Wind</string>
+    <string name="rain_none">None</string>
+    <string name="rain_light">Light</string>
+    <string name="rain_heavy">Heavy</string>
+    <string name="temperature_cold">Cold</string>
+    <string name="temperature_cool">Cool</string>
+    <string name="temperature_neutral">Mild</string>
+    <string name="temperature_warm">Warm</string>
+    <string name="temperature_hot">Hot</string>
+    <string name="wind_still">Still</string>
+    <string name="wind_breeze">Breeze</string>
+    <string name="wind_windy">Windy</string>
+    <string name="log_past_walk_notes">Notes</string>
+    <string name="log_past_walk_notes_placeholder">What stood out? Reactions, other dogs, pulling, where you went.</string>
+    <string name="log_past_walk_save">Save walk</string>
+    <string name="log_past_walk_needs_handler">Choose who walked before this walk can be saved.</string>
+    <string name="log_past_walk_needs_times">Enter start and end times before this walk can be saved.</string>
+    <string name="log_past_walk_needs_end_after_start">The end time must be after the start time.</string>
+    <string name="log_past_walk_needs_past_end">A past walk can\u2019t end in the future.</string>
+    <string name="log_past_walk_needs_rating">A rating is needed before this walk can be saved.</string>
 </resources>
