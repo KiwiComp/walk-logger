@@ -20,6 +20,9 @@ data class DayUiState(
     val date: LocalDate,
     val hasWalks: Boolean,
     val isSelected: Boolean,
+    val isToday: Boolean,
+    /** False for days after today: nothing can be logged there yet. */
+    val isEnabled: Boolean,
 )
 
 data class WalkUiState(

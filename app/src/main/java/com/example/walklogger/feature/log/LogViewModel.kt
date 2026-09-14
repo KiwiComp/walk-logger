@@ -44,11 +44,18 @@ class LogViewModel @Inject constructor(
 
     private fun buildState(date: LocalDate, walks: List<Walk>): LogUiState {
         val walksByDate = walks.groupBy { it.startDate(clock.zone) }
+        val today = LocalDate.now(clock)
         val monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
         return LogUiState(
             selectedDate = date,
             week = (0L until 7L).map { monday.plusDays(it) }.map { day ->
-                DayUiState(date = day, hasWalks = day in walksByDate, isSelected = day == date)
+                DayUiState(
+                    date = day,
+                    hasWalks = day in walksByDate,
+                    isSelected = day == date,
+                    isToday = day == today,
+                    isEnabled = !day.isAfter(today),
+                )
             },
             walks = walksByDate[date].orEmpty()
                 .sortedBy { it.startTime }

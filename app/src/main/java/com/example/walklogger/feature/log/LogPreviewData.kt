@@ -34,7 +34,13 @@ internal object LogPreviewData {
         selectedDate = saturday,
         week = (0L until 7L).map { offset ->
             val day = saturday.minusDays(5).plusDays(offset)
-            DayUiState(date = day, hasWalks = offset !in setOf(2L, 6L), isSelected = day == saturday)
+            DayUiState(
+                date = day,
+                hasWalks = offset !in setOf(2L, 6L),
+                isSelected = day == saturday,
+                isToday = day == saturday,
+                isEnabled = !day.isAfter(saturday),
+            )
         },
         walks = walks,
     )

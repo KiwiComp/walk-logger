@@ -48,6 +48,8 @@ class LogViewModelTest {
             assertEquals((7..13).map { LocalDate.of(2026, 9, it) }, state.week.map { it.date })
             assertEquals(listOf(false, false, false, false, false, true, false), state.week.map { it.isSelected })
             assertEquals(List(7) { false }, state.week.map { it.hasWalks })
+            assertEquals(listOf(true, true, true, true, true, true, false), state.week.map { it.isEnabled })
+            assertEquals(today, state.week.single { it.isToday }.date)
             assertEquals(emptyList<WalkUiState>(), state.walks)
             assertNull(state.averageRating)
         }
@@ -91,6 +93,7 @@ class LogViewModelTest {
             assertEquals(friday, state.selectedDate)
             assertEquals(listOf(1L), state.walks.map { it.id })
             assertEquals(friday, state.week.single { it.isSelected }.date)
+            assertEquals(today, state.week.single { it.isToday }.date)
         }
     }
 }
