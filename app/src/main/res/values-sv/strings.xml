@@ -93,7 +93,7 @@
     <string name="rain_heavy">Kraftigt</string>
     <string name="temperature_cold">Kallt</string>
     <string name="temperature_cool">Svalt</string>
-    <string name="temperature_neutral">Lagom</string>
+    <string name="temperature_neutral">Milt</string>
     <string name="temperature_warm">Varmt</string>
     <string name="temperature_hot">Hett</string>
     <string name="wind_still">Stilla</string>

@@ -13,6 +13,7 @@ import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.saveable.rememberSaveable
@@ -22,6 +23,8 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
@@ -40,6 +43,38 @@ import java.time.LocalDate
 import java.time.LocalTime
 
 private const val NotesMinLines = 3
+
+@Composable
+fun LogPastWalkRoute(
+    date: LocalDate,
+    onClose: () -> Unit,
+    onSaved: () -> Unit,
+    modifier: Modifier = Modifier,
+    viewModel: LogPastWalkViewModel =
+        hiltViewModel<LogPastWalkViewModel, LogPastWalkViewModel.Factory> { it.create(date) },
+) {
+    val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) onSaved()
+    }
+    LogPastWalkScreen(
+        uiState = uiState,
+        onClose = onClose,
+        onDateChange = viewModel::setDate,
+        onStartTimeChange = viewModel::setStartTime,
+        onEndTimeChange = viewModel::setEndTime,
+        onHandlerToggled = viewModel::toggleHandler,
+        onAddHandler = viewModel::addHandler,
+        onRatingChange = viewModel::setRating,
+        onEquipmentSelected = viewModel::selectEquipment,
+        onRainSelected = viewModel::selectRain,
+        onTemperatureSelected = viewModel::selectTemperature,
+        onWindSelected = viewModel::selectWind,
+        onNotesChange = viewModel::setNotes,
+        onSave = viewModel::save,
+        modifier = modifier,
+    )
+}
 
 @Composable
 fun LogPastWalkScreen(

@@ -30,11 +30,12 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import java.time.LocalDate
 
-/** Start / log-past-walk are no-ops until those flows exist. */
+/** Start walk is a no-op until the timer flow exists. */
 @Composable
 fun NewWalkRoute(
     date: LocalDate,
     onBack: () -> Unit,
+    onLogPastWalk: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: NewWalkViewModel = hiltViewModel<NewWalkViewModel, NewWalkViewModel.Factory> { it.create(date) },
 ) {
@@ -46,7 +47,7 @@ fun NewWalkRoute(
         onAddHandler = viewModel::addHandler,
         onEquipmentSelected = viewModel::selectEquipment,
         onStartWalk = {},
-        onLogPastWalk = {},
+        onLogPastWalk = { onLogPastWalk(uiState.date) },
         modifier = modifier,
     )
 }

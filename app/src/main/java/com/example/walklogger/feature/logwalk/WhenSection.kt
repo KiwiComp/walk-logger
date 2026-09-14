@@ -22,7 +22,6 @@ import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -35,12 +34,11 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
-import java.time.format.FormatStyle
-import java.util.Locale
 
 private const val DateWeight = 3f
 private const val TimeWeight = 2f
 private val DateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE d MMM")
+private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 /** Date, start and end pickers side by side, with the resulting duration underneath. */
 @Composable
@@ -54,7 +52,6 @@ internal fun WhenSection(
     onEndTimeChange: (LocalTime) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val locale = LocalConfiguration.current.locales[0]
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
         Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
             AppDateField(
@@ -68,7 +65,6 @@ internal fun WhenSection(
                 time = startTime,
                 label = stringResource(R.string.log_past_walk_start),
                 dialogTitle = stringResource(R.string.log_past_walk_start_time),
-                locale = locale,
                 onTimeChange = onStartTimeChange,
                 modifier = Modifier.weight(TimeWeight),
             )
@@ -76,7 +72,6 @@ internal fun WhenSection(
                 time = endTime,
                 label = stringResource(R.string.log_past_walk_end),
                 dialogTitle = stringResource(R.string.log_past_walk_end_time),
-                locale = locale,
                 onTimeChange = onEndTimeChange,
                 modifier = Modifier.weight(TimeWeight),
             )
@@ -98,14 +93,12 @@ private fun TimeField(
     time: LocalTime?,
     label: String,
     dialogTitle: String,
-    locale: Locale,
     onTimeChange: (LocalTime) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val formatter = remember(locale) { DateTimeFormatter.ofLocalizedTime(FormatStyle.SHORT).withLocale(locale) }
     var showPicker by rememberSaveable { mutableStateOf(false) }
     AppPickerField(
-        value = time?.format(formatter).orEmpty(),
+        value = time?.format(TimeFormatter).orEmpty(),
         label = label,
         onPress = { showPicker = true },
         modifier = modifier,
@@ -114,6 +107,7 @@ private fun TimeField(
         val pickerState = rememberTimePickerState(
             initialHour = time?.hour ?: LocalTime.NOON.hour,
             initialMinute = time?.minute ?: 0,
+            is24Hour = true
         )
         var displayMode by remember { mutableStateOf(TimePickerDisplayMode.Picker) }
         TimePickerDialog(

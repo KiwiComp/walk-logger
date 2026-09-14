@@ -95,7 +95,7 @@
     <string name="rain_heavy">Heavy</string>
     <string name="temperature_cold">Cold</string>
     <string name="temperature_cool">Cool</string>
-    <string name="temperature_neutral">Neutral</string>
+    <string name="temperature_neutral">Mild</string>
     <string name="temperature_warm">Warm</string>
     <string name="temperature_hot">Hot</string>
     <string name="wind_still">Still</string>
