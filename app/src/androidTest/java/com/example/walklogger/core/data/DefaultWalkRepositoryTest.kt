@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.walklogger.core.database.WalkLoggerDatabase
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
+import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
@@ -45,6 +46,7 @@ class DefaultWalkRepositoryTest {
         rain = Rain.LIGHT,
         temperature = Temperature.COLD,
         wind = Wind.WINDY,
+        snow = Snow.NONE,
     )
 
     @Before

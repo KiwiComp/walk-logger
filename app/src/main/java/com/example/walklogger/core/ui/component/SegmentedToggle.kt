@@ -33,6 +33,15 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val DividerWidth = 1.dp
 
+/** Label size of a [SegmentedToggle]; the segments themselves keep the same height. */
+enum class SegmentedToggleSize {
+    /** Bold title text for primary choices such as equipment. */
+    Regular,
+
+    /** Body-small text for dense rows such as the weather conditions. */
+    Compact,
+}
+
 /**
  * Joined row of equal-width segments where exactly one can be selected
  * (equipment, rain, temperature, wind). [selected] is null until the user picks.
@@ -44,6 +53,7 @@ fun <T> SegmentedToggle(
     onSelect: (T) -> Unit,
     label: @Composable (T) -> String,
     modifier: Modifier = Modifier,
+    size: SegmentedToggleSize = SegmentedToggleSize.Regular,
 ) {
     val shape = MaterialTheme.shapes.extraSmall
     Row(
@@ -62,13 +72,14 @@ fun <T> SegmentedToggle(
                 text = label(option),
                 isSelected = option == selected,
                 onClick = { onSelect(option) },
+                size = size,
             )
         }
     }
 }
 
 @Composable
-private fun RowScope.Segment(text: String, isSelected: Boolean, onClick: () -> Unit) {
+private fun RowScope.Segment(text: String, isSelected: Boolean, onClick: () -> Unit, size: SegmentedToggleSize) {
     Box(
         modifier = Modifier
             .weight(1f)
@@ -80,7 +91,10 @@ private fun RowScope.Segment(text: String, isSelected: Boolean, onClick: () -> U
     ) {
         Text(
             text = text,
-            style = MaterialTheme.typography.titleSmall,
+            style = when (size) {
+                SegmentedToggleSize.Regular -> MaterialTheme.typography.titleSmall
+                SegmentedToggleSize.Compact -> MaterialTheme.typography.bodySmall
+            },
             color = if (isSelected) OnNavy else Ink,
             maxLines = 1,
         )
@@ -104,6 +118,7 @@ private fun SegmentedTogglePreview() {
                 onSelect = {},
                 label = { it },
                 modifier = Modifier.padding(top = AppSpacing.lg),
+                size = SegmentedToggleSize.Compact,
             )
         }
     }

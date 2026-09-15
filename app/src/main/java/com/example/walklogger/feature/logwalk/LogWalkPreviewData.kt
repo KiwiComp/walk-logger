@@ -2,6 +2,7 @@ package com.example.walklogger.feature.logwalk
 
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
+import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 import java.time.Duration
@@ -34,6 +35,7 @@ internal object LogWalkPreviewData {
         rain = Rain.LIGHT,
         temperature = Temperature.COLD,
         wind = Wind.WINDY,
+        snow = Snow.LIGHT,
     )
 
     val activeWalk = ActiveWalkUiState(
@@ -57,6 +59,7 @@ internal object LogWalkPreviewData {
         rain = Rain.NONE,
         temperature = Temperature.COOL,
         wind = Wind.BREEZE,
+        snow = Snow.NONE,
         notes = "Barked at the bin lorry, otherwise steady. Off-lead in the field for ten minutes.",
         isLoading = false,
     )

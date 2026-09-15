@@ -17,6 +17,7 @@ data class Walk(
     val rain: Rain? = null,
     val temperature: Temperature? = null,
     val wind: Wind? = null,
+    val snow: Snow? = null,
 ) {
     init {
         require(handlers.isNotEmpty()) { "a walk needs at least one handler" }
@@ -37,3 +38,5 @@ enum class Rain { NONE, LIGHT, HEAVY }
 enum class Temperature { COLD, COOL, NEUTRAL, WARM, HOT }
 
 enum class Wind { STILL, BREEZE, WINDY }
+
+enum class Snow { NONE, LIGHT, HEAVY }

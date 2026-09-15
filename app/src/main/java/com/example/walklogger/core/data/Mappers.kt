@@ -20,6 +20,7 @@ internal fun WalkEntity.toModel(): Walk = Walk(
     rain = rain,
     temperature = temperature,
     wind = wind,
+    snow = snow,
 )
 
 internal fun Walk.toEntity(): WalkEntity = WalkEntity(
@@ -34,6 +35,7 @@ internal fun Walk.toEntity(): WalkEntity = WalkEntity(
     rain = rain,
     temperature = temperature,
     wind = wind,
+    snow = snow,
 )
 
 internal fun DogEntity.toModel(): Dog = Dog(
