@@ -12,7 +12,10 @@ data class NewWalkUiState(
     val handlers: List<String> = emptyList(),
     val selectedHandlers: Set<String> = emptySet(),
     val equipment: Equipment = Equipment.HARNESS,
+    val isStarting: Boolean = false,
+    /** Set once the walk is stored; the timer screen opens for it. */
+    val startedWalkId: Long? = null,
 ) {
     /** A walk always has at least one handler. */
-    val canStart: Boolean get() = selectedHandlers.isNotEmpty()
+    val canStart: Boolean get() = selectedHandlers.isNotEmpty() && !isStarting && startedWalkId == null
 }

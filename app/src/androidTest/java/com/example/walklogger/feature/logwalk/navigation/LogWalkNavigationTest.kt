@@ -17,7 +17,7 @@ import org.junit.Before
 import org.junit.Test
 import org.junit.runner.RunWith
 
-/** Exercises the log → new walk → log past walk stack without composing any screens. */
+/** Exercises the log → new walk → log past walk / timer → after-walk stacks without composing any screens. */
 @RunWith(AndroidJUnit4::class)
 class LogWalkNavigationTest {
 
@@ -32,6 +32,8 @@ class LogWalkNavigationTest {
                 composable<LogDestination> {}
                 composable<NewWalkDestination> {}
                 composable<LogPastWalkDestination> {}
+                composable<ActiveWalkDestination> {}
+                composable<FinishWalkDestination> {}
             }
         }
     }
@@ -65,6 +67,39 @@ class LogWalkNavigationTest {
 
         assertTrue(navController.currentDestination!!.hasRoute<LogDestination>())
         assertTrue(navController.currentBackStack.value.none { it.destination.hasRoute<NewWalkDestination>() })
+    }
+
+    @Test
+    fun startingAWalk_replacesNewWalkWithTheTimer() = onMain {
+        navController.navigateToNewWalk(date)
+
+        navController.navigateToActiveWalk(walkId = 7)
+
+        val entry = navController.currentBackStackEntry!!
+        assertTrue(entry.destination.hasRoute<ActiveWalkDestination>())
+        assertEquals(7L, entry.toRoute<ActiveWalkDestination>().walkId)
+        assertTrue(navController.currentBackStack.value.none { it.destination.hasRoute<NewWalkDestination>() })
+    }
+
+    @Test
+    fun resumingTheTimerTwice_keepsOneEntry() = onMain {
+        navController.navigateToActiveWalk(walkId = 7)
+        navController.navigateToActiveWalk(walkId = 7)
+
+        assertEquals(1, navController.currentBackStack.value.count { it.destination.hasRoute<ActiveWalkDestination>() })
+    }
+
+    @Test
+    fun endingAWalk_replacesTheTimerWithTheForm() = onMain {
+        navController.navigateToActiveWalk(walkId = 7)
+
+        navController.navigateToFinishWalk(walkId = 7)
+
+        val entry = navController.currentBackStackEntry!!
+        assertTrue(entry.destination.hasRoute<FinishWalkDestination>())
+        assertEquals(7L, entry.toRoute<FinishWalkDestination>().walkId)
+        assertTrue(navController.currentBackStack.value.none { it.destination.hasRoute<ActiveWalkDestination>() })
+        assertTrue(navController.previousBackStackEntry!!.destination.hasRoute<LogDestination>())
     }
 
     private fun onMain(block: () -> Unit) = InstrumentationRegistry.getInstrumentation().runOnMainSync(block)

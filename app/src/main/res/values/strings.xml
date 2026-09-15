@@ -72,6 +72,23 @@
 
     <string name="close">Close</string>
 
+    <string name="active_walk_title">Walking</string>
+    <string name="active_walk_out_with">Out with %1$s</string>
+    <string name="active_walk_started_at">Started %1$s</string>
+    <string name="active_walk_quick_note">Quick note while you walk</string>
+    <string name="active_walk_quick_note_placeholder">Barked at the bin lorry…</string>
+    <string name="active_walk_end">End walk</string>
+    <string name="active_walk_discard">Discard walk</string>
+    <string name="active_walk_discard_confirm_title">Discard this walk?</string>
+    <string name="active_walk_discard_confirm_message">The timer stops and nothing is logged, not even the note. This can\'t be undone.</string>
+    <string name="active_walk_discard_confirm">Discard</string>
+
+    <string name="finish_walk_title">How was it?</string>
+    <string name="finish_walk_edit_times">Edit times</string>
+    <string name="finish_walk_times_summary">%1$s → %2$s · %3$s · logged automatically</string>
+    <string name="finish_walk_walked_by">Walked by %1$s</string>
+    <string name="finish_walk_dog_walked_by">%1$s walked by %2$s</string>
+
     <string name="log_past_walk_title">Log a past walk</string>
     <string name="edit_walk_title">Edit walk</string>
     <string name="edit_walk_delete">Delete walk</string>

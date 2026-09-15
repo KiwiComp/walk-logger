@@ -24,6 +24,9 @@ interface WalkRepository {
 
     /** Replaces the stored walk with [Walk.id]; like [logWalk], it must have an end time. */
     suspend fun updateWalk(walk: Walk)
+
+    /** Replaces the notes of the walk with [walkId]; used while a walk is still in progress. */
+    suspend fun updateNotes(walkId: Long, notes: String)
     suspend fun finishWalk(walkId: Long)
     suspend fun deleteWalk(id: Long)
 }

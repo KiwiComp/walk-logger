@@ -10,8 +10,12 @@ import com.example.walklogger.feature.dog.navigation.navigateToRegisterDog
 import com.example.walklogger.feature.dog.navigation.registerDogScreen
 import com.example.walklogger.feature.log.navigation.LogDestination
 import com.example.walklogger.feature.log.navigation.logScreen
+import com.example.walklogger.feature.logwalk.navigation.activeWalkScreen
+import com.example.walklogger.feature.logwalk.navigation.finishWalkScreen
 import com.example.walklogger.feature.logwalk.navigation.logPastWalkScreen
+import com.example.walklogger.feature.logwalk.navigation.navigateToActiveWalk
 import com.example.walklogger.feature.logwalk.navigation.navigateToEditWalk
+import com.example.walklogger.feature.logwalk.navigation.navigateToFinishWalk
 import com.example.walklogger.feature.logwalk.navigation.navigateToLogPastWalk
 import com.example.walklogger.feature.logwalk.navigation.navigateToNewWalk
 import com.example.walklogger.feature.logwalk.navigation.newWalkScreen
@@ -39,8 +43,14 @@ fun WalkLoggerNavHost(
         registerDogScreen(onDone = { navController.popBackStack() })
         newWalkScreen(
             onBack = { navController.popBackStack() },
+            onWalkStarted = navController::navigateToActiveWalk,
             onLogPastWalk = navController::navigateToLogPastWalk,
         )
+        activeWalkScreen(
+            onWalkEnded = navController::navigateToFinishWalk,
+            onWalkDiscarded = { navController.popBackStack<LogDestination>(inclusive = false) },
+        )
+        finishWalkScreen(onSaved = { navController.popBackStack<LogDestination>(inclusive = false) })
         logPastWalkScreen(
             onClose = { navController.popBackStack() },
             onSaved = { navController.popBackStack<LogDestination>(inclusive = false) },

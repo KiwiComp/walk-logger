@@ -9,6 +9,9 @@ import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
+import java.time.Clock
+import java.time.Instant
+import java.time.ZoneOffset
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
@@ -27,6 +30,9 @@ class DefaultWalkRepositoryTest {
     private lateinit var database: WalkLoggerDatabase
     private lateinit var repository: DefaultWalkRepository
 
+    private val now = Instant.parse("2026-09-12T07:05:00Z")
+    private val clock = Clock.fixed(now, ZoneOffset.UTC)
+
     private val pastWalk = Walk(
         id = 99,
         dogId = 7,
@@ -44,7 +50,7 @@ class DefaultWalkRepositoryTest {
     @Before
     fun setUp() {
         database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), WalkLoggerDatabase::class.java).build()
-        repository = DefaultWalkRepository(database.walkDao(), Dispatchers.IO)
+        repository = DefaultWalkRepository(database.walkDao(), clock, Dispatchers.IO)
     }
 
     @After
@@ -83,14 +89,16 @@ class DefaultWalkRepositoryTest {
     }
 
     @Test
-    fun startWalk_thenFinishWalk_setsEndTime() = runBlocking {
+    fun startWalk_thenFinishWalk_stampsBothTimesFromTheClock() = runBlocking {
         val id = repository.startWalk(dogId = 7, handlers = listOf("Anna"), equipment = Equipment.HARNESS)
-        assertEquals(id, repository.observeActiveWalk().first()?.id)
+        val active = repository.observeActiveWalk().first()!!
+        assertEquals(id, active.id)
+        assertEquals(now.toEpochMilli(), active.startTime)
 
         repository.finishWalk(id)
 
         assertNull(repository.observeActiveWalk().first())
-        assertTrue(repository.observeWalk(id).first()!!.endTime != null)
+        assertEquals(now.toEpochMilli(), repository.observeWalk(id).first()!!.endTime)
     }
 
     @Test
