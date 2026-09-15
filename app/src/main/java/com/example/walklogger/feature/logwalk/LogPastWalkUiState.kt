@@ -2,6 +2,7 @@ package com.example.walklogger.feature.logwalk
 
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
+import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 import java.time.Duration
@@ -24,6 +25,9 @@ data class LogPastWalkUiState(
     val rain: Rain? = null,
     val temperature: Temperature? = null,
     val wind: Wind? = null,
+    val snow: Snow? = null,
+    /** True while the optional weather rows are shown; opens by itself when a stored walk has any. */
+    val isWeatherExpanded: Boolean = false,
     val notes: String = "",
     /** True when the form changes an existing walk rather than logging a new one. */
     val isEditing: Boolean = false,

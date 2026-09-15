@@ -116,6 +116,8 @@
     <string name="weather_rain">Rain</string>
     <string name="weather_temperature">Temp</string>
     <string name="weather_wind">Wind</string>
+    <string name="weather_snow">Snow</string>
+    <string name="weather_clear">Clear</string>
     <string name="rain_none">None</string>
     <string name="rain_light">Light</string>
     <string name="rain_heavy">Heavy</string>
@@ -127,6 +129,9 @@
     <string name="wind_still">Still</string>
     <string name="wind_breeze">Breeze</string>
     <string name="wind_windy">Windy</string>
+    <string name="snow_none">None</string>
+    <string name="snow_light">Light</string>
+    <string name="snow_heavy">Heavy</string>
     <string name="log_past_walk_notes">Notes</string>
     <string name="log_past_walk_notes_placeholder">What stood out? Reactions, other dogs, pulling, where you went.</string>
     <string name="log_past_walk_save">Save walk</string>

@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
+import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
@@ -79,6 +80,43 @@ class FinishWalkViewModelTest {
     }
 
     @Test
+    fun `weather starts collapsed for a walk without conditions and toggles`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            assertFalse(expectMostRecentItem().isWeatherExpanded)
+            viewModel.toggleWeather()
+            assertTrue(expectMostRecentItem().isWeatherExpanded)
+            viewModel.toggleWeather()
+            assertFalse(expectMostRecentItem().isWeatherExpanded)
+        }
+    }
+
+    @Test
+    fun `weather starts expanded for a walk with conditions`() = runTest {
+        walkRepository.addWalks(walk.copy(snow = Snow.HEAVY))
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertEquals(Snow.HEAVY, state.snow)
+            assertTrue(state.isWeatherExpanded)
+        }
+    }
+
+    @Test
+    fun `clear weather resets every condition`() = runTest {
+        walkRepository.addWalks(walk.copy(rain = Rain.HEAVY, temperature = Temperature.HOT))
+        viewModel.uiState.test {
+            viewModel.selectWind(Wind.STILL)
+            viewModel.selectSnow(Snow.LIGHT)
+            viewModel.clearWeather()
+            val state = expectMostRecentItem()
+            assertNull(state.rain)
+            assertNull(state.temperature)
+            assertNull(state.wind)
+            assertNull(state.snow)
+        }
+    }
+
+    @Test
     fun `end before start blocks saving`() = runTest {
         walkRepository.addWalks(walk)
         viewModel.uiState.test {
@@ -108,6 +146,7 @@ class FinishWalkViewModelTest {
             viewModel.selectRain(Rain.NONE)
             viewModel.selectTemperature(Temperature.COOL)
             viewModel.selectWind(Wind.BREEZE)
+            viewModel.selectSnow(Snow.LIGHT)
             viewModel.setNotes("  Off-lead in the field  ")
             viewModel.save()
 
@@ -123,6 +162,7 @@ class FinishWalkViewModelTest {
             assertEquals(Rain.NONE, stored.rain)
             assertEquals(Temperature.COOL, stored.temperature)
             assertEquals(Wind.BREEZE, stored.wind)
+            assertEquals(Snow.LIGHT, stored.snow)
             assertEquals("Off-lead in the field", stored.notes)
         }
     }

@@ -14,11 +14,12 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.ui.component.SegmentedToggle
+import com.example.walklogger.core.ui.component.SegmentedToggleSize
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
-private val LabelWidth = 64.dp
+private val LabelWidth = 48.dp
 
 /** A weather condition's [label] beside a [SegmentedToggle] of its values. */
 @Composable
@@ -32,7 +33,7 @@ internal fun <T> WeatherRow(
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
-        horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Text(
@@ -47,6 +48,7 @@ internal fun <T> WeatherRow(
             onSelect = onSelect,
             label = optionLabel,
             modifier = Modifier.weight(1f),
+            size = SegmentedToggleSize.Compact,
         )
     }
 }

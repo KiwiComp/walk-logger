@@ -7,6 +7,7 @@ import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
+import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
@@ -116,6 +117,12 @@ class LogPastWalkViewModel @AssistedInject constructor(
 
     fun selectWind(value: Wind) = form.update { it.copy(wind = value) }
 
+    fun selectSnow(value: Snow) = form.update { it.copy(snow = value) }
+
+    fun toggleWeather() = form.update { it.copy(isWeatherExpanded = !it.isWeatherExpanded) }
+
+    fun clearWeather() = form.update { it.copy(rain = null, temperature = null, wind = null, snow = null) }
+
     fun setNotes(notes: String) = form.update { it.copy(notes = notes.take(MAX_NOTES_LENGTH)) }
 
     fun save() {
@@ -138,6 +145,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
                 rain = state.rain,
                 temperature = state.temperature,
                 wind = state.wind,
+                snow = state.snow,
             )
             if (edited != null) walkRepository.updateWalk(walk) else walkRepository.logWalk(walk)
             form.update { it.copy(isSaving = false, isSaved = true) }
@@ -168,6 +176,8 @@ class LogPastWalkViewModel @AssistedInject constructor(
             rain = walk.rain,
             temperature = walk.temperature,
             wind = walk.wind,
+            snow = walk.snow,
+            isWeatherExpanded = listOf(walk.rain, walk.temperature, walk.wind, walk.snow).any { it != null },
             notes = walk.notes,
             isLoading = false,
         )

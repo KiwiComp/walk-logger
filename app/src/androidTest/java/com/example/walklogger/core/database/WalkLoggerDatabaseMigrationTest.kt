@@ -78,6 +78,21 @@ class WalkLoggerDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migrate4To5_addsNullableSnowColumnAndKeepsWalks() {
+        helper.createDatabase(DB_NAME, 4).use { db ->
+            db.execSQL("INSERT INTO walks (id, startTime, rain) VALUES (1, 100, 'LIGHT')")
+        }
+
+        val db = helper.runMigrationsAndValidate(DB_NAME, 5, true)
+
+        db.query("SELECT rain, snow FROM walks WHERE id = 1").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("LIGHT", cursor.getString(0))
+            assertTrue(cursor.isNull(1))
+        }
+    }
+
     private companion object {
         const val DB_NAME = "migration-test.db"
     }

@@ -5,6 +5,7 @@ import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
+import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 
@@ -22,4 +23,5 @@ data class WalkEntity(
     val rain: Rain? = null,
     val temperature: Temperature? = null,
     val wind: Wind? = null,
+    val snow: Snow? = null,
 )

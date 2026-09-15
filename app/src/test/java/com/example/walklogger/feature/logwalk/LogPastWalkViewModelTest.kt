@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
+import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
@@ -63,6 +64,33 @@ class LogPastWalkViewModelTest {
             assertNull(state.startTime)
             assertNull(state.endTime)
             assertNull(state.durationMinutes)
+        }
+    }
+
+    @Test
+    fun `weather starts collapsed for a new walk and toggles`() = runTest {
+        viewModel.uiState.test {
+            assertFalse(expectMostRecentItem().isWeatherExpanded)
+            viewModel.toggleWeather()
+            assertTrue(expectMostRecentItem().isWeatherExpanded)
+            viewModel.toggleWeather()
+            assertFalse(expectMostRecentItem().isWeatherExpanded)
+        }
+    }
+
+    @Test
+    fun `clear weather resets every condition`() = runTest {
+        viewModel.uiState.test {
+            viewModel.selectRain(Rain.LIGHT)
+            viewModel.selectTemperature(Temperature.COOL)
+            viewModel.selectWind(Wind.BREEZE)
+            viewModel.selectSnow(Snow.HEAVY)
+            viewModel.clearWeather()
+            val state = expectMostRecentItem()
+            assertNull(state.rain)
+            assertNull(state.temperature)
+            assertNull(state.wind)
+            assertNull(state.snow)
         }
     }
 
@@ -156,6 +184,7 @@ class LogPastWalkViewModelTest {
             viewModel.selectRain(Rain.LIGHT)
             viewModel.selectTemperature(Temperature.COLD)
             viewModel.selectWind(Wind.WINDY)
+            viewModel.selectSnow(Snow.NONE)
             viewModel.setNotes(" Pulled at the gate ")
             viewModel.save()
             assertTrue(expectMostRecentItem().isSaved)
@@ -170,6 +199,7 @@ class LogPastWalkViewModelTest {
         assertEquals(Rain.LIGHT, walk.rain)
         assertEquals(Temperature.COLD, walk.temperature)
         assertEquals(Wind.WINDY, walk.wind)
+        assertEquals(Snow.NONE, walk.snow)
         assertEquals("Pulled at the gate", walk.notes)
     }
 
@@ -209,6 +239,7 @@ class LogPastWalkViewModelTest {
             rain = Rain.HEAVY,
             temperature = Temperature.COOL,
             wind = Wind.BREEZE,
+            snow = Snow.LIGHT,
         )
         walkRepository.addWalks(walk)
         walkId = walk.id
@@ -232,6 +263,8 @@ class LogPastWalkViewModelTest {
             assertEquals(Rain.HEAVY, state.rain)
             assertEquals(Temperature.COOL, state.temperature)
             assertEquals(Wind.BREEZE, state.wind)
+            assertEquals(Snow.LIGHT, state.snow)
+            assertTrue(state.isWeatherExpanded)
             assertEquals("Muddy", state.notes)
             assertTrue(state.canSave)
         }

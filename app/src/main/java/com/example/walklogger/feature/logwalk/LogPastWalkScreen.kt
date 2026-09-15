@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
+import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 import com.example.walklogger.core.ui.component.AppButton
@@ -76,6 +77,9 @@ fun LogPastWalkRoute(
         onRainSelected = viewModel::selectRain,
         onTemperatureSelected = viewModel::selectTemperature,
         onWindSelected = viewModel::selectWind,
+        onSnowSelected = viewModel::selectSnow,
+        onToggleWeather = viewModel::toggleWeather,
+        onClearWeather = viewModel::clearWeather,
         onNotesChange = viewModel::setNotes,
         onSave = viewModel::save,
         onDelete = viewModel::delete,
@@ -97,6 +101,9 @@ fun LogPastWalkScreen(
     onRainSelected: (Rain) -> Unit,
     onTemperatureSelected: (Temperature) -> Unit,
     onWindSelected: (Wind) -> Unit,
+    onSnowSelected: (Snow) -> Unit,
+    onToggleWeather: () -> Unit,
+    onClearWeather: () -> Unit,
     onNotesChange: (String) -> Unit,
     onSave: () -> Unit,
     onDelete: () -> Unit,
@@ -168,31 +175,19 @@ fun LogPastWalkScreen(
                     label = { stringResource(it.labelRes) },
                 )
             }
-            FormSection(label = stringResource(R.string.log_past_walk_weather)) {
-                Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
-                    WeatherRow(
-                        label = stringResource(R.string.weather_rain),
-                        options = Rain.entries,
-                        selected = uiState.rain,
-                        onSelect = onRainSelected,
-                        optionLabel = { stringResource(it.labelRes) },
-                    )
-                    WeatherRow(
-                        label = stringResource(R.string.weather_temperature),
-                        options = Temperature.entries,
-                        selected = uiState.temperature,
-                        onSelect = onTemperatureSelected,
-                        optionLabel = { stringResource(it.labelRes) },
-                    )
-                    WeatherRow(
-                        label = stringResource(R.string.weather_wind),
-                        options = Wind.entries,
-                        selected = uiState.wind,
-                        onSelect = onWindSelected,
-                        optionLabel = { stringResource(it.labelRes) },
-                    )
-                }
-            }
+            WeatherSection(
+                rain = uiState.rain,
+                temperature = uiState.temperature,
+                wind = uiState.wind,
+                snow = uiState.snow,
+                expanded = uiState.isWeatherExpanded,
+                onToggle = onToggleWeather,
+                onClear = onClearWeather,
+                onRainSelected = onRainSelected,
+                onTemperatureSelected = onTemperatureSelected,
+                onWindSelected = onWindSelected,
+                onSnowSelected = onSnowSelected,
+            )
             FormSection(label = stringResource(R.string.log_past_walk_notes)) {
                 AppTextField(
                     value = uiState.notes,
@@ -260,6 +255,9 @@ private fun LogPastWalkScreenPreview() {
             onRainSelected = {},
             onTemperatureSelected = {},
             onWindSelected = {},
+            onSnowSelected = {},
+            onToggleWeather = {},
+            onClearWeather = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},
@@ -284,6 +282,9 @@ private fun LogPastWalkScreenCompletePreview() {
             onRainSelected = {},
             onTemperatureSelected = {},
             onWindSelected = {},
+            onSnowSelected = {},
+            onToggleWeather = {},
+            onClearWeather = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},
@@ -308,6 +309,9 @@ private fun LogPastWalkScreenEditPreview() {
             onRainSelected = {},
             onTemperatureSelected = {},
             onWindSelected = {},
+            onSnowSelected = {},
+            onToggleWeather = {},
+            onClearWeather = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},
@@ -320,7 +324,7 @@ private fun LogPastWalkScreenEditPreview() {
 private fun LogPastWalkScreenEmptyPreview() {
     WalkLoggerTheme {
         LogPastWalkScreen(
-            uiState = LogWalkPreviewData.logPastWalk.copy(startTime = null, endTime = null, selectedHandlers = emptySet(), rain = null, temperature = null, wind = null),
+            uiState = LogWalkPreviewData.logPastWalk.copy(startTime = null, endTime = null, selectedHandlers = emptySet(), rain = null, temperature = null, wind = null, snow = null),
             onClose = {},
             onDateChange = {},
             onStartTimeChange = {},
@@ -332,6 +336,9 @@ private fun LogPastWalkScreenEmptyPreview() {
             onRainSelected = {},
             onTemperatureSelected = {},
             onWindSelected = {},
+            onSnowSelected = {},
+            onToggleWeather = {},
+            onClearWeather = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},

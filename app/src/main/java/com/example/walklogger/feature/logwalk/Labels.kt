@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import com.example.walklogger.R
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
+import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 
@@ -34,6 +35,13 @@ internal val Wind.labelRes: Int
         Wind.STILL -> R.string.wind_still
         Wind.BREEZE -> R.string.wind_breeze
         Wind.WINDY -> R.string.wind_windy
+    }
+
+internal val Snow.labelRes: Int
+    @StringRes get() = when (this) {
+        Snow.NONE -> R.string.snow_none
+        Snow.LIGHT -> R.string.snow_light
+        Snow.HEAVY -> R.string.snow_heavy
     }
 
 internal val SaveBlocker.messageRes: Int
