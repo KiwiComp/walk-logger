@@ -59,6 +59,7 @@ class CalendarViewModelTest {
             assertEquals(emptyList<CalendarWalkUiState>(), state.walks)
             assertTrue(state.isCurrentMonth)
             assertFalse(state.canShowNextMonth)
+            assertTrue(state.canStartLiveWalk)
             assertNull(state.activeDogName)
         }
     }
@@ -119,6 +120,7 @@ class CalendarViewModelTest {
             assertEquals(friday, state.selectedDate)
             assertEquals(listOf(1L), state.walks.map { it.id })
             assertEquals(friday, state.days.single { it.isSelected }.date)
+            assertFalse(state.canStartLiveWalk)
         }
     }
 
@@ -134,10 +136,12 @@ class CalendarViewModelTest {
             assertTrue(august.days.all { it.isEnabled })
             assertFalse(august.isCurrentMonth)
             assertTrue(august.canShowNextMonth)
+            assertFalse(august.canStartLiveWalk)
             viewModel.showNextMonth()
             val september = expectMostRecentItem()
             assertEquals(YearMonth.of(2026, 9), september.month)
             assertEquals(today, september.selectedDate)
+            assertTrue(september.canStartLiveWalk)
         }
     }
 

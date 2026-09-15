@@ -14,6 +14,8 @@ data class CalendarUiState(
     /** Completed walks on [selectedDate], earliest first. */
     val walks: List<CalendarWalkUiState>,
     val isCurrentMonth: Boolean,
+    /** A live walk can only be started today; past days go straight to the past-walk form. */
+    val canStartLiveWalk: Boolean,
     /** Null until a dog has been registered. */
     val activeDogName: String? = null,
 ) {
