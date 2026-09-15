@@ -19,3 +19,17 @@ val Ink = Color(0xFF1F2D3D)
 val InkMuted = Color(0xFF7A8189)
 val OnNavy = Color(0xFFFFFFFF)
 val OnNavyMuted = Color(0xFFB9C2CE)
+
+/** The one warm colour, reserved for marking a selection on top of the blues (calendar day). */
+val Accent = Color(0xFFD9A441)
+
+/** One shade per rating 1..7, lightest first; the top four are the palette blues. Index with `rating - 1`. */
+val RatingTints: List<Color> = listOf(
+    Color(0xFFDCE4EE),
+    Color(0xFFC4D2E2),
+    Color(0xFFA9BDD3),
+    SteelLight,
+    Steel,
+    NavyLight,
+    Navy,
+)

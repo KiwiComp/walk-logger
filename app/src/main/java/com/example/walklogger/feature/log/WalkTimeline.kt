@@ -31,23 +31,6 @@ private val TimelineConnectorWidth = 16.dp
 private val TimelineDotSize = 8.dp
 private val StartTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
-/** Day title with a muted summary hanging off its baseline. */
-@Composable
-internal fun DayHeading(title: String, summary: String?) {
-    Row(verticalAlignment = Alignment.Bottom) {
-        Text(text = title, style = MaterialTheme.typography.headlineMedium)
-        if (summary != null) {
-            Spacer(Modifier.width(AppSpacing.md))
-            Text(
-                text = summary,
-                style = MaterialTheme.typography.bodySmall,
-                color = InkMuted,
-                modifier = Modifier.padding(bottom = 3.dp),
-            )
-        }
-    }
-}
-
 /** The day's walks, each with its start time and a connector dot leading to a [WalkCard]. */
 @Composable
 internal fun WalkTimeline(walks: List<WalkUiState>, onWalkClick: (Long) -> Unit) {
@@ -85,8 +68,6 @@ internal fun WalkTimeline(walks: List<WalkUiState>, onWalkClick: (Long) -> Unit)
 private fun WalkTimelinePreview() {
     WalkLoggerTheme {
         Column(modifier = Modifier.padding(AppSpacing.lg)) {
-            DayHeading(title = "Saturday 12 Sep", summary = "2 walks · avg 5.0")
-            Spacer(Modifier.height(AppSpacing.lg))
             WalkTimeline(walks = LogPreviewData.walks, onWalkClick = {})
         }
     }

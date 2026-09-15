@@ -37,7 +37,11 @@ fun WalkLoggerNavHost(
             onEditWalk = navController::navigateToEditWalk,
             onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
         )
-        calendarScreen()
+        calendarScreen(
+            onAddWalk = navController::navigateToNewWalk,
+            onEditWalk = navController::navigateToEditWalk,
+            onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
+        )
         patternsScreen()
         dogScreen(onAddDog = navController::navigateToRegisterDog)
         registerDogScreen(onDone = { navController.popBackStack() })
@@ -46,15 +50,16 @@ fun WalkLoggerNavHost(
             onWalkStarted = navController::navigateToActiveWalk,
             onLogPastWalk = navController::navigateToLogPastWalk,
         )
+        // Walk flows can start from the Log or Calendar tab; finishing one returns to whichever it was.
         activeWalkScreen(
             onWalkEnded = navController::navigateToFinishWalk,
-            onWalkDiscarded = { navController.popBackStack<LogDestination>(inclusive = false) },
+            onWalkDiscarded = navController::popToTopLevel,
         )
-        finishWalkScreen(onSaved = { navController.popBackStack<LogDestination>(inclusive = false) })
+        finishWalkScreen(onSaved = navController::popToTopLevel)
         logPastWalkScreen(
             onClose = { navController.popBackStack() },
-            onSaved = { navController.popBackStack<LogDestination>(inclusive = false) },
-            onDeleted = { navController.popBackStack<LogDestination>(inclusive = false) },
+            onSaved = navController::popToTopLevel,
+            onDeleted = navController::popToTopLevel,
         )
     }
 }

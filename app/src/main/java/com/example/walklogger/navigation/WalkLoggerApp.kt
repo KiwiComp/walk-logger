@@ -116,7 +116,7 @@ private fun WalkLoggerBottomBar(
  * restored when the user comes back to that tab.
  */
 internal fun NavHostController.navigateToTopLevel(destination: TopLevelDestination) {
-    while (currentDestination?.isTopLevel() == false) popBackStack()
+    popToTopLevel()
     val options = navOptions {
         popUpTo(graph.findStartDestination().id) { saveState = true }
         launchSingleTop = true
@@ -128,6 +128,11 @@ internal fun NavHostController.navigateToTopLevel(destination: TopLevelDestinati
         TopLevelDestination.PATTERNS -> navigateToPatterns(options)
         TopLevelDestination.DOG -> navigateToDog(options)
     }
+}
+
+/** Drops every pushed screen, landing on the tab they were opened from. */
+internal fun NavHostController.popToTopLevel() {
+    while (currentDestination?.isTopLevel() == false) popBackStack()
 }
 
 private fun NavDestination.isTopLevel(): Boolean =

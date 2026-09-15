@@ -23,16 +23,19 @@ import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.Navy
 import com.example.walklogger.core.ui.theme.OnNavy
+import com.example.walklogger.core.ui.theme.OnNavyMuted
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /**
- * The dark header every tab shares. [navigationIcon], [title] and [actions] sit on the first row;
- * [content] is an optional slot below it for tab-specific chrome such as the week strip.
+ * The dark header every tab shares. [navigationIcon], [title] (with an optional muted [subtitle]
+ * beneath it) and [actions] sit on the first row; [content] is an optional slot below it for
+ * tab-specific chrome such as the week strip.
  */
 @Composable
 fun WalkLoggerHeader(
     title: String,
     modifier: Modifier = Modifier,
+    subtitle: String? = null,
     navigationIcon: @Composable (() -> Unit)? = null,
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit = {},
@@ -52,11 +55,12 @@ fun WalkLoggerHeader(
                 horizontalArrangement = Arrangement.spacedBy(AppSpacing.lg),
             ) {
                 navigationIcon?.invoke()
-                Text(
-                    text = title,
-                    style = MaterialTheme.typography.headlineLarge,
-                    modifier = Modifier.weight(1f),
-                )
+                Column(modifier = Modifier.weight(1f)) {
+                    Text(text = title, style = MaterialTheme.typography.headlineLarge)
+                    if (subtitle != null) {
+                        Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = OnNavyMuted)
+                    }
+                }
                 actions()
             }
             content()

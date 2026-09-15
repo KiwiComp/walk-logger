@@ -16,15 +16,16 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
-import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.ui.component.EquipmentChip
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.CardSurface
-import com.example.walklogger.core.ui.theme.ChipSurface
+import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.Outline
 import com.example.walklogger.core.ui.theme.Steel
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -47,36 +48,24 @@ internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier
     ) {
         Row(verticalAlignment = Alignment.CenterVertically) {
             if (walk.equipment != null) {
-                Text(
-                    text = walk.equipment.label(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    modifier = Modifier
-                        .background(ChipSurface)
-                        .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
-                )
+                EquipmentChip(equipment = walk.equipment)
             }
             Spacer(Modifier.weight(1f))
             if (walk.rating != null) {
                 RatingBar(rating = walk.rating)
             }
         }
+        val hasNote = walk.note.isNotEmpty()
         Text(
-            text = walk.note,
+            text = if (hasNote) walk.note else stringResource(R.string.calendar_no_description),
             style = MaterialTheme.typography.bodyLarge,
+            color = if (hasNote) Color.Unspecified else InkMuted,
             minLines = NoteLines,
             maxLines = NoteLines,
             overflow = TextOverflow.Ellipsis,
         )
     }
 }
-
-@Composable
-private fun Equipment.label() = stringResource(
-    when (this) {
-        Equipment.COLLAR -> R.string.equipment_collar
-        Equipment.HARNESS -> R.string.equipment_harness
-    },
-)
 
 @Composable
 private fun RatingBar(rating: Int, max: Int = 7) {
