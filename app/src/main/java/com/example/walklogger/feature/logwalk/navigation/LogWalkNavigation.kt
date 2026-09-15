@@ -4,7 +4,6 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.walklogger.feature.log.navigation.LogDestination
 import com.example.walklogger.feature.logwalk.ActiveWalkRoute
 import com.example.walklogger.feature.logwalk.FinishWalkRoute
 import com.example.walklogger.feature.logwalk.LogPastWalkRoute
@@ -33,9 +32,9 @@ data class FinishWalkDestination(val walkId: Long)
 
 fun NavController.navigateToNewWalk(date: LocalDate) = navigate(NewWalkDestination(epochDay = date.toEpochDay()))
 
-/** Replaces everything above the log, so back from the timer never lands on the new-walk form. */
+/** Replaces the new-walk form, so back from the timer never lands on it. */
 fun NavController.navigateToActiveWalk(walkId: Long) = navigate(ActiveWalkDestination(walkId)) {
-    popUpTo<LogDestination>()
+    popUpTo<NewWalkDestination> { inclusive = true }
     launchSingleTop = true
 }
 

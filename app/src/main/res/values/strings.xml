@@ -7,10 +7,14 @@
     <string name="tab_dogs">Dogs</string>
 
     <string name="log_title">Walk log</string>
-    <string name="calendar_title">Calendar</string>
     <string name="patterns_title">Patterns</string>
 
-    <string name="calendar_coming_soon">Calendar coming soon</string>
+    <string name="calendar_previous_month">Previous month</string>
+    <string name="calendar_next_month">Next month</string>
+    <string name="calendar_today">Today</string>
+    <string name="calendar_legend_rating">rating</string>
+    <string name="calendar_legend_range">1 → 7</string>
+    <string name="calendar_no_description">(No description)</string>
     <string name="patterns_coming_soon">Patterns coming soon</string>
     <string name="dog_title">Your dog</string>
     <string name="dog_none_registered">No dog registered yet. Add one to start logging walks.</string>

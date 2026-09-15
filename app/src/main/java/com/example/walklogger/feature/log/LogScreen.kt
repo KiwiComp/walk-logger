@@ -21,14 +21,16 @@ import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
+import com.example.walklogger.core.ui.component.AddWalkButton
+import com.example.walklogger.core.ui.component.DayHeading
 import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
+import com.example.walklogger.core.ui.component.walkSummary
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.Navy
 import com.example.walklogger.core.ui.theme.OnNavy
@@ -128,7 +130,7 @@ private fun LogContent(
         ) {
             DayHeading(
                 title = uiState.selectedDate.format(dayHeadingFormatter).replaceFirstChar { it.titlecase(locale) },
-                summary = uiState.summary(),
+                summary = if (uiState.walks.isEmpty()) null else walkSummary(uiState.walks.size, uiState.averageRating),
             )
             Spacer(Modifier.height(AppSpacing.lg))
             if (uiState.walks.isNotEmpty()) {
@@ -141,14 +143,6 @@ private fun LogContent(
             )
         }
     }
-}
-
-@Composable
-private fun LogUiState.summary(): String? {
-    if (walks.isEmpty()) return null
-    val count = pluralStringResource(R.plurals.walk_count, walks.size, walks.size)
-    val average = averageRating?.let { " " + stringResource(R.string.summary_average, it) }.orEmpty()
-    return count + average
 }
 
 @Preview(showBackground = true, heightDp = 900)

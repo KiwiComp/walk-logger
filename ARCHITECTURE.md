@@ -14,7 +14,7 @@ com.example.walklogger
 │
 ├── feature/                   one package per tab/screen
 │   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from one file per
-│   │                          piece (WeekStrip, WalkTimeline, WalkCard, AddWalkButton);
+│   │                          piece (WeekStrip, WalkTimeline, WalkCard);
 │   │                          LogPreviewData.kt holds fixed content for @Previews only
 │   ├── logwalk/               the flow behind AddWalkButton, one package for all its screens.
 │   │                          NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
@@ -27,7 +27,10 @@ com.example.walklogger
 │   │                          the same screen edits a logged walk when the route carries a walkId,
 │   │                          and can delete it (DeleteWalkDialog confirms first);
 │   │                          the chosen day travels as a route argument into both form ViewModels
-│   ├── calendar/              placeholder; ViewModel only feeds the active dog's name to the header badge
+│   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
+│   │                          rounded rating); CalendarScreen composed from RatingLegend (in the header),
+│   │                          MonthGrid (cells tinted by rating, selection ringed in Accent) and CalendarWalkList;
+│   │                          a walk row opens the edit screen, the dashed button logs a walk on that day
 │   ├── patterns/              placeholder, same shape as calendar
 │   ├── dog/                   DogViewModel + DogUiState (profile header, dog list, add-dog CTA);
 │   │                          RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight)
@@ -42,10 +45,10 @@ com.example.walklogger
 │   ├── database/              Room database, DAOs, entities, type converters
 │   ├── datastore/             Preferences DataStore (active dog id)
 │   ├── common/di/             injectable coroutine dispatchers and Clock
-│   └── ui/                    theme (fixed palette, AppSpacing/AppRadius/AppSize tokens)
-│                              + shared composables (WalkLoggerHeader, HeaderIconButton, DogBadge, SectionLabel,
-│                              SegmentedToggle, DashedButton, AppButton, AppTextField, AppPickerField,
-│                              AppDateField, EmptyTabContent)
+│   └── ui/                    theme (fixed palette incl. RatingTints/Accent, AppSpacing/AppRadius/AppSize tokens)
+│                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
+│                              SectionLabel, SegmentedToggle, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
+│                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent)
 ```
 
 ## Rules of thumb
@@ -64,7 +67,8 @@ com.example.walklogger
   (new walk, log past walk, register dog) is a full-screen task with a leading back chevron
   (or close cross for forms) in the header. The timer and after-walk screens have neither: a
   timed walk is stored the moment it starts, ended by "End walk" and already logged before the
-  form opens, so there is nothing to cancel.
+  form opens, so there is nothing to cancel. When a flow finishes, `popToTopLevel()` returns to
+  whichever tab (Log or Calendar) it was started from.
 - **Each feature owns its navigation.** Add a `@Serializable` route + `NavGraphBuilder.xxxScreen()`
   in `feature/<name>/navigation`, then register it in `WalkLoggerNavHost`.
 - **One file per composable piece, flat in the feature package.** A feature's building blocks
