@@ -10,7 +10,6 @@ import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
-import java.time.Clock
 import java.time.LocalDate
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -28,15 +27,12 @@ class NewWalkViewModel @AssistedInject constructor(
     private val dogRepository: DogRepository,
     private val handlerRepository: HandlerRepository,
     private val walkRepository: WalkRepository,
-    clock: Clock,
 ) : ViewModel() {
 
     @AssistedFactory
     interface Factory {
         fun create(date: LocalDate): NewWalkViewModel
     }
-
-    private val isToday = date == LocalDate.now(clock)
 
     private val selectedHandlers = MutableStateFlow<Set<String>>(emptySet())
     private val equipment = MutableStateFlow(Equipment.HARNESS)
@@ -52,7 +48,6 @@ class NewWalkViewModel @AssistedInject constructor(
         ) { dog, handlers, selected, equipment, start ->
             NewWalkUiState(
                 date = date,
-                isToday = isToday,
                 dogName = dog?.name,
                 handlers = handlers,
                 selectedHandlers = selected,
@@ -63,7 +58,7 @@ class NewWalkViewModel @AssistedInject constructor(
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = NewWalkUiState(date = date, isToday = isToday),
+            initialValue = NewWalkUiState(date = date),
         )
 
     fun toggleHandler(handler: String) = selectedHandlers.update { selected ->

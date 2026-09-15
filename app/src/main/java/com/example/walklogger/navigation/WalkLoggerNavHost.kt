@@ -34,11 +34,13 @@ fun WalkLoggerNavHost(
     ) {
         logScreen(
             onAddWalk = navController::navigateToNewWalk,
+            onLogPastWalk = navController::navigateToLogPastWalk,
             onEditWalk = navController::navigateToEditWalk,
             onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
         )
         calendarScreen(
             onAddWalk = navController::navigateToNewWalk,
+            onLogPastWalk = navController::navigateToLogPastWalk,
             onEditWalk = navController::navigateToEditWalk,
             onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
         )

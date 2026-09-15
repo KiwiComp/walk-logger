@@ -57,6 +57,7 @@ class LogViewModelTest {
             assertEquals(emptyList<WalkUiState>(), state.walks)
             assertNull(state.averageRating)
             assertNull(state.activeDogName)
+            assertEquals(true, state.canStartLiveWalk)
         }
     }
 
@@ -107,6 +108,7 @@ class LogViewModelTest {
             assertEquals(listOf(1L), state.walks.map { it.id })
             assertEquals(friday, state.week.single { it.isSelected }.date)
             assertEquals(today, state.week.single { it.isToday }.date)
+            assertEquals(false, state.canStartLiveWalk)
         }
     }
 }

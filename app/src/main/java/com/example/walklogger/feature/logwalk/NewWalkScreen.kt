@@ -104,9 +104,7 @@ fun NewWalkScreen(
                 )
             }
             AfterWalkNote()
-            if (uiState.isToday) {
-                StartWalkButton(summary = uiState.summary(), enabled = uiState.canStart, onClick = onStartWalk)
-            }
+            StartWalkButton(summary = uiState.summary(), enabled = uiState.canStart, onClick = onStartWalk)
             LogPastWalkButton(onClick = onLogPastWalk)
         }
     }
@@ -137,22 +135,6 @@ private fun NewWalkScreenPreview() {
     WalkLoggerTheme {
         NewWalkScreen(
             uiState = LogWalkPreviewData.newWalk,
-            onBack = {},
-            onHandlerToggled = {},
-            onAddHandler = {},
-            onEquipmentSelected = {},
-            onStartWalk = {},
-            onLogPastWalk = {},
-        )
-    }
-}
-
-@Preview(showBackground = true, heightDp = 900)
-@Composable
-private fun NewWalkScreenPastDayPreview() {
-    WalkLoggerTheme {
-        NewWalkScreen(
-            uiState = LogWalkPreviewData.newWalk.copy(isToday = false),
             onBack = {},
             onHandlerToggled = {},
             onAddHandler = {},

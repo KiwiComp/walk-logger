@@ -47,6 +47,7 @@ internal object CalendarPreviewData {
         },
         walks = walks,
         isCurrentMonth = true,
+        canStartLiveWalk = true,
         activeDogName = "Sixten",
     )
 }

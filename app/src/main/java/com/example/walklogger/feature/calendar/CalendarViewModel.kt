@@ -76,6 +76,7 @@ class CalendarViewModel @Inject constructor(
                 .sortedBy { it.startTime }
                 .map { it.toUiState(clock.zone) },
             isCurrentMonth = month == YearMonth.from(today),
+            canStartLiveWalk = date == today,
             activeDogName = activeDog?.name,
         )
     }

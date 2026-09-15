@@ -60,6 +60,7 @@ class LogViewModel @Inject constructor(
             walks = walksByDate[date].orEmpty()
                 .sortedBy { it.startTime }
                 .map { it.toUiState(clock.zone) },
+            canStartLiveWalk = date == today,
             activeDogName = activeDog?.name,
         )
     }

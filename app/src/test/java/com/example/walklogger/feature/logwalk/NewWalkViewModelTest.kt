@@ -7,9 +7,7 @@ import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeHandlerRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
-import java.time.Clock
 import java.time.LocalDate
-import java.time.ZoneOffset
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
@@ -25,37 +23,22 @@ class NewWalkViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val today = LocalDate.of(2026, 9, 12)
-    private val clock = Clock.fixed(today.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
     private val dogRepository = FakeDogRepository()
     private val handlerRepository = FakeHandlerRepository()
     private val walkRepository = FakeWalkRepository()
-    private var date = today
     private val viewModel by lazy {
         NewWalkViewModel(
-            date = date,
+            date = today,
             dogRepository = dogRepository,
             handlerRepository = handlerRepository,
             walkRepository = walkRepository,
-            clock = clock,
         )
     }
 
     @Test
-    fun `today's date allows starting a timed walk`() = runTest {
+    fun `shows the chosen date`() = runTest {
         viewModel.uiState.test {
-            val state = expectMostRecentItem()
-            assertEquals(today, state.date)
-            assertTrue(state.isToday)
-        }
-    }
-
-    @Test
-    fun `a past date cannot start a timed walk`() = runTest {
-        date = today.minusDays(1)
-        viewModel.uiState.test {
-            val state = expectMostRecentItem()
-            assertEquals(today.minusDays(1), state.date)
-            assertFalse(state.isToday)
+            assertEquals(today, expectMostRecentItem().date)
         }
     }
 

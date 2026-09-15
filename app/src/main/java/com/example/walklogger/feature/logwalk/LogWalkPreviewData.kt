@@ -16,7 +16,6 @@ internal object LogWalkPreviewData {
 
     val newWalk = NewWalkUiState(
         date = LocalDate.of(2026, 9, 12),
-        isToday = true,
         dogName = "Sixten",
         handlers = handlers,
         selectedHandlers = setOf("Anna", "Jonas"),

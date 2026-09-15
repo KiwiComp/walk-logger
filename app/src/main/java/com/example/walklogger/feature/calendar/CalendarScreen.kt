@@ -51,6 +51,7 @@ import kotlinx.coroutines.launch
 @Composable
 fun CalendarRoute(
     onAddWalk: (LocalDate) -> Unit,
+    onLogPastWalk: (LocalDate) -> Unit,
     onEditWalk: (LocalDate, Long) -> Unit,
     onGoToDogs: () -> Unit,
     modifier: Modifier = Modifier,
@@ -69,13 +70,15 @@ fun CalendarRoute(
         onShowCurrentMonth = viewModel::showCurrentMonth,
         onDaySelected = viewModel::selectDay,
         onAddWalk = {
-            if (uiState.canAddWalk) {
-                onAddWalk(uiState.selectedDate)
-            } else {
+            if (!uiState.canAddWalk) {
                 scope.launch {
                     val result = snackbarHostState.showSnackbar(message = noDogMessage, actionLabel = noDogAction)
                     if (result == SnackbarResult.ActionPerformed) onGoToDogs()
                 }
+            } else if (uiState.canStartLiveWalk) {
+                onAddWalk(uiState.selectedDate)
+            } else {
+                onLogPastWalk(uiState.selectedDate)
             }
         },
         onWalkClick = { walkId -> onEditWalk(uiState.selectedDate, walkId) },
