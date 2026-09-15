@@ -44,7 +44,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
 
     /** What the user has typed; null until they touch the field, so the stored note shows instead. */
     private val note = MutableStateFlow<String?>(null)
-    private val ending = MutableStateFlow(EndState())
+    private val outcome = MutableStateFlow(Outcome())
 
     private val ticks = flow {
         while (true) {
@@ -53,11 +53,10 @@ class ActiveWalkViewModel @AssistedInject constructor(
         }
     }
 
-    init {
-        viewModelScope.launch {
-            @OptIn(FlowPreview::class)
-            note.filterNotNull().debounce(NOTE_SAVE_DELAY_MILLIS).collect { walkRepository.updateNotes(walkId, it) }
-        }
+    /** Cancelled on discard so a pending note can't be written after the walk is gone. */
+    private val noteSaver = viewModelScope.launch {
+        @OptIn(FlowPreview::class)
+        note.filterNotNull().debounce(NOTE_SAVE_DELAY_MILLIS).collect { walkRepository.updateNotes(walkId, it) }
     }
 
     val uiState: StateFlow<ActiveWalkUiState> =
@@ -66,8 +65,8 @@ class ActiveWalkViewModel @AssistedInject constructor(
             dogRepository.observeActiveDog(),
             ticks,
             note,
-            ending,
-        ) { walk, dog, now, note, ending ->
+            outcome,
+        ) { walk, dog, now, note, outcome ->
             ActiveWalkUiState(
                 dogName = dog?.name,
                 handlers = walk.handlers,
@@ -75,8 +74,10 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 startTime = walk.startInstant().atZone(clock.zone).toLocalTime(),
                 elapsed = Duration.between(walk.startInstant(), now),
                 note = note ?: walk.notes,
-                isEnding = ending.isEnding,
-                isEnded = ending.isEnded,
+                isEnding = outcome.isEnding,
+                isEnded = outcome.isEnded,
+                isDiscarding = outcome.isDiscarding,
+                isDiscarded = outcome.isDiscarded,
             )
         }.stateIn(
             scope = viewModelScope,
@@ -90,17 +91,33 @@ class ActiveWalkViewModel @AssistedInject constructor(
     fun endWalk() {
         val state = uiState.value
         if (!state.canEnd) return
-        ending.update { it.copy(isEnding = true) }
+        outcome.update { it.copy(isEnding = true) }
         viewModelScope.launch {
             walkRepository.updateNotes(walkId, state.note)
             walkRepository.finishWalk(walkId)
-            ending.update { EndState(isEnding = false, isEnded = true) }
+            outcome.update { Outcome(isEnded = true) }
+        }
+    }
+
+    /** Deletes the walk outright, note included; nothing is logged. */
+    fun discardWalk() {
+        if (!uiState.value.canDiscard) return
+        outcome.update { it.copy(isDiscarding = true) }
+        noteSaver.cancel()
+        viewModelScope.launch {
+            walkRepository.deleteWalk(walkId)
+            outcome.update { Outcome(isDiscarded = true) }
         }
     }
 
     private fun Walk.startInstant(): Instant = Instant.ofEpochMilli(startTime)
 
-    private data class EndState(val isEnding: Boolean = false, val isEnded: Boolean = false)
+    private data class Outcome(
+        val isEnding: Boolean = false,
+        val isEnded: Boolean = false,
+        val isDiscarding: Boolean = false,
+        val isDiscarded: Boolean = false,
+    )
 
     private companion object {
         const val TICK_MILLIS = 1_000L

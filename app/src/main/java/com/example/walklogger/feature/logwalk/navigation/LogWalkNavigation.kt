@@ -65,9 +65,13 @@ fun NavGraphBuilder.newWalkScreen(
     }
 }
 
-fun NavGraphBuilder.activeWalkScreen(onWalkEnded: (walkId: Long) -> Unit) {
+fun NavGraphBuilder.activeWalkScreen(onWalkEnded: (walkId: Long) -> Unit, onWalkDiscarded: () -> Unit) {
     composable<ActiveWalkDestination> { entry ->
-        ActiveWalkRoute(walkId = entry.toRoute<ActiveWalkDestination>().walkId, onWalkEnded = onWalkEnded)
+        ActiveWalkRoute(
+            walkId = entry.toRoute<ActiveWalkDestination>().walkId,
+            onWalkEnded = onWalkEnded,
+            onWalkDiscarded = onWalkDiscarded,
+        )
     }
 }
 

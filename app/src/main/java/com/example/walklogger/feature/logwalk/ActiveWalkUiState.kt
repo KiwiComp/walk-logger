@@ -15,6 +15,13 @@ data class ActiveWalkUiState(
     val note: String = "",
     val isEnding: Boolean = false,
     val isEnded: Boolean = false,
+    val isDiscarding: Boolean = false,
+    /** True once the walk has been deleted; nothing of it remains to log. */
+    val isDiscarded: Boolean = false,
 ) {
-    val canEnd: Boolean get() = startTime != null && !isEnding && !isEnded
+    private val isBusy: Boolean get() = isEnding || isEnded || isDiscarding || isDiscarded
+
+    val canEnd: Boolean get() = startTime != null && !isBusy
+
+    val canDiscard: Boolean get() = startTime != null && !isBusy
 }

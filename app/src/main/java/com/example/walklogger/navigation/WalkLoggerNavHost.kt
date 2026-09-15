@@ -46,7 +46,10 @@ fun WalkLoggerNavHost(
             onWalkStarted = navController::navigateToActiveWalk,
             onLogPastWalk = navController::navigateToLogPastWalk,
         )
-        activeWalkScreen(onWalkEnded = navController::navigateToFinishWalk)
+        activeWalkScreen(
+            onWalkEnded = navController::navigateToFinishWalk,
+            onWalkDiscarded = { navController.popBackStack<LogDestination>(inclusive = false) },
+        )
         finishWalkScreen(onSaved = { navController.popBackStack<LogDestination>(inclusive = false) })
         logPastWalkScreen(
             onClose = { navController.popBackStack() },

@@ -10,6 +10,7 @@ import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
+import java.time.Clock
 import javax.inject.Inject
 import javax.inject.Singleton
 
@@ -17,6 +18,7 @@ import javax.inject.Singleton
 @Singleton
 class DefaultWalkRepository @Inject constructor(
     private val walkDao: WalkDao,
+    private val clock: Clock,
     @param:Dispatcher(WalkLoggerDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : WalkRepository {
 
@@ -36,7 +38,7 @@ class DefaultWalkRepository @Inject constructor(
                     dogId = dogId,
                     handlers = handlers,
                     equipment = equipment,
-                    startTime = System.currentTimeMillis(),
+                    startTime = clock.millis(),
                 ),
             )
         }
@@ -57,7 +59,7 @@ class DefaultWalkRepository @Inject constructor(
 
     override suspend fun finishWalk(walkId: Long) = withContext(ioDispatcher) {
         val walk = walkDao.getWalk(walkId) ?: return@withContext
-        walkDao.updateWalk(walk.copy(endTime = System.currentTimeMillis()))
+        walkDao.updateWalk(walk.copy(endTime = clock.millis()))
     }
 
     override suspend fun deleteWalk(id: Long) = withContext(ioDispatcher) {

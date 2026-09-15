@@ -185,7 +185,7 @@ fun FinishWalkScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 Text(
-                    text = stringResource(R.string.finish_walk_walked_by, uiState.handlers.joinToString()),
+                    text = uiState.walkedBy(),
                     style = MaterialTheme.typography.bodyMedium,
                     color = InkMuted,
                 )
@@ -208,6 +208,14 @@ fun FinishWalkScreen(
             }
         }
     }
+}
+
+/** "Sixten walked by Anna", or just "Walked by Anna" until the dog is known. */
+@Composable
+private fun FinishWalkUiState.walkedBy(): String {
+    val handlers = handlers.joinToString()
+    val dog = dogName ?: return stringResource(R.string.finish_walk_walked_by, handlers)
+    return stringResource(R.string.finish_walk_dog_walked_by, dog, handlers)
 }
 
 /** "07:05 → 07:39 · 34 min · logged automatically", or nothing until the walk has loaded. */

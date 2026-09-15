@@ -14,15 +14,18 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneId
 import java.time.ZoneOffset
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
 
+@OptIn(ExperimentalCoroutinesApi::class)
 class ActiveWalkViewModelTest {
 
     @get:Rule
@@ -97,6 +100,32 @@ class ActiveWalkViewModelTest {
             val stored = walkRepository.observeWalk(1).first()!!
             assertFalse(stored.isActive)
             assertEquals("Pulled at the gate", stored.notes)
+        }
+    }
+
+    @Test
+    fun `discarding deletes the walk and reports it`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.discardWalk()
+            val state = expectMostRecentItem()
+            assertTrue(state.isDiscarded)
+            assertFalse(state.canEnd)
+            assertFalse(state.canDiscard)
+            assertNull(walkRepository.observeWalk(1).first())
+            assertTrue(walkRepository.observeWalks().first().isEmpty())
+        }
+    }
+
+    @Test
+    fun `a note typed just before discarding is not written afterwards`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.setNote("Pulled at the gate")
+            viewModel.discardWalk()
+            advanceTimeBy(1_000)
+            assertTrue(walkRepository.observeWalks().first().isEmpty())
+            cancelAndIgnoreRemainingEvents()
         }
     }
 
