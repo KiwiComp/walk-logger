@@ -43,6 +43,8 @@
 
 * Never come up with your own colors, always use the colors already in the project. If you want to use another color, you have to ask before.
 * Always use the design tokens specified in app/src/main/java/com/example/walklogger/core/ui/theme, never make up "magic numbers" on your own. If you want to add something, always ask before.
+* Always use existing components before using Android's build in components.
+* When creating new components, always check if there is already a created component for it.
 
 
 # Strings and locales
@@ -78,4 +80,5 @@ See ARCHITECTURE.md for the package tree and how to add a feature.
   `src/test/.../testing`; Room and Compose UI tests in `src/androidTest`.
 * No deprecated APIs: never use anything marked `@Deprecated`, and fix deprecation warnings you
   introduce or touch rather than suppressing them.
+* No APIs that do not work for the project's minSDK: never use anything marked incompatible with the project's minSDK.
 * Verify before reporting: `./gradlew :app:compileDebugKotlin :app:testDebugUnitTest` must pass.
