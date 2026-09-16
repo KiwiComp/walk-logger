@@ -29,15 +29,28 @@ import com.example.walklogger.core.ui.theme.Outline
 import com.example.walklogger.core.ui.theme.Steel
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
-/** One square cell per value in [Walk.RATING_RANGE]; [rating] is null until the user picks. */
+/**
+ * One square cell per value in [Walk.RATING_RANGE]; [rating] is null until the user picks.
+ * Pass [onDeselect] to let a tap on the selected cell clear the rating again.
+ */
 @Composable
-internal fun RatingScale(rating: Int?, onRatingChange: (Int) -> Unit, modifier: Modifier = Modifier) {
+internal fun RatingScale(
+    rating: Int?,
+    onRatingChange: (Int) -> Unit,
+    modifier: Modifier = Modifier,
+    onDeselect: (() -> Unit)? = null,
+) {
     Row(
         modifier = modifier.fillMaxWidth().selectableGroup(),
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) {
         Walk.RATING_RANGE.forEach { value ->
-            RatingCell(value = value, isSelected = value == rating, onClick = { onRatingChange(value) })
+            val isSelected = value == rating
+            RatingCell(
+                value = value,
+                isSelected = isSelected,
+                onClick = { if (isSelected && onDeselect != null) onDeselect() else onRatingChange(value) },
+            )
         }
     }
 }

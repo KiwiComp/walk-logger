@@ -30,6 +30,7 @@ import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
+import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -49,6 +50,7 @@ import com.example.walklogger.feature.logwalk.component.AddMedicalConcernDialog
 import com.example.walklogger.feature.logwalk.component.BehaviourSection
 import com.example.walklogger.feature.logwalk.component.FormSection
 import com.example.walklogger.feature.logwalk.component.MedicalSection
+import com.example.walklogger.feature.logwalk.component.OptionalRatingsSection
 import com.example.walklogger.feature.logwalk.component.RatingScale
 import com.example.walklogger.feature.logwalk.component.WeatherSection
 import com.example.walklogger.feature.logwalk.component.WhenSection
@@ -82,6 +84,9 @@ fun FinishWalkRoute(
         onStartTimeChange = viewModel::setStartTime,
         onEndTimeChange = viewModel::setEndTime,
         onRatingChange = viewModel::setRating,
+        onOptionalRatingChange = viewModel::setOptionalRating,
+        onToggleOptionalRatings = viewModel::toggleOptionalRatings,
+        onClearOptionalRatings = viewModel::clearOptionalRatings,
         onEquipmentSelected = viewModel::selectEquipment,
         onRainSelected = viewModel::selectRain,
         onTemperatureSelected = viewModel::selectTemperature,
@@ -111,6 +116,9 @@ fun FinishWalkScreen(
     onStartTimeChange: (LocalTime) -> Unit,
     onEndTimeChange: (LocalTime) -> Unit,
     onRatingChange: (Int) -> Unit,
+    onOptionalRatingChange: (OptionalRating, Int?) -> Unit,
+    onToggleOptionalRatings: () -> Unit,
+    onClearOptionalRatings: () -> Unit,
     onEquipmentSelected: (Equipment) -> Unit,
     onRainSelected: (Rain) -> Unit,
     onTemperatureSelected: (Temperature) -> Unit,
@@ -174,12 +182,6 @@ fun FinishWalkScreen(
                     )
                 }
             }
-            FormSection(
-                label = stringResource(R.string.log_past_walk_rating),
-                hint = stringResource(R.string.log_past_walk_rating_scale),
-            ) {
-                RatingScale(rating = uiState.rating, onRatingChange = onRatingChange)
-            }
             FormSection(label = stringResource(R.string.new_walk_equipment)) {
                 SegmentedToggle(
                     options = Equipment.entries,
@@ -188,6 +190,19 @@ fun FinishWalkScreen(
                     label = { stringResource(it.labelRes) },
                 )
             }
+            FormSection(
+                label = stringResource(R.string.log_past_walk_rating),
+                hint = stringResource(R.string.log_past_walk_rating_scale),
+            ) {
+                RatingScale(rating = uiState.rating, onRatingChange = onRatingChange)
+            }
+            OptionalRatingsSection(
+                ratings = uiState.optionalRatings,
+                expanded = uiState.isOptionalRatingsExpanded,
+                onToggle = onToggleOptionalRatings,
+                onClear = onClearOptionalRatings,
+                onRatingChange = onOptionalRatingChange,
+            )
             WeatherSection(
                 rain = uiState.rain,
                 temperature = uiState.temperature,
@@ -310,6 +325,9 @@ private fun FinishWalkScreenPreview() {
             onStartTimeChange = {},
             onEndTimeChange = {},
             onRatingChange = {},
+            onOptionalRatingChange = { _, _ -> },
+            onToggleOptionalRatings = {},
+            onClearOptionalRatings = {},
             onEquipmentSelected = {},
             onRainSelected = {},
             onTemperatureSelected = {},
@@ -342,6 +360,9 @@ private fun FinishWalkScreenEditingTimesPreview() {
             onStartTimeChange = {},
             onEndTimeChange = {},
             onRatingChange = {},
+            onOptionalRatingChange = { _, _ -> },
+            onToggleOptionalRatings = {},
+            onClearOptionalRatings = {},
             onEquipmentSelected = {},
             onRainSelected = {},
             onTemperatureSelected = {},

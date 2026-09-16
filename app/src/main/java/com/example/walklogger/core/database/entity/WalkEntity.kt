@@ -24,4 +24,9 @@ data class WalkEntity(
     val temperature: Temperature? = null,
     val wind: Wind? = null,
     val snow: Snow? = null,
+    val reactivity: Int? = null,
+    val energyLevel: Int? = null,
+    val responsiveness: Int? = null,
+    val engagement: Int? = null,
+    val distraction: Int? = null,
 )

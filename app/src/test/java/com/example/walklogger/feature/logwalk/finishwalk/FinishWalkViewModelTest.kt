@@ -5,6 +5,7 @@ import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
+import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -91,6 +92,39 @@ class FinishWalkViewModelTest {
             assertTrue(expectMostRecentItem().isEditingTimes)
             viewModel.toggleEditTimes()
             assertFalse(expectMostRecentItem().isEditingTimes)
+        }
+    }
+
+    @Test
+    fun `optional ratings start collapsed for a walk without any and toggle`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            assertFalse(expectMostRecentItem().isOptionalRatingsExpanded)
+            viewModel.toggleOptionalRatings()
+            assertTrue(expectMostRecentItem().isOptionalRatingsExpanded)
+        }
+    }
+
+    @Test
+    fun `optional ratings start expanded for a walk with one`() = runTest {
+        walkRepository.addWalks(walk.copy(optionalRatings = mapOf(OptionalRating.ENGAGEMENT to 2)))
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertEquals(mapOf(OptionalRating.ENGAGEMENT to 2), state.optionalRatings)
+            assertTrue(state.isOptionalRatingsExpanded)
+        }
+    }
+
+    @Test
+    fun `an optional rating can be removed on its own or cleared with the rest`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.setOptionalRating(OptionalRating.REACTIVITY, 3)
+            viewModel.setOptionalRating(OptionalRating.DISTRACTION, 7)
+            viewModel.setOptionalRating(OptionalRating.REACTIVITY, null)
+            assertEquals(mapOf(OptionalRating.DISTRACTION to 7), expectMostRecentItem().optionalRatings)
+            viewModel.clearOptionalRatings()
+            assertTrue(expectMostRecentItem().optionalRatings.isEmpty())
         }
     }
 
@@ -236,6 +270,7 @@ class FinishWalkViewModelTest {
             viewModel.selectTemperature(Temperature.COOL)
             viewModel.selectWind(Wind.BREEZE)
             viewModel.selectSnow(Snow.LIGHT)
+            viewModel.setOptionalRating(OptionalRating.REACTIVITY, 1)
             viewModel.setNotes("  Off-lead in the field  ")
             viewModel.save()
 
@@ -252,6 +287,7 @@ class FinishWalkViewModelTest {
             assertEquals(Temperature.COOL, stored.temperature)
             assertEquals(Wind.BREEZE, stored.wind)
             assertEquals(Snow.LIGHT, stored.snow)
+            assertEquals(mapOf(OptionalRating.REACTIVITY to 1), stored.optionalRatings)
             assertEquals(listOf(BehaviourIssue(2, "Barking")), stored.issues)
             assertEquals(listOf(MedicalConcern(1, "Limping")), stored.concerns)
             assertEquals("Off-lead in the field", stored.notes)

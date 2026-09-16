@@ -9,6 +9,7 @@ import com.example.walklogger.core.database.entity.MedicalConcernEntity
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
+import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -58,6 +59,7 @@ class DefaultWalkRepositoryTest {
         snow = Snow.NONE,
         issues = listOf(pulling, barking),
         concerns = listOf(limping, vomit),
+        optionalRatings = mapOf(OptionalRating.REACTIVITY to 2, OptionalRating.DISTRACTION to 6),
     )
 
     @Before

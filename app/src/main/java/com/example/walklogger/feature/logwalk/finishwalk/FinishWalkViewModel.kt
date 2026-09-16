@@ -9,6 +9,7 @@ import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
+import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -92,6 +93,15 @@ class FinishWalkViewModel @AssistedInject constructor(
 
     fun setRating(rating: Int) = form.update { it.copy(rating = rating) }
 
+    /** A null [value] removes the rating for [aspect]. */
+    fun setOptionalRating(aspect: OptionalRating, value: Int?) = form.update {
+        it.copy(optionalRatings = if (value == null) it.optionalRatings - aspect else it.optionalRatings + (aspect to value))
+    }
+
+    fun toggleOptionalRatings() = form.update { it.copy(isOptionalRatingsExpanded = !it.isOptionalRatingsExpanded) }
+
+    fun clearOptionalRatings() = form.update { it.copy(optionalRatings = emptyMap()) }
+
     fun selectEquipment(value: Equipment) = form.update { it.copy(equipment = value) }
 
     fun selectRain(value: Rain) = form.update { it.copy(rain = value) }
@@ -155,6 +165,7 @@ class FinishWalkViewModel @AssistedInject constructor(
                     notes = state.notes.trim(),
                     equipment = state.equipment,
                     rating = state.rating,
+                    optionalRatings = state.optionalRatings,
                     rain = state.rain,
                     temperature = state.temperature,
                     wind = state.wind,
@@ -178,6 +189,8 @@ class FinishWalkViewModel @AssistedInject constructor(
             endTime = end.toLocalTime(),
             handlers = walk.handlers,
             rating = walk.rating,
+            optionalRatings = walk.optionalRatings,
+            isOptionalRatingsExpanded = walk.optionalRatings.isNotEmpty(),
             equipment = walk.equipment ?: equipment,
             rain = walk.rain,
             temperature = walk.temperature,

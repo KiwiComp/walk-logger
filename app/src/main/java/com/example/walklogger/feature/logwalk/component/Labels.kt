@@ -5,8 +5,9 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
-import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.MedicalConcern
+import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -18,6 +19,15 @@ internal val Equipment.labelRes: Int
     @StringRes get() = when (this) {
         Equipment.COLLAR -> R.string.equipment_collar
         Equipment.HARNESS -> R.string.equipment_harness
+    }
+
+internal val OptionalRating.labelRes: Int
+    @StringRes get() = when (this) {
+        OptionalRating.REACTIVITY -> R.string.optional_rating_reactivity
+        OptionalRating.ENERGY_LEVEL -> R.string.optional_rating_energy_level
+        OptionalRating.RESPONSIVENESS -> R.string.optional_rating_responsiveness
+        OptionalRating.ENGAGEMENT -> R.string.optional_rating_engagement
+        OptionalRating.DISTRACTION -> R.string.optional_rating_distraction
     }
 
 internal val Rain.labelRes: Int

@@ -20,10 +20,15 @@ data class Walk(
     val snow: Snow? = null,
     val issues: List<BehaviourIssue> = emptyList(),
     val concerns: List<MedicalConcern> = emptyList(),
+    /** Only the aspects the handler chose to rate; each on [RATING_RANGE], 1 least, 7 most. */
+    val optionalRatings: Map<OptionalRating, Int> = emptyMap(),
 ) {
     init {
         require(handlers.isNotEmpty()) { "a walk needs at least one handler" }
         require(rating == null || rating in RATING_RANGE) { "rating must be in $RATING_RANGE, was $rating" }
+        optionalRatings.forEach { (aspect, value) ->
+            require(value in RATING_RANGE) { "$aspect rating must be in $RATING_RANGE, was $value" }
+        }
     }
 
     val isActive: Boolean get() = endTime == null
@@ -34,6 +39,9 @@ data class Walk(
 }
 
 enum class Equipment { COLLAR, HARNESS }
+
+/** The aspects of a walk that can be rated on top of the overall rating. */
+enum class OptionalRating { REACTIVITY, ENERGY_LEVEL, RESPONSIVENESS, ENGAGEMENT, DISTRACTION }
 
 enum class Rain { NONE, LIGHT, HEAVY }
 
