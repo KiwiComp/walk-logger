@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -44,8 +45,10 @@ import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.OnNavyMuted
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.AddBehaviourIssueDialog
+import com.example.walklogger.feature.logwalk.component.AddMedicalConcernDialog
 import com.example.walklogger.feature.logwalk.component.BehaviourSection
 import com.example.walklogger.feature.logwalk.component.FormSection
+import com.example.walklogger.feature.logwalk.component.MedicalSection
 import com.example.walklogger.feature.logwalk.component.RatingScale
 import com.example.walklogger.feature.logwalk.component.WeatherSection
 import com.example.walklogger.feature.logwalk.component.WhenSection
@@ -90,6 +93,10 @@ fun FinishWalkRoute(
         onAddIssue = viewModel::addIssue,
         onToggleBehaviour = viewModel::toggleBehaviour,
         onClearIssues = viewModel::clearIssues,
+        onConcernToggled = viewModel::toggleConcern,
+        onAddConcern = viewModel::addConcern,
+        onToggleMedical = viewModel::toggleMedical,
+        onClearConcerns = viewModel::clearConcerns,
         onNotesChange = viewModel::setNotes,
         onSave = viewModel::save,
         modifier = modifier,
@@ -115,11 +122,16 @@ fun FinishWalkScreen(
     onAddIssue: (String) -> Unit,
     onToggleBehaviour: () -> Unit,
     onClearIssues: () -> Unit,
+    onConcernToggled: (MedicalConcern) -> Unit,
+    onAddConcern: (String) -> Unit,
+    onToggleMedical: () -> Unit,
+    onClearConcerns: () -> Unit,
     onNotesChange: (String) -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showAddIssue by rememberSaveable { mutableStateOf(false) }
+    var showAddConcern by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(R.string.finish_walk_title),
@@ -198,6 +210,15 @@ fun FinishWalkScreen(
                 onIssueToggled = onIssueToggled,
                 onAddIssue = { showAddIssue = true },
             )
+            MedicalSection(
+                concerns = uiState.concerns,
+                selectedIds = uiState.selectedConcernIds,
+                expanded = uiState.isMedicalExpanded,
+                onToggle = onToggleMedical,
+                onClear = onClearConcerns,
+                onConcernToggled = onConcernToggled,
+                onAddConcern = { showAddConcern = true },
+            )
             FormSection(label = stringResource(R.string.log_past_walk_notes)) {
                 AppTextField(
                     value = uiState.notes,
@@ -243,6 +264,15 @@ fun FinishWalkScreen(
                 showAddIssue = false
             },
             onDismiss = { showAddIssue = false },
+        )
+    }
+    if (showAddConcern) {
+        AddMedicalConcernDialog(
+            onConfirm = { name ->
+                onAddConcern(name)
+                showAddConcern = false
+            },
+            onDismiss = { showAddConcern = false },
         )
     }
 }
@@ -291,6 +321,10 @@ private fun FinishWalkScreenPreview() {
             onAddIssue = {},
             onToggleBehaviour = {},
             onClearIssues = {},
+            onConcernToggled = {},
+            onAddConcern = {},
+            onToggleMedical = {},
+            onClearConcerns = {},
             onNotesChange = {},
             onSave = {},
         )
@@ -319,6 +353,10 @@ private fun FinishWalkScreenEditingTimesPreview() {
             onAddIssue = {},
             onToggleBehaviour = {},
             onClearIssues = {},
+            onConcernToggled = {},
+            onAddConcern = {},
+            onToggleMedical = {},
+            onClearConcerns = {},
             onNotesChange = {},
             onSave = {},
         )

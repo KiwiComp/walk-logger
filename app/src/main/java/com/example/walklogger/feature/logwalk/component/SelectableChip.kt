@@ -51,7 +51,7 @@ internal enum class SelectableChipSize {
 internal fun <T> SelectableChip(
     items: List<T>,
     isSelected: (T) -> Boolean,
-    label: (T) -> String,
+    label: @Composable (T) -> String,
     onToggle: (T) -> Unit,
     addLabel: String,
     onAdd: () -> Unit,
@@ -140,7 +140,7 @@ private fun SelectableChipPreview() {
             SelectableChip(
                 items = LogWalkPreviewData.issues,
                 isSelected = { it.id in setOf(1L, 4L) },
-                label = { it.name },
+                label = { it.label() },
                 onToggle = {},
                 addLabel = "+ Other issue",
                 onAdd = {},

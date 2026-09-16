@@ -2,6 +2,7 @@ package com.example.walklogger.feature.logwalk.preview
 
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -21,11 +22,19 @@ internal object LogWalkPreviewData {
     val handlers = listOf("Anna", "Jonas", "Elin")
 
     val issues = listOf(
-        BehaviourIssue(1, "Pulling"),
-        BehaviourIssue(2, "Barking"),
-        BehaviourIssue(3, "Lunging"),
-        BehaviourIssue(4, "Dog reactivity"),
-        BehaviourIssue(5, "Chasing"),
+        BehaviourIssue(1, "Pulling", key = "pulling"),
+        BehaviourIssue(2, "Barking", key = "barking"),
+        BehaviourIssue(3, "Lunging", key = "lunging"),
+        BehaviourIssue(4, "Dog reactivity", key = "dog_reactivity"),
+        BehaviourIssue(5, "Digging"),
+    )
+
+    val concerns = listOf(
+        MedicalConcern(1, "Diarrhoea", key = "diarrhoea"),
+        MedicalConcern(2, "Vomit", key = "vomit"),
+        MedicalConcern(3, "Scooting", key = "scooting"),
+        MedicalConcern(4, "Limping", key = "limping"),
+        MedicalConcern(5, "Coughing"),
     )
 
     val newWalk = NewWalkUiState(
@@ -52,6 +61,9 @@ internal object LogWalkPreviewData {
         issues = issues,
         selectedIssueIds = setOf(1L, 4L),
         isBehaviourExpanded = true,
+        concerns = concerns,
+        selectedConcernIds = setOf(4L),
+        isMedicalExpanded = true,
     )
 
     val activeWalk = ActiveWalkUiState(
@@ -77,6 +89,7 @@ internal object LogWalkPreviewData {
         wind = Wind.BREEZE,
         snow = Snow.NONE,
         issues = issues,
+        concerns = concerns,
         notes = "Barked at the bin lorry, otherwise steady. Off-lead in the field for ten minutes.",
         isLoading = false,
     )

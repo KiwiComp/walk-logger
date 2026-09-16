@@ -5,8 +5,10 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.walklogger.core.database.WalkLoggerDatabase
 import com.example.walklogger.core.database.entity.BehaviourIssueEntity
+import com.example.walklogger.core.database.entity.MedicalConcernEntity
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -38,6 +40,8 @@ class DefaultWalkRepositoryTest {
 
     private val pulling = BehaviourIssue(id = 1, name = "Pulling")
     private val barking = BehaviourIssue(id = 2, name = "Barking")
+    private val limping = MedicalConcern(id = 1, name = "Limping")
+    private val vomit = MedicalConcern(id = 2, name = "Vomit")
 
     private val pastWalk = Walk(
         id = 99,
@@ -53,6 +57,7 @@ class DefaultWalkRepositoryTest {
         wind = Wind.WINDY,
         snow = Snow.NONE,
         issues = listOf(pulling, barking),
+        concerns = listOf(limping, vomit),
     )
 
     @Before
@@ -60,6 +65,7 @@ class DefaultWalkRepositoryTest {
         database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), WalkLoggerDatabase::class.java).build()
         repository = DefaultWalkRepository(database.walkDao(), clock, Dispatchers.IO)
         listOf(pulling, barking).forEach { database.behaviourIssueDao().insertIssue(BehaviourIssueEntity(id = it.id, name = it.name)) }
+        listOf(limping, vomit).forEach { database.medicalConcernDao().insertConcern(MedicalConcernEntity(id = it.id, name = it.name)) }
     }
 
     @After
@@ -120,13 +126,26 @@ class DefaultWalkRepositoryTest {
     }
 
     @Test
-    fun deleteWalk_removesItAndItsIssueRows() = runBlocking {
+    fun updateWalk_replacesTheTickedConcerns() = runBlocking {
+        val id = repository.logWalk(pastWalk)
+
+        repository.updateWalk(pastWalk.copy(id = id, concerns = listOf(vomit)))
+
+        assertEquals(listOf(vomit), repository.observeWalk(id).first()!!.concerns)
+    }
+
+    @Test
+    fun deleteWalk_removesItAndItsIssueAndConcernRows() = runBlocking {
         val id = repository.logWalk(pastWalk)
 
         repository.deleteWalk(id)
 
         assertNull(repository.observeWalk(id).first())
         database.query("SELECT COUNT(*) FROM walk_behaviour_issues", null).use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(0, cursor.getInt(0))
+        }
+        database.query("SELECT COUNT(*) FROM walk_medical_concerns", null).use { cursor ->
             assertTrue(cursor.moveToFirst())
             assertEquals(0, cursor.getInt(0))
         }

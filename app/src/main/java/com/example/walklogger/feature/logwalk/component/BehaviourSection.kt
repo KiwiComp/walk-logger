@@ -34,7 +34,7 @@ internal fun BehaviourSection(
         SelectableChip(
             items = issues,
             isSelected = { it.id in selectedIds },
-            label = { it.name },
+            label = { it.label() },
             onToggle = onIssueToggled,
             addLabel = stringResource(R.string.behaviour_other_issue),
             onAdd = onAddIssue,

@@ -2,6 +2,7 @@ package com.example.walklogger.feature.logwalk.finishwalk
 
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -35,6 +36,10 @@ data class FinishWalkUiState(
     val selectedIssueIds: Set<Long> = emptySet(),
     /** True while the optional issue chips are shown; opens by itself when a stored walk has any. */
     val isBehaviourExpanded: Boolean = false,
+    val concerns: List<MedicalConcern> = emptyList(),
+    val selectedConcernIds: Set<Long> = emptySet(),
+    /** True while the optional concern chips are shown; opens by itself when a stored walk has any. */
+    val isMedicalExpanded: Boolean = false,
     val notes: String = "",
     /** True while the "Edit times" pickers are shown. */
     val isEditingTimes: Boolean = false,

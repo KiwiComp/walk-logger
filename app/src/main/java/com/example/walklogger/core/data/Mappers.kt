@@ -3,17 +3,25 @@ package com.example.walklogger.core.data
 import com.example.walklogger.core.database.WalkWithIssues
 import com.example.walklogger.core.database.entity.BehaviourIssueEntity
 import com.example.walklogger.core.database.entity.DogEntity
+import com.example.walklogger.core.database.entity.MedicalConcernEntity
 import com.example.walklogger.core.database.entity.WalkEntity
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Dog
+import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.Walk
 import java.time.LocalDate
 
 // Entity <-> domain model mapping. Keeps Room types out of the rest of the app.
 
-internal fun WalkWithIssues.toModel(): Walk = walk.toModel(issues.sortedBy { it.id }.map { it.toModel() })
+internal fun WalkWithIssues.toModel(): Walk = walk.toModel(
+    issues = issues.sortedBy { it.id }.map { it.toModel() },
+    concerns = concerns.sortedBy { it.id }.map { it.toModel() },
+)
 
-internal fun WalkEntity.toModel(issues: List<BehaviourIssue> = emptyList()): Walk = Walk(
+internal fun WalkEntity.toModel(
+    issues: List<BehaviourIssue> = emptyList(),
+    concerns: List<MedicalConcern> = emptyList(),
+): Walk = Walk(
     id = id,
     dogId = dogId,
     handlers = handlers,
@@ -27,6 +35,7 @@ internal fun WalkEntity.toModel(issues: List<BehaviourIssue> = emptyList()): Wal
     wind = wind,
     snow = snow,
     issues = issues,
+    concerns = concerns,
 )
 
 internal fun Walk.toEntity(): WalkEntity = WalkEntity(
@@ -44,7 +53,9 @@ internal fun Walk.toEntity(): WalkEntity = WalkEntity(
     snow = snow,
 )
 
-internal fun BehaviourIssueEntity.toModel(): BehaviourIssue = BehaviourIssue(id = id, name = name)
+internal fun BehaviourIssueEntity.toModel(): BehaviourIssue = BehaviourIssue(id = id, name = name, key = key)
+
+internal fun MedicalConcernEntity.toModel(): MedicalConcern = MedicalConcern(id = id, name = name, key = key)
 
 internal fun DogEntity.toModel(): Dog = Dog(
     id = id,

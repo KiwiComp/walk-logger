@@ -4,10 +4,12 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
+import com.example.walklogger.core.data.MedicalConcernRepository
 import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -44,6 +46,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
     private val dogRepository: DogRepository,
     private val handlerRepository: HandlerRepository,
     private val behaviourIssueRepository: BehaviourIssueRepository,
+    private val medicalConcernRepository: MedicalConcernRepository,
     private val walkRepository: WalkRepository,
     private val clock: Clock,
 ) : ViewModel() {
@@ -53,7 +56,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
         fun create(date: LocalDate, walkId: Long?): LogPastWalkViewModel
     }
 
-    /** Everything the user enters; the dog, handler and issue lists are overlaid from their repositories. */
+    /** Everything the user enters; the dog, handler, issue and concern lists are overlaid from their repositories. */
     private val form = MutableStateFlow(
         LogPastWalkUiState(
             date = date,
@@ -82,8 +85,9 @@ class LogPastWalkViewModel @AssistedInject constructor(
             dogRepository.observeActiveDog(),
             handlerRepository.observeHandlers(),
             behaviourIssueRepository.observeIssues(),
-        ) { form, dog, handlers, issues ->
-            form.copy(dogName = dog?.name, handlers = handlers, issues = issues)
+            medicalConcernRepository.observeConcerns(),
+        ) { form, dog, handlers, issues, concerns ->
+            form.copy(dogName = dog?.name, handlers = handlers, issues = issues, concerns = concerns)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -146,6 +150,23 @@ class LogPastWalkViewModel @AssistedInject constructor(
 
     fun clearIssues() = form.update { it.copy(selectedIssueIds = emptySet()) }
 
+    fun toggleConcern(concern: MedicalConcern) = form.update { state ->
+        val selected = state.selectedConcernIds
+        state.copy(selectedConcernIds = if (concern.id in selected) selected - concern.id else selected + concern.id)
+    }
+
+    /** Stores the concern (or finds the existing one) and selects it. */
+    fun addConcern(name: String) {
+        viewModelScope.launch {
+            val stored = medicalConcernRepository.addConcern(name)
+            form.update { it.copy(selectedConcernIds = it.selectedConcernIds + stored.id) }
+        }
+    }
+
+    fun toggleMedical() = form.update { it.copy(isMedicalExpanded = !it.isMedicalExpanded) }
+
+    fun clearConcerns() = form.update { it.copy(selectedConcernIds = emptySet()) }
+
     fun setNotes(notes: String) = form.update { it.copy(notes = notes.take(MAX_NOTES_LENGTH)) }
 
     fun save() {
@@ -170,6 +191,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
                 wind = state.wind,
                 snow = state.snow,
                 issues = state.issues.filter { it.id in state.selectedIssueIds },
+                concerns = state.concerns.filter { it.id in state.selectedConcernIds },
             )
             if (edited != null) walkRepository.updateWalk(walk) else walkRepository.logWalk(walk)
             form.update { it.copy(isSaving = false, isSaved = true) }
@@ -204,6 +226,8 @@ class LogPastWalkViewModel @AssistedInject constructor(
             isWeatherExpanded = listOf(walk.rain, walk.temperature, walk.wind, walk.snow).any { it != null },
             selectedIssueIds = walk.issues.map { it.id }.toSet(),
             isBehaviourExpanded = walk.issues.isNotEmpty(),
+            selectedConcernIds = walk.concerns.map { it.id }.toSet(),
+            isMedicalExpanded = walk.concerns.isNotEmpty(),
             notes = walk.notes,
             isLoading = false,
         )

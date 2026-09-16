@@ -3,12 +3,14 @@ package com.example.walklogger.core.data
 import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
+import com.example.walklogger.core.database.DefaultBehaviourIssues
 import com.example.walklogger.core.database.WalkLoggerDatabase
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.runBlocking
 import org.junit.After
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Assert.assertThrows
 import org.junit.Before
 import org.junit.Test
@@ -32,12 +34,11 @@ class DefaultBehaviourIssueRepositoryTest {
     fun tearDown() = database.close()
 
     @Test
-    fun aFreshDatabase_startsWithTheDefaultIssues() = runBlocking {
-        val names = repository.observeIssues().first().map { it.name }
+    fun aFreshDatabase_startsWithTheKeyedDefaultIssues() = runBlocking {
+        val issues = repository.observeIssues().first()
 
-        assertEquals("Pulling", names.first())
-        assertEquals("Chasing", names.last())
-        assertEquals(10, names.size)
+        assertEquals(DefaultBehaviourIssues.keys.toList(), issues.map { it.key })
+        assertEquals(DefaultBehaviourIssues.values.toList(), issues.map { it.name })
     }
 
     @Test
@@ -45,6 +46,7 @@ class DefaultBehaviourIssueRepositoryTest {
         val added = repository.addIssue("  Digging ")
 
         assertEquals("Digging", added.name)
+        assertNull(added.key)
         assertEquals(added, repository.observeIssues().first().last())
     }
 
@@ -53,6 +55,17 @@ class DefaultBehaviourIssueRepositoryTest {
         val existing = repository.observeIssues().first().first { it.name == "Pulling" }
 
         assertEquals(existing, repository.addIssue("pulling"))
+        assertEquals(10, repository.observeIssues().first().size)
+    }
+
+    @Test
+    fun addIssue_revivesAHiddenIssue() = runBlocking {
+        val pulling = repository.observeIssues().first().first { it.key == "pulling" }
+        database.behaviourIssueDao().setHidden(pulling.id, true)
+        assertEquals(9, repository.observeIssues().first().size)
+
+        assertEquals(pulling, repository.addIssue("pulling"))
+
         assertEquals(10, repository.observeIssues().first().size)
     }
 
