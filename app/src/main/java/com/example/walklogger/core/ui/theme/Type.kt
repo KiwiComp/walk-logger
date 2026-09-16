@@ -63,7 +63,16 @@ val Typography = Typography(
         fontSize = 13.sp,
         lineHeight = 16.sp,
     ),
-    // Small-caps section labels ("WHO IS WALKING", "MON", bottom-bar labels).
+    // Small-caps headers above form sections ("RATING", "WEATHER"); larger than labelSmall so they
+    // hold their own next to the controls beneath them.
+    labelLarge = TextStyle(
+        fontFamily = Display,
+        fontWeight = FontWeight.Bold,
+        fontSize = 13.sp,
+        lineHeight = 16.sp,
+        letterSpacing = 1.5.sp,
+    ),
+    // Small-caps labels inside cells ("MON", bottom-bar labels).
     labelSmall = TextStyle(
         fontFamily = Display,
         fontWeight = FontWeight.Bold,

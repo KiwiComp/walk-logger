@@ -64,7 +64,7 @@
     <string name="new_walk_title">New walk</string>
     <string name="new_walk_who_is_walking">Who is walking</string>
     <string name="new_walk_equipment">Equipment</string>
-    <string name="new_walk_someone_else">+ Someone else</string>
+    <string name="new_walk_add_handler">+ Add</string>
     <string name="new_walk_after_note">Rating, weather and notes come after the walk. Start time is set when you tap.</string>
     <string name="new_walk_timer_starts_now">Timer starts now</string>
     <string name="new_walk_start">Start walk</string>
@@ -159,7 +159,7 @@
     <string name="concern_irregular_gait">Irregular gait</string>
     <string name="concern_excessive_drooling">Excessive drooling</string>
     <string name="log_past_walk_notes">Notes</string>
-    <string name="log_past_walk_notes_placeholder">What stood out? Reactions, other dogs, pulling, where you went.</string>
+    <string name="log_past_walk_notes_placeholder">Other information you want to store.</string>
     <string name="log_past_walk_save">Save walk</string>
     <string name="log_past_walk_needs_handler">Choose who walked before this walk can be saved.</string>
     <string name="log_past_walk_needs_times">Enter start and end times before this walk can be saved.</string>

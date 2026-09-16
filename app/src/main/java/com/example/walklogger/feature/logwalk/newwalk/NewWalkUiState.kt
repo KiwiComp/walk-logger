@@ -9,7 +9,7 @@ data class NewWalkUiState(
     val dogName: String? = null,
     val handlers: List<String> = emptyList(),
     val selectedHandlers: Set<String> = emptySet(),
-    val equipment: Equipment = Equipment.HARNESS,
+    val equipment: Equipment = Equipment.COLLAR,
     val isStarting: Boolean = false,
     /** Set once the walk is stored; the timer screen opens for it. */
     val startedWalkId: Long? = null,

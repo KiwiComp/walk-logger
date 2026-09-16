@@ -25,7 +25,7 @@ data class LogPastWalkUiState(
     val handlers: List<String> = emptyList(),
     val selectedHandlers: Set<String> = emptySet(),
     val rating: Int? = null,
-    val equipment: Equipment = Equipment.HARNESS,
+    val equipment: Equipment = Equipment.COLLAR,
     val rain: Rain? = null,
     val temperature: Temperature? = null,
     val wind: Wind? = null,

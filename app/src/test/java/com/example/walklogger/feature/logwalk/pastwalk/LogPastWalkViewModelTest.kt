@@ -60,8 +60,8 @@ class LogPastWalkViewModelTest {
         )
     }
 
+    /** Relies on the first stored handler being preselected. */
     private fun fillInValidWalk() {
-        viewModel.toggleHandler("Anna")
         viewModel.setStartTime(LocalTime.of(17, 40))
         viewModel.setEndTime(LocalTime.of(18, 5))
         viewModel.setRating(5)
@@ -115,6 +115,7 @@ class LogPastWalkViewModelTest {
             val state = expectMostRecentItem()
             assertEquals("Sixten", state.dogName)
             assertEquals(listOf("Anna", "Jonas"), state.handlers)
+            assertEquals(setOf("Anna"), state.selectedHandlers)
             assertEquals(listOf(BehaviourIssue(1, "Pulling"), BehaviourIssue(2, "Barking")), state.issues)
             assertEquals(listOf(MedicalConcern(1, "Limping"), MedicalConcern(2, "Vomit")), state.concerns)
         }
@@ -209,6 +210,7 @@ class LogPastWalkViewModelTest {
     fun `save is blocked by the first missing input in form order`() = runTest {
         handlerRepository.addHandlers("Anna")
         viewModel.uiState.test {
+            viewModel.toggleHandler("Anna")
             assertEquals(SaveBlocker.HANDLER, expectMostRecentItem().saveBlocker)
             viewModel.toggleHandler("Anna")
             assertEquals(SaveBlocker.TIMES, expectMostRecentItem().saveBlocker)

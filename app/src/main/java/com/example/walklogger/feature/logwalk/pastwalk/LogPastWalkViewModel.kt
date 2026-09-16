@@ -69,12 +69,17 @@ class LogPastWalkViewModel @AssistedInject constructor(
     /** The walk being edited, kept so saving preserves its id and dog. */
     private var editedWalk: Walk? = null
 
+    /** Editing prefills from the stored walk; a new walk starts with the first (usual) handler selected. */
     init {
-        if (walkId != null) {
-            viewModelScope.launch {
+        viewModelScope.launch {
+            if (walkId != null) {
                 val walk = checkNotNull(walkRepository.observeWalk(walkId).first()) { "walk $walkId not found" }
                 editedWalk = walk
                 form.update { it.prefilledFrom(walk) }
+            } else {
+                handlerRepository.observeHandlers().first().firstOrNull()?.let { first ->
+                    form.update { if (it.selectedHandlers.isEmpty()) it.copy(selectedHandlers = setOf(first)) else it }
+                }
             }
         }
     }
