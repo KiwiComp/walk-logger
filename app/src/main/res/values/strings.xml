@@ -95,10 +95,6 @@
 
     <string name="log_past_walk_title">Log a past walk</string>
     <string name="edit_walk_title">Edit walk</string>
-    <string name="edit_walk_delete">Delete walk</string>
-    <string name="edit_walk_delete_confirm_title">Delete this walk?</string>
-    <string name="edit_walk_delete_confirm_message">The walk is removed from the log. This can\'t be undone.</string>
-    <string name="edit_walk_delete_confirm">Delete</string>
     <string name="log_past_walk_when">When</string>
     <string name="log_past_walk_date">Date</string>
     <string name="log_past_walk_start">Start</string>
@@ -173,4 +169,19 @@
     <string name="log_past_walk_needs_end_after_start">The end time must be after the start time.</string>
     <string name="log_past_walk_needs_past_end">A past walk can\u2019t end in the future.</string>
     <string name="log_past_walk_needs_rating">A rating is needed before this walk can be saved.</string>
+
+    <string name="walk_detail_title">Logged walk</string>
+    <string name="walk_detail_edit">Edit</string>
+    <string name="walk_detail_discard">Discard</string>
+    <string name="walk_detail_discard_confirm_title">Discard this walk?</string>
+    <string name="walk_detail_discard_confirm_message">The walk is removed from the log. This can\'t be undone.</string>
+    <string name="walk_detail_discard_confirm">Discard</string>
+    <string name="walk_detail_length">Length</string>
+    <string name="walk_detail_dog">Dog</string>
+    <string name="walk_detail_not_recorded">Not recorded</string>
+    <string name="walk_detail_nothing_noted">Nothing noted</string>
+    <plurals name="walk_detail_noted_count">
+        <item quantity="one">%1$d noted</item>
+        <item quantity="other">%1$d noted</item>
+    </plurals>
 </resources>

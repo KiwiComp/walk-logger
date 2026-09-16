@@ -10,7 +10,6 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
-import androidx.compose.material.icons.filled.Delete
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -71,17 +70,13 @@ fun LogPastWalkRoute(
     walkId: Long?,
     onClose: () -> Unit,
     onSaved: () -> Unit,
-    onDeleted: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LogPastWalkViewModel =
         hiltViewModel<LogPastWalkViewModel, LogPastWalkViewModel.Factory> { it.create(date, walkId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiState.isSaved, uiState.isDeleted) {
-        when {
-            uiState.isSaved -> onSaved()
-            uiState.isDeleted -> onDeleted()
-        }
+    LaunchedEffect(uiState.isSaved) {
+        if (uiState.isSaved) onSaved()
     }
     LogPastWalkScreen(
         uiState = uiState,
@@ -112,7 +107,6 @@ fun LogPastWalkRoute(
         onClearConcerns = viewModel::clearConcerns,
         onNotesChange = viewModel::setNotes,
         onSave = viewModel::save,
-        onDelete = viewModel::delete,
         modifier = modifier,
     )
 }
@@ -147,13 +141,11 @@ fun LogPastWalkScreen(
     onClearConcerns: () -> Unit,
     onNotesChange: (String) -> Unit,
     onSave: () -> Unit,
-    onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showAddHandler by rememberSaveable { mutableStateOf(false) }
     var showAddIssue by rememberSaveable { mutableStateOf(false) }
     var showAddConcern by rememberSaveable { mutableStateOf(false) }
-    var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(if (uiState.isEditing) R.string.edit_walk_title else R.string.log_past_walk_title),
@@ -164,17 +156,7 @@ fun LogPastWalkScreen(
                     onClick = onClose,
                 )
             },
-            actions = {
-                if (uiState.isEditing) {
-                    HeaderIconButton(
-                        icon = Icons.Filled.Delete,
-                        contentDescription = stringResource(R.string.edit_walk_delete),
-                        onClick = { showDeleteConfirm = true },
-                        enabled = uiState.canDelete,
-                    )
-                }
-                DogBadge(name = uiState.dogName)
-            },
+            actions = { DogBadge(name = uiState.dogName) },
         )
         Column(
             modifier = Modifier
@@ -315,15 +297,6 @@ fun LogPastWalkScreen(
             onDismiss = { showAddConcern = false },
         )
     }
-    if (showDeleteConfirm) {
-        DeleteWalkDialog(
-            onConfirm = {
-                showDeleteConfirm = false
-                onDelete()
-            },
-            onDismiss = { showDeleteConfirm = false },
-        )
-    }
 }
 
 @Preview(showBackground = true, heightDp = 1200)
@@ -359,7 +332,6 @@ private fun LogPastWalkScreenPreview() {
             onClearConcerns = {},
             onNotesChange = {},
             onSave = {},
-            onDelete = {},
         )
     }
 }
@@ -397,7 +369,6 @@ private fun LogPastWalkScreenCompletePreview() {
             onClearConcerns = {},
             onNotesChange = {},
             onSave = {},
-            onDelete = {},
         )
     }
 }
@@ -435,7 +406,6 @@ private fun LogPastWalkScreenEditPreview() {
             onClearConcerns = {},
             onNotesChange = {},
             onSave = {},
-            onDelete = {},
         )
     }
 }
@@ -473,7 +443,6 @@ private fun LogPastWalkScreenEmptyPreview() {
             onClearConcerns = {},
             onNotesChange = {},
             onSave = {},
-            onDelete = {},
         )
     }
 }

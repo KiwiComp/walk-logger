@@ -81,15 +81,15 @@ fun NavGraphBuilder.finishWalkScreen(onSaved: () -> Unit) {
     }
 }
 
-fun NavGraphBuilder.logPastWalkScreen(onClose: () -> Unit, onSaved: () -> Unit, onDeleted: () -> Unit) {
+/** [onLogged] runs after a new walk is stored, [onUpdated] after an edited one. */
+fun NavGraphBuilder.logPastWalkScreen(onClose: () -> Unit, onLogged: () -> Unit, onUpdated: () -> Unit) {
     composable<LogPastWalkDestination> { entry ->
         val destination = entry.toRoute<LogPastWalkDestination>()
         LogPastWalkRoute(
             date = LocalDate.ofEpochDay(destination.epochDay),
             walkId = destination.walkId,
             onClose = onClose,
-            onSaved = onSaved,
-            onDeleted = onDeleted,
+            onSaved = if (destination.walkId == null) onLogged else onUpdated,
         )
     }
 }

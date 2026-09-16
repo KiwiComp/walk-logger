@@ -29,7 +29,7 @@ com.example.walklogger
 │   │                          medical, notes for the just-finished walk, with an "Edit times" toggle);
 │   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating, optional ratings,
 │   │                          equipment, weather, behaviour, medical, notes); the same screen edits a logged walk when the route
-│   │                          carries a walkId, and can delete it (DeleteWalkDialog confirms first);
+│   │                          carries a walkId, pushed on top of that walk's detail screen so saving or closing returns there;
 │   │                          component/ holds the form pieces the screens share (FormSection, SelectableChip,
 │   │                          BehaviourSection, MedicalSection, AddNameDialog and its AddHandlerDialog /
 │   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, OptionalRatingsSection, WeatherSection, WhenSection, Labels);
@@ -37,7 +37,12 @@ com.example.walklogger
 │   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
 │   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
 │   │                          MonthGrid with cells tinted by rating and selection ringed in Accent, CalendarWalkList);
-│   │                          a walk row opens the edit screen, the dashed button logs a walk on that day
+│   │                          a walk row opens the walk's detail screen, the dashed button logs a walk on that day
+│   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk (when, handler, dog,
+│   │                          equipment, rating, optional ratings, weather, behaviour, medical, notes; empty sections say so),
+│   │                          opened from a walk row on Log or Calendar; Edit pushes LogPastWalkScreen, Discard deletes the walk
+│   │                          (DiscardWalkDialog confirms first) and back returns to the tab; component/ holds the read-only
+│   │                          pieces (DetailField, DetailPlaceholder, RatingSummary, OptionalRatingRow, NotedItem)
 │   ├── patterns/              placeholder, same shape as calendar
 │   └── dog/                   DogViewModel + DogScreen (profile header, dog list, add-dog CTA) composed from
 │                              component/ (DogList);
@@ -75,7 +80,7 @@ com.example.walklogger
   `LogPastWalkViewModel` take their `date` (and the walk screens their `walkId`) through an `@AssistedFactory` rather than `SavedStateHandle.toRoute()`, because
   `SavedStateHandle` needs Android's `Bundle` and would push ViewModel tests off the JVM.
 - **Pushed screens hide the bottom bar.** Anything that is not a `TopLevelDestination`
-  (new walk, log past walk, register dog) is a full-screen task with a leading back chevron
+  (new walk, log past walk, walk detail, register dog) is a full-screen task with a leading back chevron
   (or close cross for forms) in the header. The timer and after-walk screens have neither: a
   timed walk is stored the moment it starts, ended by "End walk" and already logged before the
   form opens, so there is nothing to cancel. When a flow finishes, `popToTopLevel()` returns to

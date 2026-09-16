@@ -1,4 +1,4 @@
-package com.example.walklogger.feature.logwalk.pastwalk
+package com.example.walklogger.feature.walkdetail
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -12,16 +12,16 @@ import com.example.walklogger.core.ui.theme.Canvas
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 @Composable
-internal fun DeleteWalkDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+internal fun DiscardWalkDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         shape = MaterialTheme.shapes.extraSmall,
         containerColor = Canvas,
-        title = { Text(stringResource(R.string.edit_walk_delete_confirm_title)) },
-        text = { Text(stringResource(R.string.edit_walk_delete_confirm_message)) },
+        title = { Text(stringResource(R.string.walk_detail_discard_confirm_title)) },
+        text = { Text(stringResource(R.string.walk_detail_discard_confirm_message)) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(stringResource(R.string.edit_walk_delete_confirm))
+                Text(stringResource(R.string.walk_detail_discard_confirm))
             }
         },
         dismissButton = {
@@ -34,8 +34,8 @@ internal fun DeleteWalkDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 
 @Preview
 @Composable
-private fun DeleteWalkDialogPreview() {
+private fun DiscardWalkDialogPreview() {
     WalkLoggerTheme {
-        DeleteWalkDialog(onConfirm = {}, onDismiss = {})
+        DiscardWalkDialog(onConfirm = {}, onDismiss = {})
     }
 }

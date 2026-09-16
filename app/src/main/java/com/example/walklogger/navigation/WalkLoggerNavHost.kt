@@ -20,6 +20,8 @@ import com.example.walklogger.feature.logwalk.navigation.navigateToLogPastWalk
 import com.example.walklogger.feature.logwalk.navigation.navigateToNewWalk
 import com.example.walklogger.feature.logwalk.navigation.newWalkScreen
 import com.example.walklogger.feature.patterns.navigation.patternsScreen
+import com.example.walklogger.feature.walkdetail.navigation.navigateToWalkDetail
+import com.example.walklogger.feature.walkdetail.navigation.walkDetailScreen
 
 /** App-level graph. Features contribute their destinations via extension functions. */
 @Composable
@@ -35,13 +37,13 @@ fun WalkLoggerNavHost(
         logScreen(
             onAddWalk = navController::navigateToNewWalk,
             onLogPastWalk = navController::navigateToLogPastWalk,
-            onEditWalk = navController::navigateToEditWalk,
+            onOpenWalk = navController::navigateToWalkDetail,
             onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
         )
         calendarScreen(
             onAddWalk = navController::navigateToNewWalk,
             onLogPastWalk = navController::navigateToLogPastWalk,
-            onEditWalk = navController::navigateToEditWalk,
+            onOpenWalk = navController::navigateToWalkDetail,
             onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
         )
         patternsScreen()
@@ -58,10 +60,16 @@ fun WalkLoggerNavHost(
             onWalkDiscarded = navController::popToTopLevel,
         )
         finishWalkScreen(onSaved = navController::popToTopLevel)
+        // Editing is pushed on top of the walk's detail screen, so every way out of the form lands back there.
         logPastWalkScreen(
             onClose = { navController.popBackStack() },
-            onSaved = navController::popToTopLevel,
-            onDeleted = navController::popToTopLevel,
+            onLogged = navController::popToTopLevel,
+            onUpdated = { navController.popBackStack() },
+        )
+        walkDetailScreen(
+            onBack = navController::popToTopLevel,
+            onEdit = navController::navigateToEditWalk,
+            onDiscarded = navController::popToTopLevel,
         )
     }
 }
