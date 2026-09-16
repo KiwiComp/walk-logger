@@ -16,6 +16,9 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -24,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
+import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
@@ -39,6 +43,8 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.OnNavyMuted
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+import com.example.walklogger.feature.logwalk.component.AddBehaviourIssueDialog
+import com.example.walklogger.feature.logwalk.component.BehaviourSection
 import com.example.walklogger.feature.logwalk.component.FormSection
 import com.example.walklogger.feature.logwalk.component.RatingScale
 import com.example.walklogger.feature.logwalk.component.WeatherSection
@@ -80,6 +86,10 @@ fun FinishWalkRoute(
         onSnowSelected = viewModel::selectSnow,
         onToggleWeather = viewModel::toggleWeather,
         onClearWeather = viewModel::clearWeather,
+        onIssueToggled = viewModel::toggleIssue,
+        onAddIssue = viewModel::addIssue,
+        onToggleBehaviour = viewModel::toggleBehaviour,
+        onClearIssues = viewModel::clearIssues,
         onNotesChange = viewModel::setNotes,
         onSave = viewModel::save,
         modifier = modifier,
@@ -101,10 +111,15 @@ fun FinishWalkScreen(
     onSnowSelected: (Snow) -> Unit,
     onToggleWeather: () -> Unit,
     onClearWeather: () -> Unit,
+    onIssueToggled: (BehaviourIssue) -> Unit,
+    onAddIssue: (String) -> Unit,
+    onToggleBehaviour: () -> Unit,
+    onClearIssues: () -> Unit,
     onNotesChange: (String) -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showAddIssue by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(R.string.finish_walk_title),
@@ -174,6 +189,15 @@ fun FinishWalkScreen(
                 onWindSelected = onWindSelected,
                 onSnowSelected = onSnowSelected,
             )
+            BehaviourSection(
+                issues = uiState.issues,
+                selectedIds = uiState.selectedIssueIds,
+                expanded = uiState.isBehaviourExpanded,
+                onToggle = onToggleBehaviour,
+                onClear = onClearIssues,
+                onIssueToggled = onIssueToggled,
+                onAddIssue = { showAddIssue = true },
+            )
             FormSection(label = stringResource(R.string.log_past_walk_notes)) {
                 AppTextField(
                     value = uiState.notes,
@@ -211,6 +235,15 @@ fun FinishWalkScreen(
                 )
             }
         }
+    }
+    if (showAddIssue) {
+        AddBehaviourIssueDialog(
+            onConfirm = { name ->
+                onAddIssue(name)
+                showAddIssue = false
+            },
+            onDismiss = { showAddIssue = false },
+        )
     }
 }
 
@@ -254,6 +287,10 @@ private fun FinishWalkScreenPreview() {
             onSnowSelected = {},
             onToggleWeather = {},
             onClearWeather = {},
+            onIssueToggled = {},
+            onAddIssue = {},
+            onToggleBehaviour = {},
+            onClearIssues = {},
             onNotesChange = {},
             onSave = {},
         )
@@ -278,6 +315,10 @@ private fun FinishWalkScreenEditingTimesPreview() {
             onSnowSelected = {},
             onToggleWeather = {},
             onClearWeather = {},
+            onIssueToggled = {},
+            onAddIssue = {},
+            onToggleBehaviour = {},
+            onClearIssues = {},
             onNotesChange = {},
             onSave = {},
         )

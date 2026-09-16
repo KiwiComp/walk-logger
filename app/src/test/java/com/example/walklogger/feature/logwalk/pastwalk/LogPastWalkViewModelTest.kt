@@ -1,6 +1,7 @@
 package com.example.walklogger.feature.logwalk.pastwalk
 
 import app.cash.turbine.test
+import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
@@ -10,6 +11,7 @@ import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
 import com.example.walklogger.feature.logwalk.MAX_NOTES_LENGTH
 import com.example.walklogger.feature.logwalk.SaveBlocker
+import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeHandlerRepository
 import com.example.walklogger.testing.FakeWalkRepository
@@ -39,6 +41,7 @@ class LogPastWalkViewModelTest {
     private val clock = Clock.fixed(now.toInstant(zone), zone)
     private val dogRepository = FakeDogRepository()
     private val handlerRepository = FakeHandlerRepository()
+    private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val walkRepository = FakeWalkRepository()
     private var walkId: Long? = null
     private val viewModel by lazy {
@@ -47,6 +50,7 @@ class LogPastWalkViewModelTest {
             walkId = walkId,
             dogRepository = dogRepository,
             handlerRepository = handlerRepository,
+            behaviourIssueRepository = behaviourIssueRepository,
             walkRepository = walkRepository,
             clock = clock,
         )
@@ -98,13 +102,53 @@ class LogPastWalkViewModelTest {
     }
 
     @Test
-    fun `shows the active dog and stored handlers`() = runTest {
+    fun `shows the active dog, stored handlers and issues`() = runTest {
         dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         handlerRepository.addHandlers("Anna", "Jonas")
+        behaviourIssueRepository.addIssues("Pulling", "Barking")
         viewModel.uiState.test {
             val state = expectMostRecentItem()
             assertEquals("Sixten", state.dogName)
             assertEquals(listOf("Anna", "Jonas"), state.handlers)
+            assertEquals(listOf(BehaviourIssue(1, "Pulling"), BehaviourIssue(2, "Barking")), state.issues)
+        }
+    }
+
+    @Test
+    fun `behaviour starts collapsed for a new walk and toggles`() = runTest {
+        viewModel.uiState.test {
+            assertFalse(expectMostRecentItem().isBehaviourExpanded)
+            viewModel.toggleBehaviour()
+            assertTrue(expectMostRecentItem().isBehaviourExpanded)
+            viewModel.toggleBehaviour()
+            assertFalse(expectMostRecentItem().isBehaviourExpanded)
+        }
+    }
+
+    @Test
+    fun `issues toggle on and off and clear together`() = runTest {
+        behaviourIssueRepository.addIssues("Pulling", "Barking")
+        val pulling = BehaviourIssue(1, "Pulling")
+        val barking = BehaviourIssue(2, "Barking")
+        viewModel.uiState.test {
+            viewModel.toggleIssue(pulling)
+            viewModel.toggleIssue(barking)
+            assertEquals(setOf(1L, 2L), expectMostRecentItem().selectedIssueIds)
+            viewModel.toggleIssue(pulling)
+            assertEquals(setOf(2L), expectMostRecentItem().selectedIssueIds)
+            viewModel.clearIssues()
+            assertTrue(expectMostRecentItem().selectedIssueIds.isEmpty())
+        }
+    }
+
+    @Test
+    fun `adding an issue stores and selects it`() = runTest {
+        behaviourIssueRepository.addIssues("Pulling")
+        viewModel.uiState.test {
+            viewModel.addIssue("  Digging ")
+            val state = expectMostRecentItem()
+            assertEquals(listOf(BehaviourIssue(1, "Pulling"), BehaviourIssue(2, "Digging")), state.issues)
+            assertEquals(setOf(2L), state.selectedIssueIds)
         }
     }
 
@@ -181,8 +225,10 @@ class LogPastWalkViewModelTest {
     fun `save stores the walk for the active dog and flags completion`() = runTest {
         dogRepository.addDogs(Dog(id = 7, name = "Sixten"))
         handlerRepository.addHandlers("Anna", "Jonas")
+        behaviourIssueRepository.addIssues("Pulling", "Barking")
         viewModel.uiState.test {
             fillInValidWalk()
+            viewModel.toggleIssue(BehaviourIssue(2, "Barking"))
             viewModel.selectEquipment(Equipment.COLLAR)
             viewModel.selectRain(Rain.LIGHT)
             viewModel.selectTemperature(Temperature.COLD)
@@ -203,6 +249,7 @@ class LogPastWalkViewModelTest {
         assertEquals(Temperature.COLD, walk.temperature)
         assertEquals(Wind.WINDY, walk.wind)
         assertEquals(Snow.NONE, walk.snow)
+        assertEquals(listOf(BehaviourIssue(2, "Barking")), walk.issues)
         assertEquals("Pulled at the gate", walk.notes)
     }
 
@@ -243,6 +290,7 @@ class LogPastWalkViewModelTest {
             temperature = Temperature.COOL,
             wind = Wind.BREEZE,
             snow = Snow.LIGHT,
+            issues = listOf(BehaviourIssue(1, "Pulling")),
         )
         walkRepository.addWalks(walk)
         walkId = walk.id
@@ -268,6 +316,8 @@ class LogPastWalkViewModelTest {
             assertEquals(Wind.BREEZE, state.wind)
             assertEquals(Snow.LIGHT, state.snow)
             assertTrue(state.isWeatherExpanded)
+            assertEquals(setOf(1L), state.selectedIssueIds)
+            assertTrue(state.isBehaviourExpanded)
             assertEquals("Muddy", state.notes)
             assertTrue(state.canSave)
         }

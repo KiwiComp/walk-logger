@@ -2,9 +2,11 @@ package com.example.walklogger.feature.logwalk.pastwalk
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
@@ -41,6 +43,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
     @Assisted private val walkId: Long?,
     private val dogRepository: DogRepository,
     private val handlerRepository: HandlerRepository,
+    private val behaviourIssueRepository: BehaviourIssueRepository,
     private val walkRepository: WalkRepository,
     private val clock: Clock,
 ) : ViewModel() {
@@ -50,7 +53,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
         fun create(date: LocalDate, walkId: Long?): LogPastWalkViewModel
     }
 
-    /** Everything the user enters; the dog and handler list are overlaid from their repositories. */
+    /** Everything the user enters; the dog, handler and issue lists are overlaid from their repositories. */
     private val form = MutableStateFlow(
         LogPastWalkUiState(
             date = date,
@@ -78,8 +81,9 @@ class LogPastWalkViewModel @AssistedInject constructor(
             form,
             dogRepository.observeActiveDog(),
             handlerRepository.observeHandlers(),
-        ) { form, dog, handlers ->
-            form.copy(dogName = dog?.name, handlers = handlers)
+            behaviourIssueRepository.observeIssues(),
+        ) { form, dog, handlers, issues ->
+            form.copy(dogName = dog?.name, handlers = handlers, issues = issues)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -125,6 +129,23 @@ class LogPastWalkViewModel @AssistedInject constructor(
 
     fun clearWeather() = form.update { it.copy(rain = null, temperature = null, wind = null, snow = null) }
 
+    fun toggleIssue(issue: BehaviourIssue) = form.update { state ->
+        val selected = state.selectedIssueIds
+        state.copy(selectedIssueIds = if (issue.id in selected) selected - issue.id else selected + issue.id)
+    }
+
+    /** Stores the issue (or finds the existing one) and selects it. */
+    fun addIssue(name: String) {
+        viewModelScope.launch {
+            val stored = behaviourIssueRepository.addIssue(name)
+            form.update { it.copy(selectedIssueIds = it.selectedIssueIds + stored.id) }
+        }
+    }
+
+    fun toggleBehaviour() = form.update { it.copy(isBehaviourExpanded = !it.isBehaviourExpanded) }
+
+    fun clearIssues() = form.update { it.copy(selectedIssueIds = emptySet()) }
+
     fun setNotes(notes: String) = form.update { it.copy(notes = notes.take(MAX_NOTES_LENGTH)) }
 
     fun save() {
@@ -148,6 +169,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
                 temperature = state.temperature,
                 wind = state.wind,
                 snow = state.snow,
+                issues = state.issues.filter { it.id in state.selectedIssueIds },
             )
             if (edited != null) walkRepository.updateWalk(walk) else walkRepository.logWalk(walk)
             form.update { it.copy(isSaving = false, isSaved = true) }
@@ -180,6 +202,8 @@ class LogPastWalkViewModel @AssistedInject constructor(
             wind = walk.wind,
             snow = walk.snow,
             isWeatherExpanded = listOf(walk.rain, walk.temperature, walk.wind, walk.snow).any { it != null },
+            selectedIssueIds = walk.issues.map { it.id }.toSet(),
+            isBehaviourExpanded = walk.issues.isNotEmpty(),
             notes = walk.notes,
             isLoading = false,
         )

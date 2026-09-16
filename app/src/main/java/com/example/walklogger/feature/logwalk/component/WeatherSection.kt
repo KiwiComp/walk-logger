@@ -35,7 +35,7 @@ internal fun WeatherSection(
         label = stringResource(R.string.log_past_walk_weather),
         expanded = expanded,
         onToggle = onToggle,
-        actionLabel = if (listOf(rain, temperature, wind, snow).any { it != null }) stringResource(R.string.weather_clear) else null,
+        actionLabel = if (listOf(rain, temperature, wind, snow).any { it != null }) stringResource(R.string.form_section_clear) else null,
         onAction = onClear,
         modifier = modifier,
     ) {

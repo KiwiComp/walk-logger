@@ -25,13 +25,14 @@ com.example.walklogger
 │   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
 │   │                          stored start, quick note, end walk; system back is swallowed);
-│   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen (rating, equipment, weather, notes
-│   │                          for the just-finished walk, with an "Edit times" toggle);
+│   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen (rating, equipment, weather, behaviour,
+│   │                          notes for the just-finished walk, with an "Edit times" toggle);
 │   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating,
-│   │                          equipment, weather, notes); the same screen edits a logged walk when the route
+│   │                          equipment, weather, behaviour, notes); the same screen edits a logged walk when the route
 │   │                          carries a walkId, and can delete it (DeleteWalkDialog confirms first);
-│   │                          component/ holds the form pieces the screens share (FormSection, HandlerChips,
-│   │                          AddHandlerDialog, RatingScale, WeatherSection, WhenSection, Labels);
+│   │                          component/ holds the form pieces the screens share (FormSection, SelectableChip,
+│   │                          BehaviourSection, AddNameDialog and its AddHandlerDialog /
+│   │                          AddBehaviourIssueDialog wrappers, RatingScale, WeatherSection, WhenSection, Labels);
 │   │                          the chosen day travels as a route argument into both form ViewModels
 │   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
 │   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
@@ -45,10 +46,12 @@ com.example.walklogger
 ├── domain/                    optional use cases (pure Kotlin, injectable)
 │
 ├── core/
-│   ├── model/                 domain models (Walk, Dog) – no Android deps
-│   ├── data/                  WalkRepository / DogRepository / HandlerRepository interfaces
-│   │                          + Room-backed implementations, mappers
-│   ├── database/              Room database, DAOs, entities, type converters
+│   ├── model/                 domain models (Walk, Dog, BehaviourIssue) – no Android deps
+│   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository
+│   │                          interfaces + Room-backed implementations, mappers
+│   ├── database/              Room database, DAOs, entities, type converters; walks and behaviour issues are
+│   │                          joined through walk_behaviour_issues, and the default issues are seeded on
+│   │                          create (SeedCallback) and on the migration that added the table
 │   ├── datastore/             Preferences DataStore (active dog id)
 │   ├── common/di/             injectable coroutine dispatchers and Clock
 │   └── ui/                    theme (fixed palette incl. RatingTints/Accent, AppSpacing/AppRadius/AppSize tokens)

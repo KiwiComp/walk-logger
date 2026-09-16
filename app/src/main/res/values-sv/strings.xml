@@ -5,10 +5,14 @@
     <string name="tab_dogs">Hundar</string>
 
     <string name="log_title">Promenadlogg</string>
-    <string name="calendar_title">Kalender</string>
     <string name="patterns_title">Mönster</string>
 
-    <string name="calendar_coming_soon">Kalender kommer snart</string>
+    <string name="calendar_previous_month">Föregående månad</string>
+    <string name="calendar_next_month">Nästa månad</string>
+    <string name="calendar_today">Idag</string>
+    <string name="calendar_legend_rating">betyg</string>
+    <string name="calendar_legend_range">1 → 7</string>
+    <string name="calendar_no_description">(Ingen beskrivning)</string>
     <string name="patterns_coming_soon">Mönster kommer snart</string>
     <string name="dog_title">Din hund</string>
     <string name="dog_none_registered">Ingen hund registrerad än. Lägg till en för att börja logga promenader.</string>
@@ -88,6 +92,11 @@
     <string name="finish_walk_dog_walked_by">%1$s gick med %2$s</string>
 
     <string name="log_past_walk_title">Logga en tidigare promenad</string>
+    <string name="edit_walk_title">Redigera promenad</string>
+    <string name="edit_walk_delete">Ta bort promenad</string>
+    <string name="edit_walk_delete_confirm_title">Ta bort den här promenaden?</string>
+    <string name="edit_walk_delete_confirm_message">Promenaden tas bort från loggen. Det går inte att ångra.</string>
+    <string name="edit_walk_delete_confirm">Ta bort</string>
     <string name="log_past_walk_when">När</string>
     <string name="log_past_walk_date">Datum</string>
     <string name="log_past_walk_start">Start</string>
@@ -105,6 +114,8 @@
     <string name="weather_rain">Regn</string>
     <string name="weather_temperature">Temp</string>
     <string name="weather_wind">Vind</string>
+    <string name="weather_snow">Snö</string>
+    <string name="form_section_clear">Rensa</string>
     <string name="rain_none">Inget</string>
     <string name="rain_light">Lätt</string>
     <string name="rain_heavy">Kraftigt</string>
@@ -116,6 +127,13 @@
     <string name="wind_still">Stilla</string>
     <string name="wind_breeze">Bris</string>
     <string name="wind_windy">Blåsigt</string>
+    <string name="snow_none">Ingen</string>
+    <string name="snow_light">Lätt</string>
+    <string name="snow_heavy">Kraftig</string>
+    <string name="log_past_walk_behaviour">Beteende</string>
+    <string name="behaviour_other_issue">+ Annat problem</string>
+    <string name="behaviour_add_issue_title">Vad hände mer?</string>
+    <string name="behaviour_add_issue_name">Problem</string>
     <string name="log_past_walk_notes">Anteckningar</string>
     <string name="log_past_walk_notes_placeholder">Vad stack ut? Reaktioner, andra hundar, dragande, vart ni gick.</string>
     <string name="log_past_walk_save">Spara promenad</string>

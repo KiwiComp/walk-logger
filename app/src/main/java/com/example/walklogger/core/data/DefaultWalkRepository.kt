@@ -45,12 +45,12 @@ class DefaultWalkRepository @Inject constructor(
 
     override suspend fun logWalk(walk: Walk): Long {
         require(!walk.isActive) { "a logged walk needs an end time" }
-        return withContext(ioDispatcher) { walkDao.insertWalk(walk.copy(id = 0).toEntity()) }
+        return withContext(ioDispatcher) { walkDao.insertWalk(walk.copy(id = 0).toEntity(), walk.issues.map { it.id }) }
     }
 
     override suspend fun updateWalk(walk: Walk) {
         require(!walk.isActive) { "a logged walk needs an end time" }
-        withContext(ioDispatcher) { walkDao.updateWalk(walk.toEntity()) }
+        withContext(ioDispatcher) { walkDao.updateWalk(walk.toEntity(), walk.issues.map { it.id }) }
     }
 
     override suspend fun updateNotes(walkId: Long, notes: String) = withContext(ioDispatcher) {

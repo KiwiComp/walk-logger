@@ -27,6 +27,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
+import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
@@ -41,10 +42,12 @@ import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+import com.example.walklogger.feature.logwalk.component.AddBehaviourIssueDialog
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
+import com.example.walklogger.feature.logwalk.component.BehaviourSection
 import com.example.walklogger.feature.logwalk.component.FormSection
-import com.example.walklogger.feature.logwalk.component.HandlerChips
 import com.example.walklogger.feature.logwalk.component.RatingScale
+import com.example.walklogger.feature.logwalk.component.SelectableChip
 import com.example.walklogger.feature.logwalk.component.WeatherSection
 import com.example.walklogger.feature.logwalk.component.WhenSection
 import com.example.walklogger.feature.logwalk.component.labelRes
@@ -91,6 +94,10 @@ fun LogPastWalkRoute(
         onSnowSelected = viewModel::selectSnow,
         onToggleWeather = viewModel::toggleWeather,
         onClearWeather = viewModel::clearWeather,
+        onIssueToggled = viewModel::toggleIssue,
+        onAddIssue = viewModel::addIssue,
+        onToggleBehaviour = viewModel::toggleBehaviour,
+        onClearIssues = viewModel::clearIssues,
         onNotesChange = viewModel::setNotes,
         onSave = viewModel::save,
         onDelete = viewModel::delete,
@@ -115,12 +122,17 @@ fun LogPastWalkScreen(
     onSnowSelected: (Snow) -> Unit,
     onToggleWeather: () -> Unit,
     onClearWeather: () -> Unit,
+    onIssueToggled: (BehaviourIssue) -> Unit,
+    onAddIssue: (String) -> Unit,
+    onToggleBehaviour: () -> Unit,
+    onClearIssues: () -> Unit,
     onNotesChange: (String) -> Unit,
     onSave: () -> Unit,
     onDelete: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showAddHandler by rememberSaveable { mutableStateOf(false) }
+    var showAddIssue by rememberSaveable { mutableStateOf(false) }
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
@@ -165,10 +177,12 @@ fun LogPastWalkScreen(
                 )
             }
             FormSection(label = stringResource(R.string.log_past_walk_handler)) {
-                HandlerChips(
-                    handlers = uiState.handlers,
-                    selected = uiState.selectedHandlers,
+                SelectableChip(
+                    items = uiState.handlers,
+                    isSelected = { it in uiState.selectedHandlers },
+                    label = { it },
                     onToggle = onHandlerToggled,
+                    addLabel = stringResource(R.string.new_walk_someone_else),
                     onAdd = { showAddHandler = true },
                 )
             }
@@ -198,6 +212,15 @@ fun LogPastWalkScreen(
                 onTemperatureSelected = onTemperatureSelected,
                 onWindSelected = onWindSelected,
                 onSnowSelected = onSnowSelected,
+            )
+            BehaviourSection(
+                issues = uiState.issues,
+                selectedIds = uiState.selectedIssueIds,
+                expanded = uiState.isBehaviourExpanded,
+                onToggle = onToggleBehaviour,
+                onClear = onClearIssues,
+                onIssueToggled = onIssueToggled,
+                onAddIssue = { showAddIssue = true },
             )
             FormSection(label = stringResource(R.string.log_past_walk_notes)) {
                 AppTextField(
@@ -238,6 +261,15 @@ fun LogPastWalkScreen(
             onDismiss = { showAddHandler = false },
         )
     }
+    if (showAddIssue) {
+        AddBehaviourIssueDialog(
+            onConfirm = { name ->
+                onAddIssue(name)
+                showAddIssue = false
+            },
+            onDismiss = { showAddIssue = false },
+        )
+    }
     if (showDeleteConfirm) {
         DeleteWalkDialog(
             onConfirm = {
@@ -269,6 +301,10 @@ private fun LogPastWalkScreenPreview() {
             onSnowSelected = {},
             onToggleWeather = {},
             onClearWeather = {},
+            onIssueToggled = {},
+            onAddIssue = {},
+            onToggleBehaviour = {},
+            onClearIssues = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},
@@ -296,6 +332,10 @@ private fun LogPastWalkScreenCompletePreview() {
             onSnowSelected = {},
             onToggleWeather = {},
             onClearWeather = {},
+            onIssueToggled = {},
+            onAddIssue = {},
+            onToggleBehaviour = {},
+            onClearIssues = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},
@@ -323,6 +363,10 @@ private fun LogPastWalkScreenEditPreview() {
             onSnowSelected = {},
             onToggleWeather = {},
             onClearWeather = {},
+            onIssueToggled = {},
+            onAddIssue = {},
+            onToggleBehaviour = {},
+            onClearIssues = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},
@@ -335,7 +379,7 @@ private fun LogPastWalkScreenEditPreview() {
 private fun LogPastWalkScreenEmptyPreview() {
     WalkLoggerTheme {
         LogPastWalkScreen(
-            uiState = LogWalkPreviewData.logPastWalk.copy(startTime = null, endTime = null, selectedHandlers = emptySet(), rain = null, temperature = null, wind = null, snow = null),
+            uiState = LogWalkPreviewData.logPastWalk.copy(startTime = null, endTime = null, selectedHandlers = emptySet(), rain = null, temperature = null, wind = null, snow = null, selectedIssueIds = emptySet(), isBehaviourExpanded = false),
             onClose = {},
             onDateChange = {},
             onStartTimeChange = {},
@@ -350,6 +394,10 @@ private fun LogPastWalkScreenEmptyPreview() {
             onSnowSelected = {},
             onToggleWeather = {},
             onClearWeather = {},
+            onIssueToggled = {},
+            onAddIssue = {},
+            onToggleBehaviour = {},
+            onClearIssues = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},

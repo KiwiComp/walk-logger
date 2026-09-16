@@ -93,6 +93,29 @@ class WalkLoggerDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migrate5To6_addsIssueTablesSeededWithDefaultsAndKeepsWalks() {
+        helper.createDatabase(DB_NAME, 5).use { db ->
+            db.execSQL("INSERT INTO walks (id, startTime) VALUES (1, 100)")
+        }
+
+        val db = helper.runMigrationsAndValidate(DB_NAME, 6, true)
+
+        db.query("SELECT COUNT(*) FROM walks").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+        db.query("SELECT name, isDefault FROM behaviour_issues ORDER BY id").use { cursor ->
+            val names = buildList { while (cursor.moveToNext()) { assertEquals(1, cursor.getInt(1)); add(cursor.getString(0)) } }
+            assertEquals(DefaultBehaviourIssues, names)
+        }
+        db.execSQL("INSERT INTO walk_behaviour_issues (walkId, issueId) VALUES (1, 1)")
+        db.query("SELECT COUNT(*) FROM walk_behaviour_issues").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+    }
+
     private companion object {
         const val DB_NAME = "migration-test.db"
     }

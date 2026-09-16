@@ -1,5 +1,7 @@
 package com.example.walklogger.core.data.di
 
+import com.example.walklogger.core.data.BehaviourIssueRepository
+import com.example.walklogger.core.data.DefaultBehaviourIssueRepository
 import com.example.walklogger.core.data.DefaultDogRepository
 import com.example.walklogger.core.data.DefaultHandlerRepository
 import com.example.walklogger.core.data.DefaultWalkRepository
@@ -22,4 +24,7 @@ abstract class DataModule {
 
     @Binds
     abstract fun bindsHandlerRepository(impl: DefaultHandlerRepository): HandlerRepository
+
+    @Binds
+    abstract fun bindsBehaviourIssueRepository(impl: DefaultBehaviourIssueRepository): BehaviourIssueRepository
 }

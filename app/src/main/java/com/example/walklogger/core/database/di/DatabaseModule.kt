@@ -2,6 +2,7 @@ package com.example.walklogger.core.database.di
 
 import android.content.Context
 import androidx.room.Room
+import com.example.walklogger.core.database.BehaviourIssueDao
 import com.example.walklogger.core.database.DogDao
 import com.example.walklogger.core.database.HandlerDao
 import com.example.walklogger.core.database.WalkDao
@@ -21,6 +22,7 @@ object DatabaseModule {
     @Singleton
     fun providesDatabase(@ApplicationContext context: Context): WalkLoggerDatabase =
         Room.databaseBuilder(context, WalkLoggerDatabase::class.java, "walklogger.db")
+            .addCallback(WalkLoggerDatabase.SeedCallback())
             .build()
 
     @Provides
@@ -31,4 +33,7 @@ object DatabaseModule {
 
     @Provides
     fun providesHandlerDao(database: WalkLoggerDatabase): HandlerDao = database.handlerDao()
+
+    @Provides
+    fun providesBehaviourIssueDao(database: WalkLoggerDatabase): BehaviourIssueDao = database.behaviourIssueDao()
 }

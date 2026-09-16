@@ -31,7 +31,7 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
 import com.example.walklogger.feature.logwalk.component.FormSection
-import com.example.walklogger.feature.logwalk.component.HandlerChips
+import com.example.walklogger.feature.logwalk.component.SelectableChip
 import com.example.walklogger.feature.logwalk.component.labelRes
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 import java.time.LocalDate
@@ -95,10 +95,12 @@ fun NewWalkScreen(
             verticalArrangement = Arrangement.spacedBy(AppSpacing.xl),
         ) {
             FormSection(label = stringResource(R.string.new_walk_who_is_walking)) {
-                HandlerChips(
-                    handlers = uiState.handlers,
-                    selected = uiState.selectedHandlers,
+                SelectableChip(
+                    items = uiState.handlers,
+                    isSelected = { it in uiState.selectedHandlers },
+                    label = { it },
                     onToggle = onHandlerToggled,
+                    addLabel = stringResource(R.string.new_walk_someone_else),
                     onAdd = { showAddHandler = true },
                 )
             }

@@ -4,6 +4,8 @@ import androidx.room.Room
 import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.walklogger.core.database.WalkLoggerDatabase
+import com.example.walklogger.core.database.entity.BehaviourIssueEntity
+import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
@@ -34,6 +36,9 @@ class DefaultWalkRepositoryTest {
     private val now = Instant.parse("2026-09-12T07:05:00Z")
     private val clock = Clock.fixed(now, ZoneOffset.UTC)
 
+    private val pulling = BehaviourIssue(id = 1, name = "Pulling")
+    private val barking = BehaviourIssue(id = 2, name = "Barking")
+
     private val pastWalk = Walk(
         id = 99,
         dogId = 7,
@@ -47,12 +52,14 @@ class DefaultWalkRepositoryTest {
         temperature = Temperature.COLD,
         wind = Wind.WINDY,
         snow = Snow.NONE,
+        issues = listOf(pulling, barking),
     )
 
     @Before
-    fun setUp() {
+    fun setUp() = runBlocking {
         database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), WalkLoggerDatabase::class.java).build()
         repository = DefaultWalkRepository(database.walkDao(), clock, Dispatchers.IO)
+        listOf(pulling, barking).forEach { database.behaviourIssueDao().insertIssue(BehaviourIssueEntity(id = it.id, name = it.name)) }
     }
 
     @After
@@ -104,11 +111,24 @@ class DefaultWalkRepositoryTest {
     }
 
     @Test
-    fun deleteWalk_removesIt() = runBlocking {
+    fun updateWalk_replacesTheTickedIssues() = runBlocking {
+        val id = repository.logWalk(pastWalk)
+
+        repository.updateWalk(pastWalk.copy(id = id, issues = listOf(barking)))
+
+        assertEquals(listOf(barking), repository.observeWalk(id).first()!!.issues)
+    }
+
+    @Test
+    fun deleteWalk_removesItAndItsIssueRows() = runBlocking {
         val id = repository.logWalk(pastWalk)
 
         repository.deleteWalk(id)
 
         assertNull(repository.observeWalk(id).first())
+        database.query("SELECT COUNT(*) FROM walk_behaviour_issues", null).use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(0, cursor.getInt(0))
+        }
     }
 }

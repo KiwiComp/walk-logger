@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.logwalk.preview
 
+import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
@@ -18,6 +19,14 @@ import java.time.LocalTime
 /** Fixed content for `@Preview`s only; never reaches the running app. */
 internal object LogWalkPreviewData {
     val handlers = listOf("Anna", "Jonas", "Elin")
+
+    val issues = listOf(
+        BehaviourIssue(1, "Pulling"),
+        BehaviourIssue(2, "Barking"),
+        BehaviourIssue(3, "Lunging"),
+        BehaviourIssue(4, "Dog reactivity"),
+        BehaviourIssue(5, "Chasing"),
+    )
 
     val newWalk = NewWalkUiState(
         date = LocalDate.of(2026, 9, 12),
@@ -40,6 +49,9 @@ internal object LogWalkPreviewData {
         temperature = Temperature.COLD,
         wind = Wind.WINDY,
         snow = Snow.LIGHT,
+        issues = issues,
+        selectedIssueIds = setOf(1L, 4L),
+        isBehaviourExpanded = true,
     )
 
     val activeWalk = ActiveWalkUiState(
@@ -64,6 +76,7 @@ internal object LogWalkPreviewData {
         temperature = Temperature.COOL,
         wind = Wind.BREEZE,
         snow = Snow.NONE,
+        issues = issues,
         notes = "Barked at the bin lorry, otherwise steady. Off-lead in the field for ten minutes.",
         isLoading = false,
     )
