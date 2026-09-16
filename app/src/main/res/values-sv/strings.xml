@@ -62,7 +62,7 @@
     <string name="new_walk_title">Ny promenad</string>
     <string name="new_walk_who_is_walking">Vem går</string>
     <string name="new_walk_equipment">Utrustning</string>
-    <string name="new_walk_someone_else">+ Någon annan</string>
+    <string name="new_walk_add_handler">+ Lägg till</string>
     <string name="new_walk_after_note">Betyg, väder och anteckningar fylls i efter promenaden. Starttiden sätts när du trycker.</string>
     <string name="new_walk_timer_starts_now">Timern startar nu</string>
     <string name="new_walk_start">Starta promenad</string>
@@ -157,7 +157,7 @@
     <string name="concern_irregular_gait">Avvikande gång</string>
     <string name="concern_excessive_drooling">Dreglar mycket</string>
     <string name="log_past_walk_notes">Anteckningar</string>
-    <string name="log_past_walk_notes_placeholder">Vad stack ut? Reaktioner, andra hundar, dragande, vart ni gick.</string>
+    <string name="log_past_walk_notes_placeholder">Annan information du vill spara.</string>
     <string name="log_past_walk_save">Spara promenad</string>
     <string name="log_past_walk_needs_handler">Välj vem som gick innan promenaden kan sparas.</string>
     <string name="log_past_walk_needs_times">Ange start- och sluttid innan promenaden kan sparas.</string>

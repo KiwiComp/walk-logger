@@ -194,7 +194,7 @@ fun LogPastWalkScreen(
                     isSelected = { it in uiState.selectedHandlers },
                     label = { it },
                     onToggle = onHandlerToggled,
-                    addLabel = stringResource(R.string.new_walk_someone_else),
+                    addLabel = stringResource(R.string.new_walk_add_handler),
                     onAdd = { showAddHandler = true },
                 )
             }

@@ -35,8 +35,17 @@ class NewWalkViewModel @AssistedInject constructor(
     }
 
     private val selectedHandlers = MutableStateFlow<Set<String>>(emptySet())
-    private val equipment = MutableStateFlow(Equipment.HARNESS)
+    private val equipment = MutableStateFlow(Equipment.COLLAR)
     private val start = MutableStateFlow(StartState())
+
+    /** The first stored handler is the usual walker, so it starts selected. */
+    init {
+        viewModelScope.launch {
+            handlerRepository.observeHandlers().first().firstOrNull()?.let { first ->
+                selectedHandlers.update { if (it.isEmpty()) setOf(first) else it }
+            }
+        }
+    }
 
     val uiState: StateFlow<NewWalkUiState> =
         combine(

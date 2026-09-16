@@ -50,7 +50,7 @@ internal fun FormSection(
             horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SectionLabel(text = label, color = InkMuted)
+            SectionLabel(text = label, color = InkMuted, style = MaterialTheme.typography.labelLarge)
             if (hint != null) {
                 Text(text = hint, style = MaterialTheme.typography.bodySmall, color = InkMuted)
             }

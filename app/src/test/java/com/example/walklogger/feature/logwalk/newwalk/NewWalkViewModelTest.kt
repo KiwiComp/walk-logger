@@ -66,10 +66,17 @@ class NewWalkViewModelTest {
     }
 
     @Test
+    fun `the first stored handler starts selected`() = runTest {
+        handlerRepository.addHandlers("Anna", "Jonas")
+        viewModel.uiState.test {
+            assertEquals(setOf("Anna"), expectMostRecentItem().selectedHandlers)
+        }
+    }
+
+    @Test
     fun `handlers toggle on and off independently`() = runTest {
         handlerRepository.addHandlers("Anna", "Jonas")
         viewModel.uiState.test {
-            viewModel.toggleHandler("Anna")
             viewModel.toggleHandler("Jonas")
             assertEquals(setOf("Anna", "Jonas"), expectMostRecentItem().selectedHandlers)
             viewModel.toggleHandler("Anna")
@@ -81,6 +88,7 @@ class NewWalkViewModelTest {
     fun `cannot start until a handler is selected`() = runTest {
         handlerRepository.addHandlers("Anna")
         viewModel.uiState.test {
+            viewModel.toggleHandler("Anna")
             assertFalse(expectMostRecentItem().canStart)
             viewModel.toggleHandler("Anna")
             assertTrue(expectMostRecentItem().canStart)
@@ -109,11 +117,11 @@ class NewWalkViewModelTest {
     }
 
     @Test
-    fun `harness is the default equipment and can be changed`() = runTest {
+    fun `collar is the default equipment and can be changed`() = runTest {
         viewModel.uiState.test {
-            assertEquals(Equipment.HARNESS, expectMostRecentItem().equipment)
-            viewModel.selectEquipment(Equipment.COLLAR)
             assertEquals(Equipment.COLLAR, expectMostRecentItem().equipment)
+            viewModel.selectEquipment(Equipment.HARNESS)
+            assertEquals(Equipment.HARNESS, expectMostRecentItem().equipment)
         }
     }
 
@@ -123,15 +131,15 @@ class NewWalkViewModelTest {
         handlerRepository.addHandlers("Anna", "Jonas")
         viewModel.uiState.test {
             viewModel.toggleHandler("Jonas")
-            viewModel.selectEquipment(Equipment.COLLAR)
+            viewModel.selectEquipment(Equipment.HARNESS)
             viewModel.startWalk()
 
             val state = expectMostRecentItem()
             val walk = walkRepository.observeActiveWalk().first()!!
             assertEquals(walk.id, state.startedWalkId)
             assertEquals(3L, walk.dogId)
-            assertEquals(listOf("Jonas"), walk.handlers)
-            assertEquals(Equipment.COLLAR, walk.equipment)
+            assertEquals(listOf("Anna", "Jonas"), walk.handlers)
+            assertEquals(Equipment.HARNESS, walk.equipment)
             assertFalse(state.canStart)
         }
     }
