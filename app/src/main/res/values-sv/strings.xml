@@ -110,6 +110,13 @@
     <string name="log_past_walk_handler">Vem gick</string>
     <string name="log_past_walk_rating">Betyg</string>
     <string name="log_past_walk_rating_scale">1 sämst · 7 bäst</string>
+    <string name="log_past_walk_optional_ratings">Valfria betyg</string>
+    <string name="log_past_walk_optional_ratings_scale">1 minst · 7 mest</string>
+    <string name="optional_rating_reactivity">Reaktivitet</string>
+    <string name="optional_rating_energy_level">Energinivå</string>
+    <string name="optional_rating_responsiveness">Följsamhet</string>
+    <string name="optional_rating_engagement">Engagemang</string>
+    <string name="optional_rating_distraction">Distraktion</string>
     <string name="log_past_walk_weather">Väder</string>
     <string name="weather_rain">Regn</string>
     <string name="weather_temperature">Temp</string>

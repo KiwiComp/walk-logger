@@ -3,6 +3,7 @@ package com.example.walklogger.feature.logwalk.finishwalk
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
+import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -25,6 +26,9 @@ data class FinishWalkUiState(
     /** Chosen before the walk; not editable here. */
     val handlers: List<String> = emptyList(),
     val rating: Int? = null,
+    val optionalRatings: Map<OptionalRating, Int> = emptyMap(),
+    /** True while the optional rating scales are shown; opens by itself when a stored walk has any. */
+    val isOptionalRatingsExpanded: Boolean = false,
     val equipment: Equipment = Equipment.COLLAR,
     val rain: Rain? = null,
     val temperature: Temperature? = null,

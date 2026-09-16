@@ -5,6 +5,7 @@ import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
+import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -75,6 +76,31 @@ class LogPastWalkViewModelTest {
             assertNull(state.startTime)
             assertNull(state.endTime)
             assertNull(state.durationMinutes)
+        }
+    }
+
+    @Test
+    fun `optional ratings start collapsed for a new walk and toggle`() = runTest {
+        viewModel.uiState.test {
+            assertFalse(expectMostRecentItem().isOptionalRatingsExpanded)
+            viewModel.toggleOptionalRatings()
+            assertTrue(expectMostRecentItem().isOptionalRatingsExpanded)
+            viewModel.toggleOptionalRatings()
+            assertFalse(expectMostRecentItem().isOptionalRatingsExpanded)
+        }
+    }
+
+    @Test
+    fun `an optional rating can be set, replaced, removed and cleared`() = runTest {
+        viewModel.uiState.test {
+            viewModel.setOptionalRating(OptionalRating.REACTIVITY, 3)
+            viewModel.setOptionalRating(OptionalRating.DISTRACTION, 7)
+            assertEquals(mapOf(OptionalRating.REACTIVITY to 3, OptionalRating.DISTRACTION to 7), expectMostRecentItem().optionalRatings)
+            viewModel.setOptionalRating(OptionalRating.REACTIVITY, 5)
+            viewModel.setOptionalRating(OptionalRating.DISTRACTION, null)
+            assertEquals(mapOf(OptionalRating.REACTIVITY to 5), expectMostRecentItem().optionalRatings)
+            viewModel.clearOptionalRatings()
+            assertTrue(expectMostRecentItem().optionalRatings.isEmpty())
         }
     }
 
@@ -282,6 +308,7 @@ class LogPastWalkViewModelTest {
             viewModel.selectTemperature(Temperature.COLD)
             viewModel.selectWind(Wind.WINDY)
             viewModel.selectSnow(Snow.NONE)
+            viewModel.setOptionalRating(OptionalRating.ENERGY_LEVEL, 6)
             viewModel.setNotes(" Pulled at the gate ")
             viewModel.save()
             assertTrue(expectMostRecentItem().isSaved)
@@ -297,6 +324,7 @@ class LogPastWalkViewModelTest {
         assertEquals(Temperature.COLD, walk.temperature)
         assertEquals(Wind.WINDY, walk.wind)
         assertEquals(Snow.NONE, walk.snow)
+        assertEquals(mapOf(OptionalRating.ENERGY_LEVEL to 6), walk.optionalRatings)
         assertEquals(listOf(BehaviourIssue(2, "Barking")), walk.issues)
         assertEquals(listOf(MedicalConcern(2, "Vomit")), walk.concerns)
         assertEquals("Pulled at the gate", walk.notes)
@@ -341,6 +369,7 @@ class LogPastWalkViewModelTest {
             snow = Snow.LIGHT,
             issues = listOf(BehaviourIssue(1, "Pulling")),
             concerns = listOf(MedicalConcern(1, "Limping")),
+            optionalRatings = mapOf(OptionalRating.RESPONSIVENESS to 4),
         )
         walkRepository.addWalks(walk)
         walkId = walk.id
@@ -366,6 +395,8 @@ class LogPastWalkViewModelTest {
             assertEquals(Wind.BREEZE, state.wind)
             assertEquals(Snow.LIGHT, state.snow)
             assertTrue(state.isWeatherExpanded)
+            assertEquals(mapOf(OptionalRating.RESPONSIVENESS to 4), state.optionalRatings)
+            assertTrue(state.isOptionalRatingsExpanded)
             assertEquals(setOf(1L), state.selectedIssueIds)
             assertTrue(state.isBehaviourExpanded)
             assertEquals(setOf(1L), state.selectedConcernIds)

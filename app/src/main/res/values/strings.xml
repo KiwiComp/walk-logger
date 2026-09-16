@@ -112,6 +112,13 @@
     <string name="log_past_walk_handler">Handler</string>
     <string name="log_past_walk_rating">Rating</string>
     <string name="log_past_walk_rating_scale">1 worst · 7 best</string>
+    <string name="log_past_walk_optional_ratings">Optional ratings</string>
+    <string name="log_past_walk_optional_ratings_scale">1 least · 7 most</string>
+    <string name="optional_rating_reactivity">Reactivity</string>
+    <string name="optional_rating_energy_level">Energy level</string>
+    <string name="optional_rating_responsiveness">Responsiveness</string>
+    <string name="optional_rating_engagement">Engagement</string>
+    <string name="optional_rating_distraction">Distraction</string>
     <string name="log_past_walk_weather">Weather</string>
     <string name="weather_rain">Rain</string>
     <string name="weather_temperature">Temp</string>
