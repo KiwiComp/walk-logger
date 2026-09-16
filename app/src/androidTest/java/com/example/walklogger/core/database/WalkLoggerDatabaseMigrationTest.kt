@@ -107,10 +107,49 @@ class WalkLoggerDatabaseMigrationTest {
         }
         db.query("SELECT name, isDefault FROM behaviour_issues ORDER BY id").use { cursor ->
             val names = buildList { while (cursor.moveToNext()) { assertEquals(1, cursor.getInt(1)); add(cursor.getString(0)) } }
-            assertEquals(DefaultBehaviourIssues, names)
+            assertEquals(DefaultBehaviourIssues.values.toList(), names)
         }
         db.execSQL("INSERT INTO walk_behaviour_issues (walkId, issueId) VALUES (1, 1)")
         db.query("SELECT COUNT(*) FROM walk_behaviour_issues").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+    }
+
+    @Test
+    fun migrate6To7_addsConcernTablesKeysSeededIssuesAndKeepsWalks() {
+        helper.createDatabase(DB_NAME, 6).use { db ->
+            db.execSQL("INSERT INTO walks (id, startTime) VALUES (1, 100)")
+            db.execSQL("INSERT INTO behaviour_issues (id, name, isDefault) VALUES (1, 'Pulling', 1), (2, 'Digging', 0)")
+            db.execSQL("INSERT INTO walk_behaviour_issues (walkId, issueId) VALUES (1, 2)")
+        }
+
+        val db = helper.runMigrationsAndValidate(DB_NAME, 7, true)
+
+        db.query("SELECT COUNT(*) FROM walks").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+        db.query("SELECT name, `key`, isHidden FROM behaviour_issues ORDER BY id").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Pulling", cursor.getString(0))
+            assertEquals("pulling", cursor.getString(1))
+            assertEquals(0, cursor.getInt(2))
+            assertTrue(cursor.moveToNext())
+            assertEquals("Digging", cursor.getString(0))
+            assertTrue(cursor.isNull(1))
+            assertEquals(0, cursor.getInt(2))
+        }
+        db.query("SELECT COUNT(*) FROM walk_behaviour_issues WHERE walkId = 1 AND issueId = 2").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+        db.query("SELECT name, `key`, isHidden FROM medical_concerns ORDER BY id").use { cursor ->
+            val rows = buildList { while (cursor.moveToNext()) { assertEquals(0, cursor.getInt(2)); add(cursor.getString(1) to cursor.getString(0)) } }
+            assertEquals(DefaultMedicalConcerns.toList(), rows)
+        }
+        db.execSQL("INSERT INTO walk_medical_concerns (walkId, concernId) VALUES (1, 1)")
+        db.query("SELECT COUNT(*) FROM walk_medical_concerns").use { cursor ->
             assertTrue(cursor.moveToFirst())
             assertEquals(1, cursor.getInt(0))
         }

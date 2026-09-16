@@ -11,8 +11,10 @@ import androidx.sqlite.db.SupportSQLiteDatabase
 import com.example.walklogger.core.database.entity.BehaviourIssueEntity
 import com.example.walklogger.core.database.entity.DogEntity
 import com.example.walklogger.core.database.entity.HandlerEntity
+import com.example.walklogger.core.database.entity.MedicalConcernEntity
 import com.example.walklogger.core.database.entity.WalkBehaviourIssueEntity
 import com.example.walklogger.core.database.entity.WalkEntity
+import com.example.walklogger.core.database.entity.WalkMedicalConcernEntity
 
 @Database(
     entities = [
@@ -21,8 +23,10 @@ import com.example.walklogger.core.database.entity.WalkEntity
         HandlerEntity::class,
         BehaviourIssueEntity::class,
         WalkBehaviourIssueEntity::class,
+        MedicalConcernEntity::class,
+        WalkMedicalConcernEntity::class,
     ],
-    version = 6,
+    version = 7,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = WalkLoggerDatabase.Migration1To2::class),
@@ -30,6 +34,7 @@ import com.example.walklogger.core.database.entity.WalkEntity
         AutoMigration(from = 3, to = 4, spec = WalkLoggerDatabase.Migration3To4::class),
         AutoMigration(from = 4, to = 5),
         AutoMigration(from = 5, to = 6, spec = WalkLoggerDatabase.Migration5To6::class),
+        AutoMigration(from = 6, to = 7, spec = WalkLoggerDatabase.Migration6To7::class),
     ],
 )
 @TypeConverters(StringListConverter::class)
@@ -38,6 +43,7 @@ abstract class WalkLoggerDatabase : RoomDatabase() {
     abstract fun dogDao(): DogDao
     abstract fun handlerDao(): HandlerDao
     abstract fun behaviourIssueDao(): BehaviourIssueDao
+    abstract fun medicalConcernDao(): MedicalConcernDao
 
     @RenameColumn(tableName = "walks", fromColumnName = "startedAtMillis", toColumnName = "startTime")
     @RenameColumn(tableName = "walks", fromColumnName = "endedAtMillis", toColumnName = "endTime")
@@ -49,11 +55,26 @@ abstract class WalkLoggerDatabase : RoomDatabase() {
 
     /** Existing installs get the same default issues a fresh database is created with. */
     class Migration5To6 : AutoMigrationSpec {
-        override fun onPostMigrate(db: SupportSQLiteDatabase) = db.seedDefaultBehaviourIssues()
+        override fun onPostMigrate(db: SupportSQLiteDatabase) = db.seedDefaultBehaviourIssuesV6()
     }
 
-    /** Seeds the default issues when the database is first created. */
+    /**
+     * Adds medical concerns, and gives behaviour issues a localisation `key` plus soft-delete `isHidden`
+     * in place of `isDefault`. Existing installs get the same defaults a fresh database is created with.
+     */
+    @DeleteColumn(tableName = "behaviour_issues", columnName = "isDefault")
+    class Migration6To7 : AutoMigrationSpec {
+        override fun onPostMigrate(db: SupportSQLiteDatabase) {
+            db.keyDefaultBehaviourIssues()
+            db.seedDefaultMedicalConcerns()
+        }
+    }
+
+    /** Seeds the default issues and concerns when the database is first created. */
     class SeedCallback : Callback() {
-        override fun onCreate(db: SupportSQLiteDatabase) = db.seedDefaultBehaviourIssues()
+        override fun onCreate(db: SupportSQLiteDatabase) {
+            db.seedDefaultBehaviourIssues()
+            db.seedDefaultMedicalConcerns()
+        }
     }
 }

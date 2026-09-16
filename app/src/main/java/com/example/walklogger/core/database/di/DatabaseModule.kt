@@ -5,6 +5,7 @@ import androidx.room.Room
 import com.example.walklogger.core.database.BehaviourIssueDao
 import com.example.walklogger.core.database.DogDao
 import com.example.walklogger.core.database.HandlerDao
+import com.example.walklogger.core.database.MedicalConcernDao
 import com.example.walklogger.core.database.WalkDao
 import com.example.walklogger.core.database.WalkLoggerDatabase
 import dagger.Module
@@ -36,4 +37,7 @@ object DatabaseModule {
 
     @Provides
     fun providesBehaviourIssueDao(database: WalkLoggerDatabase): BehaviourIssueDao = database.behaviourIssueDao()
+
+    @Provides
+    fun providesMedicalConcernDao(database: WalkLoggerDatabase): MedicalConcernDao = database.medicalConcernDao()
 }

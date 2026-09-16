@@ -29,6 +29,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Temperature
@@ -43,9 +44,11 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.AddBehaviourIssueDialog
+import com.example.walklogger.feature.logwalk.component.AddMedicalConcernDialog
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
 import com.example.walklogger.feature.logwalk.component.BehaviourSection
 import com.example.walklogger.feature.logwalk.component.FormSection
+import com.example.walklogger.feature.logwalk.component.MedicalSection
 import com.example.walklogger.feature.logwalk.component.RatingScale
 import com.example.walklogger.feature.logwalk.component.SelectableChip
 import com.example.walklogger.feature.logwalk.component.WeatherSection
@@ -98,6 +101,10 @@ fun LogPastWalkRoute(
         onAddIssue = viewModel::addIssue,
         onToggleBehaviour = viewModel::toggleBehaviour,
         onClearIssues = viewModel::clearIssues,
+        onConcernToggled = viewModel::toggleConcern,
+        onAddConcern = viewModel::addConcern,
+        onToggleMedical = viewModel::toggleMedical,
+        onClearConcerns = viewModel::clearConcerns,
         onNotesChange = viewModel::setNotes,
         onSave = viewModel::save,
         onDelete = viewModel::delete,
@@ -126,6 +133,10 @@ fun LogPastWalkScreen(
     onAddIssue: (String) -> Unit,
     onToggleBehaviour: () -> Unit,
     onClearIssues: () -> Unit,
+    onConcernToggled: (MedicalConcern) -> Unit,
+    onAddConcern: (String) -> Unit,
+    onToggleMedical: () -> Unit,
+    onClearConcerns: () -> Unit,
     onNotesChange: (String) -> Unit,
     onSave: () -> Unit,
     onDelete: () -> Unit,
@@ -133,6 +144,7 @@ fun LogPastWalkScreen(
 ) {
     var showAddHandler by rememberSaveable { mutableStateOf(false) }
     var showAddIssue by rememberSaveable { mutableStateOf(false) }
+    var showAddConcern by rememberSaveable { mutableStateOf(false) }
     var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
@@ -222,6 +234,15 @@ fun LogPastWalkScreen(
                 onIssueToggled = onIssueToggled,
                 onAddIssue = { showAddIssue = true },
             )
+            MedicalSection(
+                concerns = uiState.concerns,
+                selectedIds = uiState.selectedConcernIds,
+                expanded = uiState.isMedicalExpanded,
+                onToggle = onToggleMedical,
+                onClear = onClearConcerns,
+                onConcernToggled = onConcernToggled,
+                onAddConcern = { showAddConcern = true },
+            )
             FormSection(label = stringResource(R.string.log_past_walk_notes)) {
                 AppTextField(
                     value = uiState.notes,
@@ -270,6 +291,15 @@ fun LogPastWalkScreen(
             onDismiss = { showAddIssue = false },
         )
     }
+    if (showAddConcern) {
+        AddMedicalConcernDialog(
+            onConfirm = { name ->
+                onAddConcern(name)
+                showAddConcern = false
+            },
+            onDismiss = { showAddConcern = false },
+        )
+    }
     if (showDeleteConfirm) {
         DeleteWalkDialog(
             onConfirm = {
@@ -305,6 +335,10 @@ private fun LogPastWalkScreenPreview() {
             onAddIssue = {},
             onToggleBehaviour = {},
             onClearIssues = {},
+            onConcernToggled = {},
+            onAddConcern = {},
+            onToggleMedical = {},
+            onClearConcerns = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},
@@ -336,6 +370,10 @@ private fun LogPastWalkScreenCompletePreview() {
             onAddIssue = {},
             onToggleBehaviour = {},
             onClearIssues = {},
+            onConcernToggled = {},
+            onAddConcern = {},
+            onToggleMedical = {},
+            onClearConcerns = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},
@@ -367,6 +405,10 @@ private fun LogPastWalkScreenEditPreview() {
             onAddIssue = {},
             onToggleBehaviour = {},
             onClearIssues = {},
+            onConcernToggled = {},
+            onAddConcern = {},
+            onToggleMedical = {},
+            onClearConcerns = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},
@@ -379,7 +421,7 @@ private fun LogPastWalkScreenEditPreview() {
 private fun LogPastWalkScreenEmptyPreview() {
     WalkLoggerTheme {
         LogPastWalkScreen(
-            uiState = LogWalkPreviewData.logPastWalk.copy(startTime = null, endTime = null, selectedHandlers = emptySet(), rain = null, temperature = null, wind = null, snow = null, selectedIssueIds = emptySet(), isBehaviourExpanded = false),
+            uiState = LogWalkPreviewData.logPastWalk.copy(startTime = null, endTime = null, selectedHandlers = emptySet(), rain = null, temperature = null, wind = null, snow = null, selectedIssueIds = emptySet(), isBehaviourExpanded = false, selectedConcernIds = emptySet(), isMedicalExpanded = false),
             onClose = {},
             onDateChange = {},
             onStartTimeChange = {},
@@ -398,6 +440,10 @@ private fun LogPastWalkScreenEmptyPreview() {
             onAddIssue = {},
             onToggleBehaviour = {},
             onClearIssues = {},
+            onConcernToggled = {},
+            onAddConcern = {},
+            onToggleMedical = {},
+            onClearConcerns = {},
             onNotesChange = {},
             onSave = {},
             onDelete = {},

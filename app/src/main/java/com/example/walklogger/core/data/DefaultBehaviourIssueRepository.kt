@@ -9,7 +9,6 @@ import javax.inject.Inject
 import javax.inject.Singleton
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.withContext
 
@@ -26,7 +25,11 @@ class DefaultBehaviourIssueRepository @Inject constructor(
     override suspend fun addIssue(name: String): BehaviourIssue = withContext(ioDispatcher) {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "issue name must not be blank" }
-        val existing = behaviourIssueDao.observeIssues().first().find { it.name.equals(trimmed, ignoreCase = true) }
-        existing?.toModel() ?: BehaviourIssue(id = behaviourIssueDao.insertIssue(BehaviourIssueEntity(name = trimmed)), name = trimmed)
+        val existing = behaviourIssueDao.findByName(trimmed)
+        when {
+            existing == null -> BehaviourIssue(id = behaviourIssueDao.insertIssue(BehaviourIssueEntity(name = trimmed)), name = trimmed)
+            existing.isHidden -> existing.toModel().also { behaviourIssueDao.setHidden(existing.id, false) }
+            else -> existing.toModel()
+        }
     }
 }

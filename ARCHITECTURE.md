@@ -26,13 +26,13 @@ com.example.walklogger
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
 │   │                          stored start, quick note, end walk; system back is swallowed);
 │   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen (rating, equipment, weather, behaviour,
-│   │                          notes for the just-finished walk, with an "Edit times" toggle);
+│   │                          medical, notes for the just-finished walk, with an "Edit times" toggle);
 │   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating,
-│   │                          equipment, weather, behaviour, notes); the same screen edits a logged walk when the route
+│   │                          equipment, weather, behaviour, medical, notes); the same screen edits a logged walk when the route
 │   │                          carries a walkId, and can delete it (DeleteWalkDialog confirms first);
 │   │                          component/ holds the form pieces the screens share (FormSection, SelectableChip,
-│   │                          BehaviourSection, AddNameDialog and its AddHandlerDialog /
-│   │                          AddBehaviourIssueDialog wrappers, RatingScale, WeatherSection, WhenSection, Labels);
+│   │                          BehaviourSection, MedicalSection, AddNameDialog and its AddHandlerDialog /
+│   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, WeatherSection, WhenSection, Labels);
 │   │                          the chosen day travels as a route argument into both form ViewModels
 │   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
 │   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
@@ -46,12 +46,14 @@ com.example.walklogger
 ├── domain/                    optional use cases (pure Kotlin, injectable)
 │
 ├── core/
-│   ├── model/                 domain models (Walk, Dog, BehaviourIssue) – no Android deps
-│   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository
-│   │                          interfaces + Room-backed implementations, mappers
-│   ├── database/              Room database, DAOs, entities, type converters; walks and behaviour issues are
-│   │                          joined through walk_behaviour_issues, and the default issues are seeded on
-│   │                          create (SeedCallback) and on the migration that added the table
+│   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern) – no Android deps
+│   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository /
+│   │                          MedicalConcernRepository interfaces + Room-backed implementations, mappers
+│   ├── database/              Room database, DAOs, entities, type converters; walks join behaviour issues and medical
+│   │                          concerns through walk_behaviour_issues / walk_medical_concerns; the defaults are
+│   │                          seeded on create (SeedCallback) and on the migration that added each table;
+│   │                          seeded defaults carry a `key` that Labels.kt maps to a string resource (user-added
+│   │                          rows show their name), and `isHidden` soft-deletes without touching walk history
 │   ├── datastore/             Preferences DataStore (active dog id)
 │   ├── common/di/             injectable coroutine dispatchers and Clock
 │   └── ui/                    theme (fixed palette incl. RatingTints/Accent, AppSpacing/AppRadius/AppSize tokens)

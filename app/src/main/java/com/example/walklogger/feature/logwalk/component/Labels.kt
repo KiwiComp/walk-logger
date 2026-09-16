@@ -1,7 +1,11 @@
 package com.example.walklogger.feature.logwalk.component
 
 import androidx.annotation.StringRes
+import androidx.compose.runtime.Composable
+import androidx.compose.ui.res.stringResource
 import com.example.walklogger.R
+import com.example.walklogger.core.model.BehaviourIssue
+import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
@@ -54,3 +58,39 @@ internal val SaveBlocker.messageRes: Int
         SaveBlocker.IN_FUTURE -> R.string.log_past_walk_needs_past_end
         SaveBlocker.RATING -> R.string.log_past_walk_needs_rating
     }
+
+/** The seeded issues' keys (see DefaultBehaviourIssues) to their localised labels; null for user-added issues. */
+@StringRes
+internal fun behaviourIssueLabelRes(key: String?): Int? = when (key) {
+    "pulling" -> R.string.issue_pulling
+    "barking" -> R.string.issue_barking
+    "lunging" -> R.string.issue_lunging
+    "dog_reactivity" -> R.string.issue_dog_reactivity
+    "people_reactivity" -> R.string.issue_people_reactivity
+    "noise_fright" -> R.string.issue_noise_fright
+    "vehicle_fright" -> R.string.issue_vehicle_fright
+    "not_listening" -> R.string.issue_not_listening
+    "not_recalling" -> R.string.issue_not_recalling
+    "chasing" -> R.string.issue_chasing
+    else -> null
+}
+
+/** The seeded concerns' keys (see DefaultMedicalConcerns) to their localised labels; null for user-added concerns. */
+@StringRes
+internal fun medicalConcernLabelRes(key: String?): Int? = when (key) {
+    "diarrhoea" -> R.string.concern_diarrhoea
+    "vomit" -> R.string.concern_vomit
+    "scooting" -> R.string.concern_scooting
+    "limping" -> R.string.concern_limping
+    "unwilling_to_walk" -> R.string.concern_unwilling_to_walk
+    "breathing_issues" -> R.string.concern_breathing_issues
+    "irregular_gait" -> R.string.concern_irregular_gait
+    "excessive_drooling" -> R.string.concern_excessive_drooling
+    else -> null
+}
+
+@Composable
+internal fun BehaviourIssue.label(): String = behaviourIssueLabelRes(key)?.let { stringResource(it) } ?: name
+
+@Composable
+internal fun MedicalConcern.label(): String = medicalConcernLabelRes(key)?.let { stringResource(it) } ?: name
