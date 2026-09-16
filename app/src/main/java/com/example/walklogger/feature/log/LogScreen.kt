@@ -49,7 +49,7 @@ import kotlinx.coroutines.launch
 fun LogRoute(
     onAddWalk: (LocalDate) -> Unit,
     onLogPastWalk: (LocalDate) -> Unit,
-    onEditWalk: (LocalDate, Long) -> Unit,
+    onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LogViewModel = hiltViewModel(),
@@ -75,7 +75,7 @@ fun LogRoute(
                 onLogPastWalk(uiState.selectedDate)
             }
         },
-        onWalkClick = { walkId -> onEditWalk(uiState.selectedDate, walkId) },
+        onWalkClick = onOpenWalk,
         modifier = modifier,
     )
 }

@@ -93,10 +93,6 @@
 
     <string name="log_past_walk_title">Logga en tidigare promenad</string>
     <string name="edit_walk_title">Redigera promenad</string>
-    <string name="edit_walk_delete">Ta bort promenad</string>
-    <string name="edit_walk_delete_confirm_title">Ta bort den här promenaden?</string>
-    <string name="edit_walk_delete_confirm_message">Promenaden tas bort från loggen. Det går inte att ångra.</string>
-    <string name="edit_walk_delete_confirm">Ta bort</string>
     <string name="log_past_walk_when">När</string>
     <string name="log_past_walk_date">Datum</string>
     <string name="log_past_walk_start">Start</string>
@@ -171,4 +167,19 @@
     <string name="log_past_walk_needs_end_after_start">Sluttiden måste vara efter starttiden.</string>
     <string name="log_past_walk_needs_past_end">En tidigare promenad kan inte sluta i framtiden.</string>
     <string name="log_past_walk_needs_rating">Ett betyg behövs innan promenaden kan sparas.</string>
+
+    <string name="walk_detail_title">Loggad promenad</string>
+    <string name="walk_detail_edit">Redigera</string>
+    <string name="walk_detail_discard">Släng</string>
+    <string name="walk_detail_discard_confirm_title">Släng den här promenaden?</string>
+    <string name="walk_detail_discard_confirm_message">Promenaden tas bort från loggen. Det går inte att ångra.</string>
+    <string name="walk_detail_discard_confirm">Släng</string>
+    <string name="walk_detail_length">Längd</string>
+    <string name="walk_detail_dog">Hund</string>
+    <string name="walk_detail_not_recorded">Inte angivet</string>
+    <string name="walk_detail_nothing_noted">Inget noterat</string>
+    <plurals name="walk_detail_noted_count">
+        <item quantity="one">%1$d noterad</item>
+        <item quantity="other">%1$d noterade</item>
+    </plurals>
 </resources>

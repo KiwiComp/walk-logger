@@ -214,15 +214,6 @@ class LogPastWalkViewModel @AssistedInject constructor(
         }
     }
 
-    fun delete() {
-        if (!uiState.value.canDelete) return
-        form.update { it.copy(isDeleting = true) }
-        viewModelScope.launch {
-            walkRepository.deleteWalk(checkNotNull(walkId))
-            form.update { it.copy(isDeleting = false, isDeleted = true) }
-        }
-    }
-
     private fun LocalDateTime.toEpochMilli(): Long = atZone(clock.zone).toInstant().toEpochMilli()
 
     private fun LogPastWalkUiState.prefilledFrom(walk: Walk): LogPastWalkUiState {

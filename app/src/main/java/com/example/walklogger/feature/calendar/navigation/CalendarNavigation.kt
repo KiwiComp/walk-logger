@@ -17,14 +17,14 @@ fun NavController.navigateToCalendar(navOptions: NavOptions? = null) =
 fun NavGraphBuilder.calendarScreen(
     onAddWalk: (LocalDate) -> Unit,
     onLogPastWalk: (LocalDate) -> Unit,
-    onEditWalk: (LocalDate, Long) -> Unit,
+    onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
 ) {
     composable<CalendarDestination> {
         CalendarRoute(
             onAddWalk = onAddWalk,
             onLogPastWalk = onLogPastWalk,
-            onEditWalk = onEditWalk,
+            onOpenWalk = onOpenWalk,
             onGoToDogs = onGoToDogs,
         )
     }

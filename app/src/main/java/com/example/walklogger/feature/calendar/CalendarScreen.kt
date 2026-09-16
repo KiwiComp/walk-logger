@@ -57,7 +57,7 @@ import kotlinx.coroutines.launch
 fun CalendarRoute(
     onAddWalk: (LocalDate) -> Unit,
     onLogPastWalk: (LocalDate) -> Unit,
-    onEditWalk: (LocalDate, Long) -> Unit,
+    onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: CalendarViewModel = hiltViewModel(),
@@ -86,7 +86,7 @@ fun CalendarRoute(
                 onLogPastWalk(uiState.selectedDate)
             }
         },
-        onWalkClick = { walkId -> onEditWalk(uiState.selectedDate, walkId) },
+        onWalkClick = onOpenWalk,
         modifier = modifier,
     )
 }
