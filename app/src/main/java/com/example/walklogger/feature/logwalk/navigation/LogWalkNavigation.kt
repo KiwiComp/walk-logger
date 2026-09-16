@@ -4,12 +4,13 @@ import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
 import androidx.navigation.toRoute
-import com.example.walklogger.feature.logwalk.ActiveWalkRoute
-import com.example.walklogger.feature.logwalk.FinishWalkRoute
-import com.example.walklogger.feature.logwalk.LogPastWalkRoute
-import com.example.walklogger.feature.logwalk.NewWalkRoute
+import com.example.walklogger.feature.logwalk.activewalk.ActiveWalkRoute
+import com.example.walklogger.feature.logwalk.finishwalk.FinishWalkRoute
+import com.example.walklogger.feature.logwalk.newwalk.NewWalkRoute
+import com.example.walklogger.feature.logwalk.pastwalk.LogPastWalkRoute
 import java.time.LocalDate
 import kotlinx.serialization.Serializable
+
 
 /** [epochDay] is the day chosen on the log screen, see [java.time.LocalDate.toEpochDay]. */
 @Serializable

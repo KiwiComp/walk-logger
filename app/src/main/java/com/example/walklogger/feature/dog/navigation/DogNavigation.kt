@@ -5,8 +5,9 @@ import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
 import androidx.navigation.compose.composable
 import com.example.walklogger.feature.dog.DogRoute
-import com.example.walklogger.feature.dog.RegisterDogRoute
+import com.example.walklogger.feature.dog.registerdog.RegisterDogRoute
 import kotlinx.serialization.Serializable
+
 
 @Serializable
 data object DogDestination

@@ -12,29 +12,35 @@ com.example.walklogger
 ├── navigation/                app-level NavHost, bottom bar, top-level destinations;
 │                              WalkLoggerAppViewModel reopens the timer when the app starts mid-walk
 │
-├── feature/                   one package per tab/screen
-│   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from one file per
-│   │                          piece (WeekStrip, WalkTimeline, WalkCard);
-│   │                          LogPreviewData.kt holds fixed content for @Previews only
-│   ├── logwalk/               the flow behind AddWalkButton, one package for all its screens.
-│   │                          NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
-│   │                          ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
+├── feature/                   one package per tab/flow; layout inside a feature:
+│   │                            <root>       Screen/Route, ViewModel, UiState of a single-screen feature
+│   │                            <screen>/    the same trio per screen when a feature has several,
+│   │                                         plus pieces only that screen uses
+│   │                            component/   pieces shared by more than one file in the feature
+│   │                            preview/     fixed content for @Previews only
+│   │                            navigation/  type-safe @Serializable route + NavGraphBuilder extension
+│   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from
+│   │                          component/ (WeekStrip, WalkTimeline, WalkCard)
+│   ├── logwalk/               the flow behind AddWalkButton, one sub-package per screen.
+│   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
+│   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
 │   │                          stored start, quick note, end walk; system back is swallowed);
-│   │                          FinishWalkViewModel + FinishWalkScreen (rating, equipment, weather, notes
+│   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen (rating, equipment, weather, notes
 │   │                          for the just-finished walk, with an "Edit times" toggle);
-│   │                          LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating,
-│   │                          equipment, weather, notes) composed from WhenSection, RatingScale, WeatherRow;
-│   │                          the same screen edits a logged walk when the route carries a walkId,
-│   │                          and can delete it (DeleteWalkDialog confirms first);
+│   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating,
+│   │                          equipment, weather, notes); the same screen edits a logged walk when the route
+│   │                          carries a walkId, and can delete it (DeleteWalkDialog confirms first);
+│   │                          component/ holds the form pieces the screens share (FormSection, HandlerChips,
+│   │                          AddHandlerDialog, RatingScale, WeatherSection, WhenSection, Labels);
 │   │                          the chosen day travels as a route argument into both form ViewModels
 │   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
-│   │                          rounded rating); CalendarScreen composed from RatingLegend (in the header),
-│   │                          MonthGrid (cells tinted by rating, selection ringed in Accent) and CalendarWalkList;
+│   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
+│   │                          MonthGrid with cells tinted by rating and selection ringed in Accent, CalendarWalkList);
 │   │                          a walk row opens the edit screen, the dashed button logs a walk on that day
 │   ├── patterns/              placeholder, same shape as calendar
-│   ├── dog/                   DogViewModel + DogUiState (profile header, dog list, add-dog CTA);
-│   │                          RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight)
-│   └── */navigation/          type-safe @Serializable route + NavGraphBuilder extension
+│   └── dog/                   DogViewModel + DogScreen (profile header, dog list, add-dog CTA) composed from
+│                              component/ (DogList);
+│                              registerdog/ RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight)
 │
 ├── domain/                    optional use cases (pure Kotlin, injectable)
 │
@@ -71,17 +77,19 @@ com.example.walklogger
   whichever tab (Log or Calendar) it was started from.
 - **Each feature owns its navigation.** Add a `@Serializable` route + `NavGraphBuilder.xxxScreen()`
   in `feature/<name>/navigation`, then register it in `WalkLoggerNavHost`.
-- **One file per composable piece, flat in the feature package.** A feature's building blocks
-  (`WalkCard.kt`, `WeekStrip.kt`, …) sit beside its `Screen`, each with its own `@Preview`.
-  The piece other files call is `internal`; helpers and size constants that only that file
-  needs are `private`. Only the `Screen`/`Route` and `core/ui` components are public.
+- **One file per composable piece.** A feature's building blocks (`WalkCard.kt`, `WeekStrip.kt`, …)
+  each get their own file with their own `@Preview`. A piece used by more than one file lives in the
+  feature's `component/`; a piece used by a single screen sits beside that screen. Preview fixtures
+  live in `preview/`. The piece other files call is `internal`; helpers and size constants that only
+  that file needs are `private`. Only the `Screen`/`Route` and `core/ui` components are public.
 - **Dimensions come from tokens.** Padding and gaps use `AppSpacing`, corners use `AppRadius`,
   sizes shared by several components use `AppSize`. Component-specific sizes (a dot, a cell
   height) are named `private val`s in the component's file, not tokens.
 
 ## Adding a feature
 
-1. `feature/<name>/` → `UiState`, `ViewModel` (`@HiltViewModel`), `Route`/`Screen`, `navigation/`.
+1. `feature/<name>/` → `UiState`, `ViewModel` (`@HiltViewModel`), `Route`/`Screen`, `navigation/`;
+   shared pieces in `component/`, preview fixtures in `preview/`, one sub-package per screen if there are several.
 2. If it needs new data, add methods to a repository interface in `core/data` and implement them.
    A schema change bumps the Room version with an `AutoMigration`, exports a new `app/schemas/*.json`
    and gets a case in `WalkLoggerDatabaseMigrationTest`.

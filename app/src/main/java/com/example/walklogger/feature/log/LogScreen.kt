@@ -36,10 +36,14 @@ import com.example.walklogger.core.ui.theme.Navy
 import com.example.walklogger.core.ui.theme.OnNavy
 import com.example.walklogger.core.ui.theme.SteelLight
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+import com.example.walklogger.feature.log.component.WalkTimeline
+import com.example.walklogger.feature.log.component.WeekStrip
+import com.example.walklogger.feature.log.preview.LogPreviewData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun LogRoute(
