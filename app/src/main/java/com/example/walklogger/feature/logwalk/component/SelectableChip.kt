@@ -23,6 +23,7 @@ import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.CardSurface
 import com.example.walklogger.core.ui.theme.Ink
@@ -31,8 +32,6 @@ import com.example.walklogger.core.ui.theme.Outline
 import com.example.walklogger.core.ui.theme.Steel
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
-
-private val ChipHeight = 44.dp
 
 /** Label size of a [SelectableChip]; the chips themselves keep the same height. */
 internal enum class SelectableChipSize {
@@ -75,7 +74,7 @@ private fun Chip(text: String, isSelected: Boolean, onToggle: () -> Unit, size: 
     val shape = MaterialTheme.shapes.extraSmall
     Box(
         modifier = Modifier
-            .height(ChipHeight)
+            .height(AppSize.chipHeight)
             .clip(shape)
             .background(if (isSelected) Steel else CardSurface)
             .border(1.dp, if (isSelected) Steel else Outline, shape)
@@ -97,7 +96,7 @@ private fun AddChip(text: String, onClick: () -> Unit, chipSize: SelectableChipS
     val shape = MaterialTheme.shapes.extraSmall
     Box(
         modifier = Modifier
-            .height(ChipHeight)
+            .height(AppSize.chipHeight)
             .clip(shape)
             .drawBehind {
                 drawOutline(
