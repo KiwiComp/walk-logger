@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.foundation.background
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.ChipSurface
@@ -50,7 +51,7 @@ fun AppTextField(
     readOnly: Boolean = false,
     singleLine: Boolean = true,
     minLines: Int = 1,
-    keyboardOptions: KeyboardOptions = KeyboardOptions.Default,
+    keyboardOptions: KeyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
     interactionSource: MutableInteractionSource? = null,
 ) {
     val colors = when (style) {

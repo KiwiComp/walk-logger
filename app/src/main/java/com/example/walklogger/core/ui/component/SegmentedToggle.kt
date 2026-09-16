@@ -59,7 +59,7 @@ fun <T> SegmentedToggle(
     Row(
         modifier = modifier
             .fillMaxWidth()
-            .height(AppSize.buttonHeight)
+            .height(AppSize.chipHeight)
             .clip(shape)
             .border(1.dp, Outline, shape)
             .selectableGroup(),

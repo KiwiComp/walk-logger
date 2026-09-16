@@ -7,4 +7,7 @@ import androidx.compose.ui.unit.dp
 object AppSize {
     /** Height of full-width actions (AppButton, DashedButton). */
     val buttonHeight: Dp = 56.dp
+
+    /** Height of inline choice controls (SelectableChip, SegmentedToggle). */
+    val chipHeight: Dp = 44.dp
 }
