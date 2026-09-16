@@ -28,7 +28,11 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.OnNavyMuted
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+import com.example.walklogger.feature.dog.component.DogList
+import com.example.walklogger.feature.dog.preview.DogPreviewData
 import java.text.NumberFormat
+
+
 
 @Composable
 fun DogRoute(

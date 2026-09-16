@@ -43,10 +43,15 @@ import com.example.walklogger.core.ui.theme.Navy
 import com.example.walklogger.core.ui.theme.OnNavy
 import com.example.walklogger.core.ui.theme.SteelLight
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+import com.example.walklogger.feature.calendar.component.CalendarWalkList
+import com.example.walklogger.feature.calendar.component.MonthGrid
+import com.example.walklogger.feature.calendar.component.RatingLegend
+import com.example.walklogger.feature.calendar.preview.CalendarPreviewData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import kotlinx.coroutines.launch
+
 
 @Composable
 fun CalendarRoute(
