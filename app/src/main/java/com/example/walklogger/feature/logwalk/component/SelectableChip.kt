@@ -5,6 +5,7 @@ import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -19,11 +20,9 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.CardSurface
 import com.example.walklogger.core.ui.theme.Ink
@@ -33,32 +32,46 @@ import com.example.walklogger.core.ui.theme.Steel
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 
-
 private val ChipHeight = 44.dp
 
-/** Handler names, any number of which can be selected, ending with a dashed "+ Someone else" chip. */
+/** Label size of a [SelectableChip]; the chips themselves keep the same height. */
+internal enum class SelectableChipSize {
+    /** Bold title text for primary choices such as handlers. */
+    Regular,
+
+    /** Body-small text for dense rows such as the behavioural issues. */
+    Compact,
+}
+
+/**
+ * [items], any number of which can be selected, laid out as wrapping chips and ending with a dashed
+ * [addLabel] chip. Selection is decided per item by [isSelected], so callers can key it on a name or an id.
+ */
 @Composable
-internal fun HandlerChips(
-    handlers: List<String>,
-    selected: Set<String>,
-    onToggle: (String) -> Unit,
+internal fun <T> SelectableChip(
+    items: List<T>,
+    isSelected: (T) -> Boolean,
+    label: (T) -> String,
+    onToggle: (T) -> Unit,
+    addLabel: String,
     onAdd: () -> Unit,
     modifier: Modifier = Modifier,
+    size: SelectableChipSize = SelectableChipSize.Regular,
 ) {
     FlowRow(
         modifier = modifier,
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) {
-        handlers.forEach { handler ->
-            HandlerChip(name = handler, isSelected = handler in selected, onToggle = { onToggle(handler) })
+        items.forEach { item ->
+            Chip(text = label(item), isSelected = isSelected(item), onToggle = { onToggle(item) }, size = size)
         }
-        AddHandlerChip(onClick = onAdd)
+        AddChip(text = addLabel, onClick = onAdd, chipSize = size)
     }
 }
 
 @Composable
-private fun HandlerChip(name: String, isSelected: Boolean, onToggle: () -> Unit) {
+private fun Chip(text: String, isSelected: Boolean, onToggle: () -> Unit, size: SelectableChipSize) {
     val shape = MaterialTheme.shapes.extraSmall
     Box(
         modifier = Modifier
@@ -71,15 +84,15 @@ private fun HandlerChip(name: String, isSelected: Boolean, onToggle: () -> Unit)
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = name,
-            style = MaterialTheme.typography.titleSmall,
+            text = text,
+            style = size.textStyle(),
             color = if (isSelected) OnNavy else Ink,
         )
     }
 }
 
 @Composable
-private fun AddHandlerChip(onClick: () -> Unit) {
+private fun AddChip(text: String, onClick: () -> Unit, chipSize: SelectableChipSize) {
     val dash = PathEffect.dashPathEffect(floatArrayOf(12f, 8f))
     val shape = MaterialTheme.shapes.extraSmall
     Box(
@@ -98,23 +111,42 @@ private fun AddHandlerChip(onClick: () -> Unit) {
         contentAlignment = Alignment.Center,
     ) {
         Text(
-            text = stringResource(R.string.new_walk_someone_else),
-            style = MaterialTheme.typography.titleSmall,
+            text = text,
+            style = chipSize.textStyle(),
             color = Ink,
         )
     }
 }
 
+@Composable
+private fun SelectableChipSize.textStyle() = when (this) {
+    SelectableChipSize.Regular -> MaterialTheme.typography.titleSmall
+    SelectableChipSize.Compact -> MaterialTheme.typography.bodySmall
+}
+
 @Preview(showBackground = true)
 @Composable
-private fun HandlerChipsPreview() {
+private fun SelectableChipPreview() {
     WalkLoggerTheme {
-        HandlerChips(
-            handlers = LogWalkPreviewData.handlers,
-            selected = setOf("Anna", "Jonas"),
-            onToggle = {},
-            onAdd = {},
-            modifier = Modifier.padding(AppSpacing.lg),
-        )
+        Column(modifier = Modifier.padding(AppSpacing.lg)) {
+            SelectableChip(
+                items = LogWalkPreviewData.handlers,
+                isSelected = { it in setOf("Anna", "Jonas") },
+                label = { it },
+                onToggle = {},
+                addLabel = "+ Someone else",
+                onAdd = {},
+            )
+            SelectableChip(
+                items = LogWalkPreviewData.issues,
+                isSelected = { it.id in setOf(1L, 4L) },
+                label = { it.name },
+                onToggle = {},
+                addLabel = "+ Other issue",
+                onAdd = {},
+                modifier = Modifier.padding(top = AppSpacing.lg),
+                size = SelectableChipSize.Compact,
+            )
+        }
     }
 }

@@ -18,6 +18,7 @@ data class Walk(
     val temperature: Temperature? = null,
     val wind: Wind? = null,
     val snow: Snow? = null,
+    val issues: List<BehaviourIssue> = emptyList(),
 ) {
     init {
         require(handlers.isNotEmpty()) { "a walk needs at least one handler" }

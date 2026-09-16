@@ -1,5 +1,5 @@
 <resources>
-    <string name="app_name">WalkLogger</string>
+    <string name="app_name" translatable="false">WalkLogger</string>
 
     <string name="tab_log">Log</string>
     <string name="tab_calendar">Calendar</string>
@@ -117,7 +117,7 @@
     <string name="weather_temperature">Temp</string>
     <string name="weather_wind">Wind</string>
     <string name="weather_snow">Snow</string>
-    <string name="weather_clear">Clear</string>
+    <string name="form_section_clear">Clear</string>
     <string name="rain_none">None</string>
     <string name="rain_light">Light</string>
     <string name="rain_heavy">Heavy</string>
@@ -132,6 +132,10 @@
     <string name="snow_none">None</string>
     <string name="snow_light">Light</string>
     <string name="snow_heavy">Heavy</string>
+    <string name="log_past_walk_behaviour">Behaviour</string>
+    <string name="behaviour_other_issue">+ Other issue</string>
+    <string name="behaviour_add_issue_title">What else happened?</string>
+    <string name="behaviour_add_issue_name">Issue</string>
     <string name="log_past_walk_notes">Notes</string>
     <string name="log_past_walk_notes_placeholder">What stood out? Reactions, other dogs, pulling, where you went.</string>
     <string name="log_past_walk_save">Save walk</string>

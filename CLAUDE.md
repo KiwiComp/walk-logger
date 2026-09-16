@@ -45,6 +45,13 @@
 * Always use the design tokens specified in app/src/main/java/com/example/walklogger/core/ui/theme, never make up "magic numbers" on your own. If you want to add something, always ask before.
 
 
+# Strings and locales
+
+* No hard-coded user-facing strings in Kotlin; every string lives in `res/values/strings.xml`.
+* The app has two locales: English (`values`, the default) and Swedish (`values-sv`). Every new string
+  is added to both files in the same change.
+
+
 # Architecture
 
 The project follows Google's recommended app architecture: https://developer.android.com/topic/architecture

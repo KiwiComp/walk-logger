@@ -2,8 +2,10 @@ package com.example.walklogger.feature.logwalk.finishwalk
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
@@ -36,6 +38,7 @@ import kotlinx.coroutines.launch
 class FinishWalkViewModel @AssistedInject constructor(
     @Assisted private val walkId: Long,
     dogRepository: DogRepository,
+    private val behaviourIssueRepository: BehaviourIssueRepository,
     private val walkRepository: WalkRepository,
     private val clock: Clock,
 ) : ViewModel() {
@@ -59,8 +62,8 @@ class FinishWalkViewModel @AssistedInject constructor(
     }
 
     val uiState: StateFlow<FinishWalkUiState> =
-        combine(form, dogRepository.observeActiveDog()) { form, dog ->
-            form.copy(dogName = dog?.name)
+        combine(form, dogRepository.observeActiveDog(), behaviourIssueRepository.observeIssues()) { form, dog, issues ->
+            form.copy(dogName = dog?.name, issues = issues)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -95,6 +98,23 @@ class FinishWalkViewModel @AssistedInject constructor(
 
     fun clearWeather() = form.update { it.copy(rain = null, temperature = null, wind = null, snow = null) }
 
+    fun toggleIssue(issue: BehaviourIssue) = form.update { state ->
+        val selected = state.selectedIssueIds
+        state.copy(selectedIssueIds = if (issue.id in selected) selected - issue.id else selected + issue.id)
+    }
+
+    /** Stores the issue (or finds the existing one) and selects it. */
+    fun addIssue(name: String) {
+        viewModelScope.launch {
+            val stored = behaviourIssueRepository.addIssue(name)
+            form.update { it.copy(selectedIssueIds = it.selectedIssueIds + stored.id) }
+        }
+    }
+
+    fun toggleBehaviour() = form.update { it.copy(isBehaviourExpanded = !it.isBehaviourExpanded) }
+
+    fun clearIssues() = form.update { it.copy(selectedIssueIds = emptySet()) }
+
     fun setNotes(notes: String) = form.update { it.copy(notes = notes.take(MAX_NOTES_LENGTH)) }
 
     fun save() {
@@ -114,6 +134,7 @@ class FinishWalkViewModel @AssistedInject constructor(
                     temperature = state.temperature,
                     wind = state.wind,
                     snow = state.snow,
+                    issues = state.issues.filter { it.id in state.selectedIssueIds },
                 ),
             )
             form.update { it.copy(isSaving = false, isSaved = true) }
@@ -137,6 +158,8 @@ class FinishWalkViewModel @AssistedInject constructor(
             wind = walk.wind,
             snow = walk.snow,
             isWeatherExpanded = listOf(walk.rain, walk.temperature, walk.wind, walk.snow).any { it != null },
+            selectedIssueIds = walk.issues.map { it.id }.toSet(),
+            isBehaviourExpanded = walk.issues.isNotEmpty(),
             notes = walk.notes,
             isLoading = false,
         )
