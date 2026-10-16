@@ -41,6 +41,12 @@
     <string name="register_dog_weight_error">Enter a number</string>
     <string name="register_dog_save">Save dog</string>
 
+    <string name="edit_dog_title">Edit dog</string>
+    <string name="edit_dog_delete">Delete</string>
+    <string name="edit_dog_delete_confirm_title">Delete this dog?</string>
+    <string name="edit_dog_delete_confirm_message">The dog is removed from the app. This can\'t be undone.</string>
+    <string name="edit_dog_delete_confirm">Delete</string>
+
     <plurals name="walk_count">
         <item quantity="one">%1$d walk</item>
         <item quantity="other">%1$d walks</item>
