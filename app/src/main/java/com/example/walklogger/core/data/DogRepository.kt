@@ -16,4 +16,8 @@ interface DogRepository {
     suspend fun registerDog(name: String, breed: String, birthDate: LocalDate?, weightKg: Double?): Long
 
     suspend fun setActiveDog(id: Long)
+
+    suspend fun updateDog(id: Long, name: String, breed: String, birthDate: LocalDate?, weightKg: Double?)
+
+    suspend fun deleteDog(id: Long)
 }

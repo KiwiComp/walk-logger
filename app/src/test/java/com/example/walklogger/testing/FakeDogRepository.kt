@@ -32,4 +32,14 @@ class FakeDogRepository : DogRepository {
     override suspend fun setActiveDog(id: Long) {
         activeDogId.value = id
     }
+
+    override suspend fun updateDog(id: Long, name: String, breed: String, birthDate: LocalDate?, weightKg: Double?) {
+        dogs.update { list ->
+            list.map { dog ->
+                if (dog.id == id) dog.copy(name = name, breed = breed, birthDate = birthDate, weightKg = weightKg) else dog
+            }
+        }
+    }
+
+    override suspend fun deleteDog(id: Long) = dogs.update { list -> list.filterNot { it.id == id } }
 }

@@ -52,4 +52,26 @@ class DefaultDogRepository @Inject constructor(
     }
 
     override suspend fun setActiveDog(id: Long) = preferences.setActiveDogId(id)
+
+    override suspend fun updateDog(
+        id: Long,
+        name: String,
+        breed: String,
+        birthDate: LocalDate?,
+        weightKg: Double?,
+    ) = withContext(ioDispatcher) {
+        dogDao.updateDog(
+            DogEntity(
+                id = id,
+                name = name.trim(),
+                breed = breed.trim(),
+                birthDate = birthDate?.toEpochDay(),
+                weightKg = weightKg,
+            )
+        )
+    }
+
+    override suspend fun deleteDog(id: Long) = withContext(ioDispatcher) {
+        dogDao.deleteDog(id = id)
+    }
 }
