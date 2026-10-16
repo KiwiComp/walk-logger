@@ -1,5 +1,7 @@
 package com.example.walklogger.navigation
 
+import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
@@ -70,10 +72,14 @@ fun WalkLoggerApp(viewModel: WalkLoggerAppViewModel = hiltViewModel()) {
         },
     ) { innerPadding ->
         // Only the bottom inset is consumed here; headers handle the status bar themselves
-        // so the navy colour runs edge-to-edge behind it.
+        // so the navy colour runs edge-to-edge behind it. Consuming it lets imePadding below
+        // subtract the bottom bar / navigation bar instead of adding the keyboard on top of it.
+        val bottomPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding())
         WalkLoggerNavHost(
             navController = navController,
-            modifier = Modifier.padding(bottom = innerPadding.calculateBottomPadding()),
+            modifier = Modifier
+                .padding(bottomPadding)
+                .consumeWindowInsets(bottomPadding),
         )
     }
 }

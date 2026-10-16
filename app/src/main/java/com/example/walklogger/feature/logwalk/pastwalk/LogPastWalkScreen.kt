@@ -161,8 +161,8 @@ fun LogPastWalkScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
                 .imePadding()
+                .verticalScroll(rememberScrollState())
                 .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
             verticalArrangement = Arrangement.spacedBy(AppSpacing.xl),
         ) {
