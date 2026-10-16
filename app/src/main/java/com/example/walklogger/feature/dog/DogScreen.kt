@@ -22,6 +22,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.DashedButton
+import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.SectionLabel
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
@@ -37,6 +38,7 @@ import java.text.NumberFormat
 @Composable
 fun DogRoute(
     onAddDog: () -> Unit,
+    onEditDog: (Long) -> Unit,
     modifier: Modifier = Modifier,
     viewModel: DogViewModel = hiltViewModel(),
 ) {
@@ -45,6 +47,7 @@ fun DogRoute(
         uiState = uiState,
         onSwitchDog = viewModel::switchDog,
         onAddDog = onAddDog,
+        onEditDog = onEditDog,
         modifier = modifier,
     )
 }
@@ -55,13 +58,19 @@ fun DogScreen(
     uiState: DogUiState,
     onSwitchDog: (Long) -> Unit,
     onAddDog: () -> Unit,
+    onEditDog: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         when (uiState) {
             DogUiState.Loading -> Unit
             DogUiState.NoDog -> NoDogContent(onAddDog = onAddDog)
-            is DogUiState.Profile -> ProfileContent(uiState = uiState, onSwitchDog = onSwitchDog, onAddDog = onAddDog)
+            is DogUiState.Profile -> ProfileContent(
+                uiState = uiState,
+                onSwitchDog = onSwitchDog,
+                onAddDog = onAddDog,
+                onEditDog = onEditDog,
+            )
         }
     }
 }
@@ -89,8 +98,17 @@ private fun ProfileContent(
     uiState: DogUiState.Profile,
     onSwitchDog: (Long) -> Unit,
     onAddDog: () -> Unit,
+    onEditDog: (Long) -> Unit,
 ) {
-    WalkLoggerHeader(title = uiState.active.name) {
+    WalkLoggerHeader(
+        title = uiState.active.name,
+        actions = {
+            HeaderTextButton(
+                text = stringResource(R.string.dog_edit),
+                onClick = { onEditDog(uiState.active.id) },
+            )
+        },
+    ) {
         val subtitle = uiState.active.subtitle()
         if (subtitle.isNotEmpty()) {
             Text(text = subtitle, style = MaterialTheme.typography.bodyMedium, color = OnNavyMuted)
@@ -132,7 +150,7 @@ private fun DogProfileUiState.subtitle(): String {
 @Composable
 private fun DogScreenPreview() {
     WalkLoggerTheme {
-        DogScreen(uiState = DogPreviewData.profile, onSwitchDog = {}, onAddDog = {})
+        DogScreen(uiState = DogPreviewData.profile, onSwitchDog = {}, onAddDog = {}, onEditDog = {})
     }
 }
 
@@ -140,6 +158,6 @@ private fun DogScreenPreview() {
 @Composable
 private fun DogScreenNoDogPreview() {
     WalkLoggerTheme {
-        DogScreen(uiState = DogUiState.NoDog, onSwitchDog = {}, onAddDog = {})
+        DogScreen(uiState = DogUiState.NoDog, onSwitchDog = {}, onAddDog = {}, onEditDog = {})
     }
 }

@@ -38,7 +38,7 @@ class DogViewModelTest {
         repository.addDogs(sixten, mira)
         viewModel.uiState.test {
             val state = expectMostRecentItem() as DogUiState.Profile
-            assertEquals(DogProfileUiState(name = "Sixten", breed = "Border collie", ageYears = 3, weightKg = 18.0), state.active)
+            assertEquals(DogProfileUiState(id = 1, name = "Sixten", breed = "Border collie", ageYears = 3, weightKg = 18.0), state.active)
             assertEquals(
                 listOf(
                     DogListItemUiState(id = 1, name = "Sixten", isActive = true),
@@ -54,7 +54,7 @@ class DogViewModelTest {
         repository.addDogs(mira)
         viewModel.uiState.test {
             val state = expectMostRecentItem() as DogUiState.Profile
-            assertEquals(DogProfileUiState(name = "Mira", breed = "", ageYears = null, weightKg = null), state.active)
+            assertEquals(DogProfileUiState(id = 2, name = "Mira", breed = "", ageYears = null, weightKg = null), state.active)
         }
     }
 

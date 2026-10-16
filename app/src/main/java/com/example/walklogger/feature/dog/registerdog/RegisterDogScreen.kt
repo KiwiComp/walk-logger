@@ -34,13 +34,15 @@ import java.time.LocalDate
 
 @Composable
 fun RegisterDogRoute(
+    dogId: Long?,
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: RegisterDogViewModel = hiltViewModel(),
+    viewModel: RegisterDogViewModel =
+        hiltViewModel<RegisterDogViewModel, RegisterDogViewModel.Factory> { it.create(dogId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiState.isSaved) {
-        if (uiState.isSaved) onDone()
+    LaunchedEffect(uiState.isSaved, uiState.isDeleted) {
+        if (uiState.isSaved || uiState.isDeleted) onDone()
     }
     RegisterDogScreen(
         uiState = uiState,
@@ -67,7 +69,7 @@ fun RegisterDogScreen(
 ) {
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
-            title = stringResource(R.string.register_dog_title),
+            title = if (uiState.isEditing) "Edit dog" else stringResource(R.string.register_dog_title),
             navigationIcon = {
                 HeaderIconButton(
                     icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,

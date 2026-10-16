@@ -22,6 +22,7 @@
     <string name="dog_active">Aktiv</string>
     <string name="dog_switch">Byt</string>
     <string name="dog_switch_to">Byt till %1$s</string>
+    <string name="dog_edit">Redigera</string>
     <plurals name="dog_age_years">
         <item quantity="one">%1$d år</item>
         <item quantity="other">%1$d år</item>

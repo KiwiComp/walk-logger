@@ -20,7 +20,9 @@ class RegisterDogViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val repository = FakeDogRepository()
-    private val viewModel by lazy { RegisterDogViewModel(repository) }
+    private val viewModel by lazy { RegisterDogViewModel(dogId = null, dogRepository = repository) }
+
+    private fun editViewModel(dogId: Long) = RegisterDogViewModel(dogId = dogId, dogRepository = repository)
 
     @Test
     fun `cannot save without a name`() = runTest {
@@ -72,5 +74,55 @@ class RegisterDogViewModelTest {
         viewModel.save()
         assertFalse(viewModel.uiState.value.isSaved)
         assertEquals(emptyList<Dog>(), repository.observeDogs().first())
+    }
+
+    @Test
+    fun `editing prefills the form from the stored dog`() = runTest {
+        val birthDate = LocalDate.of(2023, 9, 2)
+        repository.addDogs(Dog(id = 7, name = "Sixten", breed = "Border collie", birthDate = birthDate, weightKg = 18.0))
+        editViewModel(7).uiState.test {
+            val state = expectMostRecentItem()
+            assertEquals("Sixten", state.name)
+            assertEquals("Border collie", state.breed)
+            assertEquals(birthDate, state.birthDate)
+            assertEquals("18", state.weight)
+            assertTrue(state.isEditing)
+            assertFalse(state.isLoading)
+        }
+    }
+
+    @Test
+    fun `save updates the edited dog instead of adding one`() = runTest {
+        repository.addDogs(Dog(id = 7, name = "Sixten", breed = "Border collie", weightKg = 18.0))
+        val editing = editViewModel(7)
+        editing.uiState.test {
+            awaitItem()
+            editing.setName("Sixten II")
+            editing.setWeight("19,5")
+            editing.save()
+            assertTrue(expectMostRecentItem().isSaved)
+        }
+        assertEquals(
+            listOf(Dog(id = 7, name = "Sixten II", breed = "Border collie", weightKg = 19.5)),
+            repository.observeDogs().first(),
+        )
+    }
+
+    @Test
+    fun `delete removes the edited dog and flags completion`() = runTest {
+        repository.addDogs(Dog(id = 7, name = "Sixten"))
+        val editing = editViewModel(7)
+        editing.uiState.test {
+            awaitItem()
+            editing.delete()
+            assertTrue(expectMostRecentItem().isDeleted)
+        }
+        assertEquals(emptyList<Dog>(), repository.observeDogs().first())
+    }
+
+    @Test
+    fun `delete does nothing when registering a new dog`() = runTest {
+        viewModel.delete()
+        assertFalse(viewModel.uiState.value.isDeleted)
     }
 }

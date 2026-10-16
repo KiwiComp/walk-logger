@@ -24,6 +24,7 @@
     <string name="dog_active">Active</string>
     <string name="dog_switch">Switch</string>
     <string name="dog_switch_to">Switch to %1$s</string>
+    <string name="dog_edit">Edit</string>
     <plurals name="dog_age_years">
         <item quantity="one">%1$d year</item>
         <item quantity="other">%1$d years</item>
