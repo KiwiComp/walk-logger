@@ -36,6 +36,7 @@ class DogViewModel @Inject constructor(
 
     private fun buildProfile(active: Dog, dogs: List<Dog>) = DogUiState.Profile(
         active = DogProfileUiState(
+            id = active.id,
             name = active.name,
             breed = active.breed,
             ageYears = active.birthDate?.let { Period.between(it, LocalDate.now(clock)).years },

@@ -22,6 +22,7 @@
     <string name="dog_active">Aktiv</string>
     <string name="dog_switch">Byt</string>
     <string name="dog_switch_to">Byt till %1$s</string>
+    <string name="dog_edit">Redigera</string>
     <plurals name="dog_age_years">
         <item quantity="one">%1$d år</item>
         <item quantity="other">%1$d år</item>
@@ -37,6 +38,12 @@
     <string name="register_dog_weight_unit">kg</string>
     <string name="register_dog_weight_error">Ange ett tal</string>
     <string name="register_dog_save">Spara hund</string>
+
+    <string name="edit_dog_title">Redigera hund</string>
+    <string name="edit_dog_delete">Ta bort</string>
+    <string name="edit_dog_delete_confirm_title">Ta bort hunden?</string>
+    <string name="edit_dog_delete_confirm_message">Hunden tas bort från appen. Det kan inte ångras.</string>
+    <string name="edit_dog_delete_confirm">Ta bort</string>
 
     <plurals name="walk_count">
         <item quantity="one">%1$d promenad</item>

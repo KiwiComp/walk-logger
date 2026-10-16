@@ -13,6 +13,7 @@ sealed interface DogUiState {
 }
 
 data class DogProfileUiState(
+    val id: Long,
     val name: String,
     val breed: String,
     val ageYears: Int?,

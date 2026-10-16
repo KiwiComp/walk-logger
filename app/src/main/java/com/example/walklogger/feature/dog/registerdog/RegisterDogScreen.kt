@@ -16,6 +16,9 @@ import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
@@ -27,6 +30,7 @@ import com.example.walklogger.core.ui.component.AppButton
 import com.example.walklogger.core.ui.component.AppDateField
 import com.example.walklogger.core.ui.component.AppTextField
 import com.example.walklogger.core.ui.component.HeaderIconButton
+import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -34,13 +38,15 @@ import java.time.LocalDate
 
 @Composable
 fun RegisterDogRoute(
+    dogId: Long?,
     onDone: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: RegisterDogViewModel = hiltViewModel(),
+    viewModel: RegisterDogViewModel =
+        hiltViewModel<RegisterDogViewModel, RegisterDogViewModel.Factory> { it.create(dogId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiState.isSaved) {
-        if (uiState.isSaved) onDone()
+    LaunchedEffect(uiState.isSaved, uiState.isDeleted) {
+        if (uiState.isSaved || uiState.isDeleted) onDone()
     }
     RegisterDogScreen(
         uiState = uiState,
@@ -49,6 +55,7 @@ fun RegisterDogRoute(
         onBirthDateChange = viewModel::setBirthDate,
         onWeightChange = viewModel::setWeight,
         onSave = viewModel::save,
+        onDelete = viewModel::delete,
         onCancel = onDone,
         modifier = modifier,
     )
@@ -62,18 +69,32 @@ fun RegisterDogScreen(
     onBirthDateChange: (LocalDate?) -> Unit,
     onWeightChange: (String) -> Unit,
     onSave: () -> Unit,
+    onDelete: () -> Unit,
     onCancel: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showDeleteConfirm by rememberSaveable { mutableStateOf(false) }
+
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
-            title = stringResource(R.string.register_dog_title),
+            title = stringResource(
+                if (uiState.isEditing) R.string.edit_dog_title else R.string.register_dog_title,
+            ),
             navigationIcon = {
                 HeaderIconButton(
                     icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
                     contentDescription = stringResource(R.string.back),
                     onClick = onCancel,
                 )
+            },
+            actions = {
+                if (uiState.isEditing) {
+                    HeaderTextButton(
+                        text = stringResource(R.string.edit_dog_delete),
+                        onClick = { showDeleteConfirm = true },
+                        visible = uiState.canDelete,
+                    )
+                }
             },
         )
         Column(
@@ -121,6 +142,16 @@ fun RegisterDogScreen(
                 .imePadding(),
         )
     }
+
+    if (showDeleteConfirm) {
+        DeleteDogDialog(
+            onConfirm = {
+                showDeleteConfirm = false
+                onDelete()
+            },
+            onDismiss = { showDeleteConfirm = false },
+        )
+    }
 }
 
 @Preview(showBackground = true, heightDp = 700)
@@ -134,6 +165,29 @@ private fun RegisterDogScreenPreview() {
             onBirthDateChange = {},
             onWeightChange = {},
             onSave = {},
+            onDelete = {},
+            onCancel = {},
+        )
+    }
+}
+
+@Preview(showBackground = true, heightDp = 700)
+@Composable
+private fun EditDogScreenPreview() {
+    WalkLoggerTheme {
+        RegisterDogScreen(
+            uiState = RegisterDogUiState(
+                name = "Sixten",
+                breed = "Border collie",
+                weight = "18",
+                isEditing = true,
+            ),
+            onNameChange = {},
+            onBreedChange = {},
+            onBirthDateChange = {},
+            onWeightChange = {},
+            onSave = {},
+            onDelete = {},
             onCancel = {},
         )
     }
