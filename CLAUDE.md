@@ -26,17 +26,12 @@
 # Git
 
 * Branch names: `<type>/<short-description>`, e.g. `feat/walk-detail-screen`, `chore/spacing-tokens`,
-  `docs/architecture`. Types: `feat`, `fix`, `chore`, `docs`, `refactor`, `test`.
-* Commit messages: one short imperative line. Squash-and-merge is used, so the PR title and body
+  `docs/architecture`. Types: `feat` (new user-facing behavior), `fix` (bug fix), `refactor` (no behavior change),
+  `test` (tests only), `docs` (CLAUDE.md, docs/, skills), `build` (Gradle, version catalog),
+  `ci` (CI config), `chore` (anything else, e.g. .gitignore).
+* Commit messages: `<type>: <description>`, one short imperative lowercase line, no trailing period. Squash-and-merge is used, so the PR title and body
   carry the history, not individual commits.
-* PR title: `<type>: <description>`, mirroring the branch name — branch `feat/walk-detail-screen`
-  → title `feat: walk detail screen`. This becomes the squash commit message on `main`.
-* PR body: brief and concise, using exactly these headers:
-  * **What** — one or two sentences on the change.
-  * **Issue** — linked issue, or `none`.
-  * **Notes** — decisions, trade-offs, follow-ups. Omit if there are none.
-  * **Verification** — what was run (`./gradlew :app:compileDebugKotlin :app:testDebugUnitTest`, manual checks).
-  * **Screenshots** — only when the UI changed; before/after if applicable.
+* Pull request: see `.claude/skills/pull-request/SKILL.md`.
 
 
 # Design system
@@ -57,7 +52,7 @@
 # Architecture
 
 The project follows Google's recommended app architecture: https://developer.android.com/topic/architecture
-See ARCHITECTURE.md for the package tree and how to add a feature.
+See docs/ARCHITECTURE.md for the package tree and how to add a feature.
 
 * Layers: UI (Compose + ViewModel) → optional domain (use cases) → data (repository → Room).
   Dependencies only point downwards; the UI layer never touches Room or DAOs directly.
@@ -81,4 +76,4 @@ See ARCHITECTURE.md for the package tree and how to add a feature.
 * No deprecated APIs: never use anything marked `@Deprecated`, and fix deprecation warnings you
   introduce or touch rather than suppressing them.
 * No APIs that do not work for the project's minSDK: never use anything marked incompatible with the project's minSDK.
-* Verify before reporting: `./gradlew :app:compileDebugKotlin :app:testDebugUnitTest` must pass.
+* Verify before reporting: run the checks in `.claude/skills/verify/SKILL.md`.
