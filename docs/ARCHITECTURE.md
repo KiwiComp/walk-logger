@@ -25,21 +25,22 @@ com.example.walklogger
 │   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
 │   │                          stored start, quick note, end walk; system back is swallowed);
-│   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen (rating, optional ratings, equipment, weather, behaviour,
+│   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen (rating, stool, optional ratings, equipment, weather, behaviour,
 │   │                          medical, notes for the just-finished walk, with an "Edit times" toggle);
-│   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating, optional ratings,
+│   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating, stool, optional ratings,
 │   │                          equipment, weather, behaviour, medical, notes); the same screen edits a logged walk when the route
 │   │                          carries a walkId, pushed on top of that walk's detail screen so saving or closing returns there;
 │   │                          component/ holds the form pieces the screens share (FormSection, SelectableChip,
 │   │                          BehaviourSection, MedicalSection, AddNameDialog and its AddHandlerDialog /
-│   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, OptionalRatingsSection, WeatherSection, WhenSection, Labels);
+│   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, StoolSection with StoolColourPicker and
+│   │                          StoolSwatch, OptionalRatingsSection, WeatherSection, WhenSection, Labels);
 │   │                          the chosen day travels as a route argument into both form ViewModels
 │   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
 │   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
 │   │                          MonthGrid with cells tinted by rating and selection ringed in Accent, CalendarWalkList);
 │   │                          a walk row opens the walk's detail screen, the dashed button logs a walk on that day
 │   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk (when, handler, dog,
-│   │                          equipment, rating, optional ratings, weather, behaviour, medical, notes; empty sections say so),
+│   │                          equipment, rating, stool, optional ratings, weather, behaviour, medical, notes; empty sections say so),
 │   │                          opened from a walk row on Log or Calendar; Edit pushes LogPastWalkScreen, Discard deletes the walk
 │   │                          (DiscardWalkDialog confirms first) and back returns to the tab; component/ holds the read-only
 │   │                          pieces (DetailField, DetailPlaceholder, RatingSummary, OptionalRatingRow, NotedItem)
@@ -61,7 +62,7 @@ com.example.walklogger
 │   │                          rows show their name), and `isHidden` soft-deletes without touching walk history
 │   ├── datastore/             Preferences DataStore (active dog id)
 │   ├── common/di/             injectable coroutine dispatchers and Clock
-│   └── ui/                    theme (fixed palette incl. RatingTints/Accent, AppSpacing/AppRadius/AppSize tokens)
+│   └── ui/                    theme (fixed palette incl. RatingTints/Accent/stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
 │                              SectionLabel, SegmentedToggle, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent)

@@ -12,6 +12,10 @@ import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
@@ -102,6 +106,25 @@ class FinishWalkViewModel @AssistedInject constructor(
 
     fun clearOptionalRatings() = form.update { it.copy(optionalRatings = emptyMap()) }
 
+    /** Keeps the description when Yes is picked again; No drops it. */
+    fun selectStoolPassed(passed: Boolean) = form.update {
+        it.copy(stool = if (passed) it.stool?.takeIf(Stool::passed) ?: Stool(passed = true) else Stool(passed = false))
+    }
+
+    fun selectStoolQuantity(value: StoolQuantity) = updatePassedStool { copy(quantity = value) }
+
+    fun selectStoolTexture(value: StoolTexture) = updatePassedStool { copy(texture = value) }
+
+    /** A null [value] removes the colour. */
+    fun selectStoolColour(value: StoolColour?) = updatePassedStool { copy(colour = value) }
+
+    /** The description only applies once Yes has been picked. */
+    private fun updatePassedStool(edit: Stool.() -> Stool) = form.update { state ->
+        state.stool?.takeIf(Stool::passed)?.let { state.copy(stool = it.edit()) } ?: state
+    }
+
+    fun clearStool() = form.update { it.copy(stool = null) }
+
     fun selectEquipment(value: Equipment) = form.update { it.copy(equipment = value) }
 
     fun selectRain(value: Rain) = form.update { it.copy(rain = value) }
@@ -166,6 +189,7 @@ class FinishWalkViewModel @AssistedInject constructor(
                     equipment = state.equipment,
                     rating = state.rating,
                     optionalRatings = state.optionalRatings,
+                    stool = state.stool,
                     rain = state.rain,
                     temperature = state.temperature,
                     wind = state.wind,
@@ -191,6 +215,7 @@ class FinishWalkViewModel @AssistedInject constructor(
             rating = walk.rating,
             optionalRatings = walk.optionalRatings,
             isOptionalRatingsExpanded = walk.optionalRatings.isNotEmpty(),
+            stool = walk.stool,
             equipment = walk.equipment ?: equipment,
             rain = walk.rain,
             temperature = walk.temperature,

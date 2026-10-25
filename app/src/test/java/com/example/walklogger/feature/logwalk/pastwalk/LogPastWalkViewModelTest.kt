@@ -8,6 +8,10 @@ import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
@@ -76,6 +80,27 @@ class LogPastWalkViewModelTest {
             assertNull(state.startTime)
             assertNull(state.endTime)
             assertNull(state.durationMinutes)
+            assertNull(state.stool)
+        }
+    }
+
+    @Test
+    fun `stool description only applies after yes, and no drops it`() = runTest {
+        viewModel.uiState.test {
+            viewModel.selectStoolQuantity(StoolQuantity.SMALL)
+            assertNull(expectMostRecentItem().stool)
+            viewModel.selectStoolPassed(true)
+            viewModel.selectStoolQuantity(StoolQuantity.LARGE)
+            viewModel.selectStoolTexture(StoolTexture.SOFT)
+            viewModel.selectStoolColour(StoolColour.GREY)
+            assertEquals(Stool(true, StoolQuantity.LARGE, StoolTexture.SOFT, StoolColour.GREY), expectMostRecentItem().stool)
+            viewModel.selectStoolColour(null)
+            viewModel.selectStoolPassed(true)
+            assertEquals(Stool(true, StoolQuantity.LARGE, StoolTexture.SOFT), expectMostRecentItem().stool)
+            viewModel.selectStoolPassed(false)
+            assertEquals(Stool(passed = false), expectMostRecentItem().stool)
+            viewModel.clearStool()
+            assertNull(expectMostRecentItem().stool)
         }
     }
 
@@ -309,6 +334,7 @@ class LogPastWalkViewModelTest {
             viewModel.selectWind(Wind.WINDY)
             viewModel.selectSnow(Snow.NONE)
             viewModel.setOptionalRating(OptionalRating.ENERGY_LEVEL, 6)
+            viewModel.selectStoolPassed(false)
             viewModel.setNotes(" Pulled at the gate ")
             viewModel.save()
             assertTrue(expectMostRecentItem().isSaved)
@@ -325,6 +351,7 @@ class LogPastWalkViewModelTest {
         assertEquals(Wind.WINDY, walk.wind)
         assertEquals(Snow.NONE, walk.snow)
         assertEquals(mapOf(OptionalRating.ENERGY_LEVEL to 6), walk.optionalRatings)
+        assertEquals(Stool(passed = false), walk.stool)
         assertEquals(listOf(BehaviourIssue(2, "Barking")), walk.issues)
         assertEquals(listOf(MedicalConcern(2, "Vomit")), walk.concerns)
         assertEquals("Pulled at the gate", walk.notes)
@@ -370,6 +397,7 @@ class LogPastWalkViewModelTest {
             issues = listOf(BehaviourIssue(1, "Pulling")),
             concerns = listOf(MedicalConcern(1, "Limping")),
             optionalRatings = mapOf(OptionalRating.RESPONSIVENESS to 4),
+            stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, colour = StoolColour.DARK_BROWN),
         )
         walkRepository.addWalks(walk)
         walkId = walk.id
@@ -397,6 +425,7 @@ class LogPastWalkViewModelTest {
             assertTrue(state.isWeatherExpanded)
             assertEquals(mapOf(OptionalRating.RESPONSIVENESS to 4), state.optionalRatings)
             assertTrue(state.isOptionalRatingsExpanded)
+            assertEquals(Stool(passed = true, quantity = StoolQuantity.NORMAL, colour = StoolColour.DARK_BROWN), state.stool)
             assertEquals(setOf(1L), state.selectedIssueIds)
             assertTrue(state.isBehaviourExpanded)
             assertEquals(setOf(1L), state.selectedConcernIds)

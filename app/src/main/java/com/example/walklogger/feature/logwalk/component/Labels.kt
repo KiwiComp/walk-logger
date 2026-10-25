@@ -10,6 +10,9 @@ import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 import com.example.walklogger.feature.logwalk.SaveBlocker
@@ -58,6 +61,36 @@ internal val Snow.labelRes: Int
         Snow.NONE -> R.string.snow_none
         Snow.LIGHT -> R.string.snow_light
         Snow.HEAVY -> R.string.snow_heavy
+    }
+
+internal val StoolQuantity.labelRes: Int
+    @StringRes get() = when (this) {
+        StoolQuantity.SMALL -> R.string.stool_quantity_small
+        StoolQuantity.NORMAL -> R.string.stool_quantity_normal
+        StoolQuantity.LARGE -> R.string.stool_quantity_large
+    }
+
+internal val StoolTexture.labelRes: Int
+    @StringRes get() = when (this) {
+        StoolTexture.HARD -> R.string.stool_texture_hard
+        StoolTexture.FIRM -> R.string.stool_texture_firm
+        StoolTexture.SOFT -> R.string.stool_texture_soft
+        StoolTexture.MUSHY -> R.string.stool_texture_mushy
+        StoolTexture.LIQUID -> R.string.stool_texture_liquid
+    }
+
+internal val StoolColour.labelRes: Int
+    @StringRes get() = when (this) {
+        StoolColour.LIGHT_BROWN -> R.string.stool_colour_light_brown
+        StoolColour.MEDIUM_BROWN -> R.string.stool_colour_medium_brown
+        StoolColour.DARK_BROWN -> R.string.stool_colour_dark_brown
+        StoolColour.BLACK -> R.string.stool_colour_black
+        StoolColour.YELLOWY_BROWN -> R.string.stool_colour_yellowy_brown
+        StoolColour.BRIGHT_YELLOW -> R.string.stool_colour_bright_yellow
+        StoolColour.GREY -> R.string.stool_colour_grey
+        StoolColour.GREEN -> R.string.stool_colour_green
+        StoolColour.RED_STREAKED -> R.string.stool_colour_red_streaked
+        StoolColour.WHITE_SPECKED -> R.string.stool_colour_white_specked
     }
 
 internal val SaveBlocker.messageRes: Int

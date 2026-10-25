@@ -1,0 +1,65 @@
+<?xml version="1.0" encoding="utf-8"?>
+<!-- Full-bleed square texture: brown base with marble-style red veins.
+     Colour 1 (base): #FF8B5A2B   Colour 2 (veins): #FFB3261E -->
+<vector xmlns:android="http://schemas.android.com/apk/res/android"
+    android:width="48dp"
+    android:height="48dp"
+    android:viewportWidth="48"
+    android:viewportHeight="48">
+
+    <group>
+        <clip-path android:pathData="M0,0 H48 V48 H0 Z" />
+
+        <!-- Base fill -->
+        <path
+            android:fillColor="#FF8B5A2B"
+            android:pathData="M0,0 H48 V48 H0 Z" />
+
+        <!-- Main vein: soft halo -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#FFB3261E"
+            android:strokeAlpha="0.22"
+            android:strokeWidth="5.5"
+            android:strokeLineCap="round"
+            android:pathData="M-2,10 C8,14 12,8 20,16 S30,30 38,28 S46,36 50,40" />
+
+        <!-- Main vein -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#FFB3261E"
+            android:strokeWidth="3"
+            android:strokeLineCap="round"
+            android:pathData="M-2,10 C8,14 12,8 20,16 S30,30 38,28 S46,36 50,40" />
+
+        <!-- Branches -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#FFB3261E"
+            android:strokeWidth="1.8"
+            android:strokeLineCap="round"
+            android:pathData="M20,16 C22,12 27,11 30,6 S36,0 38,-2
+                M30,29 C28,34 31,38 27,44 S24,50 22,50" />
+
+        <!-- Faint secondary veins -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#FFB3261E"
+            android:strokeAlpha="0.6"
+            android:strokeWidth="2"
+            android:strokeLineCap="round"
+            android:pathData="M-2,30 C6,27 10,34 16,32 S22,38 26,36
+                M34,-2 C36,6 42,10 50,12" />
+
+        <!-- Hairlines -->
+        <path
+            android:fillColor="#00000000"
+            android:strokeColor="#FFB3261E"
+            android:strokeAlpha="0.65"
+            android:strokeWidth="1.1"
+            android:strokeLineCap="round"
+            android:pathData="M8,13 C9,18 6,22 7,26
+                M38,28 C42,24 44,22 50,22
+                M16,32 C15,37 10,41 8,50" />
+    </group>
+</vector>

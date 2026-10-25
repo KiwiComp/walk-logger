@@ -6,6 +6,10 @@ import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 import com.example.walklogger.feature.walkdetail.WalkDetailUiState
@@ -24,6 +28,7 @@ internal object WalkDetailPreviewData {
         handlers = listOf("Kim"),
         equipment = Equipment.COLLAR,
         rating = 5,
+        stool = Stool(passed = true, quantity = StoolQuantity.LARGE, texture = StoolTexture.SOFT, colour = StoolColour.YELLOWY_BROWN),
         optionalRatings = mapOf(
             OptionalRating.REACTIVITY to 6,
             OptionalRating.ENERGY_LEVEL to 5,

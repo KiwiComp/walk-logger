@@ -72,6 +72,7 @@ class WalkDetailViewModel @AssistedInject constructor(
             equipment = walk.equipment,
             rating = walk.rating,
             optionalRatings = walk.optionalRatings,
+            stool = walk.stool,
             rain = walk.rain,
             temperature = walk.temperature,
             wind = walk.wind,

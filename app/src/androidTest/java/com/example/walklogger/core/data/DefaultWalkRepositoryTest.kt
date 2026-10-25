@@ -12,6 +12,10 @@ import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
@@ -60,6 +64,7 @@ class DefaultWalkRepositoryTest {
         issues = listOf(pulling, barking),
         concerns = listOf(limping, vomit),
         optionalRatings = mapOf(OptionalRating.REACTIVITY to 2, OptionalRating.DISTRACTION to 6),
+        stool = Stool(passed = true, quantity = StoolQuantity.SMALL, texture = StoolTexture.MUSHY, colour = StoolColour.GREEN),
     )
 
     @Before
@@ -80,6 +85,15 @@ class DefaultWalkRepositoryTest {
         val stored = repository.observeWalk(id).first()!!
         assertEquals(pastWalk.copy(id = id), stored)
         assertEquals(id, repository.observeWalks().first().single().id)
+    }
+
+    @Test
+    fun logWalk_keepsAnUnansweredAndANoStoolApart() = runBlocking {
+        val unanswered = repository.logWalk(pastWalk.copy(stool = null))
+        val no = repository.logWalk(pastWalk.copy(stool = Stool(passed = false)))
+
+        assertNull(repository.observeWalk(unanswered).first()!!.stool)
+        assertEquals(Stool(passed = false), repository.observeWalk(no).first()!!.stool)
     }
 
     @Test

@@ -6,6 +6,7 @@ import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 import java.time.Duration
@@ -24,6 +25,7 @@ data class WalkDetailUiState(
     val equipment: Equipment? = null,
     val rating: Int? = null,
     val optionalRatings: Map<OptionalRating, Int> = emptyMap(),
+    val stool: Stool? = null,
     val rain: Rain? = null,
     val temperature: Temperature? = null,
     val wind: Wind? = null,

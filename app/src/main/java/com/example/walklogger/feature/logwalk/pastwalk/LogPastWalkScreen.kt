@@ -32,6 +32,9 @@ import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 import com.example.walklogger.core.ui.component.AppButton
@@ -51,6 +54,7 @@ import com.example.walklogger.feature.logwalk.component.FormSection
 import com.example.walklogger.feature.logwalk.component.MedicalSection
 import com.example.walklogger.feature.logwalk.component.OptionalRatingsSection
 import com.example.walklogger.feature.logwalk.component.RatingScale
+import com.example.walklogger.feature.logwalk.component.StoolSection
 import com.example.walklogger.feature.logwalk.component.SelectableChip
 import com.example.walklogger.feature.logwalk.component.WeatherSection
 import com.example.walklogger.feature.logwalk.component.WhenSection
@@ -90,6 +94,11 @@ fun LogPastWalkRoute(
         onOptionalRatingChange = viewModel::setOptionalRating,
         onToggleOptionalRatings = viewModel::toggleOptionalRatings,
         onClearOptionalRatings = viewModel::clearOptionalRatings,
+        onStoolPassedSelected = viewModel::selectStoolPassed,
+        onStoolQuantitySelected = viewModel::selectStoolQuantity,
+        onStoolTextureSelected = viewModel::selectStoolTexture,
+        onStoolColourSelected = viewModel::selectStoolColour,
+        onClearStool = viewModel::clearStool,
         onEquipmentSelected = viewModel::selectEquipment,
         onRainSelected = viewModel::selectRain,
         onTemperatureSelected = viewModel::selectTemperature,
@@ -124,6 +133,11 @@ fun LogPastWalkScreen(
     onOptionalRatingChange: (OptionalRating, Int?) -> Unit,
     onToggleOptionalRatings: () -> Unit,
     onClearOptionalRatings: () -> Unit,
+    onStoolPassedSelected: (Boolean) -> Unit,
+    onStoolQuantitySelected: (StoolQuantity) -> Unit,
+    onStoolTextureSelected: (StoolTexture) -> Unit,
+    onStoolColourSelected: (StoolColour?) -> Unit,
+    onClearStool: () -> Unit,
     onEquipmentSelected: (Equipment) -> Unit,
     onRainSelected: (Rain) -> Unit,
     onTemperatureSelected: (Temperature) -> Unit,
@@ -202,6 +216,14 @@ fun LogPastWalkScreen(
             ) {
                 RatingScale(rating = uiState.rating, onRatingChange = onRatingChange)
             }
+            StoolSection(
+                stool = uiState.stool,
+                onPassedSelected = onStoolPassedSelected,
+                onQuantitySelected = onStoolQuantitySelected,
+                onTextureSelected = onStoolTextureSelected,
+                onColourSelected = onStoolColourSelected,
+                onClear = onClearStool,
+            )
             OptionalRatingsSection(
                 ratings = uiState.optionalRatings,
                 expanded = uiState.isOptionalRatingsExpanded,
@@ -315,6 +337,11 @@ private fun LogPastWalkScreenPreview() {
             onOptionalRatingChange = { _, _ -> },
             onToggleOptionalRatings = {},
             onClearOptionalRatings = {},
+            onStoolPassedSelected = {},
+            onStoolQuantitySelected = {},
+            onStoolTextureSelected = {},
+            onStoolColourSelected = {},
+            onClearStool = {},
             onEquipmentSelected = {},
             onRainSelected = {},
             onTemperatureSelected = {},
@@ -352,6 +379,11 @@ private fun LogPastWalkScreenCompletePreview() {
             onOptionalRatingChange = { _, _ -> },
             onToggleOptionalRatings = {},
             onClearOptionalRatings = {},
+            onStoolPassedSelected = {},
+            onStoolQuantitySelected = {},
+            onStoolTextureSelected = {},
+            onStoolColourSelected = {},
+            onClearStool = {},
             onEquipmentSelected = {},
             onRainSelected = {},
             onTemperatureSelected = {},
@@ -389,6 +421,11 @@ private fun LogPastWalkScreenEditPreview() {
             onOptionalRatingChange = { _, _ -> },
             onToggleOptionalRatings = {},
             onClearOptionalRatings = {},
+            onStoolPassedSelected = {},
+            onStoolQuantitySelected = {},
+            onStoolTextureSelected = {},
+            onStoolColourSelected = {},
+            onClearStool = {},
             onEquipmentSelected = {},
             onRainSelected = {},
             onTemperatureSelected = {},
@@ -426,6 +463,11 @@ private fun LogPastWalkScreenEmptyPreview() {
             onOptionalRatingChange = { _, _ -> },
             onToggleOptionalRatings = {},
             onClearOptionalRatings = {},
+            onStoolPassedSelected = {},
+            onStoolQuantitySelected = {},
+            onStoolTextureSelected = {},
+            onStoolColourSelected = {},
+            onClearStool = {},
             onEquipmentSelected = {},
             onRainSelected = {},
             onTemperatureSelected = {},

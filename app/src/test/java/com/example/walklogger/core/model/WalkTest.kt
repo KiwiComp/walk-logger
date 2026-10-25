@@ -1,5 +1,6 @@
 package com.example.walklogger.core.model
 
+import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
 import org.junit.Assert.assertThrows
 import org.junit.Assert.assertTrue
@@ -34,5 +35,20 @@ class WalkTest {
     @Test
     fun `walk without handlers is rejected`() {
         assertThrows(IllegalArgumentException::class.java) { walk(handlers = emptyList()) }
+    }
+
+    @Test
+    fun `stool that was not passed cannot be described`() {
+        Stool(passed = false)
+        Stool(passed = true, quantity = StoolQuantity.SMALL, texture = StoolTexture.HARD, colour = StoolColour.BLACK)
+        assertThrows(IllegalArgumentException::class.java) { Stool(passed = false, colour = StoolColour.GREY) }
+    }
+
+    @Test
+    fun `only the brown shades are typical stool colours`() {
+        assertEquals(
+            setOf(StoolColour.LIGHT_BROWN, StoolColour.MEDIUM_BROWN, StoolColour.DARK_BROWN),
+            StoolColour.entries.filter { it.isTypical }.toSet(),
+        )
     }
 }

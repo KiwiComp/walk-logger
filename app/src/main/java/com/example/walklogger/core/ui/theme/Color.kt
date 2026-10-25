@@ -33,3 +33,14 @@ val RatingTints: List<Color> = listOf(
     NavyLight,
     Navy,
 )
+
+// Stool swatches: the closest everyday match to what a handler sees, not part of the UI palette.
+// The streaked and specked swatches are drawables (res/drawable/stool_swatch_*) over StoolMediumBrown.
+val StoolLightBrown = Color(0xFFC8A27A)
+val StoolMediumBrown = Color(0xFF8B5A2B)
+val StoolDarkBrown = Color(0xFF4E3221)
+val StoolBlack = Color(0xFF1E1A18)
+val StoolYellowyBrown = Color(0xFFB8893A)
+val StoolBrightYellow = Color(0xFFE8C547)
+val StoolGrey = Color(0xFFA39E98)
+val StoolGreen = Color(0xFF6B7F3A)

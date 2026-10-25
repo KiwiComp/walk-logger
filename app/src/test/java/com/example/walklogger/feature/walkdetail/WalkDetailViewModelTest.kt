@@ -7,6 +7,8 @@ import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
+import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
@@ -57,6 +59,7 @@ class WalkDetailViewModelTest {
         equipment = Equipment.COLLAR,
         rating = 5,
         optionalRatings = mapOf(OptionalRating.REACTIVITY to 6),
+        stool = Stool(passed = true, colour = StoolColour.RED_STREAKED),
         rain = Rain.LIGHT,
         issues = listOf(issue),
         concerns = listOf(concern),
@@ -86,6 +89,7 @@ class WalkDetailViewModelTest {
             assertEquals(Equipment.COLLAR, state.equipment)
             assertEquals(5, state.rating)
             assertEquals(mapOf(OptionalRating.REACTIVITY to 6), state.optionalRatings)
+            assertEquals(Stool(passed = true, colour = StoolColour.RED_STREAKED), state.stool)
             assertEquals(Rain.LIGHT, state.rain)
             assertTrue(state.hasWeather)
             assertEquals(listOf(issue), state.issues)
