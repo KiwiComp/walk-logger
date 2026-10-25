@@ -53,6 +53,10 @@ Only the plan is in Swedish. Code, comments, string keys and the rest of the con
 
 ## 5. Implement
 
+- Before changing any files:
+  - Run `git status`. If there are uncommitted changes, stop and ask what to do with them.
+  - `git switch main` and `git pull --ff-only`. If the pull fails, stop and report it.
+  - `git switch -c <branch>` with the branch name from the plan.
 - Implement the plan step by step.
 - If the plan turns out to need a change (a missing file, a different approach), stop, explain it
   and wait for the developer's confirmation before continuing.
