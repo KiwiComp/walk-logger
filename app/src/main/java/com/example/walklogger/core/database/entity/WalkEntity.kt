@@ -6,6 +6,9 @@ import androidx.room.PrimaryKey
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 
@@ -29,4 +32,9 @@ data class WalkEntity(
     val responsiveness: Int? = null,
     val engagement: Int? = null,
     val distraction: Int? = null,
+    /** Null until answered; the other stool columns are only set when this is true. */
+    val stoolPassed: Boolean? = null,
+    val stoolQuantity: StoolQuantity? = null,
+    val stoolTexture: StoolTexture? = null,
+    val stoolColour: StoolColour? = null,
 )

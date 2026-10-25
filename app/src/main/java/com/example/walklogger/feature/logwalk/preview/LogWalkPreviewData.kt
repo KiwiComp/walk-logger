@@ -5,6 +5,10 @@ import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 import com.example.walklogger.feature.logwalk.activewalk.ActiveWalkUiState
@@ -83,6 +87,7 @@ internal object LogWalkPreviewData {
         dogName = "Sixten",
         handlers = listOf("Anna"),
         rating = 6,
+        stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, texture = StoolTexture.FIRM, colour = StoolColour.MEDIUM_BROWN),
         equipment = Equipment.HARNESS,
         rain = Rain.NONE,
         temperature = Temperature.COOL,

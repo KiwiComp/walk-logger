@@ -8,6 +8,10 @@ import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
@@ -80,6 +84,37 @@ class FinishWalkViewModelTest {
             assertEquals(Equipment.HARNESS, state.equipment)
             assertEquals("Barked", state.notes)
             assertEquals(SaveBlocker.RATING, state.saveBlocker)
+            assertNull(state.stool)
+        }
+    }
+
+    @Test
+    fun `prefills a stored stool`() = runTest {
+        val stool = Stool(passed = true, colour = StoolColour.WHITE_SPECKED)
+        walkRepository.addWalks(walk.copy(stool = stool))
+        viewModel.uiState.test {
+            assertEquals(stool, expectMostRecentItem().stool)
+        }
+    }
+
+    @Test
+    fun `stool description only applies after yes, and no drops it`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.selectStoolQuantity(StoolQuantity.SMALL)
+            assertNull(expectMostRecentItem().stool)
+            viewModel.selectStoolPassed(true)
+            viewModel.selectStoolQuantity(StoolQuantity.LARGE)
+            viewModel.selectStoolTexture(StoolTexture.SOFT)
+            viewModel.selectStoolColour(StoolColour.GREY)
+            assertEquals(Stool(true, StoolQuantity.LARGE, StoolTexture.SOFT, StoolColour.GREY), expectMostRecentItem().stool)
+            viewModel.selectStoolColour(null)
+            viewModel.selectStoolPassed(true)
+            assertEquals(Stool(true, StoolQuantity.LARGE, StoolTexture.SOFT), expectMostRecentItem().stool)
+            viewModel.selectStoolPassed(false)
+            assertEquals(Stool(passed = false), expectMostRecentItem().stool)
+            viewModel.clearStool()
+            assertNull(expectMostRecentItem().stool)
         }
     }
 
@@ -271,6 +306,8 @@ class FinishWalkViewModelTest {
             viewModel.selectWind(Wind.BREEZE)
             viewModel.selectSnow(Snow.LIGHT)
             viewModel.setOptionalRating(OptionalRating.REACTIVITY, 1)
+            viewModel.selectStoolPassed(true)
+            viewModel.selectStoolTexture(StoolTexture.FIRM)
             viewModel.setNotes("  Off-lead in the field  ")
             viewModel.save()
 
@@ -288,6 +325,7 @@ class FinishWalkViewModelTest {
             assertEquals(Wind.BREEZE, stored.wind)
             assertEquals(Snow.LIGHT, stored.snow)
             assertEquals(mapOf(OptionalRating.REACTIVITY to 1), stored.optionalRatings)
+            assertEquals(Stool(passed = true, texture = StoolTexture.FIRM), stored.stool)
             assertEquals(listOf(BehaviourIssue(2, "Barking")), stored.issues)
             assertEquals(listOf(MedicalConcern(1, "Limping")), stored.concerns)
             assertEquals("Off-lead in the field", stored.notes)

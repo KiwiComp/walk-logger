@@ -28,6 +28,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.model.OptionalRating
+import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
@@ -115,6 +116,8 @@ fun WalkDetailScreen(
                 WhoDetails(uiState)
                 HorizontalDivider(color = Outline)
                 RatingDetails(uiState)
+                HorizontalDivider(color = Outline)
+                StoolDetails(uiState.stool)
                 HorizontalDivider(color = Outline)
                 OptionalRatingDetails(uiState.optionalRatings)
                 HorizontalDivider(color = Outline)
@@ -228,6 +231,39 @@ private fun RatingDetails(uiState: WalkDetailUiState) {
             DetailPlaceholder(text = stringResource(R.string.walk_detail_not_recorded))
         } else {
             RatingSummary(rating = uiState.rating)
+        }
+    }
+}
+
+@Composable
+private fun StoolDetails(stool: Stool?) {
+    DetailSection(label = stringResource(R.string.log_past_walk_stool)) {
+        when {
+            stool == null -> DetailPlaceholder(text = stringResource(R.string.walk_detail_not_recorded))
+            !stool.passed -> DetailPlaceholder(text = stringResource(R.string.walk_detail_stool_none))
+            listOf(stool.quantity, stool.texture, stool.colour).all { it == null } ->
+                Text(text = stringResource(R.string.stool_passed_yes), style = MaterialTheme.typography.bodyLarge, color = Ink)
+            else -> FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
+                maxItemsInEachRow = GridColumns,
+            ) {
+                stool.quantity?.let {
+                    DetailField(
+                        label = stringResource(R.string.stool_quantity),
+                        value = stringResource(it.labelRes),
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                stool.texture?.let {
+                    DetailField(
+                        label = stringResource(R.string.stool_texture),
+                        value = stringResource(it.labelRes),
+                        modifier = Modifier.weight(1f),
+                    )
+                }
+                stool.colour?.let { StoolColourField(colour = it, modifier = Modifier.weight(1f)) }
+            }
         }
     }
 }

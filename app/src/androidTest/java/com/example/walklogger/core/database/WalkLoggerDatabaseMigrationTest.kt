@@ -170,6 +170,21 @@ class WalkLoggerDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migrate8To9_addsNullableStoolColumnsAndKeepsWalks() {
+        helper.createDatabase(DB_NAME, 8).use { db ->
+            db.execSQL("INSERT INTO walks (id, startTime, rating) VALUES (1, 100, 5)")
+        }
+
+        val db = helper.runMigrationsAndValidate(DB_NAME, 9, true)
+
+        db.query("SELECT rating, stoolPassed, stoolQuantity, stoolTexture, stoolColour FROM walks WHERE id = 1").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(5, cursor.getInt(0))
+            (1..4).forEach { assertTrue(cursor.isNull(it)) }
+        }
+    }
+
     private companion object {
         const val DB_NAME = "migration-test.db"
     }

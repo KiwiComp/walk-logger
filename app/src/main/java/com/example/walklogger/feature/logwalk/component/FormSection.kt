@@ -29,7 +29,8 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 /**
  * Small-caps [label] (with an optional [hint] beside it) above a block of form controls.
  * Pass [onToggle] to make the section collapsible; [expanded] then decides whether [content] is shown.
- * [actionLabel] with [onAction] adds a small text action ("Clear") at the end of the header row.
+ * [actionLabel] with [onAction] adds a small text action ("Clear") at the end of the header row. Its slot is
+ * kept whenever [onAction] is passed, so a null [actionLabel] hides the action without changing the row's height.
  */
 @Composable
 internal fun FormSection(
@@ -55,12 +56,12 @@ internal fun FormSection(
                 Text(text = hint, style = MaterialTheme.typography.bodySmall, color = InkMuted)
             }
             Spacer(Modifier.weight(1f))
-            if (actionLabel != null && onAction != null) {
+            if (onAction != null) {
                 SectionLabel(
-                    text = actionLabel,
+                    text = actionLabel.orEmpty(),
                     color = Steel,
                     modifier = Modifier
-                        .clickable(role = Role.Button, onClick = onAction)
+                        .then(if (actionLabel != null) Modifier.clickable(role = Role.Button, onClick = onAction) else Modifier)
                         .padding(horizontal = AppSpacing.sm, vertical = AppSpacing.xs),
                 )
             }

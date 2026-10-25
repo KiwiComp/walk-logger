@@ -22,6 +22,8 @@ data class Walk(
     val concerns: List<MedicalConcern> = emptyList(),
     /** Only the aspects the handler chose to rate; each on [RATING_RANGE], 1 least, 7 most. */
     val optionalRatings: Map<OptionalRating, Int> = emptyMap(),
+    /** Null until the handler has actively answered whether the dog passed stool. */
+    val stool: Stool? = null,
 ) {
     init {
         require(handlers.isNotEmpty()) { "a walk needs at least one handler" }
@@ -50,3 +52,33 @@ enum class Temperature { COLD, COOL, NEUTRAL, WARM, HOT }
 enum class Wind { STILL, BREEZE, WINDY }
 
 enum class Snow { NONE, LIGHT, HEAVY }
+
+/** Whether the dog passed stool on the walk and, if so, an optional description of it. */
+data class Stool(
+    val passed: Boolean,
+    val quantity: StoolQuantity? = null,
+    val texture: StoolTexture? = null,
+    val colour: StoolColour? = null,
+) {
+    init {
+        require(passed || listOf(quantity, texture, colour).all { it == null }) { "a stool that was not passed has no description" }
+    }
+}
+
+enum class StoolQuantity { SMALL, NORMAL, LARGE }
+
+enum class StoolTexture { HARD, FIRM, SOFT, MUSHY, LIQUID }
+
+/** [isTypical] marks the shades of a healthy stool; every other colour is worth a closer look. */
+enum class StoolColour(val isTypical: Boolean) {
+    LIGHT_BROWN(isTypical = true),
+    MEDIUM_BROWN(isTypical = true),
+    DARK_BROWN(isTypical = true),
+    BLACK(isTypical = false),
+    YELLOWY_BROWN(isTypical = false),
+    BRIGHT_YELLOW(isTypical = false),
+    GREY(isTypical = false),
+    GREEN(isTypical = false),
+    RED_STREAKED(isTypical = false),
+    WHITE_SPECKED(isTypical = false),
+}

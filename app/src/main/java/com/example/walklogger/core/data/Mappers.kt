@@ -9,6 +9,7 @@ import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
+import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.Walk
 import java.time.LocalDate
 
@@ -44,6 +45,9 @@ internal fun WalkEntity.toModel(
         engagement?.let { put(OptionalRating.ENGAGEMENT, it) }
         distraction?.let { put(OptionalRating.DISTRACTION, it) }
     },
+    stool = stoolPassed?.let { passed ->
+        Stool(passed = passed, quantity = stoolQuantity, texture = stoolTexture, colour = stoolColour)
+    },
 )
 
 internal fun Walk.toEntity(): WalkEntity = WalkEntity(
@@ -64,6 +68,10 @@ internal fun Walk.toEntity(): WalkEntity = WalkEntity(
     responsiveness = optionalRatings[OptionalRating.RESPONSIVENESS],
     engagement = optionalRatings[OptionalRating.ENGAGEMENT],
     distraction = optionalRatings[OptionalRating.DISTRACTION],
+    stoolPassed = stool?.passed,
+    stoolQuantity = stool?.quantity,
+    stoolTexture = stool?.texture,
+    stoolColour = stool?.colour,
 )
 
 internal fun BehaviourIssueEntity.toModel(): BehaviourIssue = BehaviourIssue(id = id, name = name, key = key)

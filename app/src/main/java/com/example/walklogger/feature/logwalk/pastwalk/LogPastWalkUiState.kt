@@ -6,6 +6,7 @@ import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
 import com.example.walklogger.feature.logwalk.SaveBlocker
@@ -29,6 +30,8 @@ data class LogPastWalkUiState(
     val optionalRatings: Map<OptionalRating, Int> = emptyMap(),
     /** True while the optional rating scales are shown; opens by itself when a stored walk has any. */
     val isOptionalRatingsExpanded: Boolean = false,
+    /** Null until the handler answers Yes or No. */
+    val stool: Stool? = null,
     val equipment: Equipment = Equipment.COLLAR,
     val rain: Rain? = null,
     val temperature: Temperature? = null,

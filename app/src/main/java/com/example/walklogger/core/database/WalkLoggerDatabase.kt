@@ -26,7 +26,7 @@ import com.example.walklogger.core.database.entity.WalkMedicalConcernEntity
         MedicalConcernEntity::class,
         WalkMedicalConcernEntity::class,
     ],
-    version = 8,
+    version = 9,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = WalkLoggerDatabase.Migration1To2::class),
@@ -36,6 +36,7 @@ import com.example.walklogger.core.database.entity.WalkMedicalConcernEntity
         AutoMigration(from = 5, to = 6, spec = WalkLoggerDatabase.Migration5To6::class),
         AutoMigration(from = 6, to = 7, spec = WalkLoggerDatabase.Migration6To7::class),
         AutoMigration(from = 7, to = 8),
+        AutoMigration(from = 8, to = 9),
     ],
 )
 @TypeConverters(StringListConverter::class)
