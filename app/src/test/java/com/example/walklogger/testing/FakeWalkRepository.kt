@@ -2,6 +2,7 @@ package com.example.walklogger.testing
 
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.Walk
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -45,6 +46,10 @@ class FakeWalkRepository : WalkRepository {
 
     override suspend fun updateNotes(walkId: Long, notes: String) {
         walks.update { list -> list.map { if (it.id == walkId) it.copy(notes = notes) else it } }
+    }
+
+    override suspend fun updateStool(walkId: Long, stool: Stool?) {
+        walks.update { list -> list.map { if (it.id == walkId) it.copy(stool = stool) else it } }
     }
 
     override suspend fun finishWalk(walkId: Long) {

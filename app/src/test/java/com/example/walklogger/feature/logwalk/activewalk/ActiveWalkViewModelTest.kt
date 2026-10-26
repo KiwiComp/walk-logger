@@ -3,6 +3,10 @@ package com.example.walklogger.feature.logwalk.activewalk
 import app.cash.turbine.test
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
@@ -126,6 +130,97 @@ class ActiveWalkViewModelTest {
             advanceTimeBy(1_000)
             assertTrue(walkRepository.observeWalks().first().isEmpty())
             cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `stool switch is off until turned on, which stores a yes and opens the description`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            val off = expectMostRecentItem()
+            assertNull(off.stool)
+            assertFalse(off.isStoolExpanded)
+            viewModel.setStoolPassed(true)
+            val on = expectMostRecentItem()
+            assertEquals(Stool(passed = true), on.stool)
+            assertTrue(on.isStoolExpanded)
+            assertEquals(Stool(passed = true), walkRepository.observeWalk(1).first()!!.stool)
+        }
+    }
+
+    @Test
+    fun `stool picks are stored at once`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.setStoolPassed(true)
+            viewModel.selectStoolQuantity(StoolQuantity.LARGE)
+            viewModel.selectStoolTexture(StoolTexture.SOFT)
+            viewModel.selectStoolColour(StoolColour.WHITE_SPECKED)
+            val expected = Stool(passed = true, quantity = StoolQuantity.LARGE, texture = StoolTexture.SOFT, colour = StoolColour.WHITE_SPECKED)
+            assertEquals(expected, expectMostRecentItem().stool)
+            assertEquals(expected, walkRepository.observeWalk(1).first()!!.stool)
+        }
+    }
+
+    @Test
+    fun `stool description only applies once the switch is on`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.selectStoolTexture(StoolTexture.SOFT)
+            assertNull(expectMostRecentItem().stool)
+            assertNull(walkRepository.observeWalk(1).first()!!.stool)
+        }
+    }
+
+    @Test
+    fun `turning the stool switch off stores null, dropping the description`() = runTest {
+        walkRepository.addWalks(walk.copy(stool = Stool(passed = true, colour = StoolColour.GREEN)))
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.setStoolPassed(false)
+            assertNull(expectMostRecentItem().stool)
+            assertNull(walkRepository.observeWalk(1).first()!!.stool)
+            viewModel.setStoolPassed(true)
+            assertEquals(Stool(passed = true), expectMostRecentItem().stool)
+        }
+    }
+
+    @Test
+    fun `done folds the description without changing the answer, and it opens again`() = runTest {
+        val stool = Stool(passed = true, quantity = StoolQuantity.NORMAL)
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.setStoolPassed(true)
+            viewModel.selectStoolQuantity(StoolQuantity.NORMAL)
+            viewModel.foldStool()
+            val folded = expectMostRecentItem()
+            assertFalse(folded.isStoolExpanded)
+            assertEquals(stool, folded.stool)
+            assertEquals(stool, walkRepository.observeWalk(1).first()!!.stool)
+            viewModel.expandStool()
+            assertTrue(expectMostRecentItem().isStoolExpanded)
+        }
+    }
+
+    @Test
+    fun `a stored stool shows folded`() = runTest {
+        val stool = Stool(passed = true, colour = StoolColour.GREEN)
+        walkRepository.addWalks(walk.copy(stool = stool))
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertEquals(stool, state.stool)
+            assertFalse(state.isStoolExpanded)
+        }
+    }
+
+    @Test
+    fun `ending keeps the stool`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.setStoolPassed(true)
+            viewModel.endWalk()
+            assertTrue(expectMostRecentItem().isEnded)
+            assertEquals(Stool(passed = true), walkRepository.observeWalk(1).first()!!.stool)
         }
     }
 

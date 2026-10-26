@@ -4,6 +4,10 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.feature.logwalk.MAX_NOTES_LENGTH
 import dagger.assisted.Assisted
@@ -47,6 +51,12 @@ class ActiveWalkViewModel @AssistedInject constructor(
 
     /** What the user has typed; null until they touch the field, so the stored note shows instead. */
     private val note = MutableStateFlow<String?>(null)
+
+    /** What the user has picked; null until they touch the section, so the stored answer shows instead. */
+    private val stool = MutableStateFlow<StoolEdit?>(null)
+
+    /** Starts folded, so a walk reopened with an answer shows only its summary. */
+    private val isStoolExpanded = MutableStateFlow(false)
     private val outcome = MutableStateFlow(Outcome())
 
     private val ticks = flow {
@@ -62,21 +72,30 @@ class ActiveWalkViewModel @AssistedInject constructor(
         note.filterNotNull().debounce(NOTE_SAVE_DELAY_MILLIS).collect { walkRepository.updateNotes(walkId, it) }
     }
 
+    /** Taps are stored at once and in order; cancelled on discard like [noteSaver]. */
+    private val stoolSaver = viewModelScope.launch {
+        stool.filterNotNull().collect { walkRepository.updateStool(walkId, it.stool) }
+    }
+
+    private val edits = combine(note, stool, isStoolExpanded, ::Edits)
+
     val uiState: StateFlow<ActiveWalkUiState> =
         combine(
             walkRepository.observeWalk(walkId).filterNotNull(),
             dogRepository.observeActiveDog(),
             ticks,
-            note,
+            edits,
             outcome,
-        ) { walk, dog, now, note, outcome ->
+        ) { walk, dog, now, edits, outcome ->
             ActiveWalkUiState(
                 dogName = dog?.name,
                 handlers = walk.handlers,
                 equipment = walk.equipment,
                 startTime = walk.startInstant().atZone(clock.zone).toLocalTime(),
                 elapsed = Duration.between(walk.startInstant(), now),
-                note = note ?: walk.notes,
+                note = edits.note ?: walk.notes,
+                stool = if (edits.stool != null) edits.stool.stool else walk.stool,
+                isStoolExpanded = edits.isStoolExpanded,
                 isEnding = outcome.isEnding,
                 isEnded = outcome.isEnded,
                 isDiscarding = outcome.isDiscarding,
@@ -90,6 +109,33 @@ class ActiveWalkViewModel @AssistedInject constructor(
 
     fun setNote(text: String) = note.update { text.take(MAX_NOTES_LENGTH) }
 
+    /** On opens the description rows; off means not answered, so the description is dropped. */
+    fun setStoolPassed(passed: Boolean) {
+        editStool { if (passed) it?.takeIf(Stool::passed) ?: Stool(passed = true) else null }
+        isStoolExpanded.value = passed
+    }
+
+    fun foldStool() {
+        isStoolExpanded.value = false
+    }
+
+    fun expandStool() {
+        isStoolExpanded.value = true
+    }
+
+    fun selectStoolQuantity(value: StoolQuantity) = editPassedStool { copy(quantity = value) }
+
+    fun selectStoolTexture(value: StoolTexture) = editPassedStool { copy(texture = value) }
+
+    /** A null [value] removes the colour. */
+    fun selectStoolColour(value: StoolColour?) = editPassedStool { copy(colour = value) }
+
+    /** The description only applies once Yes has been picked. */
+    private fun editPassedStool(edit: Stool.() -> Stool) = editStool { current -> current?.takeIf(Stool::passed)?.edit() ?: current }
+
+    private fun editStool(edit: (Stool?) -> Stool?) =
+        stool.update { StoolEdit(edit(if (it != null) it.stool else uiState.value.stool)) }
+
     /** Stores the end time; the after-walk form then opens for the finished walk. */
     fun endWalk() {
         val state = uiState.value
@@ -97,6 +143,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
         outcome.update { it.copy(isEnding = true) }
         viewModelScope.launch {
             walkRepository.updateNotes(walkId, state.note)
+            walkRepository.updateStool(walkId, state.stool)
             walkRepository.finishWalk(walkId)
             outcome.update { Outcome(isEnded = true) }
         }
@@ -107,6 +154,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
         if (!uiState.value.canDiscard) return
         outcome.update { it.copy(isDiscarding = true) }
         noteSaver.cancel()
+        stoolSaver.cancel()
         viewModelScope.launch {
             walkRepository.deleteWalk(walkId)
             outcome.update { Outcome(isDiscarded = true) }
@@ -114,6 +162,11 @@ class ActiveWalkViewModel @AssistedInject constructor(
     }
 
     private fun Walk.startInstant(): Instant = Instant.ofEpochMilli(startTime)
+
+    /** Wraps the pick so a cleared answer (null) can be told apart from an untouched section. */
+    private data class StoolEdit(val stool: Stool?)
+
+    private data class Edits(val note: String?, val stool: StoolEdit?, val isStoolExpanded: Boolean)
 
     private data class Outcome(
         val isEnding: Boolean = false,

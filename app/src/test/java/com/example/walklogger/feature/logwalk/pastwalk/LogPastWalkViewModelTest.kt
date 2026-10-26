@@ -105,6 +105,23 @@ class LogPastWalkViewModelTest {
     }
 
     @Test
+    fun `yes opens the stool description, done folds it and edit opens it again`() = runTest {
+        viewModel.uiState.test {
+            viewModel.selectStoolPassed(true)
+            assertTrue(expectMostRecentItem().isStoolExpanded)
+            viewModel.selectStoolQuantity(StoolQuantity.NORMAL)
+            viewModel.foldStool()
+            val folded = expectMostRecentItem()
+            assertFalse(folded.isStoolExpanded)
+            assertEquals(Stool(passed = true, quantity = StoolQuantity.NORMAL), folded.stool)
+            viewModel.selectStoolPassed(true)
+            assertFalse(viewModel.uiState.value.isStoolExpanded)
+            viewModel.expandStool()
+            assertTrue(expectMostRecentItem().isStoolExpanded)
+        }
+    }
+
+    @Test
     fun `optional ratings start collapsed for a new walk and toggle`() = runTest {
         viewModel.uiState.test {
             assertFalse(expectMostRecentItem().isOptionalRatingsExpanded)
@@ -426,6 +443,7 @@ class LogPastWalkViewModelTest {
             assertEquals(mapOf(OptionalRating.RESPONSIVENESS to 4), state.optionalRatings)
             assertTrue(state.isOptionalRatingsExpanded)
             assertEquals(Stool(passed = true, quantity = StoolQuantity.NORMAL, colour = StoolColour.DARK_BROWN), state.stool)
+            assertFalse(state.isStoolExpanded)
             assertEquals(setOf(1L), state.selectedIssueIds)
             assertTrue(state.isBehaviourExpanded)
             assertEquals(setOf(1L), state.selectedConcernIds)

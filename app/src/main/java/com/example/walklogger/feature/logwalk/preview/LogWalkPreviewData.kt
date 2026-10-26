@@ -77,6 +77,8 @@ internal object LogWalkPreviewData {
         startTime = LocalTime.of(7, 5),
         elapsed = Duration.ofMinutes(34).plusSeconds(12),
         note = "Barked at the bin lorry",
+        stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, texture = StoolTexture.FIRM),
+        isStoolExpanded = true,
     )
 
     val finishWalk = FinishWalkUiState(

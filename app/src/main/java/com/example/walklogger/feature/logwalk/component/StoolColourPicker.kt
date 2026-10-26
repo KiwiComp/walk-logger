@@ -26,8 +26,6 @@ import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.Steel
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private const val SwatchesPerRow = 5
@@ -44,6 +42,7 @@ internal fun StoolColourPicker(
     selected: StoolColour?,
     onSelect: (StoolColour?) -> Unit,
     modifier: Modifier = Modifier,
+    style: FormStyle = FormStyle.Default,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
         FlowRow(
@@ -59,7 +58,7 @@ internal fun StoolColourPicker(
                     modifier = Modifier
                         .size(AppSize.chipHeight)
                         .clip(CircleShape)
-                        .then(if (isSelected) Modifier.border(RingWidth, Steel, CircleShape) else Modifier)
+                        .then(if (isSelected) Modifier.border(RingWidth, style.action, CircleShape) else Modifier)
                         .selectable(
                             selected = isSelected,
                             role = Role.RadioButton,
@@ -78,7 +77,7 @@ internal fun StoolColourPicker(
         Text(
             text = selected?.let { stringResource(it.labelRes) }.orEmpty(),
             style = MaterialTheme.typography.bodySmall,
-            color = Ink,
+            color = style.text,
         )
     }
 }

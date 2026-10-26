@@ -1,6 +1,7 @@
 package com.example.walklogger.core.data
 
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.Walk
 import kotlinx.coroutines.flow.Flow
 
@@ -27,6 +28,9 @@ interface WalkRepository {
 
     /** Replaces the notes of the walk with [walkId]; used while a walk is still in progress. */
     suspend fun updateNotes(walkId: Long, notes: String)
+
+    /** Replaces the stool answer of the walk with [walkId]; used while a walk is still in progress. */
+    suspend fun updateStool(walkId: Long, stool: Stool?)
     suspend fun finishWalk(walkId: Long)
     suspend fun deleteWalk(id: Long)
 }

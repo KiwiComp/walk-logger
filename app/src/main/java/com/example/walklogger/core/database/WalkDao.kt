@@ -8,6 +8,9 @@ import androidx.room.Update
 import com.example.walklogger.core.database.entity.WalkBehaviourIssueEntity
 import com.example.walklogger.core.database.entity.WalkEntity
 import com.example.walklogger.core.database.entity.WalkMedicalConcernEntity
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import kotlinx.coroutines.flow.Flow
 
 @Dao
@@ -67,6 +70,12 @@ interface WalkDao {
 
     @Query("UPDATE walks SET notes = :notes WHERE id = :id")
     suspend fun updateNotes(id: Long, notes: String)
+
+    @Query(
+        "UPDATE walks SET stoolPassed = :passed, stoolQuantity = :quantity, stoolTexture = :texture, " +
+            "stoolColour = :colour WHERE id = :id",
+    )
+    suspend fun updateStool(id: Long, passed: Boolean?, quantity: StoolQuantity?, texture: StoolTexture?, colour: StoolColour?)
 
     @Query("DELETE FROM walks WHERE id = :id")
     suspend fun deleteWalk(id: Long)

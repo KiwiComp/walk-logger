@@ -166,6 +166,9 @@
     <string name="stool_colour_green">Green</string>
     <string name="stool_colour_red_streaked">Red streaks</string>
     <string name="stool_colour_white_specked">White specks</string>
+    <string name="stool_done">Done</string>
+    <string name="stool_edit">Edit</string>
+    <string name="stool_no_details">No details</string>
     <string name="log_past_walk_behaviour">Behaviour</string>
     <string name="behaviour_other_issue">+ Other issue</string>
     <string name="behaviour_add_issue_title">What else happened?</string>

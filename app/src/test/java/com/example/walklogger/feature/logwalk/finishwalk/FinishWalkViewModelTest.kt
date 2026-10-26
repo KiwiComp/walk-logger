@@ -93,7 +93,27 @@ class FinishWalkViewModelTest {
         val stool = Stool(passed = true, colour = StoolColour.WHITE_SPECKED)
         walkRepository.addWalks(walk.copy(stool = stool))
         viewModel.uiState.test {
-            assertEquals(stool, expectMostRecentItem().stool)
+            val state = expectMostRecentItem()
+            assertEquals(stool, state.stool)
+            assertFalse(state.isStoolExpanded)
+        }
+    }
+
+    @Test
+    fun `yes opens the stool description, done folds it and edit opens it again`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.selectStoolPassed(true)
+            assertTrue(expectMostRecentItem().isStoolExpanded)
+            viewModel.selectStoolQuantity(StoolQuantity.NORMAL)
+            viewModel.foldStool()
+            val folded = expectMostRecentItem()
+            assertFalse(folded.isStoolExpanded)
+            assertEquals(Stool(passed = true, quantity = StoolQuantity.NORMAL), folded.stool)
+            viewModel.selectStoolPassed(true)
+            assertFalse(viewModel.uiState.value.isStoolExpanded)
+            viewModel.expandStool()
+            assertTrue(expectMostRecentItem().isStoolExpanded)
         }
     }
 

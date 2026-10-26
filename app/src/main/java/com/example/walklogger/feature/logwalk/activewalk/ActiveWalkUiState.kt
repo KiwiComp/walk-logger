@@ -1,6 +1,7 @@
 package com.example.walklogger.feature.logwalk.activewalk
 
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.Stool
 import java.time.Duration
 import java.time.LocalTime
 
@@ -13,6 +14,10 @@ data class ActiveWalkUiState(
     /** Time since the walk started; advances once a second. */
     val elapsed: Duration = Duration.ZERO,
     val note: String = "",
+    /** Null until the stool switch is turned on; No is only answered in the after-walk form. */
+    val stool: Stool? = null,
+    /** True while the description rows are shown; false folds them into a summary line. */
+    val isStoolExpanded: Boolean = false,
     val isEnding: Boolean = false,
     val isEnded: Boolean = false,
     val isDiscarding: Boolean = false,
