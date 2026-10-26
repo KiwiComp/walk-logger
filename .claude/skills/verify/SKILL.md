@@ -24,6 +24,13 @@ it. Never weaken, ignore or skip a test to make a check pass.
     - The instrumented tests find nodes by English text, so the device must use English as its
       system language. If it does not, say so instead of reporting the text failures as bugs.
 
+## CI
+
+- `.github/workflows/pull-request-checks.yml` runs checks 1–3 on every pull request to and push to `main`.
+- `.github/workflows/instrumented-tests.yml` runs check 4 on an emulator, only when started by hand
+  with `confirm` set to `run`. Never start it (`gh workflow run`, or any other way) unless the
+  developer explicitly asks for it in the current message: each run costs Actions minutes.
+
 ## When a check fails
 
 - Show the part of the output that explains the failure: the compiler error, the failing test
