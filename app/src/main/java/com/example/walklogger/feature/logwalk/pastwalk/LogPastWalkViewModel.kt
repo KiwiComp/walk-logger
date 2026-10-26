@@ -138,10 +138,18 @@ class LogPastWalkViewModel @AssistedInject constructor(
 
     fun clearOptionalRatings() = form.update { it.copy(optionalRatings = emptyMap()) }
 
-    /** Keeps the description when Yes is picked again; No drops it. */
+    /** Keeps the description when Yes is picked again; No drops it. A new Yes opens the description rows. */
     fun selectStoolPassed(passed: Boolean) = form.update {
-        it.copy(stool = if (passed) it.stool?.takeIf(Stool::passed) ?: Stool(passed = true) else Stool(passed = false))
+        val wasPassed = it.stool?.passed == true
+        it.copy(
+            stool = if (passed) it.stool?.takeIf(Stool::passed) ?: Stool(passed = true) else Stool(passed = false),
+            isStoolExpanded = if (passed && !wasPassed) true else it.isStoolExpanded,
+        )
     }
+
+    fun foldStool() = form.update { it.copy(isStoolExpanded = false) }
+
+    fun expandStool() = form.update { it.copy(isStoolExpanded = true) }
 
     fun selectStoolQuantity(value: StoolQuantity) = updatePassedStool { copy(quantity = value) }
 

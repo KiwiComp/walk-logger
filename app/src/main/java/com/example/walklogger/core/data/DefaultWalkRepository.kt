@@ -5,6 +5,7 @@ import com.example.walklogger.core.common.di.WalkLoggerDispatchers
 import com.example.walklogger.core.database.WalkDao
 import com.example.walklogger.core.database.entity.WalkEntity
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.Walk
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.Flow
@@ -55,6 +56,10 @@ class DefaultWalkRepository @Inject constructor(
 
     override suspend fun updateNotes(walkId: Long, notes: String) = withContext(ioDispatcher) {
         walkDao.updateNotes(walkId, notes)
+    }
+
+    override suspend fun updateStool(walkId: Long, stool: Stool?) = withContext(ioDispatcher) {
+        walkDao.updateStool(walkId, stool?.passed, stool?.quantity, stool?.texture, stool?.colour)
     }
 
     override suspend fun finishWalk(walkId: Long) = withContext(ioDispatcher) {

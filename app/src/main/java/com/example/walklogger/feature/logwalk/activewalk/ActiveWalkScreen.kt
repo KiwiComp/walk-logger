@@ -34,6 +34,9 @@ import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
+import com.example.walklogger.core.model.StoolColour
+import com.example.walklogger.core.model.StoolQuantity
+import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.ui.component.AppButton
 import com.example.walklogger.core.ui.component.AppButtonStyle
 import com.example.walklogger.core.ui.component.AppTextField
@@ -74,6 +77,12 @@ fun ActiveWalkRoute(
     ActiveWalkScreen(
         uiState = uiState,
         onNoteChange = viewModel::setNote,
+        onStoolPassedChange = viewModel::setStoolPassed,
+        onStoolQuantitySelected = viewModel::selectStoolQuantity,
+        onStoolTextureSelected = viewModel::selectStoolTexture,
+        onStoolColourSelected = viewModel::selectStoolColour,
+        onStoolFold = viewModel::foldStool,
+        onStoolExpand = viewModel::expandStool,
         onEndWalk = viewModel::endWalk,
         onDiscardWalk = viewModel::discardWalk,
         modifier = modifier,
@@ -84,6 +93,12 @@ fun ActiveWalkRoute(
 fun ActiveWalkScreen(
     uiState: ActiveWalkUiState,
     onNoteChange: (String) -> Unit,
+    onStoolPassedChange: (Boolean) -> Unit,
+    onStoolQuantitySelected: (StoolQuantity) -> Unit,
+    onStoolTextureSelected: (StoolTexture) -> Unit,
+    onStoolColourSelected: (StoolColour?) -> Unit,
+    onStoolFold: () -> Unit,
+    onStoolExpand: () -> Unit,
     onEndWalk: () -> Unit,
     onDiscardWalk: () -> Unit,
     modifier: Modifier = Modifier,
@@ -145,6 +160,17 @@ fun ActiveWalkScreen(
                 singleLine = false,
                 minLines = NoteMinLines,
             )
+            Spacer(Modifier.height(AppSpacing.xxxl))
+            ActiveStoolSection(
+                stool = uiState.stool,
+                expanded = uiState.isStoolExpanded,
+                onPassedChange = onStoolPassedChange,
+                onQuantitySelected = onStoolQuantitySelected,
+                onTextureSelected = onStoolTextureSelected,
+                onColourSelected = onStoolColourSelected,
+                onFold = onStoolFold,
+                onExpand = onStoolExpand,
+            )
         }
         Spacer(Modifier.height(AppSpacing.xl))
         AppButton(
@@ -191,7 +217,18 @@ private fun Duration.toClockText(): String {
 @Composable
 private fun ActiveWalkScreenPreview() {
     WalkLoggerTheme {
-        ActiveWalkScreen(uiState = LogWalkPreviewData.activeWalk, onNoteChange = {}, onEndWalk = {}, onDiscardWalk = {})
+        ActiveWalkScreen(
+            uiState = LogWalkPreviewData.activeWalk,
+            onNoteChange = {},
+            onStoolPassedChange = {},
+            onStoolQuantitySelected = {},
+            onStoolTextureSelected = {},
+            onStoolColourSelected = {},
+            onStoolFold = {},
+            onStoolExpand = {},
+            onEndWalk = {},
+            onDiscardWalk = {},
+        )
     }
 }
 
@@ -199,6 +236,17 @@ private fun ActiveWalkScreenPreview() {
 @Composable
 private fun ActiveWalkScreenLoadingPreview() {
     WalkLoggerTheme {
-        ActiveWalkScreen(uiState = ActiveWalkUiState(), onNoteChange = {}, onEndWalk = {}, onDiscardWalk = {})
+        ActiveWalkScreen(
+            uiState = ActiveWalkUiState(),
+            onNoteChange = {},
+            onStoolPassedChange = {},
+            onStoolQuantitySelected = {},
+            onStoolTextureSelected = {},
+            onStoolColourSelected = {},
+            onStoolFold = {},
+            onStoolExpand = {},
+            onEndWalk = {},
+            onDiscardWalk = {},
+        )
     }
 }

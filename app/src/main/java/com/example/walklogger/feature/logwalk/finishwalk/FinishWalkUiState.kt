@@ -32,6 +32,8 @@ data class FinishWalkUiState(
     val isOptionalRatingsExpanded: Boolean = false,
     /** Null until the handler answers Yes or No. */
     val stool: Stool? = null,
+    /** True while the description rows are shown; false folds them into a summary line. A stored answer starts folded. */
+    val isStoolExpanded: Boolean = false,
     val equipment: Equipment = Equipment.COLLAR,
     val rain: Rain? = null,
     val temperature: Temperature? = null,

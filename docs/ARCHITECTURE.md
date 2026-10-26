@@ -24,7 +24,8 @@ com.example.walklogger
 │   ├── logwalk/               the flow behind AddWalkButton, one sub-package per screen.
 │   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
-│   │                          stored start, quick note, end walk; system back is swallowed);
+│   │                          stored start, quick note, ActiveStoolSection: a switch for "passed stool" whose description rows
+│   │                          fold into a summary on Done (which turns into Edit), stored on every tap; end walk; system back is swallowed);
 │   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen (rating, stool, optional ratings, equipment, weather, behaviour,
 │   │                          medical, notes for the just-finished walk, with an "Edit times" toggle);
 │   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating, stool, optional ratings,
@@ -32,8 +33,10 @@ com.example.walklogger
 │   │                          carries a walkId, pushed on top of that walk's detail screen so saving or closing returns there;
 │   │                          component/ holds the form pieces the screens share (FormSection, SelectableChip,
 │   │                          BehaviourSection, MedicalSection, AddNameDialog and its AddHandlerDialog /
-│   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, StoolSection with StoolColourPicker and
-│   │                          StoolSwatch, OptionalRatingsSection, WeatherSection, WhenSection, Labels);
+│   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, StoolSection (Yes/No; Done folds the
+│   │                          description into StoolSummary, Edit opens it) with StoolDescriptors, StoolColourPicker and
+│   │                          StoolSwatch, OptionalRatingsSection, WeatherSection, WhenSection, Labels,
+│   │                          FormStyle for the on-Navy variant the timer screen uses);
 │   │                          the chosen day travels as a route argument into both form ViewModels
 │   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
 │   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
@@ -64,7 +67,7 @@ com.example.walklogger
 │   ├── common/di/             injectable coroutine dispatchers and Clock
 │   └── ui/                    theme (fixed palette incl. RatingTints/Accent/stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
-│                              SectionLabel, SegmentedToggle, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
+│                              SectionLabel, SegmentedToggle, AppSwitch, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent)
 ```
 

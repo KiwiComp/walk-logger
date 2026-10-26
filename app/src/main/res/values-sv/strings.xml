@@ -164,6 +164,9 @@
     <string name="stool_colour_green">Grön</string>
     <string name="stool_colour_red_streaked">Rödstrimmig</string>
     <string name="stool_colour_white_specked">Vitprickig</string>
+    <string name="stool_done">Klar</string>
+    <string name="stool_edit">Redigera</string>
+    <string name="stool_no_details">Inga detaljer</string>
     <string name="log_past_walk_behaviour">Beteende</string>
     <string name="behaviour_other_issue">+ Annat problem</string>
     <string name="behaviour_add_issue_title">Vad hände mer?</string>

@@ -133,6 +133,18 @@ class DefaultWalkRepositoryTest {
     }
 
     @Test
+    fun updateStool_storesAndClearsTheAnswerOfAnActiveWalk() = runBlocking {
+        val id = repository.startWalk(dogId = 7, handlers = listOf("Anna"), equipment = Equipment.HARNESS)
+        val stool = Stool(passed = true, texture = StoolTexture.SOFT, colour = StoolColour.WHITE_SPECKED)
+
+        repository.updateStool(id, stool)
+        assertEquals(stool, repository.observeWalk(id).first()!!.stool)
+
+        repository.updateStool(id, null)
+        assertNull(repository.observeWalk(id).first()!!.stool)
+    }
+
+    @Test
     fun updateWalk_replacesTheTickedIssues() = runBlocking {
         val id = repository.logWalk(pastWalk)
 
