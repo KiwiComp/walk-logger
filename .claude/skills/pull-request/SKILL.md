@@ -50,7 +50,7 @@ any default attribution behavior.
   | Heading           | When                                                                                                                                                |
   |-------------------|-----------------------------------------------------------------------------------------------------------------------------------------------------|
   | `## Summary`      | Always. What changed in the branch.                                                                                                                 |
-  | `## Verification` | Always. How the change was verified: build, app started on emulator, manual checks.                                                                 |
+  | `## Verification` | Always. How the change was verified: build, app started on emulator, manual checks. CI (`pull-request-checks.yml`) also runs build, unit tests and lint on the PR. |
   | `## Tests`        | Only if tests were run: each test task and its result. Leave the heading out otherwise.                                                             |
   | `## Screenshots`  | Only if UI was added or changed. Don't take screenshots yourself: add the heading with `- TODO` and ask the developer in the report to add them.    |
   | `## Notes`        | Only if something important is not covered above, such as something that could not be verified or needs follow-up. Leave the heading out otherwise. |

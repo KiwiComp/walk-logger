@@ -1,0 +1,59 @@
+# Emulator runs cost private-repo Actions minutes, so this only ever runs when started by hand
+# with confirm set to "run". Never add other triggers.
+name: Instrumented tests
+
+on:
+  workflow_dispatch:
+    inputs:
+      confirm:
+        description: Type "run" to start the emulator tests
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  connected:
+    name: connectedAndroidTest (API 35)
+    if: inputs.confirm == 'run'
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v7
+
+      # gradle/gradle-daemon-jvm.properties asks for Java 25 for the Gradle daemon.
+      - uses: actions/setup-java@v6
+        with:
+          distribution: temurin
+          java-version: 25
+
+      - uses: gradle/actions/setup-gradle@v6
+        with:
+          validate-wrappers: true
+
+      - name: Enable KVM
+        run: |
+          echo 'KERNEL=="kvm", GROUP="kvm", MODE="0666", OPTIONS+="static_node=kvm"' | sudo tee /etc/udev/rules.d/99-kvm4all.rules
+          sudo udevadm control --reload-rules
+          sudo udevadm trigger --name-match=kvm
+
+      # The UI tests find nodes by English text.
+      - name: Run instrumented tests
+        uses: reactivecircus/android-emulator-runner@v2
+        with:
+          api-level: 35
+          target: google_apis
+          arch: x86_64
+          disable-animations: true
+          emulator-options: -no-window -gpu swiftshader_indirect -noaudio -no-boot-anim -change-locale en-US
+          script: ./gradlew connectedAndroidTest
+
+      - name: Upload reports
+        if: failure()
+        uses: actions/upload-artifact@v7
+        with:
+          name: instrumented-test-reports
+          path: |
+            app/build/reports/androidTests/
+            app/build/outputs/androidTest-results/
