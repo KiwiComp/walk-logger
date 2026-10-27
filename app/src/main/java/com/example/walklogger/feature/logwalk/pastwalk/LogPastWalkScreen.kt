@@ -52,13 +52,17 @@ fun LogPastWalkRoute(
     walkId: Long?,
     onClose: () -> Unit,
     onSaved: () -> Unit,
+    onNotFound: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LogPastWalkViewModel =
         hiltViewModel<LogPastWalkViewModel, LogPastWalkViewModel.Factory> { it.create(date, walkId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiState.isSaved) {
-        if (uiState.isSaved) onSaved()
+    LaunchedEffect(uiState.isSaved, uiState.isNotFound) {
+        when {
+            uiState.isSaved -> onSaved()
+            uiState.isNotFound -> onNotFound()
+        }
     }
     LogPastWalkScreen(
         uiState = uiState,

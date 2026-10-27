@@ -1,9 +1,12 @@
 package com.example.walklogger.feature.dog
 
 import app.cash.turbine.test
+import com.example.walklogger.R
 import com.example.walklogger.core.model.Dog
+import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.MainDispatcherRule
+import com.example.walklogger.testing.shownMessages
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneOffset
@@ -20,8 +23,9 @@ class DogViewModelTest {
     private val today = LocalDate.of(2026, 9, 12)
     private val clock = Clock.fixed(today.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
     private val repository = FakeDogRepository()
+    private val userMessages = UserMessages()
 
-    private val viewModel by lazy { DogViewModel(repository, clock) }
+    private val viewModel by lazy { DogViewModel(repository, userMessages, clock) }
 
     private val sixten = Dog(id = 1, name = "Sixten", breed = "Border collie", birthDate = today.minusYears(3).minusDays(10), weightKg = 18.0)
     private val mira = Dog(id = 2, name = "Mira")
@@ -68,5 +72,17 @@ class DogViewModelTest {
             assertEquals("Mira", state.active.name)
             assertEquals(listOf(false, true), state.dogs.map { it.isActive })
         }
+    }
+
+    @Test
+    fun `a failed switch keeps the profile and says so`() = runTest {
+        repository.addDogs(sixten, mira)
+        val shown = shownMessages(userMessages)
+        viewModel.uiState.test {
+            repository.failures.failWrites = true
+            viewModel.switchDog(2)
+            assertEquals("Sixten", (expectMostRecentItem() as DogUiState.Profile).active.name)
+        }
+        assertEquals(listOf(R.string.error_select_dog), shown)
     }
 }

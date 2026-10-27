@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.logwalk
 
+import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
@@ -13,8 +14,10 @@ import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
+import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
+import com.example.walklogger.testing.shownMessages
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -28,10 +31,11 @@ class WalkFormEditorTest {
 
     private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val medicalConcernRepository = FakeMedicalConcernRepository()
+    private val userMessages = UserMessages()
     private val walk = Walk(id = 42, dogId = 7, handlers = listOf("Jonas"), startTime = 1_000, endTime = 2_000)
 
     private fun runEditorTest(body: suspend TestScope.(WalkFormEditor) -> Unit) = runTest(UnconfinedTestDispatcher()) {
-        body(WalkFormEditor(backgroundScope, behaviourIssueRepository, medicalConcernRepository))
+        body(WalkFormEditor(backgroundScope, behaviourIssueRepository, medicalConcernRepository, userMessages))
     }
 
     @Test
@@ -255,5 +259,17 @@ class WalkFormEditorTest {
                 editor.applyTo(walk),
             )
         }
+    }
+
+    @Test
+    fun `a failed add says so and selects nothing`() = runEditorTest { editor ->
+        val shown = shownMessages(userMessages)
+        behaviourIssueRepository.failures.failWrites = true
+        medicalConcernRepository.failures.failWrites = true
+        editor.addBehaviourIssue("Digging")
+        editor.addMedicalConcern("Itching")
+        assertTrue(editor.state.value.selectedBehaviourIssueIds.isEmpty())
+        assertTrue(editor.state.value.selectedMedicalConcernIds.isEmpty())
+        assertEquals(listOf(R.string.error_add_name, R.string.error_add_name), shown)
     }
 }

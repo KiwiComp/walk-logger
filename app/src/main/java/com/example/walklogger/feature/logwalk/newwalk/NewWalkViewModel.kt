@@ -2,10 +2,13 @@ package com.example.walklogger.feature.logwalk.newwalk
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.walklogger.R
+import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.ui.message.UserMessages
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -27,6 +30,7 @@ class NewWalkViewModel @AssistedInject constructor(
     private val dogRepository: DogRepository,
     private val handlerRepository: HandlerRepository,
     private val walkRepository: WalkRepository,
+    private val userMessages: UserMessages,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -77,8 +81,9 @@ class NewWalkViewModel @AssistedInject constructor(
     /** Stores the name (or finds the existing one) and selects it. */
     fun addHandler(name: String) {
         viewModelScope.launch {
-            val stored = handlerRepository.addHandler(name)
-            selectedHandlers.update { it + stored }
+            runCatchingCancellable { handlerRepository.addHandler(name) }
+                .onSuccess { stored -> selectedHandlers.update { it + stored } }
+                .onFailure { userMessages.show(R.string.error_add_name) }
         }
     }
 
@@ -90,13 +95,19 @@ class NewWalkViewModel @AssistedInject constructor(
         if (!state.canStart) return
         start.update { it.copy(isStarting = true) }
         viewModelScope.launch {
-            val dog = checkNotNull(dogRepository.observeActiveDog().first()) { "starting a walk needs an active dog" }
-            val walkId = walkRepository.startWalk(
-                dogId = dog.id,
-                handlers = state.handlers.filter { it in state.selectedHandlers },
-                equipment = state.equipment,
-            )
-            start.update { StartState(isStarting = false, walkId = walkId) }
+            runCatchingCancellable {
+                val dog = checkNotNull(dogRepository.observeActiveDog().first()) { "starting a walk needs an active dog" }
+                walkRepository.startWalk(
+                    dogId = dog.id,
+                    handlers = state.handlers.filter { it in state.selectedHandlers },
+                    equipment = state.equipment,
+                )
+            }
+                .onSuccess { walkId -> start.update { StartState(isStarting = false, walkId = walkId) } }
+                .onFailure {
+                    start.update { StartState() }
+                    userMessages.show(R.string.error_start_walk)
+                }
         }
     }
 

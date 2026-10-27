@@ -217,4 +217,17 @@
         <item quantity="one">%1$d noterad</item>
         <item quantity="other">%1$d noterade</item>
     </plurals>
+
+    <string name="error_save_walk">Kunde inte spara promenaden</string>
+    <string name="error_delete_walk">Kunde inte ta bort promenaden</string>
+    <string name="error_start_walk">Kunde inte starta promenaden</string>
+    <string name="error_end_walk">Kunde inte avsluta promenaden</string>
+    <string name="error_save_note">Kunde inte spara anteckningen</string>
+    <string name="error_save_stool">Kunde inte spara avföringen</string>
+    <string name="error_add_name">Kunde inte lägga till</string>
+    <string name="error_save_dog">Kunde inte spara hunden</string>
+    <string name="error_delete_dog">Kunde inte ta bort hunden</string>
+    <string name="error_select_dog">Kunde inte byta hund</string>
+    <string name="error_walk_not_found">Promenaden finns inte längre</string>
+    <string name="error_dog_not_found">Hunden finns inte längre</string>
 </resources>

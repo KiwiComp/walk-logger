@@ -219,4 +219,17 @@
         <item quantity="one">%1$d noted</item>
         <item quantity="other">%1$d noted</item>
     </plurals>
+
+    <string name="error_save_walk">Couldn\'t save the walk</string>
+    <string name="error_delete_walk">Couldn\'t delete the walk</string>
+    <string name="error_start_walk">Couldn\'t start the walk</string>
+    <string name="error_end_walk">Couldn\'t end the walk</string>
+    <string name="error_save_note">Couldn\'t save the note</string>
+    <string name="error_save_stool">Couldn\'t save the stool answer</string>
+    <string name="error_add_name">Couldn\'t add it</string>
+    <string name="error_save_dog">Couldn\'t save the dog</string>
+    <string name="error_delete_dog">Couldn\'t delete the dog</string>
+    <string name="error_select_dog">Couldn\'t switch dog</string>
+    <string name="error_walk_not_found">The walk no longer exists</string>
+    <string name="error_dog_not_found">The dog no longer exists</string>
 </resources>

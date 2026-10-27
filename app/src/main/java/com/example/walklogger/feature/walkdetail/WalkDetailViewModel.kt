@@ -2,9 +2,12 @@ package com.example.walklogger.feature.walkdetail
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.walklogger.R
+import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.ui.message.UserMessages
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -16,6 +19,7 @@ import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -27,6 +31,7 @@ class WalkDetailViewModel @AssistedInject constructor(
     @Assisted private val walkId: Long,
     private val walkRepository: WalkRepository,
     dogRepository: DogRepository,
+    private val userMessages: UserMessages,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -36,6 +41,15 @@ class WalkDetailViewModel @AssistedInject constructor(
     }
 
     private val discard = MutableStateFlow(WalkDetailUiState())
+
+    init {
+        viewModelScope.launch {
+            if (walkRepository.observeWalk(walkId).first() == null) {
+                discard.update { it.copy(isNotFound = true) }
+                userMessages.show(R.string.error_walk_not_found)
+            }
+        }
+    }
 
     /** Once discarded the walk is gone from the repository; only the discard flags remain while the screen leaves. */
     val uiState: StateFlow<WalkDetailUiState> =
@@ -55,8 +69,12 @@ class WalkDetailViewModel @AssistedInject constructor(
         if (!uiState.value.canDiscard) return
         discard.update { it.copy(isDiscarding = true) }
         viewModelScope.launch {
-            walkRepository.deleteWalk(walkId)
-            discard.update { it.copy(isDiscarding = false, isDiscarded = true) }
+            runCatchingCancellable { walkRepository.deleteWalk(walkId) }
+                .onSuccess { discard.update { it.copy(isDiscarding = false, isDiscarded = true) } }
+                .onFailure {
+                    discard.update { it.copy(isDiscarding = false) }
+                    userMessages.show(R.string.error_delete_walk)
+                }
         }
     }
 

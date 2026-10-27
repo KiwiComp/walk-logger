@@ -23,6 +23,8 @@ data class FinishWalkUiState(
     val isEditingTimes: Boolean = false,
     /** True until the finished walk has been read; the form is not editable before that. */
     val isLoading: Boolean = true,
+    /** True when the walk no longer exists; the screen closes. */
+    val isNotFound: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
 ) {

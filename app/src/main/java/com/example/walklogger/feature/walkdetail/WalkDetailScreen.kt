@@ -60,12 +60,16 @@ fun WalkDetailRoute(
     onBack: () -> Unit,
     onEdit: (LocalDate, Long) -> Unit,
     onDiscarded: () -> Unit,
+    onNotFound: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: WalkDetailViewModel = hiltViewModel<WalkDetailViewModel, WalkDetailViewModel.Factory> { it.create(walkId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiState.isDiscarded) {
-        if (uiState.isDiscarded) onDiscarded()
+    LaunchedEffect(uiState.isDiscarded, uiState.isNotFound) {
+        when {
+            uiState.isDiscarded -> onDiscarded()
+            uiState.isNotFound -> onNotFound()
+        }
     }
     WalkDetailScreen(
         uiState = uiState,

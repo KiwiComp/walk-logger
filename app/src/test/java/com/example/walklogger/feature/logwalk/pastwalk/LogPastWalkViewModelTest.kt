@@ -1,6 +1,7 @@
 package com.example.walklogger.feature.logwalk.pastwalk
 
 import app.cash.turbine.test
+import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
@@ -15,6 +16,7 @@ import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
+import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
@@ -22,6 +24,7 @@ import com.example.walklogger.testing.FakeHandlerRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
+import com.example.walklogger.testing.shownMessages
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
@@ -50,6 +53,7 @@ class LogPastWalkViewModelTest {
     private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val walkRepository = FakeWalkRepository()
+    private val userMessages = UserMessages()
     private var walkId: Long? = null
     private val viewModel by lazy {
         LogPastWalkViewModel(
@@ -60,6 +64,7 @@ class LogPastWalkViewModelTest {
             behaviourIssueRepository = behaviourIssueRepository,
             medicalConcernRepository = medicalConcernRepository,
             walkRepository = walkRepository,
+            userMessages = userMessages,
             clock = clock,
         )
     }
@@ -295,5 +300,43 @@ class LogPastWalkViewModelTest {
             assertFalse(expectMostRecentItem().isSaved)
         }
         assertTrue(walkRepository.observeWalks().first().isEmpty())
+    }
+
+    @Test
+    fun `a failed save keeps the form open and says so`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
+        handlerRepository.addHandlers("Kim")
+        val shown = shownMessages(userMessages)
+        viewModel.uiState.test {
+            fillInValidWalk()
+            walkRepository.failures.failWrites = true
+            viewModel.save()
+            val state = expectMostRecentItem()
+            assertFalse(state.isSaving)
+            assertFalse(state.isSaved)
+            assertTrue(state.canSave)
+        }
+        assertEquals(listOf(R.string.error_save_walk), shown)
+    }
+
+    @Test
+    fun `editing a missing walk closes the screen and says so`() = runTest {
+        walkId = 9
+        val shown = shownMessages(userMessages)
+        viewModel.uiState.test {
+            assertTrue(expectMostRecentItem().isNotFound)
+        }
+        assertEquals(listOf(R.string.error_walk_not_found), shown)
+    }
+
+    @Test
+    fun `a failed handler add says so and selects nothing new`() = runTest {
+        val shown = shownMessages(userMessages)
+        viewModel.uiState.test {
+            handlerRepository.failures.failWrites = true
+            viewModel.addHandler("Anna")
+            assertTrue(expectMostRecentItem().selectedHandlers.isEmpty())
+        }
+        assertEquals(listOf(R.string.error_add_name), shown)
     }
 }

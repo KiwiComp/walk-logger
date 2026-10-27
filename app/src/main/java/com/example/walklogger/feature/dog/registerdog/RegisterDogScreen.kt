@@ -40,13 +40,17 @@ import java.time.LocalDate
 fun RegisterDogRoute(
     dogId: Long?,
     onDone: () -> Unit,
+    onNotFound: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: RegisterDogViewModel =
         hiltViewModel<RegisterDogViewModel, RegisterDogViewModel.Factory> { it.create(dogId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiState.isSaved, uiState.isDeleted) {
-        if (uiState.isSaved || uiState.isDeleted) onDone()
+    LaunchedEffect(uiState.isSaved, uiState.isDeleted, uiState.isNotFound) {
+        when {
+            uiState.isSaved || uiState.isDeleted -> onDone()
+            uiState.isNotFound -> onNotFound()
+        }
     }
     RegisterDogScreen(
         uiState = uiState,

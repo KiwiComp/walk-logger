@@ -23,6 +23,8 @@ data class LogPastWalkUiState(
     val isEditing: Boolean = false,
     /** True while the walk being edited is still being read; the form is not editable until it arrives. */
     val isLoading: Boolean = false,
+    /** True when the walk no longer exists; the screen closes. */
+    val isNotFound: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
 ) {

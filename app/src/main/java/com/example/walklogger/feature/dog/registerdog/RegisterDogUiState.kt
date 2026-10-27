@@ -11,6 +11,8 @@ data class RegisterDogUiState(
     val isEditing: Boolean = false,
     /** True while the dog being edited is still being read; the form is not editable until it arrives. */
     val isLoading: Boolean = false,
+    /** True when the dog no longer exists; the screen closes. */
+    val isNotFound: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
     val isDeleting: Boolean = false,
