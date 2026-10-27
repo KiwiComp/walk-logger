@@ -36,8 +36,8 @@ class WalkFormEditorTest {
 
     @Test
     fun `starts blank with collar and the stored issues and concerns`() {
-        behaviourIssueRepository.addIssues("Pulling")
-        medicalConcernRepository.addConcerns("Limping")
+        behaviourIssueRepository.addBehaviourIssues("Pulling")
+        medicalConcernRepository.addMedicalConcerns("Limping")
         runEditorTest { editor ->
             val form = editor.state.value
             assertNull(form.rating)
@@ -137,7 +137,7 @@ class WalkFormEditorTest {
 
     @Test
     fun `issues toggle on and off, clear together, and an added one is stored and selected`() {
-        behaviourIssueRepository.addIssues("Pulling", "Barking")
+        behaviourIssueRepository.addBehaviourIssues("Pulling", "Barking")
         runEditorTest { editor ->
             editor.toggleBehaviourIssue(BehaviourIssue(1, "Pulling"))
             editor.toggleBehaviourIssue(BehaviourIssue(2, "Barking"))
@@ -154,7 +154,7 @@ class WalkFormEditorTest {
 
     @Test
     fun `concerns toggle on and off, clear together, and an added one is stored and selected`() {
-        medicalConcernRepository.addConcerns("Limping", "Vomit")
+        medicalConcernRepository.addMedicalConcerns("Limping", "Vomit")
         runEditorTest { editor ->
             editor.toggleMedicalConcern(MedicalConcern(1, "Limping"))
             editor.toggleMedicalConcern(MedicalConcern(2, "Vomit"))
@@ -184,8 +184,8 @@ class WalkFormEditorTest {
                 equipment = Equipment.HARNESS,
                 rating = 3,
                 snow = Snow.LIGHT,
-                issues = listOf(BehaviourIssue(1, "Pulling")),
-                concerns = listOf(MedicalConcern(4, "Limping")),
+                behaviourIssues = listOf(BehaviourIssue(1, "Pulling")),
+                medicalConcerns = listOf(MedicalConcern(4, "Limping")),
                 optionalRatings = mapOf(OptionalRating.RESPONSIVENESS to 4),
                 stool = stool,
             ),
@@ -222,8 +222,8 @@ class WalkFormEditorTest {
 
     @Test
     fun `apply writes the form into the walk with trimmed notes and the selected issues and concerns`() {
-        behaviourIssueRepository.addIssues("Pulling", "Barking")
-        medicalConcernRepository.addConcerns("Limping", "Vomit")
+        behaviourIssueRepository.addBehaviourIssues("Pulling", "Barking")
+        medicalConcernRepository.addMedicalConcerns("Limping", "Vomit")
         runEditorTest { editor ->
             editor.setRating(6)
             editor.setOptionalRating(OptionalRating.ENERGY_LEVEL, 2)
@@ -249,8 +249,8 @@ class WalkFormEditorTest {
                     temperature = Temperature.WARM,
                     wind = Wind.STILL,
                     snow = Snow.NONE,
-                    issues = listOf(BehaviourIssue(2, "Barking")),
-                    concerns = listOf(MedicalConcern(1, "Limping")),
+                    behaviourIssues = listOf(BehaviourIssue(2, "Barking")),
+                    medicalConcerns = listOf(MedicalConcern(1, "Limping")),
                 ),
                 editor.applyTo(walk),
             )

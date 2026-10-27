@@ -18,8 +18,8 @@ data class Walk(
     val temperature: Temperature? = null,
     val wind: Wind? = null,
     val snow: Snow? = null,
-    val issues: List<BehaviourIssue> = emptyList(),
-    val concerns: List<MedicalConcern> = emptyList(),
+    val behaviourIssues: List<BehaviourIssue> = emptyList(),
+    val medicalConcerns: List<MedicalConcern> = emptyList(),
     /** Only the aspects the handler chose to rate; each on [RATING_RANGE], 1 least, 7 most. */
     val optionalRatings: Map<OptionalRating, Int> = emptyMap(),
     /** Null until the handler has actively answered whether the dog passed stool. */

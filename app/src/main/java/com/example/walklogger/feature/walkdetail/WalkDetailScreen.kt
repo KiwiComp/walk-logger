@@ -125,16 +125,16 @@ fun WalkDetailScreen(
                 HorizontalDivider(color = Outline)
                 DetailSection(
                     label = stringResource(R.string.log_past_walk_behaviour),
-                    hint = uiState.issues.size.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.walk_detail_noted_count, it, it) },
+                    hint = uiState.behaviourIssues.size.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.walk_detail_noted_count, it, it) },
                 ) {
-                    NotedGrid(labels = uiState.issues.map { it.label() })
+                    NotedGrid(labels = uiState.behaviourIssues.map { it.label() })
                 }
                 HorizontalDivider(color = Outline)
                 DetailSection(
                     label = stringResource(R.string.log_past_walk_medical),
-                    hint = uiState.concerns.size.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.walk_detail_noted_count, it, it) },
+                    hint = uiState.medicalConcerns.size.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.walk_detail_noted_count, it, it) },
                 ) {
-                    NotedGrid(labels = uiState.concerns.map { it.label() })
+                    NotedGrid(labels = uiState.medicalConcerns.map { it.label() })
                 }
                 HorizontalDivider(color = Outline)
                 DetailSection(label = stringResource(R.string.log_past_walk_notes)) {

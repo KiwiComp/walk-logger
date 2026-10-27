@@ -1,6 +1,6 @@
 package com.example.walklogger.core.data
 
-import com.example.walklogger.core.database.WalkWithIssues
+import com.example.walklogger.core.database.WalkWithBehaviourIssuesAndMedicalConcerns
 import com.example.walklogger.core.database.entity.BehaviourIssueEntity
 import com.example.walklogger.core.database.entity.DogEntity
 import com.example.walklogger.core.database.entity.MedicalConcernEntity
@@ -15,14 +15,14 @@ import java.time.LocalDate
 
 // Entity <-> domain model mapping. Keeps Room types out of the rest of the app.
 
-internal fun WalkWithIssues.toModel(): Walk = walk.toModel(
-    issues = issues.sortedBy { it.id }.map { it.toModel() },
-    concerns = concerns.sortedBy { it.id }.map { it.toModel() },
+internal fun WalkWithBehaviourIssuesAndMedicalConcerns.toModel(): Walk = walk.toModel(
+    behaviourIssues = behaviourIssues.sortedBy { it.id }.map { it.toModel() },
+    medicalConcerns = medicalConcerns.sortedBy { it.id }.map { it.toModel() },
 )
 
 internal fun WalkEntity.toModel(
-    issues: List<BehaviourIssue> = emptyList(),
-    concerns: List<MedicalConcern> = emptyList(),
+    behaviourIssues: List<BehaviourIssue> = emptyList(),
+    medicalConcerns: List<MedicalConcern> = emptyList(),
 ): Walk = Walk(
     id = id,
     dogId = dogId,
@@ -36,8 +36,8 @@ internal fun WalkEntity.toModel(
     temperature = temperature,
     wind = wind,
     snow = snow,
-    issues = issues,
-    concerns = concerns,
+    behaviourIssues = behaviourIssues,
+    medicalConcerns = medicalConcerns,
     optionalRatings = buildMap {
         reactivity?.let { put(OptionalRating.REACTIVITY, it) }
         energyLevel?.let { put(OptionalRating.ENERGY_LEVEL, it) }

@@ -48,7 +48,7 @@ internal fun MedicalSection(
 private fun MedicalSectionPreview() {
     WalkLoggerTheme {
         MedicalSection(
-            concerns = LogWalkPreviewData.concerns,
+            concerns = LogWalkPreviewData.medicalConcerns,
             selectedIds = setOf(2L, 4L),
             expanded = true,
             onToggle = {},

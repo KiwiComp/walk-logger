@@ -35,7 +35,7 @@ class DefaultBehaviourIssueRepositoryTest {
 
     @Test
     fun aFreshDatabase_startsWithTheKeyedDefaultIssues() = runBlocking {
-        val issues = repository.observeIssues().first()
+        val issues = repository.observeBehaviourIssues().first()
 
         assertEquals(DefaultBehaviourIssues.keys.toList(), issues.map { it.key })
         assertEquals(DefaultBehaviourIssues.values.toList(), issues.map { it.name })
@@ -43,36 +43,36 @@ class DefaultBehaviourIssueRepositoryTest {
 
     @Test
     fun addIssue_trimsAndAppendsAfterTheDefaults() = runBlocking {
-        val added = repository.addIssue("  Digging ")
+        val added = repository.addBehaviourIssue("  Digging ")
 
         assertEquals("Digging", added.name)
         assertNull(added.key)
-        assertEquals(added, repository.observeIssues().first().last())
+        assertEquals(added, repository.observeBehaviourIssues().first().last())
     }
 
     @Test
     fun addIssue_returnsTheExistingIssueIgnoringCase() = runBlocking {
-        val existing = repository.observeIssues().first().first { it.name == "Pulling" }
+        val existing = repository.observeBehaviourIssues().first().first { it.name == "Pulling" }
 
-        assertEquals(existing, repository.addIssue("pulling"))
-        assertEquals(10, repository.observeIssues().first().size)
+        assertEquals(existing, repository.addBehaviourIssue("pulling"))
+        assertEquals(10, repository.observeBehaviourIssues().first().size)
     }
 
     @Test
     fun addIssue_revivesAHiddenIssue() = runBlocking {
-        val pulling = repository.observeIssues().first().first { it.key == "pulling" }
+        val pulling = repository.observeBehaviourIssues().first().first { it.key == "pulling" }
         database.behaviourIssueDao().setHidden(pulling.id, true)
-        assertEquals(9, repository.observeIssues().first().size)
+        assertEquals(9, repository.observeBehaviourIssues().first().size)
 
-        assertEquals(pulling, repository.addIssue("pulling"))
+        assertEquals(pulling, repository.addBehaviourIssue("pulling"))
 
-        assertEquals(10, repository.observeIssues().first().size)
+        assertEquals(10, repository.observeBehaviourIssues().first().size)
     }
 
     @Test
     fun addIssue_rejectsBlankNames() {
         assertThrows(IllegalArgumentException::class.java) {
-            runBlocking { repository.addIssue("   ") }
+            runBlocking { repository.addBehaviourIssue("   ") }
         }
     }
 }

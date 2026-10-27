@@ -87,8 +87,8 @@ class LogPastWalkViewModelTest {
     fun `shows the active dog, stored handlers, issues and concerns`() = runTest {
         dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         handlerRepository.addHandlers("Anna", "Jonas")
-        behaviourIssueRepository.addIssues("Pulling", "Barking")
-        medicalConcernRepository.addConcerns("Limping", "Vomit")
+        behaviourIssueRepository.addBehaviourIssues("Pulling", "Barking")
+        medicalConcernRepository.addMedicalConcerns("Limping", "Vomit")
         viewModel.uiState.test {
             val state = expectMostRecentItem()
             assertEquals("Sixten", state.dogName)
@@ -173,8 +173,8 @@ class LogPastWalkViewModelTest {
     fun `save stores the walk for the active dog and flags completion`() = runTest {
         dogRepository.addDogs(Dog(id = 7, name = "Sixten"))
         handlerRepository.addHandlers("Anna", "Jonas")
-        behaviourIssueRepository.addIssues("Pulling", "Barking")
-        medicalConcernRepository.addConcerns("Limping", "Vomit")
+        behaviourIssueRepository.addBehaviourIssues("Pulling", "Barking")
+        medicalConcernRepository.addMedicalConcerns("Limping", "Vomit")
         viewModel.uiState.test {
             fillInValidWalk()
             viewModel.formActions.toggleBehaviourIssue(BehaviourIssue(2, "Barking"))
@@ -203,8 +203,8 @@ class LogPastWalkViewModelTest {
         assertEquals(Snow.NONE, walk.snow)
         assertEquals(mapOf(OptionalRating.ENERGY_LEVEL to 6), walk.optionalRatings)
         assertEquals(Stool(passed = false), walk.stool)
-        assertEquals(listOf(BehaviourIssue(2, "Barking")), walk.issues)
-        assertEquals(listOf(MedicalConcern(2, "Vomit")), walk.concerns)
+        assertEquals(listOf(BehaviourIssue(2, "Barking")), walk.behaviourIssues)
+        assertEquals(listOf(MedicalConcern(2, "Vomit")), walk.medicalConcerns)
         assertEquals("Pulled at the gate", walk.notes)
     }
 
@@ -237,8 +237,8 @@ class LogPastWalkViewModelTest {
             temperature = Temperature.COOL,
             wind = Wind.BREEZE,
             snow = Snow.LIGHT,
-            issues = listOf(BehaviourIssue(1, "Pulling")),
-            concerns = listOf(MedicalConcern(1, "Limping")),
+            behaviourIssues = listOf(BehaviourIssue(1, "Pulling")),
+            medicalConcerns = listOf(MedicalConcern(1, "Limping")),
             optionalRatings = mapOf(OptionalRating.RESPONSIVENESS to 4),
             stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, colour = StoolColour.DARK_BROWN),
         )

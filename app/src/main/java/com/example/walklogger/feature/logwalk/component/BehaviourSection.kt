@@ -48,7 +48,7 @@ internal fun BehaviourSection(
 private fun BehaviourSectionPreview() {
     WalkLoggerTheme {
         BehaviourSection(
-            issues = LogWalkPreviewData.issues,
+            issues = LogWalkPreviewData.behaviourIssues,
             selectedIds = setOf(1L, 4L),
             expanded = true,
             onToggle = {},

@@ -137,7 +137,7 @@ private fun SelectableChipPreview() {
                 onAdd = {},
             )
             SelectableChip(
-                items = LogWalkPreviewData.issues,
+                items = LogWalkPreviewData.behaviourIssues,
                 isSelected = { it.id in setOf(1L, 4L) },
                 label = { it.label() },
                 onToggle = {},

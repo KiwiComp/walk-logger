@@ -40,12 +40,12 @@ internal object WalkDetailPreviewData {
         temperature = Temperature.COOL,
         wind = Wind.WINDY,
         snow = Snow.NONE,
-        issues = listOf(
+        behaviourIssues = listOf(
             BehaviourIssue(1, "Pulling", key = "pulling"),
             BehaviourIssue(2, "Barking", key = "barking"),
             BehaviourIssue(7, "Vehicle fright", key = "vehicle_fright"),
         ),
-        concerns = listOf(MedicalConcern(4, "Limping", key = "limping")),
+        medicalConcerns = listOf(MedicalConcern(4, "Limping", key = "limping")),
         notes = "Wind put him on edge from the start. Barked at a passing van on Kungsgatan and pulled hard for " +
             "the first ten minutes, then settled once we reached the park. Slight limp on the left hind leg for " +
             "the last stretch — watch it tomorrow.",

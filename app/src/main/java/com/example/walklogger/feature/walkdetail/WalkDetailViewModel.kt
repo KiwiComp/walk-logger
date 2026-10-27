@@ -77,8 +77,8 @@ class WalkDetailViewModel @AssistedInject constructor(
             temperature = walk.temperature,
             wind = walk.wind,
             snow = walk.snow,
-            issues = walk.issues,
-            concerns = walk.concerns,
+            behaviourIssues = walk.behaviourIssues,
+            medicalConcerns = walk.medicalConcerns,
             notes = walk.notes,
         )
     }

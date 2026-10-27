@@ -41,8 +41,8 @@ class WalkFormEditor(
     val state: StateFlow<WalkFormState> =
         combine(
             input,
-            behaviourIssueRepository.observeIssues(),
-            medicalConcernRepository.observeConcerns(),
+            behaviourIssueRepository.observeBehaviourIssues(),
+            medicalConcernRepository.observeMedicalConcerns(),
         ) { input, issues, concerns ->
             input.copy(behaviourIssues = issues, medicalConcerns = concerns)
         }.stateIn(scope, SharingStarted.Eagerly, input.value)
@@ -61,10 +61,10 @@ class WalkFormEditor(
             wind = walk.wind,
             snow = walk.snow,
             isWeatherExpanded = listOf(walk.rain, walk.temperature, walk.wind, walk.snow).any { it != null },
-            selectedBehaviourIssueIds = walk.issues.map(BehaviourIssue::id).toSet(),
-            isBehaviourIssuesExpanded = walk.issues.isNotEmpty(),
-            selectedMedicalConcernIds = walk.concerns.map(MedicalConcern::id).toSet(),
-            isMedicalConcernsExpanded = walk.concerns.isNotEmpty(),
+            selectedBehaviourIssueIds = walk.behaviourIssues.map(BehaviourIssue::id).toSet(),
+            isBehaviourIssuesExpanded = walk.behaviourIssues.isNotEmpty(),
+            selectedMedicalConcernIds = walk.medicalConcerns.map(MedicalConcern::id).toSet(),
+            isMedicalConcernsExpanded = walk.medicalConcerns.isNotEmpty(),
             notes = walk.notes,
         )
     }
@@ -82,8 +82,8 @@ class WalkFormEditor(
             temperature = form.temperature,
             wind = form.wind,
             snow = form.snow,
-            issues = form.behaviourIssues.filter { it.id in form.selectedBehaviourIssueIds },
-            concerns = form.medicalConcerns.filter { it.id in form.selectedMedicalConcernIds },
+            behaviourIssues = form.behaviourIssues.filter { it.id in form.selectedBehaviourIssueIds },
+            medicalConcerns = form.medicalConcerns.filter { it.id in form.selectedMedicalConcernIds },
         )
     }
 
@@ -138,7 +138,7 @@ class WalkFormEditor(
 
     override fun addBehaviourIssue(name: String) {
         scope.launch {
-            val stored = behaviourIssueRepository.addIssue(name)
+            val stored = behaviourIssueRepository.addBehaviourIssue(name)
             input.update { it.copy(selectedBehaviourIssueIds = it.selectedBehaviourIssueIds + stored.id) }
         }
     }
@@ -154,7 +154,7 @@ class WalkFormEditor(
 
     override fun addMedicalConcern(name: String) {
         scope.launch {
-            val stored = medicalConcernRepository.addConcern(name)
+            val stored = medicalConcernRepository.addMedicalConcern(name)
             input.update { it.copy(selectedMedicalConcernIds = it.selectedMedicalConcernIds + stored.id) }
         }
     }
