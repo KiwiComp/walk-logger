@@ -29,8 +29,7 @@ import com.example.walklogger.core.ui.component.AppButtonStyle
 import com.example.walklogger.core.ui.component.AppButtonWidth
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.OnNavyMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.component.FormSection
@@ -97,7 +96,7 @@ fun FinishWalkScreen(
             Text(
                 text = uiState.timesSummary(),
                 style = MaterialTheme.typography.bodyMedium,
-                color = OnNavyMuted,
+                color = AppTheme.colors.onHeaderMuted,
             )
         }
         Column(
@@ -131,7 +130,7 @@ fun FinishWalkScreen(
                 Text(
                     text = uiState.walkedBy(),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = InkMuted,
+                    color = AppTheme.colors.contentMuted,
                 )
                 AppButton(
                     text = stringResource(R.string.log_past_walk_save),
@@ -145,7 +144,7 @@ fun FinishWalkScreen(
                 Text(
                     text = stringResource(blocker.messageRes),
                     style = MaterialTheme.typography.bodyMedium,
-                    color = InkMuted,
+                    color = AppTheme.colors.contentMuted,
                     textAlign = TextAlign.Center,
                     modifier = Modifier.fillMaxWidth(),
                 )

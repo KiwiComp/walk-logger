@@ -25,11 +25,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.CardSurface
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.Outline
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 
@@ -76,8 +72,8 @@ private fun Chip(text: String, isSelected: Boolean, onToggle: () -> Unit, size: 
         modifier = Modifier
             .height(AppSize.chipHeight)
             .clip(shape)
-            .background(if (isSelected) Steel else CardSurface)
-            .border(1.dp, if (isSelected) Steel else Outline, shape)
+            .background(if (isSelected) AppTheme.colors.action else AppTheme.colors.card)
+            .border(1.dp, if (isSelected) AppTheme.colors.action else AppTheme.colors.outline, shape)
             .toggleable(value = isSelected, role = Role.Checkbox, onValueChange = { onToggle() })
             .padding(horizontal = AppSpacing.lg),
         contentAlignment = Alignment.Center,
@@ -85,7 +81,7 @@ private fun Chip(text: String, isSelected: Boolean, onToggle: () -> Unit, size: 
         Text(
             text = text,
             style = size.textStyle(),
-            color = if (isSelected) OnNavy else Ink,
+            color = if (isSelected) AppTheme.colors.onHeader else AppTheme.colors.content,
         )
     }
 }
@@ -93,6 +89,7 @@ private fun Chip(text: String, isSelected: Boolean, onToggle: () -> Unit, size: 
 @Composable
 private fun AddChip(text: String, onClick: () -> Unit, chipSize: SelectableChipSize) {
     val dash = PathEffect.dashPathEffect(floatArrayOf(12f, 8f))
+    val outlineColor = AppTheme.colors.outline
     val shape = MaterialTheme.shapes.extraSmall
     Box(
         modifier = Modifier
@@ -100,7 +97,7 @@ private fun AddChip(text: String, onClick: () -> Unit, chipSize: SelectableChipS
             .clip(shape)
             .drawBehind {
                 drawOutline(
-                    color = Outline,
+                    color = outlineColor,
                     outline = shape.createOutline(size, layoutDirection, this),
                     style = Stroke(width = 3f, pathEffect = dash),
                 )
@@ -112,7 +109,7 @@ private fun AddChip(text: String, onClick: () -> Unit, chipSize: SelectableChipS
         Text(
             text = text,
             style = chipSize.textStyle(),
-            color = Ink,
+            color = AppTheme.colors.content,
         )
     }
 }

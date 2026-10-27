@@ -21,8 +21,7 @@ import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.EquipmentChip
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.Outline
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.calendar.CalendarWalkUiState
 import com.example.walklogger.feature.calendar.preview.CalendarPreviewData
@@ -37,7 +36,7 @@ private val StartTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(
 internal fun CalendarWalkList(walks: List<CalendarWalkUiState>, onWalkClick: (Long) -> Unit, modifier: Modifier = Modifier) {
     Column(modifier = modifier) {
         walks.forEachIndexed { index, walk ->
-            if (index > 0) HorizontalDivider(color = Outline)
+            if (index > 0) HorizontalDivider(color = AppTheme.colors.outline)
             CalendarWalkRow(walk = walk, onClick = { onWalkClick(walk.id) })
         }
     }
@@ -62,7 +61,7 @@ private fun CalendarWalkRow(walk: CalendarWalkUiState, onClick: () -> Unit) {
         Text(
             text = if (hasNote) walk.note else stringResource(R.string.calendar_no_description),
             style = MaterialTheme.typography.bodyLarge,
-            color = if (hasNote) Color.Unspecified else InkMuted,
+            color = if (hasNote) Color.Unspecified else AppTheme.colors.contentMuted,
             maxLines = 1,
             overflow = TextOverflow.Ellipsis,
             modifier = Modifier.weight(1f),

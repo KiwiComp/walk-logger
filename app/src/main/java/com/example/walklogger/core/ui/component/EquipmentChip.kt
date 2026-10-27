@@ -11,7 +11,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.R
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.ChipSurface
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /** "Collar" / "Harness" tag shown on a logged walk. */
@@ -26,7 +26,7 @@ fun EquipmentChip(equipment: Equipment, modifier: Modifier = Modifier) {
         ),
         style = MaterialTheme.typography.bodyMedium,
         modifier = modifier
-            .background(ChipSurface)
+            .background(AppTheme.colors.chip)
             .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
     )
 }

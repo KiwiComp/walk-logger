@@ -26,8 +26,7 @@ import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.SectionLabel
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.OnNavyMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.dog.component.DogList
 import com.example.walklogger.feature.dog.preview.DogPreviewData
@@ -87,7 +86,7 @@ private fun NoDogContent(onAddDog: () -> Unit) {
         Text(
             text = stringResource(R.string.dog_none_registered),
             style = MaterialTheme.typography.bodyLarge,
-            color = InkMuted,
+            color = AppTheme.colors.contentMuted,
         )
         DashedButton(text = stringResource(R.string.dog_add_first), onClick = onAddDog)
     }
@@ -111,7 +110,7 @@ private fun ProfileContent(
     ) {
         val subtitle = uiState.active.subtitle()
         if (subtitle.isNotEmpty()) {
-            Text(text = subtitle, style = MaterialTheme.typography.bodyMedium, color = OnNavyMuted)
+            Text(text = subtitle, style = MaterialTheme.typography.bodyMedium, color = AppTheme.colors.onHeaderMuted)
         }
     }
     Column(
@@ -120,7 +119,7 @@ private fun ProfileContent(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
     ) {
-        SectionLabel(text = stringResource(R.string.dog_section_dogs), color = InkMuted)
+        SectionLabel(text = stringResource(R.string.dog_section_dogs), color = AppTheme.colors.contentMuted)
         Spacer(Modifier.height(AppSpacing.sm))
         DogList(dogs = uiState.dogs, onSwitchDog = onSwitchDog)
         DashedButton(

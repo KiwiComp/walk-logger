@@ -13,21 +13,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.Outline
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /** Dashed box explaining what is asked for after the walk instead of now. */
 @Composable
 internal fun AfterWalkNote(modifier: Modifier = Modifier) {
     val dash = PathEffect.dashPathEffect(floatArrayOf(12f, 8f))
+    val outlineColor = AppTheme.colors.outline
     Text(
         text = stringResource(R.string.new_walk_after_note),
         style = MaterialTheme.typography.bodyMedium,
-        color = InkMuted,
+        color = AppTheme.colors.contentMuted,
         modifier = modifier
             .fillMaxWidth()
-            .drawBehind { drawRect(color = Outline, style = Stroke(width = 3f, pathEffect = dash)) }
+            .drawBehind { drawRect(color = outlineColor, style = Stroke(width = 3f, pathEffect = dash)) }
             .padding(AppSpacing.xl),
     )
 }

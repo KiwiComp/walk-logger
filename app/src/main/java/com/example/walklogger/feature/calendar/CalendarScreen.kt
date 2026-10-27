@@ -39,9 +39,7 @@ import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.component.walkSummary
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.SteelLight
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.calendar.component.CalendarWalkList
 import com.example.walklogger.feature.calendar.component.MonthGrid
@@ -120,9 +118,9 @@ fun CalendarScreen(
             Snackbar(
                 snackbarData = data,
                 shape = MaterialTheme.shapes.extraSmall,
-                containerColor = Navy,
-                contentColor = OnNavy,
-                actionColor = SteelLight,
+                containerColor = AppTheme.colors.header,
+                contentColor = AppTheme.colors.onHeader,
+                actionColor = AppTheme.colors.actionLight,
             )
         }
     }

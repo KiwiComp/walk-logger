@@ -13,7 +13,7 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.AppTextField
-import com.example.walklogger.core.ui.theme.Canvas
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /** Asks for a single name. [onConfirm] receives the untrimmed input; blank input can't be confirmed. */
@@ -23,7 +23,7 @@ internal fun AddNameDialog(title: String, label: String, onConfirm: (String) -> 
     AlertDialog(
         onDismissRequest = onDismiss,
         shape = MaterialTheme.shapes.extraSmall,
-        containerColor = Canvas,
+        containerColor = AppTheme.colors.background,
         title = { Text(title) },
         text = {
             AppTextField(

@@ -14,9 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.vector.ImageVector
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.OutlineOnNavy
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val ButtonSize = 44.dp
@@ -35,10 +33,10 @@ fun HeaderIconButton(
         onClick = onClick,
         enabled = enabled,
         shape = shape,
-        colors = IconButtonDefaults.iconButtonColors(contentColor = OnNavy),
+        colors = IconButtonDefaults.iconButtonColors(contentColor = AppTheme.colors.onHeader),
         modifier = modifier
             .size(ButtonSize)
-            .border(1.dp, OutlineOnNavy, shape),
+            .border(1.dp, AppTheme.colors.outlineOnHeader, shape),
     ) {
         Icon(imageVector = icon, contentDescription = contentDescription)
     }
@@ -52,7 +50,7 @@ private fun HeaderIconButtonPreview() {
             icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
             contentDescription = "Back",
             onClick = {},
-            modifier = Modifier.background(Navy),
+            modifier = Modifier.background(AppTheme.colors.header),
         )
     }
 }

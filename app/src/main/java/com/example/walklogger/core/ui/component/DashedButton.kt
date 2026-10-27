@@ -18,14 +18,14 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.core.ui.theme.AppSize
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.Outline
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /** Dashed, full-width call-to-action ("+ Add a walk", "+ Add another dog"). */
 @Composable
 fun DashedButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val dash = PathEffect.dashPathEffect(floatArrayOf(12f, 8f))
+    val outlineColor = AppTheme.colors.outline
     val shape = MaterialTheme.shapes.extraSmall
     Box(
         modifier = modifier
@@ -34,7 +34,7 @@ fun DashedButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifie
             .clip(shape)
             .drawBehind {
                 drawOutline(
-                    color = Outline,
+                    color = outlineColor,
                     outline = shape.createOutline(size, layoutDirection, this),
                     style = Stroke(width = 3f, pathEffect = dash))
             }
@@ -44,7 +44,7 @@ fun DashedButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifie
         Text(
             text = text,
             style = MaterialTheme.typography.titleSmall,
-            color = Ink,
+            color = AppTheme.colors.content,
             textAlign = TextAlign.Center,
         )
     }

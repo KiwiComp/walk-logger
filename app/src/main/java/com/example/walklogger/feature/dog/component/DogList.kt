@@ -24,9 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.ChipSurface
-import com.example.walklogger.core.ui.theme.Outline
-import com.example.walklogger.core.ui.theme.SteelLight
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.dog.DogListItemUiState
 import com.example.walklogger.feature.dog.preview.DogPreviewData
@@ -45,7 +43,7 @@ internal fun DogList(
     Column(modifier = modifier.fillMaxWidth()) {
         dogs.forEach { dog ->
             DogRow(dog = dog, onSwitch = { onSwitchDog(dog.id) })
-            HorizontalDivider(color = Outline)
+            HorizontalDivider(color = AppTheme.colors.outline)
         }
     }
 }
@@ -61,7 +59,7 @@ private fun DogRow(dog: DogListItemUiState, onSwitch: () -> Unit) {
         Spacer(
             Modifier
                 .size(DogAvatarSize)
-                .background(SteelLight),
+                .background(AppTheme.colors.actionLight),
         )
         Spacer(Modifier.width(AppSpacing.lg))
         Text(text = dog.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
@@ -70,7 +68,7 @@ private fun DogRow(dog: DogListItemUiState, onSwitch: () -> Unit) {
                 text = stringResource(R.string.dog_active),
                 style = MaterialTheme.typography.bodyMedium,
                 modifier = Modifier
-                    .background(ChipSurface)
+                    .background(AppTheme.colors.chip)
                     .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
             )
         } else {
@@ -79,7 +77,7 @@ private fun DogRow(dog: DogListItemUiState, onSwitch: () -> Unit) {
                 text = stringResource(R.string.dog_switch),
                 style = MaterialTheme.typography.titleSmall,
                 modifier = Modifier
-                    .border(1.dp, Outline)
+                    .border(1.dp, AppTheme.colors.outline)
                     .clickable(role = Role.Button, onClick = onSwitch)
                     .semantics { contentDescription = description }
                     .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),

@@ -22,11 +22,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.CardSurface
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.Outline
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /**
@@ -63,15 +59,15 @@ private fun RowScope.RatingCell(value: Int, isSelected: Boolean, onClick: () -> 
             .weight(1f)
             .aspectRatio(1f)
             .clip(shape)
-            .background(if (isSelected) Steel else CardSurface)
-            .border(1.dp, if (isSelected) Steel else Outline, shape)
+            .background(if (isSelected) AppTheme.colors.action else AppTheme.colors.card)
+            .border(1.dp, if (isSelected) AppTheme.colors.action else AppTheme.colors.outline, shape)
             .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {
         Text(
             text = value.toString(),
             style = MaterialTheme.typography.titleMedium,
-            color = if (isSelected) OnNavy else Ink,
+            color = if (isSelected) AppTheme.colors.onHeader else AppTheme.colors.content,
         )
     }
 }

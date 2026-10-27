@@ -15,8 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.InkMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.StoolSwatch
 import com.example.walklogger.feature.logwalk.component.labelRes
@@ -27,10 +26,18 @@ private val SwatchSize = 20.dp
 @Composable
 internal fun StoolColourField(colour: StoolColour, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
-        Text(text = stringResource(R.string.stool_colour), style = MaterialTheme.typography.bodyMedium, color = InkMuted)
+        Text(
+            text = stringResource(R.string.stool_colour),
+            style = MaterialTheme.typography.bodyMedium,
+            color = AppTheme.colors.contentMuted,
+        )
         Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm), verticalAlignment = Alignment.CenterVertically) {
             StoolSwatch(colour = colour, size = SwatchSize)
-            Text(text = stringResource(colour.labelRes), style = MaterialTheme.typography.bodyLarge, color = Ink)
+            Text(
+                text = stringResource(colour.labelRes),
+                style = MaterialTheme.typography.bodyLarge,
+                color = AppTheme.colors.content,
+            )
         }
     }
 }

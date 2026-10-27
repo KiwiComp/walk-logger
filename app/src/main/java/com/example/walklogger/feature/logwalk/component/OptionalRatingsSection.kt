@@ -15,7 +15,7 @@ import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /** Collapsible "Optional ratings" form section; one [RatingScale] per [OptionalRating], each clearable on its own. */
@@ -43,7 +43,7 @@ internal fun OptionalRatingsSection(
                     Text(
                         text = stringResource(aspect.labelRes),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = InkMuted,
+                        color = AppTheme.colors.contentMuted,
                     )
                     RatingScale(
                         rating = ratings[aspect],

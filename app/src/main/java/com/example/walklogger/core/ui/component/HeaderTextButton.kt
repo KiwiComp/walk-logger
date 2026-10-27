@@ -13,9 +13,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.OutlineOnNavy
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /**
@@ -28,11 +26,11 @@ fun HeaderTextButton(text: String, onClick: () -> Unit, modifier: Modifier = Mod
     val shape = MaterialTheme.shapes.extraSmall
     SectionLabel(
         text = text,
-        color = OnNavy,
+        color = AppTheme.colors.onHeader,
         modifier = modifier
             .alpha(if (visible) 1f else 0f)
             .clip(shape)
-            .border(1.dp, OutlineOnNavy, shape)
+            .border(1.dp, AppTheme.colors.outlineOnHeader, shape)
             .clickable(enabled = visible, role = Role.Button, onClick = onClick)
             .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
     )
@@ -42,6 +40,6 @@ fun HeaderTextButton(text: String, onClick: () -> Unit, modifier: Modifier = Mod
 @Composable
 private fun HeaderTextButtonPreview() {
     WalkLoggerTheme {
-        HeaderTextButton(text = "Today", onClick = {}, modifier = Modifier.background(Navy))
+        HeaderTextButton(text = "Today", onClick = {}, modifier = Modifier.background(AppTheme.colors.header))
     }
 }

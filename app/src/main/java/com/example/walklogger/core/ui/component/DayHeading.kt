@@ -15,7 +15,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /** Day title with a muted summary hanging off its baseline. */
@@ -28,7 +28,7 @@ fun DayHeading(title: String, summary: String?, modifier: Modifier = Modifier) {
             Text(
                 text = summary,
                 style = MaterialTheme.typography.bodySmall,
-                color = InkMuted,
+                color = AppTheme.colors.contentMuted,
                 modifier = Modifier.padding(bottom = 3.dp),
             )
         }

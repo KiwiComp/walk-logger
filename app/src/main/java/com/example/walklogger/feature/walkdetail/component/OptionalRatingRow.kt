@@ -19,9 +19,7 @@ import androidx.compose.ui.unit.DpSize
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.Outline
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val SegmentSize = DpSize(width = 12.dp, height = 20.dp)
@@ -38,18 +36,22 @@ internal fun OptionalRatingRow(label: String, value: Int, modifier: Modifier = M
         Text(
             text = label,
             style = MaterialTheme.typography.bodyLarge,
-            color = Ink,
+            color = AppTheme.colors.content,
             modifier = Modifier.weight(1f),
         )
         Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
             Walk.RATING_RANGE.forEach { point ->
-                Box(Modifier.size(SegmentSize).background(if (point <= value) Steel else Outline))
+                Box(
+                    Modifier
+                        .size(SegmentSize)
+                        .background(if (point <= value) AppTheme.colors.action else AppTheme.colors.outline),
+                )
             }
         }
         Text(
             text = value.toString(),
             style = MaterialTheme.typography.titleMedium,
-            color = Ink,
+            color = AppTheme.colors.content,
             textAlign = TextAlign.End,
             modifier = Modifier.width(ValueWidth),
         )

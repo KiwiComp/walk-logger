@@ -31,11 +31,7 @@ import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.SectionLabel
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.OnNavyMuted
-import com.example.walklogger.core.ui.theme.OutlineOnNavy
-import com.example.walklogger.core.ui.theme.SteelLight
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.log.DayUiState
 import com.example.walklogger.feature.log.preview.LogPreviewData
@@ -65,11 +61,11 @@ internal fun WeekStrip(
 
 @Composable
 private fun RowScope.DayCell(day: DayUiState, onClick: () -> Unit) {
-    val background = if (day.isSelected) OnNavy else Color.Transparent
+    val background = if (day.isSelected) AppTheme.colors.onHeader else Color.Transparent
     val foreground = when {
-        day.isSelected -> Navy
-        !day.isEnabled -> OnNavyMuted
-        else -> OnNavy
+        day.isSelected -> AppTheme.colors.header
+        !day.isEnabled -> AppTheme.colors.onHeaderMuted
+        else -> AppTheme.colors.onHeader
     }
     val locale = LocalConfiguration.current.locales[0]
     val date = remember(locale, day.date) { day.date.format(DateTimeFormatter.ofPattern("EEEE d MMMM", locale)) }
@@ -80,7 +76,7 @@ private fun RowScope.DayCell(day: DayUiState, onClick: () -> Unit) {
             .weight(1f)
             .height(DayCellHeight)
             .background(background)
-            .border(1.dp, if (day.isSelected) OnNavy else OutlineOnNavy)
+            .border(1.dp, if (day.isSelected) AppTheme.colors.onHeader else AppTheme.colors.outlineOnHeader)
             .selectable(
                 selected = day.isSelected,
                 enabled = day.isEnabled,
@@ -114,7 +110,7 @@ private fun RowScope.DayCell(day: DayUiState, onClick: () -> Unit) {
         Box(
             Modifier
                 .size(WalkDotSize)
-                .background(if (day.hasWalks) SteelLight else Color.Transparent),
+                .background(if (day.hasWalks) AppTheme.colors.actionLight else Color.Transparent),
         )
     }
 }
@@ -126,7 +122,7 @@ private fun WeekStripPreview() {
         WeekStrip(
             days = LogPreviewData.uiState.week,
             onDaySelected = {},
-            modifier = Modifier.background(Navy).padding(AppSpacing.lg),
+            modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg),
         )
     }
 }

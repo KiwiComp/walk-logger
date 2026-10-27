@@ -24,16 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.CardSurface
-import com.example.walklogger.core.ui.theme.ChipSurface
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.OnNavyMuted
-import com.example.walklogger.core.ui.theme.Outline
-import com.example.walklogger.core.ui.theme.OutlineOnNavy
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val SpinnerSize = 20.dp
@@ -48,7 +39,7 @@ enum class AppButtonWidth {
 }
 
 enum class AppButtonStyle {
-    /** Solid Steel; the one action the screen is for ("Save walk"). */
+    /** Solid action colour; the one action the screen is for ("Save walk"). */
     Primary,
 
     /** Light fill; an alternative to the primary action ("This walk already happened", "End walk"). */
@@ -80,28 +71,31 @@ fun AppButton(
         shape = MaterialTheme.shapes.extraSmall,
         colors = when (style) {
             AppButtonStyle.Primary -> ButtonDefaults.buttonColors(
-                containerColor = Steel,
-                contentColor = OnNavy,
-                disabledContainerColor = ChipSurface,
-                disabledContentColor = InkMuted,
+                containerColor = AppTheme.colors.action,
+                contentColor = AppTheme.colors.onHeader,
+                disabledContainerColor = AppTheme.colors.chip,
+                disabledContentColor = AppTheme.colors.contentMuted,
             )
             AppButtonStyle.Secondary -> ButtonDefaults.buttonColors(
-                containerColor = CardSurface,
-                contentColor = Ink,
-                disabledContainerColor = ChipSurface,
-                disabledContentColor = InkMuted,
+                containerColor = AppTheme.colors.card,
+                contentColor = AppTheme.colors.content,
+                disabledContainerColor = AppTheme.colors.chip,
+                disabledContentColor = AppTheme.colors.contentMuted,
             )
             AppButtonStyle.Tertiary -> ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
-                contentColor = OnNavy,
+                contentColor = AppTheme.colors.onHeader,
                 disabledContainerColor = Color.Transparent,
-                disabledContentColor = OnNavyMuted,
+                disabledContentColor = AppTheme.colors.onHeaderMuted,
             )
         },
         border = when (style) {
             AppButtonStyle.Primary -> null
-            AppButtonStyle.Secondary -> BorderStroke(1.dp, Outline)
-            AppButtonStyle.Tertiary -> BorderStroke(1.dp, if (enabled) OutlineOnNavy else OnNavyMuted)
+            AppButtonStyle.Secondary -> BorderStroke(1.dp, AppTheme.colors.outline)
+            AppButtonStyle.Tertiary -> BorderStroke(
+                1.dp,
+                if (enabled) AppTheme.colors.outlineOnHeader else AppTheme.colors.onHeaderMuted,
+            )
         },
         contentPadding = PaddingValues(horizontal = AppSpacing.xxl, vertical = AppSpacing.md),
         modifier = modifier
@@ -160,7 +154,7 @@ private fun AppButtonPreview() {
 @Composable
 private fun AppButtonTertiaryPreview() {
     WalkLoggerTheme {
-        Column(modifier = Modifier.background(Navy).padding(AppSpacing.lg)) {
+        Column(modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg)) {
             AppButton(text = "Pause", onClick = {}, style = AppButtonStyle.Tertiary)
             AppButton(
                 text = "Pause",

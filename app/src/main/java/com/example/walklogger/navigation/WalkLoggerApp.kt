@@ -31,10 +31,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
-import com.example.walklogger.core.ui.theme.Canvas
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.Outline
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.feature.calendar.navigation.navigateToCalendar
 import com.example.walklogger.feature.dog.navigation.navigateToDog
 import com.example.walklogger.feature.log.navigation.navigateToLog
@@ -58,7 +55,7 @@ fun WalkLoggerApp(viewModel: WalkLoggerAppViewModel = hiltViewModel()) {
 
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        containerColor = Canvas,
+        containerColor = AppTheme.colors.background,
         bottomBar = {
             // Pushed screens (new walk, register dog) are full-screen tasks without the tab bar.
             if (currentDestination?.isTopLevel() != false) {
@@ -90,8 +87,8 @@ private fun WalkLoggerBottomBar(
     onSelect: (TopLevelDestination) -> Unit,
 ) {
     Column {
-        HorizontalDivider(color = Outline)
-        NavigationBar(containerColor = Canvas, tonalElevation = 0.dp) {
+        HorizontalDivider(color = AppTheme.colors.outline)
+        NavigationBar(containerColor = AppTheme.colors.background, tonalElevation = 0.dp) {
             TopLevelDestination.entries.forEach { destination ->
                 NavigationBarItem(
                     selected = isSelected(destination),
@@ -104,10 +101,10 @@ private fun WalkLoggerBottomBar(
                         )
                     },
                     colors = NavigationBarItemDefaults.colors(
-                        selectedIconColor = Steel,
-                        selectedTextColor = Steel,
-                        unselectedIconColor = InkMuted,
-                        unselectedTextColor = InkMuted,
+                        selectedIconColor = AppTheme.colors.action,
+                        selectedTextColor = AppTheme.colors.action,
+                        unselectedIconColor = AppTheme.colors.contentMuted,
+                        unselectedTextColor = AppTheme.colors.contentMuted,
                         indicatorColor = Color.Transparent,
                     ),
                 )

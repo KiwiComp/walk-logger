@@ -18,7 +18,7 @@ import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.ui.component.SegmentedToggle
 import com.example.walklogger.core.ui.component.SegmentedToggleSize
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Navy
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /** Amount, texture and colour rows describing a passed [stool]. */
@@ -88,7 +88,7 @@ private fun StoolDescriptorsInversePreview() {
             onTextureSelected = {},
             onColourSelected = {},
             style = FormStyle.Inverse,
-            modifier = Modifier.background(Navy).padding(AppSpacing.lg),
+            modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg),
         )
     }
 }
