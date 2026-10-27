@@ -22,6 +22,9 @@ com.example.walklogger
 │   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from
 │   │                          component/ (WeekStrip, WalkTimeline, WalkCard)
 │   ├── logwalk/               the flow behind AddWalkButton, one sub-package per screen.
+│   │                          WalkFormState + WalkFormEditor (implements WalkFormActions) hold the fields the after-walk
+│   │                          and past-walk forms share (rating to notes, incl. the issue/concern lists, prefill and
+│   │                          applyTo(walk)); each form ViewModel keeps one private and exposes only `formActions`;
 │   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
 │   │                          stored start, quick note, ActiveStoolSection: a switch for "passed stool" whose description rows
@@ -31,7 +34,8 @@ com.example.walklogger
 │   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating, stool, optional ratings,
 │   │                          equipment, weather, behaviour, medical, notes); the same screen edits a logged walk when the route
 │   │                          carries a walkId, pushed on top of that walk's detail screen so saving or closing returns there;
-│   │                          component/ holds the form pieces the screens share (FormSection, SelectableChip,
+│   │                          component/ holds the form pieces the screens share (WalkFormContent renders the shared
+│   │                          sections from equipment to notes, FormSection, SelectableChip,
 │   │                          BehaviourSection, MedicalSection, AddNameDialog and its AddHandlerDialog /
 │   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, StoolSection (Yes/No; Done folds the
 │   │                          description into StoolSummary, Edit opens it) with StoolDescriptors, StoolColourPicker and
@@ -55,7 +59,8 @@ com.example.walklogger
 ├── domain/                    optional use cases (pure Kotlin, injectable)
 │
 ├── core/
-│   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern) – no Android deps
+│   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern) – no Android deps;
+│   │                          StoolEdits holds the stool answer rules the forms and the timer share
 │   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository /
 │   │                          MedicalConcernRepository interfaces + Room-backed implementations, mappers
 │   ├── database/              Room database, DAOs, entities, type converters; walks join behaviour issues and medical

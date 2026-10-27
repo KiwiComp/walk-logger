@@ -1,15 +1,7 @@
 package com.example.walklogger.feature.logwalk.finishwalk
 
-import com.example.walklogger.core.model.BehaviourIssue
-import com.example.walklogger.core.model.Equipment
-import com.example.walklogger.core.model.MedicalConcern
-import com.example.walklogger.core.model.OptionalRating
-import com.example.walklogger.core.model.Rain
-import com.example.walklogger.core.model.Snow
-import com.example.walklogger.core.model.Stool
-import com.example.walklogger.core.model.Temperature
-import com.example.walklogger.core.model.Wind
 import com.example.walklogger.feature.logwalk.SaveBlocker
+import com.example.walklogger.feature.logwalk.WalkFormState
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
@@ -26,30 +18,7 @@ data class FinishWalkUiState(
     val dogName: String? = null,
     /** Chosen before the walk; not editable here. */
     val handlers: List<String> = emptyList(),
-    val rating: Int? = null,
-    val optionalRatings: Map<OptionalRating, Int> = emptyMap(),
-    /** True while the optional rating scales are shown; opens by itself when a stored walk has any. */
-    val isOptionalRatingsExpanded: Boolean = false,
-    /** Null until the handler answers Yes or No. */
-    val stool: Stool? = null,
-    /** True while the description rows are shown; false folds them into a summary line. A stored answer starts folded. */
-    val isStoolExpanded: Boolean = false,
-    val equipment: Equipment = Equipment.COLLAR,
-    val rain: Rain? = null,
-    val temperature: Temperature? = null,
-    val wind: Wind? = null,
-    val snow: Snow? = null,
-    /** True while the optional weather rows are shown; opens by itself when a stored walk has any. */
-    val isWeatherExpanded: Boolean = false,
-    val issues: List<BehaviourIssue> = emptyList(),
-    val selectedIssueIds: Set<Long> = emptySet(),
-    /** True while the optional issue chips are shown; opens by itself when a stored walk has any. */
-    val isBehaviourExpanded: Boolean = false,
-    val concerns: List<MedicalConcern> = emptyList(),
-    val selectedConcernIds: Set<Long> = emptySet(),
-    /** True while the optional concern chips are shown; opens by itself when a stored walk has any. */
-    val isMedicalExpanded: Boolean = false,
-    val notes: String = "",
+    val form: WalkFormState = WalkFormState(),
     /** True while the "Edit times" pickers are shown. */
     val isEditingTimes: Boolean = false,
     /** True until the finished walk has been read; the form is not editable before that. */
@@ -69,7 +38,7 @@ data class FinishWalkUiState(
         durationMinutes == null -> SaveBlocker.TIMES
         durationMinutes <= 0 -> SaveBlocker.END_BEFORE_START
         date.atTime(endTime) > now -> SaveBlocker.IN_FUTURE
-        rating == null -> SaveBlocker.RATING
+        form.rating == null -> SaveBlocker.RATING
         else -> null
     }
 

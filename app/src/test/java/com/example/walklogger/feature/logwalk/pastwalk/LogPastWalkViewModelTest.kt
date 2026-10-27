@@ -15,7 +15,6 @@ import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.Wind
-import com.example.walklogger.feature.logwalk.MAX_NOTES_LENGTH
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
@@ -69,7 +68,7 @@ class LogPastWalkViewModelTest {
     private fun fillInValidWalk() {
         viewModel.setStartTime(LocalTime.of(17, 40))
         viewModel.setEndTime(LocalTime.of(18, 5))
-        viewModel.setRating(5)
+        viewModel.formActions.setRating(5)
     }
 
     @Test
@@ -80,96 +79,7 @@ class LogPastWalkViewModelTest {
             assertNull(state.startTime)
             assertNull(state.endTime)
             assertNull(state.durationMinutes)
-            assertNull(state.stool)
-        }
-    }
-
-    @Test
-    fun `stool description only applies after yes, and no drops it`() = runTest {
-        viewModel.uiState.test {
-            viewModel.selectStoolQuantity(StoolQuantity.SMALL)
-            assertNull(expectMostRecentItem().stool)
-            viewModel.selectStoolPassed(true)
-            viewModel.selectStoolQuantity(StoolQuantity.LARGE)
-            viewModel.selectStoolTexture(StoolTexture.SOFT)
-            viewModel.selectStoolColour(StoolColour.GREY)
-            assertEquals(Stool(true, StoolQuantity.LARGE, StoolTexture.SOFT, StoolColour.GREY), expectMostRecentItem().stool)
-            viewModel.selectStoolColour(null)
-            viewModel.selectStoolPassed(true)
-            assertEquals(Stool(true, StoolQuantity.LARGE, StoolTexture.SOFT), expectMostRecentItem().stool)
-            viewModel.selectStoolPassed(false)
-            assertEquals(Stool(passed = false), expectMostRecentItem().stool)
-            viewModel.clearStool()
-            assertNull(expectMostRecentItem().stool)
-        }
-    }
-
-    @Test
-    fun `yes opens the stool description, done folds it and edit opens it again`() = runTest {
-        viewModel.uiState.test {
-            viewModel.selectStoolPassed(true)
-            assertTrue(expectMostRecentItem().isStoolExpanded)
-            viewModel.selectStoolQuantity(StoolQuantity.NORMAL)
-            viewModel.foldStool()
-            val folded = expectMostRecentItem()
-            assertFalse(folded.isStoolExpanded)
-            assertEquals(Stool(passed = true, quantity = StoolQuantity.NORMAL), folded.stool)
-            viewModel.selectStoolPassed(true)
-            assertFalse(viewModel.uiState.value.isStoolExpanded)
-            viewModel.expandStool()
-            assertTrue(expectMostRecentItem().isStoolExpanded)
-        }
-    }
-
-    @Test
-    fun `optional ratings start collapsed for a new walk and toggle`() = runTest {
-        viewModel.uiState.test {
-            assertFalse(expectMostRecentItem().isOptionalRatingsExpanded)
-            viewModel.toggleOptionalRatings()
-            assertTrue(expectMostRecentItem().isOptionalRatingsExpanded)
-            viewModel.toggleOptionalRatings()
-            assertFalse(expectMostRecentItem().isOptionalRatingsExpanded)
-        }
-    }
-
-    @Test
-    fun `an optional rating can be set, replaced, removed and cleared`() = runTest {
-        viewModel.uiState.test {
-            viewModel.setOptionalRating(OptionalRating.REACTIVITY, 3)
-            viewModel.setOptionalRating(OptionalRating.DISTRACTION, 7)
-            assertEquals(mapOf(OptionalRating.REACTIVITY to 3, OptionalRating.DISTRACTION to 7), expectMostRecentItem().optionalRatings)
-            viewModel.setOptionalRating(OptionalRating.REACTIVITY, 5)
-            viewModel.setOptionalRating(OptionalRating.DISTRACTION, null)
-            assertEquals(mapOf(OptionalRating.REACTIVITY to 5), expectMostRecentItem().optionalRatings)
-            viewModel.clearOptionalRatings()
-            assertTrue(expectMostRecentItem().optionalRatings.isEmpty())
-        }
-    }
-
-    @Test
-    fun `weather starts collapsed for a new walk and toggles`() = runTest {
-        viewModel.uiState.test {
-            assertFalse(expectMostRecentItem().isWeatherExpanded)
-            viewModel.toggleWeather()
-            assertTrue(expectMostRecentItem().isWeatherExpanded)
-            viewModel.toggleWeather()
-            assertFalse(expectMostRecentItem().isWeatherExpanded)
-        }
-    }
-
-    @Test
-    fun `clear weather resets every condition`() = runTest {
-        viewModel.uiState.test {
-            viewModel.selectRain(Rain.LIGHT)
-            viewModel.selectTemperature(Temperature.COOL)
-            viewModel.selectWind(Wind.BREEZE)
-            viewModel.selectSnow(Snow.HEAVY)
-            viewModel.clearWeather()
-            val state = expectMostRecentItem()
-            assertNull(state.rain)
-            assertNull(state.temperature)
-            assertNull(state.wind)
-            assertNull(state.snow)
+            assertNull(state.form.stool)
         }
     }
 
@@ -184,84 +94,8 @@ class LogPastWalkViewModelTest {
             assertEquals("Sixten", state.dogName)
             assertEquals(listOf("Anna", "Jonas"), state.handlers)
             assertEquals(setOf("Anna"), state.selectedHandlers)
-            assertEquals(listOf(BehaviourIssue(1, "Pulling"), BehaviourIssue(2, "Barking")), state.issues)
-            assertEquals(listOf(MedicalConcern(1, "Limping"), MedicalConcern(2, "Vomit")), state.concerns)
-        }
-    }
-
-    @Test
-    fun `behaviour starts collapsed for a new walk and toggles`() = runTest {
-        viewModel.uiState.test {
-            assertFalse(expectMostRecentItem().isBehaviourExpanded)
-            viewModel.toggleBehaviour()
-            assertTrue(expectMostRecentItem().isBehaviourExpanded)
-            viewModel.toggleBehaviour()
-            assertFalse(expectMostRecentItem().isBehaviourExpanded)
-        }
-    }
-
-    @Test
-    fun `issues toggle on and off and clear together`() = runTest {
-        behaviourIssueRepository.addIssues("Pulling", "Barking")
-        val pulling = BehaviourIssue(1, "Pulling")
-        val barking = BehaviourIssue(2, "Barking")
-        viewModel.uiState.test {
-            viewModel.toggleIssue(pulling)
-            viewModel.toggleIssue(barking)
-            assertEquals(setOf(1L, 2L), expectMostRecentItem().selectedIssueIds)
-            viewModel.toggleIssue(pulling)
-            assertEquals(setOf(2L), expectMostRecentItem().selectedIssueIds)
-            viewModel.clearIssues()
-            assertTrue(expectMostRecentItem().selectedIssueIds.isEmpty())
-        }
-    }
-
-    @Test
-    fun `adding an issue stores and selects it`() = runTest {
-        behaviourIssueRepository.addIssues("Pulling")
-        viewModel.uiState.test {
-            viewModel.addIssue("  Digging ")
-            val state = expectMostRecentItem()
-            assertEquals(listOf(BehaviourIssue(1, "Pulling"), BehaviourIssue(2, "Digging")), state.issues)
-            assertEquals(setOf(2L), state.selectedIssueIds)
-        }
-    }
-
-    @Test
-    fun `medical starts collapsed for a new walk and toggles`() = runTest {
-        viewModel.uiState.test {
-            assertFalse(expectMostRecentItem().isMedicalExpanded)
-            viewModel.toggleMedical()
-            assertTrue(expectMostRecentItem().isMedicalExpanded)
-            viewModel.toggleMedical()
-            assertFalse(expectMostRecentItem().isMedicalExpanded)
-        }
-    }
-
-    @Test
-    fun `concerns toggle on and off and clear together`() = runTest {
-        medicalConcernRepository.addConcerns("Limping", "Vomit")
-        val limping = MedicalConcern(1, "Limping")
-        val vomit = MedicalConcern(2, "Vomit")
-        viewModel.uiState.test {
-            viewModel.toggleConcern(limping)
-            viewModel.toggleConcern(vomit)
-            assertEquals(setOf(1L, 2L), expectMostRecentItem().selectedConcernIds)
-            viewModel.toggleConcern(limping)
-            assertEquals(setOf(2L), expectMostRecentItem().selectedConcernIds)
-            viewModel.clearConcerns()
-            assertTrue(expectMostRecentItem().selectedConcernIds.isEmpty())
-        }
-    }
-
-    @Test
-    fun `adding a concern stores and selects it`() = runTest {
-        medicalConcernRepository.addConcerns("Limping")
-        viewModel.uiState.test {
-            viewModel.addConcern("  Coughing ")
-            val state = expectMostRecentItem()
-            assertEquals(listOf(MedicalConcern(1, "Limping"), MedicalConcern(2, "Coughing")), state.concerns)
-            assertEquals(setOf(2L), state.selectedConcernIds)
+            assertEquals(listOf(BehaviourIssue(1, "Pulling"), BehaviourIssue(2, "Barking")), state.form.behaviourIssues)
+            assertEquals(listOf(MedicalConcern(1, "Limping"), MedicalConcern(2, "Vomit")), state.form.medicalConcerns)
         }
     }
 
@@ -287,7 +121,7 @@ class LogPastWalkViewModelTest {
             assertEquals(SaveBlocker.END_BEFORE_START, expectMostRecentItem().saveBlocker)
             viewModel.setEndTime(LocalTime.of(18, 30))
             assertEquals(SaveBlocker.RATING, expectMostRecentItem().saveBlocker)
-            viewModel.setRating(4)
+            viewModel.formActions.setRating(4)
             val state = expectMostRecentItem()
             assertNull(state.saveBlocker)
             assertTrue(state.canSave)
@@ -343,16 +177,16 @@ class LogPastWalkViewModelTest {
         medicalConcernRepository.addConcerns("Limping", "Vomit")
         viewModel.uiState.test {
             fillInValidWalk()
-            viewModel.toggleIssue(BehaviourIssue(2, "Barking"))
-            viewModel.toggleConcern(MedicalConcern(2, "Vomit"))
-            viewModel.selectEquipment(Equipment.COLLAR)
-            viewModel.selectRain(Rain.LIGHT)
-            viewModel.selectTemperature(Temperature.COLD)
-            viewModel.selectWind(Wind.WINDY)
-            viewModel.selectSnow(Snow.NONE)
-            viewModel.setOptionalRating(OptionalRating.ENERGY_LEVEL, 6)
-            viewModel.selectStoolPassed(false)
-            viewModel.setNotes(" Pulled at the gate ")
+            viewModel.formActions.toggleBehaviourIssue(BehaviourIssue(2, "Barking"))
+            viewModel.formActions.toggleMedicalConcern(MedicalConcern(2, "Vomit"))
+            viewModel.formActions.selectEquipment(Equipment.COLLAR)
+            viewModel.formActions.selectRain(Rain.LIGHT)
+            viewModel.formActions.selectTemperature(Temperature.COLD)
+            viewModel.formActions.selectWind(Wind.WINDY)
+            viewModel.formActions.selectSnow(Snow.NONE)
+            viewModel.formActions.setOptionalRating(OptionalRating.ENERGY_LEVEL, 6)
+            viewModel.formActions.selectStoolPassed(false)
+            viewModel.formActions.setNotes(" Pulled at the gate ")
             viewModel.save()
             assertTrue(expectMostRecentItem().isSaved)
         }
@@ -387,14 +221,6 @@ class LogPastWalkViewModelTest {
         }
         val walk = walkRepository.observeWalks().first().single()
         assertEquals(picked.atTime(17, 40).toInstant(zone).toEpochMilli(), walk.startTime)
-    }
-
-    @Test
-    fun `notes are cut at the maximum length`() = runTest {
-        viewModel.uiState.test {
-            viewModel.setNotes("x".repeat(MAX_NOTES_LENGTH + 1))
-            assertEquals(MAX_NOTES_LENGTH, expectMostRecentItem().notes.length)
-        }
     }
 
     private fun seedLoggedWalk(): Walk {
@@ -433,22 +259,8 @@ class LogPastWalkViewModelTest {
             assertEquals(LocalTime.of(8, 15), state.startTime)
             assertEquals(LocalTime.of(8, 50), state.endTime)
             assertEquals(setOf("Jonas"), state.selectedHandlers)
-            assertEquals(3, state.rating)
-            assertEquals(Equipment.COLLAR, state.equipment)
-            assertEquals(Rain.HEAVY, state.rain)
-            assertEquals(Temperature.COOL, state.temperature)
-            assertEquals(Wind.BREEZE, state.wind)
-            assertEquals(Snow.LIGHT, state.snow)
-            assertTrue(state.isWeatherExpanded)
-            assertEquals(mapOf(OptionalRating.RESPONSIVENESS to 4), state.optionalRatings)
-            assertTrue(state.isOptionalRatingsExpanded)
-            assertEquals(Stool(passed = true, quantity = StoolQuantity.NORMAL, colour = StoolColour.DARK_BROWN), state.stool)
-            assertFalse(state.isStoolExpanded)
-            assertEquals(setOf(1L), state.selectedIssueIds)
-            assertTrue(state.isBehaviourExpanded)
-            assertEquals(setOf(1L), state.selectedConcernIds)
-            assertTrue(state.isMedicalExpanded)
-            assertEquals("Muddy", state.notes)
+            assertEquals(3, state.form.rating)
+            assertEquals("Muddy", state.form.notes)
             assertTrue(state.canSave)
         }
     }
@@ -460,8 +272,8 @@ class LogPastWalkViewModelTest {
         handlerRepository.addHandlers("Anna", "Jonas")
         viewModel.uiState.test {
             expectMostRecentItem()
-            viewModel.setRating(6)
-            viewModel.setNotes("Dry after all")
+            viewModel.formActions.setRating(6)
+            viewModel.formActions.setNotes("Dry after all")
             viewModel.toggleHandler("Anna")
             viewModel.save()
             assertTrue(expectMostRecentItem().isSaved)
