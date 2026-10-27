@@ -1,6 +1,7 @@
 package com.example.walklogger.feature.walkdetail
 
 import app.cash.turbine.test
+import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
@@ -10,9 +11,11 @@ import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
+import com.example.walklogger.testing.shownMessages
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
@@ -37,8 +40,15 @@ class WalkDetailViewModelTest {
     private val clock = Clock.fixed(date.atTime(20, 0).toInstant(zone), zone)
     private val dogRepository = FakeDogRepository()
     private val walkRepository = FakeWalkRepository()
+    private val userMessages = UserMessages()
     private val viewModel by lazy {
-        WalkDetailViewModel(walkId = 1, walkRepository = walkRepository, dogRepository = dogRepository, clock = clock)
+        WalkDetailViewModel(
+            walkId = 1,
+            walkRepository = walkRepository,
+            dogRepository = dogRepository,
+            userMessages = userMessages,
+            clock = clock,
+        )
     }
 
     private val issue = BehaviourIssue(1, "Pulling", key = "pulling")
@@ -136,5 +146,29 @@ class WalkDetailViewModelTest {
     fun `discard does nothing before the walk has loaded`() = runTest {
         viewModel.discard()
         assertFalse(viewModel.uiState.value.isDiscarded)
+    }
+
+    @Test
+    fun `a failed discard keeps the walk and says so`() = runTest {
+        seedWalk()
+        val shown = shownMessages(userMessages)
+        viewModel.uiState.test {
+            walkRepository.failures.failWrites = true
+            viewModel.discard()
+            val state = expectMostRecentItem()
+            assertFalse(state.isDiscarding)
+            assertFalse(state.isDiscarded)
+            assertTrue(state.canDiscard)
+        }
+        assertEquals(listOf(R.string.error_delete_walk), shown)
+    }
+
+    @Test
+    fun `a missing walk closes the screen and says so`() = runTest {
+        val shown = shownMessages(userMessages)
+        viewModel.uiState.test {
+            assertTrue(expectMostRecentItem().isNotFound)
+        }
+        assertEquals(listOf(R.string.error_walk_not_found), shown)
     }
 }

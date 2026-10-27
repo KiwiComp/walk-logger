@@ -1,5 +1,7 @@
 package com.example.walklogger.feature.logwalk
 
+import com.example.walklogger.R
+import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
 import com.example.walklogger.core.model.BehaviourIssue
@@ -18,6 +20,7 @@ import com.example.walklogger.core.model.withColour
 import com.example.walklogger.core.model.withPassed
 import com.example.walklogger.core.model.withQuantity
 import com.example.walklogger.core.model.withTexture
+import com.example.walklogger.core.ui.message.UserMessages
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -32,6 +35,7 @@ class WalkFormEditor(
     private val scope: CoroutineScope,
     private val behaviourIssueRepository: BehaviourIssueRepository,
     private val medicalConcernRepository: MedicalConcernRepository,
+    private val userMessages: UserMessages,
 ) : WalkFormActions {
 
     /** What the user has entered; the issue and concern lists are overlaid from their repositories. */
@@ -138,8 +142,11 @@ class WalkFormEditor(
 
     override fun addBehaviourIssue(name: String) {
         scope.launch {
-            val stored = behaviourIssueRepository.addBehaviourIssue(name)
-            input.update { it.copy(selectedBehaviourIssueIds = it.selectedBehaviourIssueIds + stored.id) }
+            runCatchingCancellable { behaviourIssueRepository.addBehaviourIssue(name) }
+                .onSuccess { stored ->
+                    input.update { it.copy(selectedBehaviourIssueIds = it.selectedBehaviourIssueIds + stored.id) }
+                }
+                .onFailure { userMessages.show(R.string.error_add_name) }
         }
     }
 
@@ -154,8 +161,11 @@ class WalkFormEditor(
 
     override fun addMedicalConcern(name: String) {
         scope.launch {
-            val stored = medicalConcernRepository.addMedicalConcern(name)
-            input.update { it.copy(selectedMedicalConcernIds = it.selectedMedicalConcernIds + stored.id) }
+            runCatchingCancellable { medicalConcernRepository.addMedicalConcern(name) }
+                .onSuccess { stored ->
+                    input.update { it.copy(selectedMedicalConcernIds = it.selectedMedicalConcernIds + stored.id) }
+                }
+                .onFailure { userMessages.show(R.string.error_add_name) }
         }
     }
 

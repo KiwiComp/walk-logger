@@ -2,6 +2,7 @@ package com.example.walklogger.navigation
 
 import app.cash.turbine.test
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import kotlinx.coroutines.test.runTest
@@ -16,7 +17,7 @@ class WalkLoggerAppViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val walkRepository = FakeWalkRepository()
-    private val viewModel by lazy { WalkLoggerAppViewModel(walkRepository) }
+    private val viewModel by lazy { WalkLoggerAppViewModel(walkRepository, UserMessages()) }
 
     @Test
     fun `nothing to resume without an active walk`() = runTest {

@@ -69,11 +69,12 @@ com.example.walklogger
 │   │                          seeded defaults carry a `key` that Labels.kt maps to a string resource (user-added
 │   │                          rows show their name), and `isHidden` soft-deletes without touching walk history
 │   ├── datastore/             Preferences DataStore (active dog id)
-│   ├── common/di/             injectable coroutine dispatchers and Clock
+│   ├── common/                runCatchingCancellable; di/ holds the injectable coroutine dispatchers and Clock
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
 │                              SectionLabel, SegmentedToggle, AppSwitch, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
-│                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent)
+│                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost)
+│                              + message/UserMessages, the app-wide snackbar queue
 ```
 
 ## Rules of thumb
@@ -104,6 +105,10 @@ com.example.walklogger
 - **Dimensions come from tokens.** Padding and gaps use `AppSpacing`, corners use `AppRadius`,
   sizes shared by several components use `AppSize`. Component-specific sizes (a dot, a cell
   height) are named `private val`s in the component's file, not tokens.
+- **Failures become snackbars.** ViewModels run every write in `runCatchingCancellable`; on failure they
+  reset their busy flag (`isSaving`, …) and post a string resource to `UserMessages`, which `WalkLoggerApp`
+  shows in its single `AppSnackbarHost`. A screen whose walk or dog no longer exists posts a message,
+  sets `isNotFound` and its Route calls `onNotFound`, which pops back to the tab.
 - **Colours come from roles.** Read `AppTheme.colors` (`header`, `content`, `outline`, …), never a hue;
   the palette is private to `core/ui/theme`, so a dark theme or new palette only changes that package.
   Stool swatches are the exception: they depict real colours and stay fixed.

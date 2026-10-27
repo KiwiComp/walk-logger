@@ -10,6 +10,9 @@ import androidx.test.core.app.ApplicationProvider
 import androidx.test.ext.junit.runners.AndroidJUnit4
 import androidx.test.platform.app.InstrumentationRegistry
 import com.example.walklogger.feature.log.navigation.LogDestination
+import com.example.walklogger.feature.walkdetail.navigation.WalkDetailDestination
+import com.example.walklogger.feature.walkdetail.navigation.navigateToWalkDetail
+import com.example.walklogger.navigation.popToTopLevel
 import java.time.LocalDate
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertTrue
@@ -34,6 +37,7 @@ class LogWalkNavigationTest {
                 composable<LogPastWalkDestination> {}
                 composable<ActiveWalkDestination> {}
                 composable<FinishWalkDestination> {}
+                composable<WalkDetailDestination> {}
             }
         }
     }
@@ -100,6 +104,17 @@ class LogWalkNavigationTest {
         assertEquals(7L, entry.toRoute<FinishWalkDestination>().walkId)
         assertTrue(navController.currentBackStack.value.none { it.destination.hasRoute<ActiveWalkDestination>() })
         assertTrue(navController.previousBackStackEntry!!.destination.hasRoute<LogDestination>())
+    }
+
+    @Test
+    fun editingAMissingWalk_returnsToTheTabPastItsDetail() = onMain {
+        navController.navigateToWalkDetail(walkId = 7)
+        navController.navigateToEditWalk(date, walkId = 7)
+
+        navController.popToTopLevel()
+
+        assertTrue(navController.currentDestination!!.hasRoute<LogDestination>())
+        assertTrue(navController.currentBackStack.value.none { it.destination.hasRoute<WalkDetailDestination>() })
     }
 
     private fun onMain(block: () -> Unit) = InstrumentationRegistry.getInstrumentation().runOnMainSync(block)

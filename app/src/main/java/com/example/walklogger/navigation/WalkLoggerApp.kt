@@ -10,14 +10,17 @@ import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.remember
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
@@ -31,6 +34,7 @@ import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
+import com.example.walklogger.core.ui.component.AppSnackbarHost
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.feature.calendar.navigation.navigateToCalendar
 import com.example.walklogger.feature.dog.navigation.navigateToDog
@@ -53,9 +57,16 @@ fun WalkLoggerApp(viewModel: WalkLoggerAppViewModel = hiltViewModel()) {
         }
     }
 
+    val snackbarHostState = remember { SnackbarHostState() }
+    val resources = LocalResources.current
+    LaunchedEffect(viewModel, resources) {
+        viewModel.messages.collect { snackbarHostState.showSnackbar(resources.getString(it)) }
+    }
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
         containerColor = AppTheme.colors.background,
+        snackbarHost = { AppSnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
             // Pushed screens (new walk, register dog) are full-screen tasks without the tab bar.
             if (currentDestination?.isTopLevel() != false) {
@@ -74,6 +85,7 @@ fun WalkLoggerApp(viewModel: WalkLoggerAppViewModel = hiltViewModel()) {
         val bottomPadding = PaddingValues(bottom = innerPadding.calculateBottomPadding())
         WalkLoggerNavHost(
             navController = navController,
+            snackbarHostState = snackbarHostState,
             modifier = Modifier
                 .padding(bottomPadding)
                 .consumeWindowInsets(bottomPadding),

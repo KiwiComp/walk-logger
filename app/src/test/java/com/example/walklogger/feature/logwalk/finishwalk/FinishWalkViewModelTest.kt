@@ -1,18 +1,21 @@
 package com.example.walklogger.feature.logwalk.finishwalk
 
 import app.cash.turbine.test
+import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
+import com.example.walklogger.testing.shownMessages
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
@@ -40,6 +43,7 @@ class FinishWalkViewModelTest {
     private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val walkRepository = FakeWalkRepository()
+    private val userMessages = UserMessages()
     private val walk = Walk(
         id = 1,
         dogId = 1,
@@ -56,6 +60,7 @@ class FinishWalkViewModelTest {
             behaviourIssueRepository = behaviourIssueRepository,
             medicalConcernRepository = medicalConcernRepository,
             walkRepository = walkRepository,
+            userMessages = userMessages,
             clock = clock,
         )
     }
@@ -148,5 +153,30 @@ class FinishWalkViewModelTest {
             assertFalse(expectMostRecentItem().isSaved)
             assertNull(walkRepository.observeWalk(1).first()!!.rating)
         }
+    }
+
+    @Test
+    fun `a failed save keeps the form open and says so`() = runTest {
+        walkRepository.addWalks(walk)
+        val shown = shownMessages(userMessages)
+        viewModel.uiState.test {
+            viewModel.formActions.setRating(4)
+            walkRepository.failures.failWrites = true
+            viewModel.save()
+            val state = expectMostRecentItem()
+            assertFalse(state.isSaving)
+            assertFalse(state.isSaved)
+            assertTrue(state.canSave)
+        }
+        assertEquals(listOf(R.string.error_save_walk), shown)
+    }
+
+    @Test
+    fun `a missing walk closes the screen and says so`() = runTest {
+        val shown = shownMessages(userMessages)
+        viewModel.uiState.test {
+            assertTrue(expectMostRecentItem().isNotFound)
+        }
+        assertEquals(listOf(R.string.error_walk_not_found), shown)
     }
 }

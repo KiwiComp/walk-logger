@@ -62,14 +62,16 @@ fun ActiveWalkRoute(
     walkId: Long,
     onWalkEnded: (walkId: Long) -> Unit,
     onWalkDiscarded: () -> Unit,
+    onNotFound: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: ActiveWalkViewModel = hiltViewModel<ActiveWalkViewModel, ActiveWalkViewModel.Factory> { it.create(walkId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiState.isEnded, uiState.isDiscarded) {
+    LaunchedEffect(uiState.isEnded, uiState.isDiscarded, uiState.isNotFound) {
         when {
             uiState.isEnded -> onWalkEnded(walkId)
             uiState.isDiscarded -> onWalkDiscarded()
+            uiState.isNotFound -> onNotFound()
         }
     }
     ActiveWalkScreen(

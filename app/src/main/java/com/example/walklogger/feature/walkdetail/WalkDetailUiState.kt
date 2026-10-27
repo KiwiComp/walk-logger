@@ -17,6 +17,8 @@ import java.time.LocalTime
 data class WalkDetailUiState(
     /** True until the walk has been read; every other field is empty meanwhile. */
     val isLoading: Boolean = true,
+    /** True when the walk no longer exists; the screen closes. */
+    val isNotFound: Boolean = false,
     val date: LocalDate? = null,
     val startTime: LocalTime? = null,
     val endTime: LocalTime? = null,

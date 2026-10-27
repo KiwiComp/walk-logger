@@ -1,5 +1,6 @@
 package com.example.walklogger.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
@@ -28,6 +29,7 @@ import com.example.walklogger.feature.walkdetail.navigation.walkDetailScreen
 @Composable
 fun WalkLoggerNavHost(
     navController: NavHostController,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -40,19 +42,21 @@ fun WalkLoggerNavHost(
             onLogPastWalk = navController::navigateToLogPastWalk,
             onOpenWalk = navController::navigateToWalkDetail,
             onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
+            snackbarHostState = snackbarHostState,
         )
         calendarScreen(
             onAddWalk = navController::navigateToNewWalk,
             onLogPastWalk = navController::navigateToLogPastWalk,
             onOpenWalk = navController::navigateToWalkDetail,
             onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
+            snackbarHostState = snackbarHostState,
         )
         patternsScreen()
         dogScreen(
             onAddDog = navController::navigateToRegisterDog,
             onEditDog = navController::navigateToEditDog,
         )
-        registerDogScreen(onDone = { navController.popBackStack() })
+        registerDogScreen(onDone = { navController.popBackStack() }, onNotFound = navController::popToTopLevel)
         newWalkScreen(
             onBack = { navController.popBackStack() },
             onWalkStarted = navController::navigateToActiveWalk,
@@ -62,18 +66,21 @@ fun WalkLoggerNavHost(
         activeWalkScreen(
             onWalkEnded = navController::navigateToFinishWalk,
             onWalkDiscarded = navController::popToTopLevel,
+            onNotFound = navController::popToTopLevel,
         )
-        finishWalkScreen(onSaved = navController::popToTopLevel)
+        finishWalkScreen(onSaved = navController::popToTopLevel, onNotFound = navController::popToTopLevel)
         // Editing is pushed on top of the walk's detail screen, so every way out of the form lands back there.
         logPastWalkScreen(
             onClose = { navController.popBackStack() },
             onLogged = navController::popToTopLevel,
             onUpdated = { navController.popBackStack() },
+            onNotFound = navController::popToTopLevel,
         )
         walkDetailScreen(
             onBack = navController::popToTopLevel,
             onEdit = navController::navigateToEditWalk,
             onDiscarded = navController::popToTopLevel,
+            onNotFound = navController::popToTopLevel,
         )
     }
 }

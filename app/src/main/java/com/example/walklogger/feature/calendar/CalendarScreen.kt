@@ -1,6 +1,5 @@
 package com.example.walklogger.feature.calendar
 
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
@@ -13,9 +12,6 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.Snackbar
-import androidx.compose.material3.SnackbarHost
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
@@ -39,7 +35,6 @@ import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.component.walkSummary
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.calendar.component.CalendarWalkList
 import com.example.walklogger.feature.calendar.component.MonthGrid
@@ -57,17 +52,16 @@ fun CalendarRoute(
     onLogPastWalk: (LocalDate) -> Unit,
     onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: CalendarViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val snackbarHostState = remember { SnackbarHostState() }
     val scope = rememberCoroutineScope()
     val noDogMessage = stringResource(R.string.log_no_dog_message)
     val noDogAction = stringResource(R.string.log_no_dog_action)
     CalendarScreen(
         uiState = uiState,
-        snackbarHostState = snackbarHostState,
         onPreviousMonth = viewModel::showPreviousMonth,
         onNextMonth = viewModel::showNextMonth,
         onShowCurrentMonth = viewModel::showCurrentMonth,
@@ -92,7 +86,6 @@ fun CalendarRoute(
 @Composable
 fun CalendarScreen(
     uiState: CalendarUiState,
-    snackbarHostState: SnackbarHostState,
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onShowCurrentMonth: () -> Unit,
@@ -101,45 +94,10 @@ fun CalendarScreen(
     onWalkClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Box(modifier = modifier.fillMaxSize()) {
-        CalendarContent(
-            uiState = uiState,
-            onPreviousMonth = onPreviousMonth,
-            onNextMonth = onNextMonth,
-            onShowCurrentMonth = onShowCurrentMonth,
-            onDaySelected = onDaySelected,
-            onAddWalk = onAddWalk,
-            onWalkClick = onWalkClick,
-        )
-        SnackbarHost(
-            hostState = snackbarHostState,
-            modifier = Modifier.align(Alignment.BottomCenter),
-        ) { data ->
-            Snackbar(
-                snackbarData = data,
-                shape = MaterialTheme.shapes.extraSmall,
-                containerColor = AppTheme.colors.header,
-                contentColor = AppTheme.colors.onHeader,
-                actionColor = AppTheme.colors.actionLight,
-            )
-        }
-    }
-}
-
-@Composable
-private fun CalendarContent(
-    uiState: CalendarUiState,
-    onPreviousMonth: () -> Unit,
-    onNextMonth: () -> Unit,
-    onShowCurrentMonth: () -> Unit,
-    onDaySelected: (LocalDate) -> Unit,
-    onAddWalk: () -> Unit,
-    onWalkClick: (Long) -> Unit,
-) {
     val locale = LocalConfiguration.current.locales[0]
     val monthFormatter = remember(locale) { DateTimeFormatter.ofPattern("MMM yyyy", locale) }
     val dayHeadingFormatter = remember(locale) { DateTimeFormatter.ofPattern("d MMMM", locale) }
-    Column(modifier = Modifier.fillMaxSize()) {
+    Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = uiState.month.format(monthFormatter).replaceFirstChar { it.titlecase(locale) },
             subtitle = pluralStringResource(R.plurals.walk_count, uiState.monthWalkCount, uiState.monthWalkCount),
@@ -206,7 +164,6 @@ private fun CalendarScreenPreview() {
     WalkLoggerTheme {
         CalendarScreen(
             uiState = CalendarPreviewData.uiState,
-            snackbarHostState = SnackbarHostState(),
             onPreviousMonth = {},
             onNextMonth = {},
             onShowCurrentMonth = {},
@@ -223,7 +180,6 @@ private fun CalendarScreenPastMonthPreview() {
     WalkLoggerTheme {
         CalendarScreen(
             uiState = CalendarPreviewData.uiState.copy(isCurrentMonth = false),
-            snackbarHostState = SnackbarHostState(),
             onPreviousMonth = {},
             onNextMonth = {},
             onShowCurrentMonth = {},
@@ -240,7 +196,6 @@ private fun CalendarScreenEmptyDayPreview() {
     WalkLoggerTheme {
         CalendarScreen(
             uiState = CalendarPreviewData.uiState.copy(walks = emptyList()),
-            snackbarHostState = SnackbarHostState(),
             onPreviousMonth = {},
             onNextMonth = {},
             onShowCurrentMonth = {},

@@ -2,6 +2,8 @@ package com.example.walklogger.feature.logwalk.activewalk
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.walklogger.R
+import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Stool
@@ -13,6 +15,7 @@ import com.example.walklogger.core.model.withColour
 import com.example.walklogger.core.model.withPassed
 import com.example.walklogger.core.model.withQuantity
 import com.example.walklogger.core.model.withTexture
+import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.feature.logwalk.MAX_NOTES_LENGTH
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -29,6 +32,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.debounce
 import kotlinx.coroutines.flow.filterNotNull
+import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.flow
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
@@ -45,6 +49,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
     @Assisted private val walkId: Long,
     dogRepository: DogRepository,
     private val walkRepository: WalkRepository,
+    private val userMessages: UserMessages,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -70,27 +75,39 @@ class ActiveWalkViewModel @AssistedInject constructor(
         }
     }
 
-    /** Cancelled on discard so a pending note can't be written after the walk is gone. */
-    private val noteSaver = viewModelScope.launch {
-        @OptIn(FlowPreview::class)
-        note.filterNotNull().debounce(NOTE_SAVE_DELAY_MILLIS).collect { walkRepository.updateNotes(walkId, it) }
-    }
+    /** Cancelled on discard so a pending note can't be written after the walk is gone; restarted if the discard fails. */
+    private var noteSaver = saveNotes()
 
     /** Taps are stored at once and in order; cancelled on discard like [noteSaver]. */
-    private val stoolSaver = viewModelScope.launch {
-        stool.filterNotNull().collect { walkRepository.updateStool(walkId, it.stool) }
+    private var stoolSaver = saveStool()
+
+    init {
+        viewModelScope.launch {
+            if (walkRepository.observeWalk(walkId).first() == null) {
+                outcome.update { it.copy(isNotFound = true) }
+                userMessages.show(R.string.error_walk_not_found)
+            }
+        }
     }
 
     private val edits = combine(note, stool, isStoolExpanded, ::Edits)
 
     val uiState: StateFlow<ActiveWalkUiState> =
         combine(
-            walkRepository.observeWalk(walkId).filterNotNull(),
+            walkRepository.observeWalk(walkId),
             dogRepository.observeActiveDog(),
             ticks,
             edits,
             outcome,
         ) { walk, dog, now, edits, outcome ->
+            // A walk deleted by discardWalk keeps showing its last state until the screen leaves.
+            if (walk == null) {
+                return@combine when {
+                    outcome.isNotFound -> ActiveWalkUiState(isNotFound = true)
+                    outcome.isDiscarded -> ActiveWalkUiState(isDiscarded = true)
+                    else -> null
+                }
+            }
             ActiveWalkUiState(
                 dogName = dog?.name,
                 handlers = walk.handlers,
@@ -105,7 +122,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 isDiscarding = outcome.isDiscarding,
                 isDiscarded = outcome.isDiscarded,
             )
-        }.stateIn(
+        }.filterNotNull().stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
             initialValue = ActiveWalkUiState(),
@@ -143,10 +160,16 @@ class ActiveWalkViewModel @AssistedInject constructor(
         if (!state.canEnd) return
         outcome.update { it.copy(isEnding = true) }
         viewModelScope.launch {
-            walkRepository.updateNotes(walkId, state.note)
-            walkRepository.updateStool(walkId, state.stool)
-            walkRepository.finishWalk(walkId)
-            outcome.update { Outcome(isEnded = true) }
+            runCatchingCancellable {
+                walkRepository.updateNotes(walkId, state.note)
+                walkRepository.updateStool(walkId, state.stool)
+                walkRepository.finishWalk(walkId)
+            }
+                .onSuccess { outcome.update { Outcome(isEnded = true) } }
+                .onFailure {
+                    outcome.update { it.copy(isEnding = false) }
+                    userMessages.show(R.string.error_end_walk)
+                }
         }
     }
 
@@ -157,8 +180,29 @@ class ActiveWalkViewModel @AssistedInject constructor(
         noteSaver.cancel()
         stoolSaver.cancel()
         viewModelScope.launch {
-            walkRepository.deleteWalk(walkId)
-            outcome.update { Outcome(isDiscarded = true) }
+            runCatchingCancellable { walkRepository.deleteWalk(walkId) }
+                .onSuccess { outcome.update { Outcome(isDiscarded = true) } }
+                .onFailure {
+                    noteSaver = saveNotes()
+                    stoolSaver = saveStool()
+                    outcome.update { it.copy(isDiscarding = false) }
+                    userMessages.show(R.string.error_delete_walk)
+                }
+        }
+    }
+
+    private fun saveNotes() = viewModelScope.launch {
+        @OptIn(FlowPreview::class)
+        note.filterNotNull().debounce(NOTE_SAVE_DELAY_MILLIS).collect {
+            runCatchingCancellable { walkRepository.updateNotes(walkId, it) }
+                .onFailure { userMessages.show(R.string.error_save_note) }
+        }
+    }
+
+    private fun saveStool() = viewModelScope.launch {
+        stool.filterNotNull().collect {
+            runCatchingCancellable { walkRepository.updateStool(walkId, it.stool) }
+                .onFailure { userMessages.show(R.string.error_save_stool) }
         }
     }
 
@@ -174,6 +218,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
         val isEnded: Boolean = false,
         val isDiscarding: Boolean = false,
         val isDiscarded: Boolean = false,
+        val isNotFound: Boolean = false,
     )
 
     private companion object {

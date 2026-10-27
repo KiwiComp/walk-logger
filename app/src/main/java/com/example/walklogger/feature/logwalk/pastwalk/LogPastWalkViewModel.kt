@@ -2,12 +2,15 @@ package com.example.walklogger.feature.logwalk.pastwalk
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.walklogger.R
+import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
 import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormEditor
 import dagger.assisted.Assisted
@@ -42,6 +45,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
     behaviourIssueRepository: BehaviourIssueRepository,
     medicalConcernRepository: MedicalConcernRepository,
     private val walkRepository: WalkRepository,
+    private val userMessages: UserMessages,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -50,7 +54,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
         fun create(date: LocalDate, walkId: Long?): LogPastWalkViewModel
     }
 
-    private val form = WalkFormEditor(viewModelScope, behaviourIssueRepository, medicalConcernRepository)
+    private val form = WalkFormEditor(viewModelScope, behaviourIssueRepository, medicalConcernRepository, userMessages)
 
     val formActions: WalkFormActions get() = form
 
@@ -71,7 +75,12 @@ class LogPastWalkViewModel @AssistedInject constructor(
     init {
         viewModelScope.launch {
             if (walkId != null) {
-                val walk = checkNotNull(walkRepository.observeWalk(walkId).first()) { "walk $walkId not found" }
+                val walk = walkRepository.observeWalk(walkId).first()
+                if (walk == null) {
+                    screen.update { it.copy(isNotFound = true) }
+                    userMessages.show(R.string.error_walk_not_found)
+                    return@launch
+                }
                 editedWalk = walk
                 form.prefillFrom(walk)
                 screen.update { it.prefilledFrom(walk) }
@@ -115,8 +124,9 @@ class LogPastWalkViewModel @AssistedInject constructor(
     /** Stores the name (or finds the existing one) and selects it. */
     fun addHandler(name: String) {
         viewModelScope.launch {
-            val stored = handlerRepository.addHandler(name)
-            screen.update { it.copy(selectedHandlers = it.selectedHandlers + stored) }
+            runCatchingCancellable { handlerRepository.addHandler(name) }
+                .onSuccess { stored -> screen.update { it.copy(selectedHandlers = it.selectedHandlers + stored) } }
+                .onFailure { userMessages.show(R.string.error_add_name) }
         }
     }
 
@@ -125,20 +135,26 @@ class LogPastWalkViewModel @AssistedInject constructor(
         if (!state.canSave) return
         screen.update { it.copy(isSaving = true) }
         viewModelScope.launch {
-            val edited = editedWalk
-            val dogId = edited?.dogId
-                ?: checkNotNull(dogRepository.observeActiveDog().first()) { "log past walk needs an active dog" }.id
-            val walk = form.applyTo(
-                Walk(
-                    id = edited?.id ?: 0,
-                    dogId = dogId,
-                    handlers = state.handlers.filter { it in state.selectedHandlers },
-                    startTime = state.date.atTime(state.startTime!!).toEpochMilli(),
-                    endTime = state.date.atTime(state.endTime!!).toEpochMilli(),
-                ),
-            )
-            if (edited != null) walkRepository.updateWalk(walk) else walkRepository.logWalk(walk)
-            screen.update { it.copy(isSaving = false, isSaved = true) }
+            runCatchingCancellable {
+                val edited = editedWalk
+                val dogId = edited?.dogId
+                    ?: checkNotNull(dogRepository.observeActiveDog().first()) { "log past walk needs an active dog" }.id
+                val walk = form.applyTo(
+                    Walk(
+                        id = edited?.id ?: 0,
+                        dogId = dogId,
+                        handlers = state.handlers.filter { it in state.selectedHandlers },
+                        startTime = state.date.atTime(state.startTime!!).toEpochMilli(),
+                        endTime = state.date.atTime(state.endTime!!).toEpochMilli(),
+                    ),
+                )
+                if (edited != null) walkRepository.updateWalk(walk) else walkRepository.logWalk(walk)
+            }
+                .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
+                .onFailure {
+                    screen.update { it.copy(isSaving = false) }
+                    userMessages.show(R.string.error_save_walk)
+                }
         }
     }
 

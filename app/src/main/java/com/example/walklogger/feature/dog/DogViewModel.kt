@@ -2,8 +2,11 @@ package com.example.walklogger.feature.dog
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.walklogger.R
+import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.model.Dog
+import com.example.walklogger.core.ui.message.UserMessages
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
 import java.time.LocalDate
@@ -18,6 +21,7 @@ import kotlinx.coroutines.launch
 @HiltViewModel
 class DogViewModel @Inject constructor(
     private val dogRepository: DogRepository,
+    private val userMessages: UserMessages,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -31,7 +35,10 @@ class DogViewModel @Inject constructor(
         )
 
     fun switchDog(id: Long) {
-        viewModelScope.launch { dogRepository.setActiveDog(id) }
+        viewModelScope.launch {
+            runCatchingCancellable { dogRepository.setActiveDog(id) }
+                .onFailure { userMessages.show(R.string.error_select_dog) }
+        }
     }
 
     private fun buildProfile(active: Dog, dogs: List<Dog>) = DogUiState.Profile(

@@ -18,6 +18,7 @@ fun NavGraphBuilder.walkDetailScreen(
     onBack: () -> Unit,
     onEdit: (LocalDate, Long) -> Unit,
     onDiscarded: () -> Unit,
+    onNotFound: () -> Unit,
 ) {
     composable<WalkDetailDestination> { entry ->
         WalkDetailRoute(
@@ -25,6 +26,7 @@ fun NavGraphBuilder.walkDetailScreen(
             onBack = onBack,
             onEdit = onEdit,
             onDiscarded = onDiscarded,
+            onNotFound = onNotFound,
         )
     }
 }

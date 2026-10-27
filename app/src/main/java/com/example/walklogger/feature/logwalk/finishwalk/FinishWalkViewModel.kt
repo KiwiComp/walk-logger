@@ -2,11 +2,14 @@ package com.example.walklogger.feature.logwalk.finishwalk
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.walklogger.R
+import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormEditor
 import dagger.assisted.Assisted
@@ -37,6 +40,7 @@ class FinishWalkViewModel @AssistedInject constructor(
     behaviourIssueRepository: BehaviourIssueRepository,
     medicalConcernRepository: MedicalConcernRepository,
     private val walkRepository: WalkRepository,
+    private val userMessages: UserMessages,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -45,7 +49,7 @@ class FinishWalkViewModel @AssistedInject constructor(
         fun create(walkId: Long): FinishWalkViewModel
     }
 
-    private val form = WalkFormEditor(viewModelScope, behaviourIssueRepository, medicalConcernRepository)
+    private val form = WalkFormEditor(viewModelScope, behaviourIssueRepository, medicalConcernRepository, userMessages)
 
     val formActions: WalkFormActions get() = form
 
@@ -56,7 +60,12 @@ class FinishWalkViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            val stored = checkNotNull(walkRepository.observeWalk(walkId).first()) { "walk $walkId not found" }
+            val stored = walkRepository.observeWalk(walkId).first()
+            if (stored == null) {
+                screen.update { it.copy(isNotFound = true) }
+                userMessages.show(R.string.error_walk_not_found)
+                return@launch
+            }
             walk = stored
             form.prefillFrom(stored)
             screen.update { it.prefilledFrom(stored) }
@@ -90,15 +99,21 @@ class FinishWalkViewModel @AssistedInject constructor(
         val stored = checkNotNull(walk) { "walk $walkId has not loaded" }
         screen.update { it.copy(isSaving = true) }
         viewModelScope.launch {
-            walkRepository.updateWalk(
-                form.applyTo(
-                    stored.copy(
-                        startTime = state.date.atTime(state.startTime!!).toEpochMilli(),
-                        endTime = state.date.atTime(state.endTime!!).toEpochMilli(),
+            runCatchingCancellable {
+                walkRepository.updateWalk(
+                    form.applyTo(
+                        stored.copy(
+                            startTime = state.date.atTime(state.startTime!!).toEpochMilli(),
+                            endTime = state.date.atTime(state.endTime!!).toEpochMilli(),
+                        ),
                     ),
-                ),
-            )
-            screen.update { it.copy(isSaving = false, isSaved = true) }
+                )
+            }
+                .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
+                .onFailure {
+                    screen.update { it.copy(isSaving = false) }
+                    userMessages.show(R.string.error_save_walk)
+                }
         }
     }
 

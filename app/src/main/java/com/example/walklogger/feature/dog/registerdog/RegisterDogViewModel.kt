@@ -2,8 +2,11 @@ package com.example.walklogger.feature.dog.registerdog
 
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
+import com.example.walklogger.R
+import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.model.Dog
+import com.example.walklogger.core.ui.message.UserMessages
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -21,6 +24,7 @@ import kotlinx.coroutines.launch
 class RegisterDogViewModel @AssistedInject constructor(
     @Assisted private val dogId: Long?,
     private val dogRepository: DogRepository,
+    private val userMessages: UserMessages,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -36,10 +40,13 @@ class RegisterDogViewModel @AssistedInject constructor(
     init {
         if (dogId != null) {
             viewModelScope.launch {
-                val dog = checkNotNull(dogRepository.observeDogs().first().find { it.id == dogId }) {
-                    "dog $dogId not found"
+                val dog = dogRepository.observeDogs().first().find { it.id == dogId }
+                if (dog == null) {
+                    _uiState.update { it.copy(isNotFound = true) }
+                    userMessages.show(R.string.error_dog_not_found)
+                } else {
+                    _uiState.update { it.prefilledFrom(dog) }
                 }
-                _uiState.update { it.prefilledFrom(dog) }
             }
         }
     }
@@ -57,23 +64,29 @@ class RegisterDogViewModel @AssistedInject constructor(
         if (!state.canSave) return
         _uiState.update { it.copy(isSaving = true) }
         viewModelScope.launch {
-            if (dogId == null) {
-                dogRepository.registerDog(
-                    name = state.name.trim(),
-                    breed = state.breed.trim(),
-                    birthDate = state.birthDate,
-                    weightKg = state.weightKg,
-                )
-            } else {
-                dogRepository.updateDog(
-                    id = dogId,
-                    name = state.name.trim(),
-                    breed = state.breed.trim(),
-                    birthDate = state.birthDate,
-                    weightKg = state.weightKg,
-                )
+            runCatchingCancellable {
+                if (dogId == null) {
+                    dogRepository.registerDog(
+                        name = state.name.trim(),
+                        breed = state.breed.trim(),
+                        birthDate = state.birthDate,
+                        weightKg = state.weightKg,
+                    )
+                } else {
+                    dogRepository.updateDog(
+                        id = dogId,
+                        name = state.name.trim(),
+                        breed = state.breed.trim(),
+                        birthDate = state.birthDate,
+                        weightKg = state.weightKg,
+                    )
+                }
             }
-            _uiState.update { it.copy(isSaving = false, isSaved = true) }
+                .onSuccess { _uiState.update { it.copy(isSaving = false, isSaved = true) } }
+                .onFailure {
+                    _uiState.update { it.copy(isSaving = false) }
+                    userMessages.show(R.string.error_save_dog)
+                }
         }
     }
 
@@ -81,8 +94,12 @@ class RegisterDogViewModel @AssistedInject constructor(
         if (dogId == null || !_uiState.value.canDelete) return
         _uiState.update { it.copy(isDeleting = true) }
         viewModelScope.launch {
-            dogRepository.deleteDog(dogId)
-            _uiState.update { it.copy(isDeleting = false, isDeleted = true) }
+            runCatchingCancellable { dogRepository.deleteDog(dogId) }
+                .onSuccess { _uiState.update { it.copy(isDeleting = false, isDeleted = true) } }
+                .onFailure {
+                    _uiState.update { it.copy(isDeleting = false) }
+                    userMessages.show(R.string.error_delete_dog)
+                }
         }
     }
 

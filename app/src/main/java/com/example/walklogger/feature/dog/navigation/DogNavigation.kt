@@ -27,8 +27,12 @@ fun NavGraphBuilder.dogScreen(onAddDog: () -> Unit, onEditDog: (dogId: Long) -> 
     composable<DogDestination> { DogRoute(onAddDog = onAddDog, onEditDog = onEditDog) }
 }
 
-fun NavGraphBuilder.registerDogScreen(onDone: () -> Unit) {
+fun NavGraphBuilder.registerDogScreen(onDone: () -> Unit, onNotFound: () -> Unit) {
     composable<RegisterDogDestination> { entry ->
-        RegisterDogRoute(dogId = entry.toRoute<RegisterDogDestination>().dogId, onDone = onDone)
+        RegisterDogRoute(
+            dogId = entry.toRoute<RegisterDogDestination>().dogId,
+            onDone = onDone,
+            onNotFound = onNotFound,
+        )
     }
 }

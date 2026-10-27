@@ -11,6 +11,8 @@ import kotlinx.coroutines.flow.update
 /** In-memory [DogRepository] for unit tests. */
 class FakeDogRepository : DogRepository {
 
+    val failures = FailureSwitch()
+
     private val dogs = MutableStateFlow<List<Dog>>(emptyList())
     private val activeDogId = MutableStateFlow<Long?>(null)
     private var nextId = 1L
@@ -23,6 +25,7 @@ class FakeDogRepository : DogRepository {
         combine(dogs, activeDogId) { list, id -> list.find { it.id == id } ?: list.firstOrNull() }
 
     override suspend fun registerDog(name: String, breed: String, birthDate: LocalDate?, weightKg: Double?): Long {
+        failures.check()
         val id = nextId++
         dogs.update { it + Dog(id = id, name = name, breed = breed, birthDate = birthDate, weightKg = weightKg) }
         if (activeDogId.value == null) activeDogId.value = id
@@ -30,10 +33,12 @@ class FakeDogRepository : DogRepository {
     }
 
     override suspend fun setActiveDog(id: Long) {
+        failures.check()
         activeDogId.value = id
     }
 
     override suspend fun updateDog(id: Long, name: String, breed: String, birthDate: LocalDate?, weightKg: Double?) {
+        failures.check()
         dogs.update { list ->
             list.map { dog ->
                 if (dog.id == id) dog.copy(name = name, breed = breed, birthDate = birthDate, weightKg = weightKg) else dog
@@ -41,5 +46,8 @@ class FakeDogRepository : DogRepository {
         }
     }
 
-    override suspend fun deleteDog(id: Long) = dogs.update { list -> list.filterNot { it.id == id } }
+    override suspend fun deleteDog(id: Long) {
+        failures.check()
+        dogs.update { list -> list.filterNot { it.id == id } }
+    }
 }

@@ -65,24 +65,38 @@ fun NavGraphBuilder.newWalkScreen(
     }
 }
 
-fun NavGraphBuilder.activeWalkScreen(onWalkEnded: (walkId: Long) -> Unit, onWalkDiscarded: () -> Unit) {
+fun NavGraphBuilder.activeWalkScreen(
+    onWalkEnded: (walkId: Long) -> Unit,
+    onWalkDiscarded: () -> Unit,
+    onNotFound: () -> Unit,
+) {
     composable<ActiveWalkDestination> { entry ->
         ActiveWalkRoute(
             walkId = entry.toRoute<ActiveWalkDestination>().walkId,
             onWalkEnded = onWalkEnded,
             onWalkDiscarded = onWalkDiscarded,
+            onNotFound = onNotFound,
         )
     }
 }
 
-fun NavGraphBuilder.finishWalkScreen(onSaved: () -> Unit) {
+fun NavGraphBuilder.finishWalkScreen(onSaved: () -> Unit, onNotFound: () -> Unit) {
     composable<FinishWalkDestination> { entry ->
-        FinishWalkRoute(walkId = entry.toRoute<FinishWalkDestination>().walkId, onSaved = onSaved)
+        FinishWalkRoute(
+            walkId = entry.toRoute<FinishWalkDestination>().walkId,
+            onSaved = onSaved,
+            onNotFound = onNotFound,
+        )
     }
 }
 
 /** [onLogged] runs after a new walk is stored, [onUpdated] after an edited one. */
-fun NavGraphBuilder.logPastWalkScreen(onClose: () -> Unit, onLogged: () -> Unit, onUpdated: () -> Unit) {
+fun NavGraphBuilder.logPastWalkScreen(
+    onClose: () -> Unit,
+    onLogged: () -> Unit,
+    onUpdated: () -> Unit,
+    onNotFound: () -> Unit,
+) {
     composable<LogPastWalkDestination> { entry ->
         val destination = entry.toRoute<LogPastWalkDestination>()
         LogPastWalkRoute(
@@ -90,6 +104,7 @@ fun NavGraphBuilder.logPastWalkScreen(onClose: () -> Unit, onLogged: () -> Unit,
             walkId = destination.walkId,
             onClose = onClose,
             onSaved = if (destination.walkId == null) onLogged else onUpdated,
+            onNotFound = onNotFound,
         )
     }
 }

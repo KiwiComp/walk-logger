@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.calendar.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -19,6 +20,7 @@ fun NavGraphBuilder.calendarScreen(
     onLogPastWalk: (LocalDate) -> Unit,
     onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     composable<CalendarDestination> {
         CalendarRoute(
@@ -26,6 +28,7 @@ fun NavGraphBuilder.calendarScreen(
             onLogPastWalk = onLogPastWalk,
             onOpenWalk = onOpenWalk,
             onGoToDogs = onGoToDogs,
+            snackbarHostState = snackbarHostState,
         )
     }
 }

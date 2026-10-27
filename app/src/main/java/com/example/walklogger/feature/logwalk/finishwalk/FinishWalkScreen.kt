@@ -49,12 +49,16 @@ private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:m
 fun FinishWalkRoute(
     walkId: Long,
     onSaved: () -> Unit,
+    onNotFound: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: FinishWalkViewModel = hiltViewModel<FinishWalkViewModel, FinishWalkViewModel.Factory> { it.create(walkId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    LaunchedEffect(uiState.isSaved) {
-        if (uiState.isSaved) onSaved()
+    LaunchedEffect(uiState.isSaved, uiState.isNotFound) {
+        when {
+            uiState.isSaved -> onSaved()
+            uiState.isNotFound -> onNotFound()
+        }
     }
     FinishWalkScreen(
         uiState = uiState,

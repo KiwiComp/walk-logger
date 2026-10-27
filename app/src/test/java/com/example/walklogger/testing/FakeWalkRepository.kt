@@ -12,6 +12,8 @@ import kotlinx.coroutines.flow.update
 /** In-memory [WalkRepository] for unit tests. Prefer fakes over mocks for repositories. */
 class FakeWalkRepository : WalkRepository {
 
+    val failures = FailureSwitch()
+
     private val walks = MutableStateFlow<List<Walk>>(emptyList())
     private var nextId = 1L
 
@@ -25,6 +27,7 @@ class FakeWalkRepository : WalkRepository {
     override fun observeActiveWalk(): Flow<Walk?> = walks.map { list -> list.find { it.isActive } }
 
     override suspend fun startWalk(dogId: Long, handlers: List<String>, equipment: Equipment): Long {
+        failures.check()
         val id = nextId++
         walks.update {
             it + Walk(id = id, dogId = dogId, handlers = handlers, equipment = equipment, startTime = 0, endTime = null)
@@ -33,6 +36,7 @@ class FakeWalkRepository : WalkRepository {
     }
 
     override suspend fun logWalk(walk: Walk): Long {
+        failures.check()
         require(!walk.isActive) { "a logged walk needs an end time" }
         val id = nextId++
         walks.update { it + walk.copy(id = id) }
@@ -40,25 +44,30 @@ class FakeWalkRepository : WalkRepository {
     }
 
     override suspend fun updateWalk(walk: Walk) {
+        failures.check()
         require(!walk.isActive) { "a logged walk needs an end time" }
         walks.update { list -> list.map { if (it.id == walk.id) walk else it } }
     }
 
     override suspend fun updateNotes(walkId: Long, notes: String) {
+        failures.check()
         walks.update { list -> list.map { if (it.id == walkId) it.copy(notes = notes) else it } }
     }
 
     override suspend fun updateStool(walkId: Long, stool: Stool?) {
+        failures.check()
         walks.update { list -> list.map { if (it.id == walkId) it.copy(stool = stool) else it } }
     }
 
     override suspend fun finishWalk(walkId: Long) {
+        failures.check()
         walks.update { list ->
             list.map { if (it.id == walkId) it.copy(endTime = 1) else it }
         }
     }
 
     override suspend fun deleteWalk(id: Long) {
+        failures.check()
         walks.update { list -> list.filterNot { it.id == id } }
     }
 }

@@ -23,6 +23,8 @@ data class ActiveWalkUiState(
     val isDiscarding: Boolean = false,
     /** True once the walk has been deleted; nothing of it remains to log. */
     val isDiscarded: Boolean = false,
+    /** True when the walk no longer exists; the screen closes. */
+    val isNotFound: Boolean = false,
 ) {
     private val isBusy: Boolean get() = isEnding || isEnded || isDiscarding || isDiscarded
 
