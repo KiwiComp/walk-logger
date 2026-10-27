@@ -9,6 +9,10 @@ import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.withColour
+import com.example.walklogger.core.model.withPassed
+import com.example.walklogger.core.model.withQuantity
+import com.example.walklogger.core.model.withTexture
 import com.example.walklogger.feature.logwalk.MAX_NOTES_LENGTH
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -111,7 +115,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
 
     /** On opens the description rows; off means not answered, so the description is dropped. */
     fun setStoolPassed(passed: Boolean) {
-        editStool { if (passed) it?.takeIf(Stool::passed) ?: Stool(passed = true) else null }
+        editStool { if (passed) it.withPassed(true) else null }
         isStoolExpanded.value = passed
     }
 
@@ -123,15 +127,12 @@ class ActiveWalkViewModel @AssistedInject constructor(
         isStoolExpanded.value = true
     }
 
-    fun selectStoolQuantity(value: StoolQuantity) = editPassedStool { copy(quantity = value) }
+    fun selectStoolQuantity(value: StoolQuantity) = editStool { it.withQuantity(value) }
 
-    fun selectStoolTexture(value: StoolTexture) = editPassedStool { copy(texture = value) }
+    fun selectStoolTexture(value: StoolTexture) = editStool { it.withTexture(value) }
 
     /** A null [value] removes the colour. */
-    fun selectStoolColour(value: StoolColour?) = editPassedStool { copy(colour = value) }
-
-    /** The description only applies once Yes has been picked. */
-    private fun editPassedStool(edit: Stool.() -> Stool) = editStool { current -> current?.takeIf(Stool::passed)?.edit() ?: current }
+    fun selectStoolColour(value: StoolColour?) = editStool { it.withColour(value) }
 
     private fun editStool(edit: (Stool?) -> Stool?) =
         stool.update { StoolEdit(edit(if (it != null) it.stool else uiState.value.stool)) }

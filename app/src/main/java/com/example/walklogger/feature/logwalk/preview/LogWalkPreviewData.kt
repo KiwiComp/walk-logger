@@ -3,6 +3,7 @@ package com.example.walklogger.feature.logwalk.preview
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
+import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Stool
@@ -11,6 +12,8 @@ import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Wind
+import com.example.walklogger.feature.logwalk.WalkFormActions
+import com.example.walklogger.feature.logwalk.WalkFormState
 import com.example.walklogger.feature.logwalk.activewalk.ActiveWalkUiState
 import com.example.walklogger.feature.logwalk.finishwalk.FinishWalkUiState
 import com.example.walklogger.feature.logwalk.newwalk.NewWalkUiState
@@ -57,17 +60,19 @@ internal object LogWalkPreviewData {
         dogName = "Sixten",
         handlers = handlers,
         selectedHandlers = setOf("Jonas"),
-        equipment = Equipment.COLLAR,
-        rain = Rain.LIGHT,
-        temperature = Temperature.COLD,
-        wind = Wind.WINDY,
-        snow = Snow.LIGHT,
-        issues = issues,
-        selectedIssueIds = setOf(1L, 4L),
-        isBehaviourExpanded = true,
-        concerns = concerns,
-        selectedConcernIds = setOf(4L),
-        isMedicalExpanded = true,
+        form = WalkFormState(
+            equipment = Equipment.COLLAR,
+            rain = Rain.LIGHT,
+            temperature = Temperature.COLD,
+            wind = Wind.WINDY,
+            snow = Snow.LIGHT,
+            behaviourIssues = issues,
+            selectedBehaviourIssueIds = setOf(1L, 4L),
+            isBehaviourIssuesExpanded = true,
+            medicalConcerns = concerns,
+            selectedMedicalConcernIds = setOf(4L),
+            isMedicalConcernsExpanded = true,
+        ),
     )
 
     val activeWalk = ActiveWalkUiState(
@@ -88,16 +93,48 @@ internal object LogWalkPreviewData {
         endTime = LocalTime.of(7, 39),
         dogName = "Sixten",
         handlers = listOf("Anna"),
-        rating = 6,
-        stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, texture = StoolTexture.FIRM, colour = StoolColour.MEDIUM_BROWN),
-        equipment = Equipment.HARNESS,
-        rain = Rain.NONE,
-        temperature = Temperature.COOL,
-        wind = Wind.BREEZE,
-        snow = Snow.NONE,
-        issues = issues,
-        concerns = concerns,
-        notes = "Barked at the bin lorry, otherwise steady. Off-lead in the field for ten minutes.",
+        form = WalkFormState(
+            rating = 6,
+            stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, texture = StoolTexture.FIRM, colour = StoolColour.MEDIUM_BROWN),
+            equipment = Equipment.HARNESS,
+            rain = Rain.NONE,
+            temperature = Temperature.COOL,
+            wind = Wind.BREEZE,
+            snow = Snow.NONE,
+            behaviourIssues = issues,
+            medicalConcerns = concerns,
+            notes = "Barked at the bin lorry, otherwise steady. Off-lead in the field for ten minutes.",
+        ),
         isLoading = false,
     )
+
+    val formActions = object : WalkFormActions {
+        override fun setRating(rating: Int) = Unit
+        override fun setOptionalRating(aspect: OptionalRating, value: Int?) = Unit
+        override fun toggleOptionalRatings() = Unit
+        override fun clearOptionalRatings() = Unit
+        override fun selectStoolPassed(passed: Boolean) = Unit
+        override fun foldStool() = Unit
+        override fun expandStool() = Unit
+        override fun selectStoolQuantity(value: StoolQuantity) = Unit
+        override fun selectStoolTexture(value: StoolTexture) = Unit
+        override fun selectStoolColour(value: StoolColour?) = Unit
+        override fun clearStool() = Unit
+        override fun selectEquipment(value: Equipment) = Unit
+        override fun selectRain(value: Rain) = Unit
+        override fun selectTemperature(value: Temperature) = Unit
+        override fun selectWind(value: Wind) = Unit
+        override fun selectSnow(value: Snow) = Unit
+        override fun toggleWeather() = Unit
+        override fun clearWeather() = Unit
+        override fun toggleBehaviourIssue(issue: BehaviourIssue) = Unit
+        override fun addBehaviourIssue(name: String) = Unit
+        override fun toggleBehaviourIssuesExpanded() = Unit
+        override fun clearBehaviourIssues() = Unit
+        override fun toggleMedicalConcern(concern: MedicalConcern) = Unit
+        override fun addMedicalConcern(name: String) = Unit
+        override fun toggleMedicalConcernsExpanded() = Unit
+        override fun clearMedicalConcerns() = Unit
+        override fun setNotes(notes: String) = Unit
+    }
 }

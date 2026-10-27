@@ -26,47 +26,25 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
-import com.example.walklogger.core.model.BehaviourIssue
-import com.example.walklogger.core.model.Equipment
-import com.example.walklogger.core.model.MedicalConcern
-import com.example.walklogger.core.model.OptionalRating
-import com.example.walklogger.core.model.Rain
-import com.example.walklogger.core.model.Snow
-import com.example.walklogger.core.model.StoolColour
-import com.example.walklogger.core.model.StoolQuantity
-import com.example.walklogger.core.model.StoolTexture
-import com.example.walklogger.core.model.Temperature
-import com.example.walklogger.core.model.Wind
 import com.example.walklogger.core.ui.component.AppButton
-import com.example.walklogger.core.ui.component.AppTextField
 import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.HeaderIconButton
-import com.example.walklogger.core.ui.component.SegmentedToggle
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.InkMuted
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
-import com.example.walklogger.feature.logwalk.component.AddBehaviourIssueDialog
-import com.example.walklogger.feature.logwalk.component.AddMedicalConcernDialog
+import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
-import com.example.walklogger.feature.logwalk.component.BehaviourSection
 import com.example.walklogger.feature.logwalk.component.FormSection
-import com.example.walklogger.feature.logwalk.component.MedicalSection
-import com.example.walklogger.feature.logwalk.component.OptionalRatingsSection
-import com.example.walklogger.feature.logwalk.component.RatingScale
-import com.example.walklogger.feature.logwalk.component.StoolSection
 import com.example.walklogger.feature.logwalk.component.SelectableChip
-import com.example.walklogger.feature.logwalk.component.WeatherSection
+import com.example.walklogger.feature.logwalk.component.WalkFormContent
 import com.example.walklogger.feature.logwalk.component.WhenSection
-import com.example.walklogger.feature.logwalk.component.labelRes
 import com.example.walklogger.feature.logwalk.component.messageRes
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 import java.time.LocalDate
 import java.time.LocalTime
 
 
-
-private const val NotesMinLines = 3
 
 @Composable
 fun LogPastWalkRoute(
@@ -84,39 +62,13 @@ fun LogPastWalkRoute(
     }
     LogPastWalkScreen(
         uiState = uiState,
+        formActions = viewModel.formActions,
         onClose = onClose,
         onDateChange = viewModel::setDate,
         onStartTimeChange = viewModel::setStartTime,
         onEndTimeChange = viewModel::setEndTime,
         onHandlerToggled = viewModel::toggleHandler,
         onAddHandler = viewModel::addHandler,
-        onRatingChange = viewModel::setRating,
-        onOptionalRatingChange = viewModel::setOptionalRating,
-        onToggleOptionalRatings = viewModel::toggleOptionalRatings,
-        onClearOptionalRatings = viewModel::clearOptionalRatings,
-        onStoolPassedSelected = viewModel::selectStoolPassed,
-        onStoolQuantitySelected = viewModel::selectStoolQuantity,
-        onStoolTextureSelected = viewModel::selectStoolTexture,
-        onStoolColourSelected = viewModel::selectStoolColour,
-        onClearStool = viewModel::clearStool,
-        onStoolFold = viewModel::foldStool,
-        onStoolExpand = viewModel::expandStool,
-        onEquipmentSelected = viewModel::selectEquipment,
-        onRainSelected = viewModel::selectRain,
-        onTemperatureSelected = viewModel::selectTemperature,
-        onWindSelected = viewModel::selectWind,
-        onSnowSelected = viewModel::selectSnow,
-        onToggleWeather = viewModel::toggleWeather,
-        onClearWeather = viewModel::clearWeather,
-        onIssueToggled = viewModel::toggleIssue,
-        onAddIssue = viewModel::addIssue,
-        onToggleBehaviour = viewModel::toggleBehaviour,
-        onClearIssues = viewModel::clearIssues,
-        onConcernToggled = viewModel::toggleConcern,
-        onAddConcern = viewModel::addConcern,
-        onToggleMedical = viewModel::toggleMedical,
-        onClearConcerns = viewModel::clearConcerns,
-        onNotesChange = viewModel::setNotes,
         onSave = viewModel::save,
         modifier = modifier,
     )
@@ -125,45 +77,17 @@ fun LogPastWalkRoute(
 @Composable
 fun LogPastWalkScreen(
     uiState: LogPastWalkUiState,
+    formActions: WalkFormActions,
     onClose: () -> Unit,
     onDateChange: (LocalDate) -> Unit,
     onStartTimeChange: (LocalTime) -> Unit,
     onEndTimeChange: (LocalTime) -> Unit,
     onHandlerToggled: (String) -> Unit,
     onAddHandler: (String) -> Unit,
-    onRatingChange: (Int) -> Unit,
-    onOptionalRatingChange: (OptionalRating, Int?) -> Unit,
-    onToggleOptionalRatings: () -> Unit,
-    onClearOptionalRatings: () -> Unit,
-    onStoolPassedSelected: (Boolean) -> Unit,
-    onStoolQuantitySelected: (StoolQuantity) -> Unit,
-    onStoolTextureSelected: (StoolTexture) -> Unit,
-    onStoolColourSelected: (StoolColour?) -> Unit,
-    onClearStool: () -> Unit,
-    onStoolFold: () -> Unit,
-    onStoolExpand: () -> Unit,
-    onEquipmentSelected: (Equipment) -> Unit,
-    onRainSelected: (Rain) -> Unit,
-    onTemperatureSelected: (Temperature) -> Unit,
-    onWindSelected: (Wind) -> Unit,
-    onSnowSelected: (Snow) -> Unit,
-    onToggleWeather: () -> Unit,
-    onClearWeather: () -> Unit,
-    onIssueToggled: (BehaviourIssue) -> Unit,
-    onAddIssue: (String) -> Unit,
-    onToggleBehaviour: () -> Unit,
-    onClearIssues: () -> Unit,
-    onConcernToggled: (MedicalConcern) -> Unit,
-    onAddConcern: (String) -> Unit,
-    onToggleMedical: () -> Unit,
-    onClearConcerns: () -> Unit,
-    onNotesChange: (String) -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showAddHandler by rememberSaveable { mutableStateOf(false) }
-    var showAddIssue by rememberSaveable { mutableStateOf(false) }
-    var showAddConcern by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(if (uiState.isEditing) R.string.edit_walk_title else R.string.log_past_walk_title),
@@ -206,78 +130,7 @@ fun LogPastWalkScreen(
                     onAdd = { showAddHandler = true },
                 )
             }
-            FormSection(label = stringResource(R.string.new_walk_equipment)) {
-                SegmentedToggle(
-                    options = Equipment.entries,
-                    selected = uiState.equipment,
-                    onSelect = onEquipmentSelected,
-                    label = { stringResource(it.labelRes) },
-                )
-            }
-            FormSection(
-                label = stringResource(R.string.log_past_walk_rating),
-                hint = stringResource(R.string.log_past_walk_rating_scale),
-            ) {
-                RatingScale(rating = uiState.rating, onRatingChange = onRatingChange)
-            }
-            StoolSection(
-                stool = uiState.stool,
-                onPassedSelected = onStoolPassedSelected,
-                onQuantitySelected = onStoolQuantitySelected,
-                onTextureSelected = onStoolTextureSelected,
-                onColourSelected = onStoolColourSelected,
-                onClear = onClearStool,
-                expanded = uiState.isStoolExpanded,
-                onFold = onStoolFold,
-                onExpand = onStoolExpand,
-            )
-            OptionalRatingsSection(
-                ratings = uiState.optionalRatings,
-                expanded = uiState.isOptionalRatingsExpanded,
-                onToggle = onToggleOptionalRatings,
-                onClear = onClearOptionalRatings,
-                onRatingChange = onOptionalRatingChange,
-            )
-            WeatherSection(
-                rain = uiState.rain,
-                temperature = uiState.temperature,
-                wind = uiState.wind,
-                snow = uiState.snow,
-                expanded = uiState.isWeatherExpanded,
-                onToggle = onToggleWeather,
-                onClear = onClearWeather,
-                onRainSelected = onRainSelected,
-                onTemperatureSelected = onTemperatureSelected,
-                onWindSelected = onWindSelected,
-                onSnowSelected = onSnowSelected,
-            )
-            BehaviourSection(
-                issues = uiState.issues,
-                selectedIds = uiState.selectedIssueIds,
-                expanded = uiState.isBehaviourExpanded,
-                onToggle = onToggleBehaviour,
-                onClear = onClearIssues,
-                onIssueToggled = onIssueToggled,
-                onAddIssue = { showAddIssue = true },
-            )
-            MedicalSection(
-                concerns = uiState.concerns,
-                selectedIds = uiState.selectedConcernIds,
-                expanded = uiState.isMedicalExpanded,
-                onToggle = onToggleMedical,
-                onClear = onClearConcerns,
-                onConcernToggled = onConcernToggled,
-                onAddConcern = { showAddConcern = true },
-            )
-            FormSection(label = stringResource(R.string.log_past_walk_notes)) {
-                AppTextField(
-                    value = uiState.notes,
-                    onValueChange = onNotesChange,
-                    placeholder = stringResource(R.string.log_past_walk_notes_placeholder),
-                    singleLine = false,
-                    minLines = NotesMinLines,
-                )
-            }
+            WalkFormContent(form = uiState.form, actions = formActions)
             Column(
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -308,198 +161,62 @@ fun LogPastWalkScreen(
             onDismiss = { showAddHandler = false },
         )
     }
-    if (showAddIssue) {
-        AddBehaviourIssueDialog(
-            onConfirm = { name ->
-                onAddIssue(name)
-                showAddIssue = false
-            },
-            onDismiss = { showAddIssue = false },
-        )
-    }
-    if (showAddConcern) {
-        AddMedicalConcernDialog(
-            onConfirm = { name ->
-                onAddConcern(name)
-                showAddConcern = false
-            },
-            onDismiss = { showAddConcern = false },
-        )
-    }
 }
 
-@Preview(showBackground = true, heightDp = 1200)
 @Composable
-private fun LogPastWalkScreenPreview() {
+private fun LogPastWalkScreenPreview(uiState: LogPastWalkUiState) {
     WalkLoggerTheme {
         LogPastWalkScreen(
-            uiState = LogWalkPreviewData.logPastWalk,
+            uiState = uiState,
+            formActions = LogWalkPreviewData.formActions,
             onClose = {},
             onDateChange = {},
             onStartTimeChange = {},
             onEndTimeChange = {},
             onHandlerToggled = {},
             onAddHandler = {},
-            onRatingChange = {},
-            onOptionalRatingChange = { _, _ -> },
-            onToggleOptionalRatings = {},
-            onClearOptionalRatings = {},
-            onStoolPassedSelected = {},
-            onStoolQuantitySelected = {},
-            onStoolTextureSelected = {},
-            onStoolColourSelected = {},
-            onClearStool = {},
-            onStoolFold = {},
-            onStoolExpand = {},
-            onEquipmentSelected = {},
-            onRainSelected = {},
-            onTemperatureSelected = {},
-            onWindSelected = {},
-            onSnowSelected = {},
-            onToggleWeather = {},
-            onClearWeather = {},
-            onIssueToggled = {},
-            onAddIssue = {},
-            onToggleBehaviour = {},
-            onClearIssues = {},
-            onConcernToggled = {},
-            onAddConcern = {},
-            onToggleMedical = {},
-            onClearConcerns = {},
-            onNotesChange = {},
             onSave = {},
         )
     }
 }
+
+@Preview(showBackground = true, heightDp = 1200)
+@Composable
+private fun LogPastWalkScreenDefaultPreview() = LogPastWalkScreenPreview(LogWalkPreviewData.logPastWalk)
 
 @Preview(showBackground = true, heightDp = 1200)
 @Composable
 private fun LogPastWalkScreenCompletePreview() {
-    WalkLoggerTheme {
-        LogPastWalkScreen(
-            uiState = LogWalkPreviewData.logPastWalk.copy(rating = 5, notes = "Calm on the lead, one barking dog at the gate."),
-            onClose = {},
-            onDateChange = {},
-            onStartTimeChange = {},
-            onEndTimeChange = {},
-            onHandlerToggled = {},
-            onAddHandler = {},
-            onRatingChange = {},
-            onOptionalRatingChange = { _, _ -> },
-            onToggleOptionalRatings = {},
-            onClearOptionalRatings = {},
-            onStoolPassedSelected = {},
-            onStoolQuantitySelected = {},
-            onStoolTextureSelected = {},
-            onStoolColourSelected = {},
-            onClearStool = {},
-            onStoolFold = {},
-            onStoolExpand = {},
-            onEquipmentSelected = {},
-            onRainSelected = {},
-            onTemperatureSelected = {},
-            onWindSelected = {},
-            onSnowSelected = {},
-            onToggleWeather = {},
-            onClearWeather = {},
-            onIssueToggled = {},
-            onAddIssue = {},
-            onToggleBehaviour = {},
-            onClearIssues = {},
-            onConcernToggled = {},
-            onAddConcern = {},
-            onToggleMedical = {},
-            onClearConcerns = {},
-            onNotesChange = {},
-            onSave = {},
-        )
-    }
+    val walk = LogWalkPreviewData.logPastWalk
+    LogPastWalkScreenPreview(walk.copy(form = walk.form.copy(rating = 5, notes = "Calm on the lead, one barking dog at the gate.")))
 }
 
 @Preview(showBackground = true, heightDp = 1200)
 @Composable
 private fun LogPastWalkScreenEditPreview() {
-    WalkLoggerTheme {
-        LogPastWalkScreen(
-            uiState = LogWalkPreviewData.logPastWalk.copy(isEditing = true, rating = 5, notes = "Calm on the lead."),
-            onClose = {},
-            onDateChange = {},
-            onStartTimeChange = {},
-            onEndTimeChange = {},
-            onHandlerToggled = {},
-            onAddHandler = {},
-            onRatingChange = {},
-            onOptionalRatingChange = { _, _ -> },
-            onToggleOptionalRatings = {},
-            onClearOptionalRatings = {},
-            onStoolPassedSelected = {},
-            onStoolQuantitySelected = {},
-            onStoolTextureSelected = {},
-            onStoolColourSelected = {},
-            onClearStool = {},
-            onStoolFold = {},
-            onStoolExpand = {},
-            onEquipmentSelected = {},
-            onRainSelected = {},
-            onTemperatureSelected = {},
-            onWindSelected = {},
-            onSnowSelected = {},
-            onToggleWeather = {},
-            onClearWeather = {},
-            onIssueToggled = {},
-            onAddIssue = {},
-            onToggleBehaviour = {},
-            onClearIssues = {},
-            onConcernToggled = {},
-            onAddConcern = {},
-            onToggleMedical = {},
-            onClearConcerns = {},
-            onNotesChange = {},
-            onSave = {},
-        )
-    }
+    val walk = LogWalkPreviewData.logPastWalk
+    LogPastWalkScreenPreview(walk.copy(isEditing = true, form = walk.form.copy(rating = 5, notes = "Calm on the lead.")))
 }
 
 @Preview(showBackground = true, heightDp = 1200)
 @Composable
 private fun LogPastWalkScreenEmptyPreview() {
-    WalkLoggerTheme {
-        LogPastWalkScreen(
-            uiState = LogWalkPreviewData.logPastWalk.copy(startTime = null, endTime = null, selectedHandlers = emptySet(), rain = null, temperature = null, wind = null, snow = null, selectedIssueIds = emptySet(), isBehaviourExpanded = false, selectedConcernIds = emptySet(), isMedicalExpanded = false),
-            onClose = {},
-            onDateChange = {},
-            onStartTimeChange = {},
-            onEndTimeChange = {},
-            onHandlerToggled = {},
-            onAddHandler = {},
-            onRatingChange = {},
-            onOptionalRatingChange = { _, _ -> },
-            onToggleOptionalRatings = {},
-            onClearOptionalRatings = {},
-            onStoolPassedSelected = {},
-            onStoolQuantitySelected = {},
-            onStoolTextureSelected = {},
-            onStoolColourSelected = {},
-            onClearStool = {},
-            onStoolFold = {},
-            onStoolExpand = {},
-            onEquipmentSelected = {},
-            onRainSelected = {},
-            onTemperatureSelected = {},
-            onWindSelected = {},
-            onSnowSelected = {},
-            onToggleWeather = {},
-            onClearWeather = {},
-            onIssueToggled = {},
-            onAddIssue = {},
-            onToggleBehaviour = {},
-            onClearIssues = {},
-            onConcernToggled = {},
-            onAddConcern = {},
-            onToggleMedical = {},
-            onClearConcerns = {},
-            onNotesChange = {},
-            onSave = {},
-        )
-    }
+    val walk = LogWalkPreviewData.logPastWalk
+    LogPastWalkScreenPreview(
+        walk.copy(
+            startTime = null,
+            endTime = null,
+            selectedHandlers = emptySet(),
+            form = walk.form.copy(
+                rain = null,
+                temperature = null,
+                wind = null,
+                snow = null,
+                selectedBehaviourIssueIds = emptySet(),
+                isBehaviourIssuesExpanded = false,
+                selectedMedicalConcernIds = emptySet(),
+                isMedicalConcernsExpanded = false,
+            ),
+        ),
+    )
 }
