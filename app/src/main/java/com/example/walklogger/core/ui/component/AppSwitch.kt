@@ -10,15 +10,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.ChipSurface
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.NavyLight
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.OnNavyMuted
-import com.example.walklogger.core.ui.theme.Outline
-import com.example.walklogger.core.ui.theme.OutlineOnNavy
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 enum class AppSwitchStyle {
@@ -29,7 +21,7 @@ enum class AppSwitchStyle {
     Inverse,
 }
 
-/** On/off switch in the app palette; on is [Steel] in both styles. */
+/** On/off switch in the app palette; on is [AppTheme.colors.action] in both styles. */
 @Composable
 fun AppSwitch(
     checked: Boolean,
@@ -48,20 +40,20 @@ fun AppSwitch(
 @Composable
 private fun AppSwitchStyle.colors(): SwitchColors = when (this) {
     AppSwitchStyle.Default -> SwitchDefaults.colors(
-        checkedThumbColor = OnNavy,
-        checkedTrackColor = Steel,
-        checkedBorderColor = Steel,
-        uncheckedThumbColor = InkMuted,
-        uncheckedTrackColor = ChipSurface,
-        uncheckedBorderColor = Outline,
+        checkedThumbColor = AppTheme.colors.onHeader,
+        checkedTrackColor = AppTheme.colors.action,
+        checkedBorderColor = AppTheme.colors.action,
+        uncheckedThumbColor = AppTheme.colors.contentMuted,
+        uncheckedTrackColor = AppTheme.colors.chip,
+        uncheckedBorderColor = AppTheme.colors.outline,
     )
     AppSwitchStyle.Inverse -> SwitchDefaults.colors(
-        checkedThumbColor = OnNavy,
-        checkedTrackColor = Steel,
-        checkedBorderColor = Steel,
-        uncheckedThumbColor = OnNavyMuted,
-        uncheckedTrackColor = NavyLight,
-        uncheckedBorderColor = OutlineOnNavy,
+        checkedThumbColor = AppTheme.colors.onHeader,
+        checkedTrackColor = AppTheme.colors.action,
+        checkedBorderColor = AppTheme.colors.action,
+        uncheckedThumbColor = AppTheme.colors.onHeaderMuted,
+        uncheckedTrackColor = AppTheme.colors.headerRaised,
+        uncheckedBorderColor = AppTheme.colors.outlineOnHeader,
     )
 }
 
@@ -80,7 +72,7 @@ private fun AppSwitchPreview() {
 @Composable
 private fun AppSwitchInversePreview() {
     WalkLoggerTheme {
-        Row(modifier = Modifier.background(Navy).padding(AppSpacing.lg)) {
+        Row(modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg)) {
             AppSwitch(checked = false, onCheckedChange = {}, style = AppSwitchStyle.Inverse)
             AppSwitch(checked = true, onCheckedChange = {}, style = AppSwitchStyle.Inverse)
         }

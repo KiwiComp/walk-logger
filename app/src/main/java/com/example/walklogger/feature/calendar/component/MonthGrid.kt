@@ -30,13 +30,8 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.SectionLabel
-import com.example.walklogger.core.ui.theme.Accent
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.ChipSurface
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.RatingTints
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.calendar.CalendarDayUiState
 import com.example.walklogger.feature.calendar.preview.CalendarPreviewData
@@ -48,7 +43,7 @@ import java.time.format.TextStyle
 
 private const val DaysPerWeek = 7
 private val SelectedBorderWidth = 2.dp
-/** Ratings from here up sit on the dark blues, where [Ink] would no longer be readable. */
+/** Ratings from here up sit on the dark blues, where [AppTheme.colors.content] would no longer be readable. */
 private const val FirstDarkRating = 5
 
 /** Monday-first month grid; each cell is tinted by its day's rating and shows the walk count. */
@@ -63,7 +58,10 @@ internal fun MonthGrid(
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = AppSpacing.xs)) {
             DayOfWeek.entries.forEach { dayOfWeek ->
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    SectionLabel(text = dayOfWeek.getDisplayName(TextStyle.NARROW, locale), color = InkMuted)
+                    SectionLabel(
+                        text = dayOfWeek.getDisplayName(TextStyle.NARROW, locale),
+                        color = AppTheme.colors.contentMuted,
+                    )
                 }
             }
         }
@@ -82,11 +80,11 @@ internal fun MonthGrid(
 
 @Composable
 private fun RowScope.DayCell(day: CalendarDayUiState, onClick: () -> Unit) {
-    val background = day.rating?.let { RatingTints[it - 1] } ?: ChipSurface
+    val background = day.rating?.let { AppTheme.colors.ratingTints[it - 1] } ?: AppTheme.colors.chip
     val foreground = when {
-        !day.isEnabled -> InkMuted
-        day.rating != null && day.rating >= FirstDarkRating -> OnNavy
-        else -> Ink
+        !day.isEnabled -> AppTheme.colors.contentMuted
+        day.rating != null && day.rating >= FirstDarkRating -> AppTheme.colors.onHeader
+        else -> AppTheme.colors.content
     }
     val locale = LocalConfiguration.current.locales[0]
     val description = remember(locale, day.date) { day.date.format(DateTimeFormatter.ofPattern("EEEE d MMMM", locale)) }
@@ -96,7 +94,7 @@ private fun RowScope.DayCell(day: CalendarDayUiState, onClick: () -> Unit) {
             .weight(1f)
             .aspectRatio(1f)
             .background(background)
-            .border(SelectedBorderWidth, if (day.isSelected) Accent else Color.Transparent)
+            .border(SelectedBorderWidth, if (day.isSelected) AppTheme.colors.selection else Color.Transparent)
             .selectable(
                 selected = day.isSelected,
                 enabled = day.isEnabled,

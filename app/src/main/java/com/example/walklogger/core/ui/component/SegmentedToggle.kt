@@ -24,11 +24,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.CardSurface
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.Outline
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val DividerWidth = 1.dp
@@ -61,12 +57,12 @@ fun <T> SegmentedToggle(
             .fillMaxWidth()
             .height(AppSize.chipHeight)
             .clip(shape)
-            .border(1.dp, Outline, shape)
+            .border(1.dp, AppTheme.colors.outline, shape)
             .selectableGroup(),
     ) {
         options.forEachIndexed { index, option ->
             if (index > 0) {
-                Box(Modifier.width(DividerWidth).fillMaxHeight().background(Outline))
+                Box(Modifier.width(DividerWidth).fillMaxHeight().background(AppTheme.colors.outline))
             }
             Segment(
                 text = label(option),
@@ -84,7 +80,7 @@ private fun RowScope.Segment(text: String, isSelected: Boolean, onClick: () -> U
         modifier = Modifier
             .weight(1f)
             .fillMaxHeight()
-            .background(if (isSelected) Steel else CardSurface)
+            .background(if (isSelected) AppTheme.colors.action else AppTheme.colors.card)
             .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick)
             .padding(horizontal = AppSpacing.sm),
         contentAlignment = Alignment.Center,
@@ -95,7 +91,7 @@ private fun RowScope.Segment(text: String, isSelected: Boolean, onClick: () -> U
                 SegmentedToggleSize.Regular -> MaterialTheme.typography.titleSmall
                 SegmentedToggleSize.Compact -> MaterialTheme.typography.bodySmall
             },
-            color = if (isSelected) OnNavy else Ink,
+            color = if (isSelected) AppTheme.colors.onHeader else AppTheme.colors.content,
             maxLines = 1,
         )
     }

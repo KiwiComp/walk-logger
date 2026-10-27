@@ -19,11 +19,7 @@ import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.SectionLabel
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.ChipSurface
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.OnNavyMuted
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val ButtonHeight = 180.dp
@@ -36,14 +32,14 @@ internal fun StartWalkButton(
     onClick: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val foreground = if (enabled) OnNavy else InkMuted
-    val mutedForeground = if (enabled) OnNavyMuted else InkMuted
+    val foreground = if (enabled) AppTheme.colors.onHeader else AppTheme.colors.contentMuted
+    val mutedForeground = if (enabled) AppTheme.colors.onHeaderMuted else AppTheme.colors.contentMuted
     Column(
         modifier = modifier
             .fillMaxWidth()
             .height(ButtonHeight)
             .clip(MaterialTheme.shapes.extraSmall)
-            .background(if (enabled) Steel else ChipSurface)
+            .background(if (enabled) AppTheme.colors.action else AppTheme.colors.chip)
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = AppSpacing.xxxl, vertical = AppSpacing.xxxl),
     ) {

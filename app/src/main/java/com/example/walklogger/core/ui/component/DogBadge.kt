@@ -7,8 +7,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.NavyLight
-import com.example.walklogger.core.ui.theme.OnNavy
+import com.example.walklogger.core.ui.theme.AppTheme
 
 /** The active dog's name tag shown in the header. Draws nothing while no dog is registered. */
 @Composable
@@ -17,9 +16,9 @@ fun DogBadge(name: String?, modifier: Modifier = Modifier) {
     Text(
         text = name,
         style = MaterialTheme.typography.bodyMedium,
-        color = OnNavy,
+        color = AppTheme.colors.onHeader,
         modifier = modifier
-            .background(NavyLight)
+            .background(AppTheme.colors.headerRaised)
             .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
     )
 }

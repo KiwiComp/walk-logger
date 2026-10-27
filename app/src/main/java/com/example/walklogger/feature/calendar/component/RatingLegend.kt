@@ -18,9 +18,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.OnNavyMuted
-import com.example.walklogger.core.ui.theme.RatingTints
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val SwatchSize = 14.dp
@@ -32,17 +30,17 @@ internal fun RatingLegend(modifier: Modifier = Modifier) {
         Text(
             text = stringResource(R.string.calendar_legend_rating),
             style = MaterialTheme.typography.bodySmall,
-            color = OnNavyMuted,
+            color = AppTheme.colors.onHeaderMuted,
         )
         Spacer(Modifier.width(AppSpacing.sm))
         Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
-            RatingTints.forEach { tint -> Box(Modifier.size(SwatchSize).background(tint)) }
+            AppTheme.colors.ratingTints.forEach { tint -> Box(Modifier.size(SwatchSize).background(tint)) }
         }
         Spacer(Modifier.width(AppSpacing.sm))
         Text(
             text = stringResource(R.string.calendar_legend_range),
             style = MaterialTheme.typography.bodySmall,
-            color = OnNavyMuted,
+            color = AppTheme.colors.onHeaderMuted,
         )
     }
 }
@@ -51,6 +49,6 @@ internal fun RatingLegend(modifier: Modifier = Modifier) {
 @Composable
 private fun RatingLegendPreview() {
     WalkLoggerTheme {
-        RatingLegend(modifier = Modifier.background(Navy).padding(AppSpacing.lg))
+        RatingLegend(modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg))
     }
 }

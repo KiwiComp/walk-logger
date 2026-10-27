@@ -28,9 +28,7 @@ import com.example.walklogger.core.ui.component.AppSwitch
 import com.example.walklogger.core.ui.component.AppSwitchStyle
 import com.example.walklogger.core.ui.component.SectionLabel
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.OnNavyMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.FormStyle
 import com.example.walklogger.feature.logwalk.component.StoolDescriptors
@@ -62,12 +60,16 @@ internal fun ActiveStoolSection(
             horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SectionLabel(text = label, color = OnNavyMuted, style = MaterialTheme.typography.labelLarge)
+            SectionLabel(
+                text = label,
+                color = AppTheme.colors.onHeaderMuted,
+                style = MaterialTheme.typography.labelLarge,
+            )
             Spacer(Modifier.weight(1f))
             if (passed) {
                 SectionLabel(
                     text = stringResource(if (expanded) R.string.stool_done else R.string.stool_edit),
-                    color = OnNavy,
+                    color = AppTheme.colors.onHeader,
                     modifier = Modifier
                         .clickable(role = Role.Button, onClick = if (expanded) onFold else onExpand)
                         .padding(horizontal = AppSpacing.sm, vertical = AppSpacing.xs),
@@ -137,6 +139,6 @@ private fun ActiveStoolSectionPreview(stool: Stool?, expanded: Boolean) {
         onColourSelected = {},
         onFold = {},
         onExpand = {},
-        modifier = Modifier.background(Navy).padding(AppSpacing.lg),
+        modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg),
     )
 }

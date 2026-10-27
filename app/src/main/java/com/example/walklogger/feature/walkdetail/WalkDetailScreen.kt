@@ -33,8 +33,7 @@ import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.Outline
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.FormSection
 import com.example.walklogger.feature.logwalk.component.label
@@ -112,36 +111,40 @@ fun WalkDetailScreen(
         if (!uiState.isLoading) {
             Column(modifier = Modifier.fillMaxWidth().verticalScroll(rememberScrollState())) {
                 WhenDetails(uiState)
-                HorizontalDivider(color = Outline)
+                HorizontalDivider(color = AppTheme.colors.outline)
                 WhoDetails(uiState)
-                HorizontalDivider(color = Outline)
+                HorizontalDivider(color = AppTheme.colors.outline)
                 RatingDetails(uiState)
-                HorizontalDivider(color = Outline)
+                HorizontalDivider(color = AppTheme.colors.outline)
                 StoolDetails(uiState.stool)
-                HorizontalDivider(color = Outline)
+                HorizontalDivider(color = AppTheme.colors.outline)
                 OptionalRatingDetails(uiState.optionalRatings)
-                HorizontalDivider(color = Outline)
+                HorizontalDivider(color = AppTheme.colors.outline)
                 WeatherDetails(uiState)
-                HorizontalDivider(color = Outline)
+                HorizontalDivider(color = AppTheme.colors.outline)
                 DetailSection(
                     label = stringResource(R.string.log_past_walk_behaviour),
                     hint = uiState.behaviourIssues.size.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.walk_detail_noted_count, it, it) },
                 ) {
                     NotedGrid(labels = uiState.behaviourIssues.map { it.label() })
                 }
-                HorizontalDivider(color = Outline)
+                HorizontalDivider(color = AppTheme.colors.outline)
                 DetailSection(
                     label = stringResource(R.string.log_past_walk_medical),
                     hint = uiState.medicalConcerns.size.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.walk_detail_noted_count, it, it) },
                 ) {
                     NotedGrid(labels = uiState.medicalConcerns.map { it.label() })
                 }
-                HorizontalDivider(color = Outline)
+                HorizontalDivider(color = AppTheme.colors.outline)
                 DetailSection(label = stringResource(R.string.log_past_walk_notes)) {
                     if (uiState.notes.isBlank()) {
                         DetailPlaceholder(text = stringResource(R.string.walk_detail_not_recorded))
                     } else {
-                        Text(text = uiState.notes, style = MaterialTheme.typography.bodyLarge, color = Ink)
+                        Text(
+                            text = uiState.notes,
+                            style = MaterialTheme.typography.bodyLarge,
+                            color = AppTheme.colors.content,
+                        )
                     }
                 }
             }
@@ -206,16 +209,24 @@ private fun WhenDetails(uiState: WalkDetailUiState) {
 private fun WhoDetails(uiState: WalkDetailUiState) {
     Row(modifier = Modifier.padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xl)) {
         FormSection(label = stringResource(R.string.log_past_walk_handler), modifier = Modifier.weight(1f)) {
-            Text(text = uiState.handlers.joinToString(), style = MaterialTheme.typography.bodyLarge, color = Ink)
+            Text(
+                text = uiState.handlers.joinToString(),
+                style = MaterialTheme.typography.bodyLarge,
+                color = AppTheme.colors.content,
+            )
         }
         FormSection(label = stringResource(R.string.walk_detail_dog), modifier = Modifier.weight(1f)) {
-            Text(text = uiState.dogName.orEmpty(), style = MaterialTheme.typography.bodyLarge, color = Ink)
+            Text(
+                text = uiState.dogName.orEmpty(),
+                style = MaterialTheme.typography.bodyLarge,
+                color = AppTheme.colors.content,
+            )
         }
         FormSection(label = stringResource(R.string.new_walk_equipment), modifier = Modifier.weight(1f)) {
             Text(
                 text = uiState.equipment?.let { stringResource(it.labelRes) }.orEmpty(),
                 style = MaterialTheme.typography.bodyLarge,
-                color = Ink,
+                color = AppTheme.colors.content,
             )
         }
     }
@@ -242,7 +253,11 @@ private fun StoolDetails(stool: Stool?) {
             stool == null -> DetailPlaceholder(text = stringResource(R.string.walk_detail_not_recorded))
             !stool.passed -> DetailPlaceholder(text = stringResource(R.string.walk_detail_stool_none))
             listOf(stool.quantity, stool.texture, stool.colour).all { it == null } ->
-                Text(text = stringResource(R.string.stool_passed_yes), style = MaterialTheme.typography.bodyLarge, color = Ink)
+                Text(
+                    text = stringResource(R.string.stool_passed_yes),
+                    style = MaterialTheme.typography.bodyLarge,
+                    color = AppTheme.colors.content,
+                )
             else -> FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
@@ -279,7 +294,7 @@ private fun OptionalRatingDetails(ratings: Map<OptionalRating, Int>) {
         } else {
             Column {
                 OptionalRating.entries.filter { it in ratings }.forEachIndexed { index, aspect ->
-                    if (index > 0) HorizontalDivider(color = Outline)
+                    if (index > 0) HorizontalDivider(color = AppTheme.colors.outline)
                     OptionalRatingRow(
                         label = stringResource(aspect.labelRes),
                         value = ratings.getValue(aspect),

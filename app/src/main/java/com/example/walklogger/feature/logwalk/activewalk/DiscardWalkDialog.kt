@@ -8,7 +8,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.R
-import com.example.walklogger.core.ui.theme.Canvas
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 @Composable
@@ -16,7 +16,7 @@ internal fun DiscardWalkDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
     AlertDialog(
         onDismissRequest = onDismiss,
         shape = MaterialTheme.shapes.extraSmall,
-        containerColor = Canvas,
+        containerColor = AppTheme.colors.background,
         title = { Text(stringResource(R.string.active_walk_discard_confirm_title)) },
         text = { Text(stringResource(R.string.active_walk_discard_confirm_message)) },
         confirmButton = {

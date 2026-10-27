@@ -22,7 +22,7 @@ import com.example.walklogger.R
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Outline
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.StoolBlack
 import com.example.walklogger.core.ui.theme.StoolBrightYellow
 import com.example.walklogger.core.ui.theme.StoolDarkBrown
@@ -41,7 +41,7 @@ internal fun StoolSwatch(colour: StoolColour, size: Dp, modifier: Modifier = Mod
             .size(size)
             .clip(CircleShape)
             .background(colour.baseColour)
-            .border(1.dp, Outline, CircleShape),
+            .border(1.dp, AppTheme.colors.outline, CircleShape),
     ) {
         colour.textureRes?.let { texture ->
             Image(

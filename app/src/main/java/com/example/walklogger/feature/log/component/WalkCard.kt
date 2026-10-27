@@ -24,10 +24,7 @@ import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.EquipmentChip
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.CardSurface
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.Outline
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.log.WalkUiState
 import com.example.walklogger.feature.log.preview.LogPreviewData
@@ -43,8 +40,8 @@ private const val NoteLines = 2
 internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Column(
         modifier = modifier
-            .background(CardSurface)
-            .border(1.dp, Outline)
+            .background(AppTheme.colors.card)
+            .border(1.dp, AppTheme.colors.outline)
             .clickable(onClick = onClick)
             .padding(AppSpacing.lg),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
@@ -62,7 +59,7 @@ internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier
         Text(
             text = if (hasNote) walk.note else stringResource(R.string.calendar_no_description),
             style = MaterialTheme.typography.bodyLarge,
-            color = if (hasNote) Color.Unspecified else InkMuted,
+            color = if (hasNote) Color.Unspecified else AppTheme.colors.contentMuted,
             minLines = NoteLines,
             maxLines = NoteLines,
             overflow = TextOverflow.Ellipsis,
@@ -77,7 +74,7 @@ private fun RatingBar(rating: Int, max: Int = 7) {
             Box(
                 Modifier
                     .size(width = RatingBarWidth, height = RatingBarHeight)
-                    .background(if (index < rating) Steel else Outline),
+                    .background(if (index < rating) AppTheme.colors.action else AppTheme.colors.outline),
             )
         }
         Spacer(Modifier.width(AppSpacing.sm))

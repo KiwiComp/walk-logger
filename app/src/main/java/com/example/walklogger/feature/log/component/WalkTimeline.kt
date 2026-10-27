@@ -20,8 +20,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.log.WalkUiState
 import com.example.walklogger.feature.log.preview.LogPreviewData
@@ -48,7 +47,7 @@ internal fun WalkTimeline(walks: List<WalkUiState>, onWalkClick: (Long) -> Unit)
                     Text(
                         text = stringResource(R.string.walk_duration_minutes, walk.duration.toMinutes()),
                         style = MaterialTheme.typography.bodySmall,
-                        color = InkMuted,
+                        color = AppTheme.colors.contentMuted,
                     )
                 }
                 Box(
@@ -57,7 +56,7 @@ internal fun WalkTimeline(walks: List<WalkUiState>, onWalkClick: (Long) -> Unit)
                         .padding(top = AppSpacing.sm),
                     contentAlignment = Alignment.TopCenter,
                 ) {
-                    Box(Modifier.size(TimelineDotSize).background(Steel))
+                    Box(Modifier.size(TimelineDotSize).background(AppTheme.colors.action))
                 }
                 WalkCard(walk = walk, onClick = { onWalkClick(walk.id) }, modifier = Modifier.weight(1f))
             }

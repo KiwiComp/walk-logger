@@ -21,9 +21,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.OnNavyMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /**
@@ -40,11 +38,11 @@ fun WalkLoggerHeader(
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit = {},
 ) {
-    CompositionLocalProvider(LocalContentColor provides OnNavy) {
+    CompositionLocalProvider(LocalContentColor provides AppTheme.colors.onHeader) {
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .background(Navy)
+                .background(AppTheme.colors.header)
                 .statusBarsPadding()
                 .padding(horizontal = AppSpacing.xl)
                 .padding(top = AppSpacing.md, bottom = AppSpacing.xl),
@@ -58,7 +56,11 @@ fun WalkLoggerHeader(
                 Column(modifier = Modifier.weight(1f)) {
                     Text(text = title, style = MaterialTheme.typography.headlineLarge)
                     if (subtitle != null) {
-                        Text(text = subtitle, style = MaterialTheme.typography.bodySmall, color = OnNavyMuted)
+                        Text(
+                            text = subtitle,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = AppTheme.colors.onHeaderMuted,
+                        )
                     }
                 }
                 actions()

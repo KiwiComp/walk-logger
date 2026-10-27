@@ -22,8 +22,7 @@ import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.core.ui.component.SectionLabel
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /**
@@ -54,15 +53,19 @@ internal fun FormSection(
             horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
-            SectionLabel(text = label, color = InkMuted, style = MaterialTheme.typography.labelLarge)
+            SectionLabel(
+                text = label,
+                color = AppTheme.colors.contentMuted,
+                style = MaterialTheme.typography.labelLarge,
+            )
             if (hint != null) {
-                Text(text = hint, style = MaterialTheme.typography.bodySmall, color = InkMuted)
+                Text(text = hint, style = MaterialTheme.typography.bodySmall, color = AppTheme.colors.contentMuted)
             }
             Spacer(Modifier.weight(1f))
             if (leadingActionLabel != null && onLeadingAction != null) {
                 SectionLabel(
                     text = leadingActionLabel,
-                    color = Steel,
+                    color = AppTheme.colors.action,
                     modifier = Modifier
                         .clickable(role = Role.Button, onClick = onLeadingAction)
                         .padding(horizontal = AppSpacing.sm, vertical = AppSpacing.xs),
@@ -71,7 +74,7 @@ internal fun FormSection(
             if (onAction != null) {
                 SectionLabel(
                     text = actionLabel.orEmpty(),
-                    color = Steel,
+                    color = AppTheme.colors.action,
                     modifier = Modifier
                         .then(if (actionLabel != null) Modifier.clickable(role = Role.Button, onClick = onAction) else Modifier)
                         .padding(horizontal = AppSpacing.sm, vertical = AppSpacing.xs),
@@ -81,7 +84,7 @@ internal fun FormSection(
                 Icon(
                     imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
                     contentDescription = null,
-                    tint = InkMuted,
+                    tint = AppTheme.colors.contentMuted,
                 )
             }
         }

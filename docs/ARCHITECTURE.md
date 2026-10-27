@@ -40,11 +40,11 @@ com.example.walklogger
 │   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, StoolSection (Yes/No; Done folds the
 │   │                          description into StoolSummary, Edit opens it) with StoolDescriptors, StoolColourPicker and
 │   │                          StoolSwatch, OptionalRatingsSection, WeatherSection, WhenSection, Labels,
-│   │                          FormStyle for the on-Navy variant the timer screen uses);
+│   │                          FormStyle for the on-header variant the timer screen uses);
 │   │                          the chosen day travels as a route argument into both form ViewModels
 │   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
 │   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
-│   │                          MonthGrid with cells tinted by rating and selection ringed in Accent, CalendarWalkList);
+│   │                          MonthGrid with cells tinted by rating and selection ringed in the selection colour, CalendarWalkList);
 │   │                          a walk row opens the walk's detail screen, the dashed button logs a walk on that day
 │   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk (when, handler, dog,
 │   │                          equipment, rating, stool, optional ratings, weather, behaviour, medical, notes; empty sections say so),
@@ -70,7 +70,7 @@ com.example.walklogger
 │   │                          rows show their name), and `isHidden` soft-deletes without touching walk history
 │   ├── datastore/             Preferences DataStore (active dog id)
 │   ├── common/di/             injectable coroutine dispatchers and Clock
-│   └── ui/                    theme (fixed palette incl. RatingTints/Accent/stool swatches, AppSpacing/AppRadius/AppSize tokens)
+│   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
 │                              SectionLabel, SegmentedToggle, AppSwitch, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent)
@@ -104,6 +104,9 @@ com.example.walklogger
 - **Dimensions come from tokens.** Padding and gaps use `AppSpacing`, corners use `AppRadius`,
   sizes shared by several components use `AppSize`. Component-specific sizes (a dot, a cell
   height) are named `private val`s in the component's file, not tokens.
+- **Colours come from roles.** Read `AppTheme.colors` (`header`, `content`, `outline`, …), never a hue;
+  the palette is private to `core/ui/theme`, so a dark theme or new palette only changes that package.
+  Stool swatches are the exception: they depict real colours and stay fixed.
 
 ## Adding a feature
 

@@ -16,7 +16,7 @@ import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.ui.component.SegmentedToggle
 import com.example.walklogger.core.ui.component.SegmentedToggleSize
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val LabelWidth = 48.dp
@@ -39,7 +39,7 @@ internal fun <T> WeatherRow(
         Text(
             text = label,
             style = MaterialTheme.typography.bodyMedium,
-            color = InkMuted,
+            color = AppTheme.colors.contentMuted,
             modifier = Modifier.width(LabelWidth),
         )
         SegmentedToggle(

@@ -29,7 +29,7 @@ import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.AppDateField
 import com.example.walklogger.core.ui.component.AppPickerField
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import java.time.LocalDate
 import java.time.LocalTime
@@ -82,7 +82,7 @@ internal fun WhenSection(
             Text(
                 text = pluralStringResource(R.plurals.log_past_walk_duration_minutes, durationMinutes, durationMinutes),
                 style = MaterialTheme.typography.bodyMedium,
-                color = InkMuted,
+                color = AppTheme.colors.contentMuted,
             )
         }
     }

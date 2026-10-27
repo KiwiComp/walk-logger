@@ -31,7 +31,7 @@ import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.InkMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
@@ -145,7 +145,7 @@ fun LogPastWalkScreen(
                     Text(
                         text = stringResource(blocker.messageRes),
                         style = MaterialTheme.typography.bodyMedium,
-                        color = InkMuted,
+                        color = AppTheme.colors.contentMuted,
                         textAlign = TextAlign.Center,
                     )
                 }

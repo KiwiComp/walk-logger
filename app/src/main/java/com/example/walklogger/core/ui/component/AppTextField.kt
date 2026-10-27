@@ -25,21 +25,12 @@ import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.ChipSurface
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.InkMuted
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.NavyLight
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.OnNavyMuted
-import com.example.walklogger.core.ui.theme.Outline
-import com.example.walklogger.core.ui.theme.OutlineOnNavy
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import kotlinx.coroutines.launch
 
 enum class AppTextFieldStyle {
-    /** Ink on a light surface; every form field. */
+    /** Dark content on a light surface; every form field. */
     Default,
 
     /** Light text on the header surface; the quick note during a walk. */
@@ -66,18 +57,18 @@ fun AppTextField(
 ) {
     val colors = when (style) {
         AppTextFieldStyle.Default -> FieldColors(
-            text = Ink,
-            muted = InkMuted,
-            container = ChipSurface,
-            outline = Outline,
-            focusedOutline = Steel,
+            text = AppTheme.colors.content,
+            muted = AppTheme.colors.contentMuted,
+            container = AppTheme.colors.chip,
+            outline = AppTheme.colors.outline,
+            focusedOutline = AppTheme.colors.action,
         )
         AppTextFieldStyle.Inverse -> FieldColors(
-            text = OnNavy,
-            muted = OnNavyMuted,
-            container = NavyLight,
-            outline = OutlineOnNavy,
-            focusedOutline = OnNavy,
+            text = AppTheme.colors.onHeader,
+            muted = AppTheme.colors.onHeaderMuted,
+            container = AppTheme.colors.headerRaised,
+            outline = AppTheme.colors.outlineOnHeader,
+            focusedOutline = AppTheme.colors.onHeader,
         )
     }
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
@@ -169,7 +160,7 @@ private fun AppTextFieldPreview() {
 @Composable
 private fun AppTextFieldInversePreview() {
     WalkLoggerTheme {
-        Column(modifier = Modifier.background(Navy).padding(AppSpacing.lg)) {
+        Column(modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg)) {
             AppTextField(
                 value = "",
                 onValueChange = {},

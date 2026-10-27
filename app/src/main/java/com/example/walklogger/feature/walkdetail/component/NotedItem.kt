@@ -14,8 +14,7 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Ink
-import com.example.walklogger.core.ui.theme.Steel
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 private val BulletSize = 12.dp
@@ -28,8 +27,8 @@ internal fun NotedItem(label: String, modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Box(Modifier.size(BulletSize).background(Steel))
-        Text(text = label, style = MaterialTheme.typography.bodyLarge, color = Ink)
+        Box(Modifier.size(BulletSize).background(AppTheme.colors.action))
+        Text(text = label, style = MaterialTheme.typography.bodyLarge, color = AppTheme.colors.content)
     }
 }
 

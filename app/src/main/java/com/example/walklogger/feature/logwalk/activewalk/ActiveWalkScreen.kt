@@ -44,9 +44,7 @@ import com.example.walklogger.core.ui.component.AppTextFieldStyle
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.SectionLabel
 import com.example.walklogger.core.ui.theme.AppSpacing
-import com.example.walklogger.core.ui.theme.Navy
-import com.example.walklogger.core.ui.theme.OnNavy
-import com.example.walklogger.core.ui.theme.OnNavyMuted
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.labelRes
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
@@ -108,7 +106,7 @@ fun ActiveWalkScreen(
     Column(
         modifier = modifier
             .fillMaxSize()
-            .background(Navy)
+            .background(AppTheme.colors.header)
             .statusBarsPadding()
             .navigationBarsPadding()
             .imePadding()
@@ -128,7 +126,7 @@ fun ActiveWalkScreen(
                 SectionLabel(
                     text = uiState.dogName?.let { stringResource(R.string.active_walk_out_with, it) }
                         ?: stringResource(R.string.active_walk_title),
-                    color = OnNavyMuted,
+                    color = AppTheme.colors.onHeaderMuted,
                 )
                 HeaderIconButton(
                     icon = Icons.Filled.Close,
@@ -141,16 +139,16 @@ fun ActiveWalkScreen(
             Text(
                 text = uiState.elapsed.toClockText(),
                 style = MaterialTheme.typography.displayLarge,
-                color = OnNavy,
+                color = AppTheme.colors.onHeader,
             )
             Spacer(Modifier.height(AppSpacing.sm))
             Text(
                 text = uiState.startedSummary(),
                 style = MaterialTheme.typography.bodyLarge,
-                color = OnNavyMuted,
+                color = AppTheme.colors.onHeaderMuted,
             )
             Spacer(Modifier.height(AppSpacing.xxxl))
-            SectionLabel(text = stringResource(R.string.active_walk_quick_note), color = OnNavyMuted)
+            SectionLabel(text = stringResource(R.string.active_walk_quick_note), color = AppTheme.colors.onHeaderMuted)
             Spacer(Modifier.height(AppSpacing.sm))
             AppTextField(
                 value = uiState.note,
