@@ -18,15 +18,15 @@ interface WalkDao {
 
     @Transaction
     @Query("SELECT * FROM walks ORDER BY startTime DESC")
-    fun observeWalks(): Flow<List<WalkWithIssues>>
+    fun observeWalks(): Flow<List<WalkWithBehaviourIssuesAndMedicalConcerns>>
 
     @Transaction
     @Query("SELECT * FROM walks WHERE id = :id")
-    fun observeWalk(id: Long): Flow<WalkWithIssues?>
+    fun observeWalk(id: Long): Flow<WalkWithBehaviourIssuesAndMedicalConcerns?>
 
     @Transaction
     @Query("SELECT * FROM walks WHERE endTime IS NULL LIMIT 1")
-    fun observeActiveWalk(): Flow<WalkWithIssues?>
+    fun observeActiveWalk(): Flow<WalkWithBehaviourIssuesAndMedicalConcerns?>
 
     @Query("SELECT * FROM walks WHERE id = :id")
     suspend fun getWalk(id: Long): WalkEntity?
@@ -36,10 +36,10 @@ interface WalkDao {
 
     /** Inserts the walk and the issues and concerns ticked on it as one unit. */
     @Transaction
-    suspend fun insertWalk(walk: WalkEntity, issueIds: List<Long>, concernIds: List<Long>): Long {
+    suspend fun insertWalk(walk: WalkEntity, behaviourIssueIds: List<Long>, medicalConcernIds: List<Long>): Long {
         val id = insertWalk(walk)
-        insertWalkIssues(issueIds.map { WalkBehaviourIssueEntity(walkId = id, issueId = it) })
-        insertWalkConcerns(concernIds.map { WalkMedicalConcernEntity(walkId = id, concernId = it) })
+        insertWalkBehaviourIssues(behaviourIssueIds.map { WalkBehaviourIssueEntity(walkId = id, behaviourIssueId = it) })
+        insertWalkMedicalConcerns(medicalConcernIds.map { WalkMedicalConcernEntity(walkId = id, medicalConcernId = it) })
         return id
     }
 
@@ -48,25 +48,25 @@ interface WalkDao {
 
     /** Replaces the walk row and its ticked issues and concerns as one unit. */
     @Transaction
-    suspend fun updateWalk(walk: WalkEntity, issueIds: List<Long>, concernIds: List<Long>) {
+    suspend fun updateWalk(walk: WalkEntity, behaviourIssueIds: List<Long>, medicalConcernIds: List<Long>) {
         updateWalk(walk)
-        deleteWalkIssues(walk.id)
-        insertWalkIssues(issueIds.map { WalkBehaviourIssueEntity(walkId = walk.id, issueId = it) })
-        deleteWalkConcerns(walk.id)
-        insertWalkConcerns(concernIds.map { WalkMedicalConcernEntity(walkId = walk.id, concernId = it) })
+        deleteWalkBehaviourIssues(walk.id)
+        insertWalkBehaviourIssues(behaviourIssueIds.map { WalkBehaviourIssueEntity(walkId = walk.id, behaviourIssueId = it) })
+        deleteWalkMedicalConcerns(walk.id)
+        insertWalkMedicalConcerns(medicalConcernIds.map { WalkMedicalConcernEntity(walkId = walk.id, medicalConcernId = it) })
     }
 
     @Insert
-    suspend fun insertWalkIssues(issues: List<WalkBehaviourIssueEntity>)
+    suspend fun insertWalkBehaviourIssues(behaviourIssues: List<WalkBehaviourIssueEntity>)
 
     @Query("DELETE FROM walk_behaviour_issues WHERE walkId = :walkId")
-    suspend fun deleteWalkIssues(walkId: Long)
+    suspend fun deleteWalkBehaviourIssues(walkId: Long)
 
     @Insert
-    suspend fun insertWalkConcerns(concerns: List<WalkMedicalConcernEntity>)
+    suspend fun insertWalkMedicalConcerns(medicalConcerns: List<WalkMedicalConcernEntity>)
 
     @Query("DELETE FROM walk_medical_concerns WHERE walkId = :walkId")
-    suspend fun deleteWalkConcerns(walkId: Long)
+    suspend fun deleteWalkMedicalConcerns(walkId: Long)
 
     @Query("UPDATE walks SET notes = :notes WHERE id = :id")
     suspend fun updateNotes(id: Long, notes: String)

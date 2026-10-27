@@ -1,5 +1,6 @@
 package com.example.walklogger.core.database.entity
 
+import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.ForeignKey
 import androidx.room.Index
@@ -16,5 +17,5 @@ import androidx.room.Index
 )
 data class WalkMedicalConcernEntity(
     val walkId: Long,
-    val concernId: Long,
+    @ColumnInfo(name = "concernId") val medicalConcernId: Long,
 )

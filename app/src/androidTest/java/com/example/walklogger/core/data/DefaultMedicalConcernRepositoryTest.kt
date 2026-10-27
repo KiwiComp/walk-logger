@@ -35,7 +35,7 @@ class DefaultMedicalConcernRepositoryTest {
 
     @Test
     fun aFreshDatabase_startsWithTheKeyedDefaultConcerns() = runBlocking {
-        val concerns = repository.observeConcerns().first()
+        val concerns = repository.observeMedicalConcerns().first()
 
         assertEquals(DefaultMedicalConcerns.keys.toList(), concerns.map { it.key })
         assertEquals(DefaultMedicalConcerns.values.toList(), concerns.map { it.name })
@@ -43,36 +43,36 @@ class DefaultMedicalConcernRepositoryTest {
 
     @Test
     fun addConcern_trimsAndAppendsAfterTheDefaults() = runBlocking {
-        val added = repository.addConcern("  Coughing ")
+        val added = repository.addMedicalConcern("  Coughing ")
 
         assertEquals("Coughing", added.name)
         assertNull(added.key)
-        assertEquals(added, repository.observeConcerns().first().last())
+        assertEquals(added, repository.observeMedicalConcerns().first().last())
     }
 
     @Test
     fun addConcern_returnsTheExistingConcernIgnoringCase() = runBlocking {
-        val existing = repository.observeConcerns().first().first { it.name == "Limping" }
+        val existing = repository.observeMedicalConcerns().first().first { it.name == "Limping" }
 
-        assertEquals(existing, repository.addConcern("limping"))
-        assertEquals(8, repository.observeConcerns().first().size)
+        assertEquals(existing, repository.addMedicalConcern("limping"))
+        assertEquals(8, repository.observeMedicalConcerns().first().size)
     }
 
     @Test
     fun addConcern_revivesAHiddenConcern() = runBlocking {
-        val limping = repository.observeConcerns().first().first { it.key == "limping" }
+        val limping = repository.observeMedicalConcerns().first().first { it.key == "limping" }
         database.medicalConcernDao().setHidden(limping.id, true)
-        assertEquals(7, repository.observeConcerns().first().size)
+        assertEquals(7, repository.observeMedicalConcerns().first().size)
 
-        assertEquals(limping, repository.addConcern("limping"))
+        assertEquals(limping, repository.addMedicalConcern("limping"))
 
-        assertEquals(8, repository.observeConcerns().first().size)
+        assertEquals(8, repository.observeMedicalConcerns().first().size)
     }
 
     @Test
     fun addConcern_rejectsBlankNames() {
         assertThrows(IllegalArgumentException::class.java) {
-            runBlocking { repository.addConcern("   ") }
+            runBlocking { repository.addMedicalConcern("   ") }
         }
     }
 }

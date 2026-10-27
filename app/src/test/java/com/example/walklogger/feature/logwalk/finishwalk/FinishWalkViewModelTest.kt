@@ -115,7 +115,7 @@ class FinishWalkViewModelTest {
     @Test
     fun `saving updates the stored walk and keeps its id, dog and handlers`() = runTest {
         walkRepository.addWalks(walk)
-        behaviourIssueRepository.addIssues("Pulling", "Barking")
+        behaviourIssueRepository.addBehaviourIssues("Pulling", "Barking")
         viewModel.uiState.test {
             viewModel.setStartTime(LocalTime.of(7, 0))
             viewModel.formActions.setRating(6)
@@ -135,7 +135,7 @@ class FinishWalkViewModelTest {
             assertEquals(6, stored.rating)
             assertEquals(Equipment.HARNESS, stored.equipment)
             assertEquals(Stool(passed = true, texture = StoolTexture.FIRM), stored.stool)
-            assertEquals(listOf(BehaviourIssue(2, "Barking")), stored.issues)
+            assertEquals(listOf(BehaviourIssue(2, "Barking")), stored.behaviourIssues)
             assertEquals("Off-lead in the field", stored.notes)
         }
     }

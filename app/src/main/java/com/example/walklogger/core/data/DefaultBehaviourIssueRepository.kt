@@ -19,15 +19,15 @@ class DefaultBehaviourIssueRepository @Inject constructor(
     @param:Dispatcher(WalkLoggerDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : BehaviourIssueRepository {
 
-    override fun observeIssues(): Flow<List<BehaviourIssue>> =
-        behaviourIssueDao.observeIssues().map { issues -> issues.map { it.toModel() } }
+    override fun observeBehaviourIssues(): Flow<List<BehaviourIssue>> =
+        behaviourIssueDao.observeBehaviourIssues().map { issues -> issues.map { it.toModel() } }
 
-    override suspend fun addIssue(name: String): BehaviourIssue = withContext(ioDispatcher) {
+    override suspend fun addBehaviourIssue(name: String): BehaviourIssue = withContext(ioDispatcher) {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "issue name must not be blank" }
         val existing = behaviourIssueDao.findByName(trimmed)
         when {
-            existing == null -> BehaviourIssue(id = behaviourIssueDao.insertIssue(BehaviourIssueEntity(name = trimmed)), name = trimmed)
+            existing == null -> BehaviourIssue(id = behaviourIssueDao.insertBehaviourIssue(BehaviourIssueEntity(name = trimmed)), name = trimmed)
             existing.isHidden -> existing.toModel().also { behaviourIssueDao.setHidden(existing.id, false) }
             else -> existing.toModel()
         }

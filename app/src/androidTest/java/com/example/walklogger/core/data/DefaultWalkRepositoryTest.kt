@@ -61,8 +61,8 @@ class DefaultWalkRepositoryTest {
         temperature = Temperature.COLD,
         wind = Wind.WINDY,
         snow = Snow.NONE,
-        issues = listOf(pulling, barking),
-        concerns = listOf(limping, vomit),
+        behaviourIssues = listOf(pulling, barking),
+        medicalConcerns = listOf(limping, vomit),
         optionalRatings = mapOf(OptionalRating.REACTIVITY to 2, OptionalRating.DISTRACTION to 6),
         stool = Stool(passed = true, quantity = StoolQuantity.SMALL, texture = StoolTexture.MUSHY, colour = StoolColour.GREEN),
     )
@@ -71,8 +71,8 @@ class DefaultWalkRepositoryTest {
     fun setUp() = runBlocking {
         database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), WalkLoggerDatabase::class.java).build()
         repository = DefaultWalkRepository(database.walkDao(), clock, Dispatchers.IO)
-        listOf(pulling, barking).forEach { database.behaviourIssueDao().insertIssue(BehaviourIssueEntity(id = it.id, name = it.name)) }
-        listOf(limping, vomit).forEach { database.medicalConcernDao().insertConcern(MedicalConcernEntity(id = it.id, name = it.name)) }
+        listOf(pulling, barking).forEach { database.behaviourIssueDao().insertBehaviourIssue(BehaviourIssueEntity(id = it.id, name = it.name)) }
+        listOf(limping, vomit).forEach { database.medicalConcernDao().insertMedicalConcern(MedicalConcernEntity(id = it.id, name = it.name)) }
     }
 
     @After
@@ -148,18 +148,18 @@ class DefaultWalkRepositoryTest {
     fun updateWalk_replacesTheTickedIssues() = runBlocking {
         val id = repository.logWalk(pastWalk)
 
-        repository.updateWalk(pastWalk.copy(id = id, issues = listOf(barking)))
+        repository.updateWalk(pastWalk.copy(id = id, behaviourIssues = listOf(barking)))
 
-        assertEquals(listOf(barking), repository.observeWalk(id).first()!!.issues)
+        assertEquals(listOf(barking), repository.observeWalk(id).first()!!.behaviourIssues)
     }
 
     @Test
     fun updateWalk_replacesTheTickedConcerns() = runBlocking {
         val id = repository.logWalk(pastWalk)
 
-        repository.updateWalk(pastWalk.copy(id = id, concerns = listOf(vomit)))
+        repository.updateWalk(pastWalk.copy(id = id, medicalConcerns = listOf(vomit)))
 
-        assertEquals(listOf(vomit), repository.observeWalk(id).first()!!.concerns)
+        assertEquals(listOf(vomit), repository.observeWalk(id).first()!!.medicalConcerns)
     }
 
     @Test

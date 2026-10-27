@@ -12,14 +12,14 @@ interface MedicalConcernDao {
 
     /** Visible concerns only; hidden ones still resolve through walk relations. */
     @Query("SELECT * FROM medical_concerns WHERE isHidden = 0 ORDER BY id")
-    fun observeConcerns(): Flow<List<MedicalConcernEntity>>
+    fun observeMedicalConcerns(): Flow<List<MedicalConcernEntity>>
 
     /** Hidden or not, so a re-added name can revive its row instead of colliding with it. */
     @Query("SELECT * FROM medical_concerns WHERE name = :name COLLATE NOCASE LIMIT 1")
     suspend fun findByName(name: String): MedicalConcernEntity?
 
     @Insert(onConflict = OnConflictStrategy.ABORT)
-    suspend fun insertConcern(concern: MedicalConcernEntity): Long
+    suspend fun insertMedicalConcern(concern: MedicalConcernEntity): Long
 
     @Query("UPDATE medical_concerns SET isHidden = :hidden WHERE id = :id")
     suspend fun setHidden(id: Long, hidden: Boolean)

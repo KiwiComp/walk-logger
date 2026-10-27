@@ -61,8 +61,8 @@ class WalkDetailViewModelTest {
         optionalRatings = mapOf(OptionalRating.REACTIVITY to 6),
         stool = Stool(passed = true, colour = StoolColour.RED_STREAKED),
         rain = Rain.LIGHT,
-        issues = listOf(issue),
-        concerns = listOf(concern),
+        behaviourIssues = listOf(issue),
+        medicalConcerns = listOf(concern),
     )
 
     @Test
@@ -92,8 +92,8 @@ class WalkDetailViewModelTest {
             assertEquals(Stool(passed = true, colour = StoolColour.RED_STREAKED), state.stool)
             assertEquals(Rain.LIGHT, state.rain)
             assertTrue(state.hasWeather)
-            assertEquals(listOf(issue), state.issues)
-            assertEquals(listOf(concern), state.concerns)
+            assertEquals(listOf(issue), state.behaviourIssues)
+            assertEquals(listOf(concern), state.medicalConcerns)
             assertEquals("Windy", state.notes)
             assertTrue(state.canDiscard)
         }

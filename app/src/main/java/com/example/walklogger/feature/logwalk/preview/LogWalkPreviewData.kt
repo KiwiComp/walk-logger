@@ -28,7 +28,7 @@ import java.time.LocalTime
 internal object LogWalkPreviewData {
     val handlers = listOf("Anna", "Jonas", "Elin")
 
-    val issues = listOf(
+    val behaviourIssues = listOf(
         BehaviourIssue(1, "Pulling", key = "pulling"),
         BehaviourIssue(2, "Barking", key = "barking"),
         BehaviourIssue(3, "Lunging", key = "lunging"),
@@ -36,7 +36,7 @@ internal object LogWalkPreviewData {
         BehaviourIssue(5, "Digging"),
     )
 
-    val concerns = listOf(
+    val medicalConcerns = listOf(
         MedicalConcern(1, "Diarrhoea", key = "diarrhoea"),
         MedicalConcern(2, "Vomit", key = "vomit"),
         MedicalConcern(3, "Scooting", key = "scooting"),
@@ -66,10 +66,10 @@ internal object LogWalkPreviewData {
             temperature = Temperature.COLD,
             wind = Wind.WINDY,
             snow = Snow.LIGHT,
-            behaviourIssues = issues,
+            behaviourIssues = behaviourIssues,
             selectedBehaviourIssueIds = setOf(1L, 4L),
             isBehaviourIssuesExpanded = true,
-            medicalConcerns = concerns,
+            medicalConcerns = medicalConcerns,
             selectedMedicalConcernIds = setOf(4L),
             isMedicalConcernsExpanded = true,
         ),
@@ -101,8 +101,8 @@ internal object LogWalkPreviewData {
             temperature = Temperature.COOL,
             wind = Wind.BREEZE,
             snow = Snow.NONE,
-            behaviourIssues = issues,
-            medicalConcerns = concerns,
+            behaviourIssues = behaviourIssues,
+            medicalConcerns = medicalConcerns,
             notes = "Barked at the bin lorry, otherwise steady. Off-lead in the field for ten minutes.",
         ),
         isLoading = false,
