@@ -26,8 +26,13 @@ class DogViewModel @Inject constructor(
 ) : ViewModel() {
 
     val uiState: StateFlow<DogUiState> =
-        combine(dogRepository.observeDogs(), dogRepository.observeActiveDog()) { dogs, active ->
-            if (active == null) DogUiState.NoDog else buildProfile(active, dogs)
+        combine(dogRepository.observeAllDogs(), dogRepository.observeActiveDog()) { dogs, active ->
+            val (deleted, remaining) = dogs.partition { it.isDeleted }
+            if (active == null) {
+                DogUiState.NoDog(deletedDogs = deleted.map { it.toListItem(active) })
+            } else {
+                buildProfile(active, remaining, deleted)
+            }
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -41,14 +46,18 @@ class DogViewModel @Inject constructor(
         }
     }
 
-    private fun buildProfile(active: Dog, dogs: List<Dog>) = DogUiState.Profile(
+    private fun buildProfile(active: Dog, remaining: List<Dog>, deleted: List<Dog>) = DogUiState.Profile(
         active = DogProfileUiState(
             id = active.id,
             name = active.name,
             breed = active.breed,
             ageYears = active.birthDate?.let { Period.between(it, LocalDate.now(clock)).years },
             weightKg = active.weightKg,
+            isDeleted = active.isDeleted,
         ),
-        dogs = dogs.map { DogListItemUiState(id = it.id, name = it.name, isActive = it.id == active.id) },
+        dogs = remaining.map { it.toListItem(active) },
+        deletedDogs = deleted.map { it.toListItem(active) },
     )
+
+    private fun Dog.toListItem(active: Dog?) = DogListItemUiState(id = id, name = name, isActive = id == active?.id)
 }

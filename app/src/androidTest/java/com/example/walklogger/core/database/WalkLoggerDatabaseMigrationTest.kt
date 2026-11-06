@@ -185,6 +185,21 @@ class WalkLoggerDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migrate9To10_addsIsHiddenAndKeepsDogsVisible() {
+        helper.createDatabase(DB_NAME, 9).use { db ->
+            db.execSQL("INSERT INTO dogs (id, name) VALUES (1, 'Sixten')")
+        }
+
+        val db = helper.runMigrationsAndValidate(DB_NAME, 10, true)
+
+        db.query("SELECT name, isHidden FROM dogs WHERE id = 1").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals("Sixten", cursor.getString(0))
+            assertEquals(0, cursor.getInt(1))
+        }
+    }
+
     private companion object {
         const val DB_NAME = "migration-test.db"
     }

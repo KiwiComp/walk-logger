@@ -203,4 +203,18 @@ class CalendarViewModelTest {
             assertEquals(0, state.monthWalkCount)
         }
     }
+
+    @Test
+    fun `a deleted active dog shows its walks but none can be added`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira", isDeleted = true))
+        dogRepository.setActiveDog(1)
+        repository.addWalks(walk(id = 1, start = today.atTime(8, 0)))
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertEquals(listOf(1L), state.walks.map { it.id })
+            assertEquals("Mira", state.activeDogName)
+            assertTrue(state.isActiveDogDeleted)
+            assertFalse(state.canAddWalk)
+        }
+    }
 }

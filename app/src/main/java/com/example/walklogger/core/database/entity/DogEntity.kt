@@ -12,4 +12,5 @@ data class DogEntity(
     /** Epoch day, see [java.time.LocalDate.toEpochDay]. */
     val birthDate: Long? = null,
     val weightKg: Double? = null,
+    @ColumnInfo(defaultValue = "0") val isHidden: Boolean = false,
 )

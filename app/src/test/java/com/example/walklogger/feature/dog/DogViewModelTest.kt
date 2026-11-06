@@ -33,7 +33,7 @@ class DogViewModelTest {
     @Test
     fun `no dog registered shows the empty state`() = runTest {
         viewModel.uiState.test {
-            assertEquals(DogUiState.NoDog, expectMostRecentItem())
+            assertEquals(DogUiState.NoDog(), expectMostRecentItem())
         }
     }
 
@@ -84,5 +84,31 @@ class DogViewModelTest {
             assertEquals("Sixten", (expectMostRecentItem() as DogUiState.Profile).active.name)
         }
         assertEquals(listOf(R.string.error_select_dog), shown)
+    }
+
+    @Test
+    fun `deleted dogs are listed apart and can be selected as active`() = runTest {
+        repository.addDogs(sixten, mira.copy(isDeleted = true))
+        viewModel.uiState.test {
+            val before = expectMostRecentItem() as DogUiState.Profile
+            assertEquals(listOf(DogListItemUiState(id = 1, name = "Sixten", isActive = true)), before.dogs)
+            assertEquals(listOf(DogListItemUiState(id = 2, name = "Mira", isActive = false)), before.deletedDogs)
+            viewModel.switchDog(2)
+            val after = expectMostRecentItem() as DogUiState.Profile
+            assertEquals("Mira", after.active.name)
+            assertEquals(true, after.active.isDeleted)
+            assertEquals(listOf(DogListItemUiState(id = 2, name = "Mira", isActive = true)), after.deletedDogs)
+        }
+    }
+
+    @Test
+    fun `only deleted dogs shows the empty state with them listed`() = runTest {
+        repository.addDogs(mira.copy(isDeleted = true))
+        viewModel.uiState.test {
+            assertEquals(
+                DogUiState.NoDog(deletedDogs = listOf(DogListItemUiState(id = 2, name = "Mira", isActive = false))),
+                expectMostRecentItem(),
+            )
+        }
     }
 }

@@ -6,6 +6,8 @@ import java.time.LocalDate
 import kotlinx.coroutines.flow.Flow
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.combine
+import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.update
 
 /** In-memory [DogRepository] for unit tests. */
@@ -19,16 +21,19 @@ class FakeDogRepository : DogRepository {
 
     fun addDogs(vararg newDogs: Dog) = dogs.update { it + newDogs }
 
-    override fun observeDogs(): Flow<List<Dog>> = dogs
+    override fun observeDogs(): Flow<List<Dog>> = dogs.map { list -> list.filterNot { it.isDeleted } }
+
+    override fun observeAllDogs(): Flow<List<Dog>> = dogs
 
     override fun observeActiveDog(): Flow<Dog?> =
-        combine(dogs, activeDogId) { list, id -> list.find { it.id == id } ?: list.firstOrNull() }
+        combine(dogs, activeDogId) { list, id -> list.find { it.id == id } ?: list.firstOrNull { !it.isDeleted } }
 
     override suspend fun registerDog(name: String, breed: String, birthDate: LocalDate?, weightKg: Double?): Long {
         failures.check()
+        val active = observeActiveDog().first()
         val id = nextId++
         dogs.update { it + Dog(id = id, name = name, breed = breed, birthDate = birthDate, weightKg = weightKg) }
-        if (activeDogId.value == null) activeDogId.value = id
+        if (active == null || active.isDeleted) activeDogId.value = id
         return id
     }
 
@@ -48,6 +53,7 @@ class FakeDogRepository : DogRepository {
 
     override suspend fun deleteDog(id: Long) {
         failures.check()
-        dogs.update { list -> list.filterNot { it.id == id } }
+        dogs.update { list -> list.map { if (it.id == id) it.copy(isDeleted = true) else it } }
+        if (activeDogId.value == id) activeDogId.value = observeDogs().first().firstOrNull()?.id
     }
 }

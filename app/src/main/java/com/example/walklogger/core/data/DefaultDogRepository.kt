@@ -25,12 +25,15 @@ class DefaultDogRepository @Inject constructor(
 ) : DogRepository {
 
     override fun observeDogs(): Flow<List<Dog>> =
+        observeAllDogs().map { dogs -> dogs.filterNot { it.isDeleted } }
+
+    override fun observeAllDogs(): Flow<List<Dog>> =
         dogDao.observeDogs().map { dogs -> dogs.map { it.toModel() } }
 
-    // Falls back to the first dog so a stale or missing preference never hides a registered dog.
+    // Falls back to the first remaining dog so a stale or missing preference never hides a registered dog.
     override fun observeActiveDog(): Flow<Dog?> =
-        combine(observeDogs(), preferences.activeDogId) { dogs, activeId ->
-            dogs.find { it.id == activeId } ?: dogs.firstOrNull()
+        combine(observeAllDogs(), preferences.activeDogId) { dogs, activeId ->
+            dogs.find { it.id == activeId } ?: dogs.firstOrNull { !it.isDeleted }
         }
 
     override suspend fun registerDog(
@@ -39,6 +42,7 @@ class DefaultDogRepository @Inject constructor(
         birthDate: LocalDate?,
         weightKg: Double?,
     ): Long = withContext(ioDispatcher) {
+        val active = observeActiveDog().first()
         val id = dogDao.insertDog(
             DogEntity(
                 name = name.trim(),
@@ -47,7 +51,7 @@ class DefaultDogRepository @Inject constructor(
                 weightKg = weightKg,
             ),
         )
-        if (preferences.activeDogId.first() == null) preferences.setActiveDogId(id)
+        if (active == null || active.isDeleted) preferences.setActiveDogId(id)
         id
     }
 
@@ -72,6 +76,10 @@ class DefaultDogRepository @Inject constructor(
     }
 
     override suspend fun deleteDog(id: Long) = withContext(ioDispatcher) {
-        dogDao.deleteDog(id = id)
+        dogDao.setHidden(id = id)
+        if (preferences.activeDogId.first() == id) {
+            val next = observeDogs().first().firstOrNull()
+            if (next != null) preferences.setActiveDogId(next.id) else preferences.clearActiveDogId()
+        }
     }
 }

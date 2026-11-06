@@ -101,4 +101,49 @@ class DefaultDogRepositoryTest {
 
         assertEquals("Sixten", repository.observeActiveDog().first()?.name)
     }
+
+    @Test
+    fun deleteDog_keepsDogAsDeletedAndHandsOverActive() = runBlocking {
+        val sixtenId = repository.registerDog(name = "Sixten", breed = "", birthDate = null, weightKg = null)
+        val miraId = repository.registerDog(name = "Mira", breed = "", birthDate = null, weightKg = null)
+
+        repository.deleteDog(sixtenId)
+
+        assertEquals(listOf(miraId), repository.observeDogs().first().map { it.id })
+        assertEquals(listOf(true, false), repository.observeAllDogs().first().map { it.isDeleted })
+        assertEquals(miraId, repository.observeActiveDog().first()?.id)
+    }
+
+    @Test
+    fun deleteLastDog_clearsActiveDog() = runBlocking {
+        val sixtenId = repository.registerDog(name = "Sixten", breed = "", birthDate = null, weightKg = null)
+
+        repository.deleteDog(sixtenId)
+
+        assertNull(repository.observeActiveDog().first())
+        assertNull(preferences.activeDogId.first())
+    }
+
+    @Test
+    fun deletedDog_canBeSelectedAsActive() = runBlocking {
+        val sixtenId = repository.registerDog(name = "Sixten", breed = "", birthDate = null, weightKg = null)
+        repository.deleteDog(sixtenId)
+
+        repository.setActiveDog(sixtenId)
+
+        val active = repository.observeActiveDog().first()
+        assertEquals(sixtenId, active?.id)
+        assertEquals(true, active?.isDeleted)
+    }
+
+    @Test
+    fun registerDog_takesOverFromDeletedActiveDog() = runBlocking {
+        val sixtenId = repository.registerDog(name = "Sixten", breed = "", birthDate = null, weightKg = null)
+        repository.deleteDog(sixtenId)
+        repository.setActiveDog(sixtenId)
+
+        val miraId = repository.registerDog(name = "Mira", breed = "", birthDate = null, weightKg = null)
+
+        assertEquals(miraId, repository.observeActiveDog().first()?.id)
+    }
 }

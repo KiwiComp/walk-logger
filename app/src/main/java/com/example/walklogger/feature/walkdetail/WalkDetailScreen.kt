@@ -103,7 +103,7 @@ fun WalkDetailScreen(
                 HeaderTextButton(
                     text = stringResource(R.string.walk_detail_edit),
                     onClick = onEdit,
-                    visible = !uiState.isLoading,
+                    visible = uiState.canEdit,
                 )
                 HeaderTextButton(
                     text = stringResource(R.string.walk_detail_discard),
@@ -221,7 +221,9 @@ private fun WhoDetails(uiState: WalkDetailUiState) {
         }
         FormSection(label = stringResource(R.string.walk_detail_dog), modifier = Modifier.weight(1f)) {
             Text(
-                text = uiState.dogName.orEmpty(),
+                text = uiState.dogName
+                    ?.let { if (uiState.isDogDeleted) stringResource(R.string.dog_name_deleted, it) else it }
+                    .orEmpty(),
                 style = MaterialTheme.typography.bodyLarge,
                 color = AppTheme.colors.content,
             )

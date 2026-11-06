@@ -62,6 +62,7 @@ class LogViewModel @Inject constructor(
                 .map { it.toUiState(clock.zone) },
             canStartLiveWalk = date == today,
             activeDogName = activeDog?.name,
+            isActiveDogDeleted = activeDog?.isDeleted == true,
         )
     }
 }

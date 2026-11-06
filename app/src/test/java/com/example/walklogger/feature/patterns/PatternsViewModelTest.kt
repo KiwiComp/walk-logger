@@ -26,4 +26,15 @@ class PatternsViewModelTest {
             assertEquals("Mira", expectMostRecentItem().activeDogName)
         }
     }
+
+    @Test
+    fun `a deleted active dog is flagged`() = runTest {
+        repository.addDogs(Dog(id = 1, name = "Mira", isDeleted = true))
+        repository.setActiveDog(1)
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertEquals("Mira", state.activeDogName)
+            assertEquals(true, state.isActiveDogDeleted)
+        }
+    }
 }
