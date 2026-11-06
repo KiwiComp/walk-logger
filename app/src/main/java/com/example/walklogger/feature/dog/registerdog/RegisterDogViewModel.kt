@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
+import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.ui.message.UserMessages
 import dagger.assisted.Assisted
@@ -24,6 +25,7 @@ import kotlinx.coroutines.launch
 class RegisterDogViewModel @AssistedInject constructor(
     @Assisted private val dogId: Long?,
     private val dogRepository: DogRepository,
+    private val walkRepository: WalkRepository,
     private val userMessages: UserMessages,
 ) : ViewModel() {
 
@@ -46,6 +48,11 @@ class RegisterDogViewModel @AssistedInject constructor(
                     userMessages.show(R.string.error_dog_not_found)
                 } else {
                     _uiState.update { it.prefilledFrom(dog) }
+                }
+            }
+            viewModelScope.launch {
+                walkRepository.observeActiveWalk().collect { walk ->
+                    _uiState.update { it.copy(hasActiveWalk = walk?.dogId == dogId) }
                 }
             }
         }

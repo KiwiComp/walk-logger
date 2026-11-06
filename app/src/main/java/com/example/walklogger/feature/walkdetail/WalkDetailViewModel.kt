@@ -6,6 +6,7 @@ import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.message.UserMessages
 import dagger.assisted.Assisted
@@ -53,11 +54,11 @@ class WalkDetailViewModel @AssistedInject constructor(
 
     /** Once discarded the walk is gone from the repository; only the discard flags remain while the screen leaves. */
     val uiState: StateFlow<WalkDetailUiState> =
-        combine(walkRepository.observeWalk(walkId), dogRepository.observeDogs(), discard) { walk, dogs, discard ->
+        combine(walkRepository.observeWalk(walkId), dogRepository.observeAllDogs(), discard) { walk, dogs, discard ->
             if (walk == null) {
                 discard
             } else {
-                discard.detailsOf(walk, dogName = dogs.find { it.id == walk.dogId }?.name)
+                discard.detailsOf(walk, dog = dogs.find { it.id == walk.dogId })
             }
         }.stateIn(
             scope = viewModelScope,
@@ -78,14 +79,15 @@ class WalkDetailViewModel @AssistedInject constructor(
         }
     }
 
-    private fun WalkDetailUiState.detailsOf(walk: Walk, dogName: String?): WalkDetailUiState {
+    private fun WalkDetailUiState.detailsOf(walk: Walk, dog: Dog?): WalkDetailUiState {
         val start = walk.startTime.toLocalDateTime()
         return copy(
             isLoading = false,
             date = start.toLocalDate(),
             startTime = start.toLocalTime(),
             endTime = walk.endTime?.toLocalDateTime()?.toLocalTime(),
-            dogName = dogName,
+            dogName = dog?.name,
+            isDogDeleted = dog?.isDeleted == true,
             handlers = walk.handlers,
             equipment = walk.equipment,
             rating = walk.rating,

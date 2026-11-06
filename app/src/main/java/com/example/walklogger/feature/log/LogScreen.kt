@@ -49,7 +49,9 @@ fun LogRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    val noDogMessage = stringResource(R.string.log_no_dog_message)
+    val noDogMessage = stringResource(
+        if (uiState.isActiveDogDeleted) R.string.log_deleted_dog_message else R.string.log_no_dog_message,
+    )
     val noDogAction = stringResource(R.string.log_no_dog_action)
     LogScreen(
         uiState = uiState,
@@ -84,7 +86,7 @@ fun LogScreen(
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(R.string.log_title),
-            actions = { DogBadge(name = uiState.activeDogName) },
+            actions = { DogBadge(name = uiState.activeDogName, isDeleted = uiState.isActiveDogDeleted) },
         ) {
             Spacer(Modifier.height(AppSpacing.xl))
             WeekStrip(days = uiState.week, onDaySelected = onDaySelected)

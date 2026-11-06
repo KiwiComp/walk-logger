@@ -13,8 +13,8 @@ interface DogDao {
     @Query("SELECT * FROM dogs ORDER BY id")
     fun observeDogs(): Flow<List<DogEntity>>
 
-    @Query("DELETE FROM dogs WHERE id = :id")
-    suspend fun deleteDog(id: Long)
+    @Query("UPDATE dogs SET isHidden = 1 WHERE id = :id")
+    suspend fun setHidden(id: Long)
 
     @Insert
     suspend fun insertDog(dog: DogEntity): Long

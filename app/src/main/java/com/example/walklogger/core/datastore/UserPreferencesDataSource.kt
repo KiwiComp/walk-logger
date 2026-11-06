@@ -20,6 +20,10 @@ class UserPreferencesDataSource @Inject constructor(
         dataStore.edit { it[ACTIVE_DOG_ID] = id }
     }
 
+    suspend fun clearActiveDogId() {
+        dataStore.edit { it.remove(ACTIVE_DOG_ID) }
+    }
+
     private companion object {
         val ACTIVE_DOG_ID = longPreferencesKey("active_dog_id")
     }

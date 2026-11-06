@@ -52,8 +52,10 @@ com.example.walklogger
 │   │                          (DiscardWalkDialog confirms first) and back returns to the tab; component/ holds the read-only
 │   │                          pieces (DetailField, DetailPlaceholder, RatingSummary, OptionalRatingRow, NotedItem)
 │   ├── patterns/              placeholder, same shape as calendar
-│   └── dog/                   DogViewModel + DogScreen (profile header, dog list, add-dog CTA) composed from
-│                              component/ (DogList);
+│   └── dog/                   DogViewModel + DogScreen (profile header, dog list, add-dog CTA, deleted dogs) composed from
+│                              component/ (DogList); deleting a dog soft-deletes it (`isHidden`) so its walks stay, and it can
+│                              still be selected as active to read its history in Log and Calendar, but not to log walks
+│                              or edit them;
 │                              registerdog/ RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight)
 │
 ├── domain/                    optional use cases (pure Kotlin, injectable); ObserveWalkHistoryUseCase gives Log and

@@ -3,8 +3,11 @@ package com.example.walklogger.feature.dog.registerdog
 import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.Dog
+import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.testing.FakeDogRepository
+import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import com.example.walklogger.testing.shownMessages
 import java.time.LocalDate
@@ -24,9 +27,14 @@ class RegisterDogViewModelTest {
 
     private val repository = FakeDogRepository()
     private val userMessages = UserMessages()
-    private val viewModel by lazy { RegisterDogViewModel(dogId = null, dogRepository = repository, userMessages = userMessages) }
+    private val walkRepository = FakeWalkRepository()
+    private val viewModel by lazy { editViewModel(dogId = null) }
 
-    private fun editViewModel(dogId: Long) = RegisterDogViewModel(dogId = dogId, dogRepository = repository, userMessages = userMessages)
+    private fun editViewModel(dogId: Long?) =
+        RegisterDogViewModel(dogId = dogId, dogRepository = repository, walkRepository = walkRepository, userMessages = userMessages)
+
+    private fun ongoingWalk(dogId: Long) =
+        Walk(id = 1, dogId = dogId, handlers = listOf("Kim"), startTime = 0, endTime = null, equipment = Equipment.HARNESS)
 
     @Test
     fun `cannot save without a name`() = runTest {
@@ -168,5 +176,36 @@ class RegisterDogViewModelTest {
             assertTrue(expectMostRecentItem().isNotFound)
         }
         assertEquals(listOf(R.string.error_dog_not_found), shown)
+    }
+
+    @Test
+    fun `delete keeps the dog as deleted and hands over to the next dog`() = runTest {
+        repository.addDogs(Dog(id = 1, name = "Sixten"), Dog(id = 2, name = "Mira"))
+        repository.setActiveDog(1)
+        val viewModel = editViewModel(dogId = 1)
+
+        viewModel.delete()
+
+        assertEquals(listOf(true, false), repository.observeAllDogs().first().map { it.isDeleted })
+        assertEquals("Mira", repository.observeActiveDog().first()?.name)
+    }
+
+    @Test
+    fun `a dog on an ongoing walk cannot be deleted`() = runTest {
+        repository.addDogs(Dog(id = 1, name = "Sixten"))
+        walkRepository.addWalks(ongoingWalk(dogId = 1))
+        val viewModel = editViewModel(dogId = 1)
+
+        assertFalse(viewModel.uiState.value.canDelete)
+        viewModel.delete()
+        assertEquals(false, repository.observeAllDogs().first().single().isDeleted)
+    }
+
+    @Test
+    fun `another dog's ongoing walk does not block deleting`() = runTest {
+        repository.addDogs(Dog(id = 1, name = "Sixten"))
+        walkRepository.addWalks(ongoingWalk(dogId = 2))
+
+        assertTrue(editViewModel(dogId = 1).uiState.value.canDelete)
     }
 }

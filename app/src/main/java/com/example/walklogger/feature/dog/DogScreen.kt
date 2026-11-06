@@ -63,7 +63,7 @@ fun DogScreen(
     Column(modifier = modifier.fillMaxSize()) {
         when (uiState) {
             DogUiState.Loading -> Unit
-            DogUiState.NoDog -> NoDogContent(onAddDog = onAddDog)
+            is DogUiState.NoDog -> NoDogContent(uiState = uiState, onSwitchDog = onSwitchDog, onAddDog = onAddDog)
             is DogUiState.Profile -> ProfileContent(
                 uiState = uiState,
                 onSwitchDog = onSwitchDog,
@@ -75,11 +75,12 @@ fun DogScreen(
 }
 
 @Composable
-private fun NoDogContent(onAddDog: () -> Unit) {
+private fun NoDogContent(uiState: DogUiState.NoDog, onSwitchDog: (Long) -> Unit, onAddDog: () -> Unit) {
     WalkLoggerHeader(title = stringResource(R.string.dog_title))
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .verticalScroll(rememberScrollState())
             .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
         verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
     ) {
@@ -89,6 +90,7 @@ private fun NoDogContent(onAddDog: () -> Unit) {
             color = AppTheme.colors.contentMuted,
         )
         DashedButton(text = stringResource(R.string.dog_add_first), onClick = onAddDog)
+        DeletedDogsSection(dogs = uiState.deletedDogs, onSwitchDog = onSwitchDog)
     }
 }
 
@@ -100,11 +102,16 @@ private fun ProfileContent(
     onEditDog: (Long) -> Unit,
 ) {
     WalkLoggerHeader(
-        title = uiState.active.name,
+        title = if (uiState.active.isDeleted) {
+            stringResource(R.string.dog_name_deleted, uiState.active.name)
+        } else {
+            uiState.active.name
+        },
         actions = {
             HeaderTextButton(
                 text = stringResource(R.string.dog_edit),
                 onClick = { onEditDog(uiState.active.id) },
+                visible = !uiState.active.isDeleted,
             )
         },
     ) {
@@ -119,14 +126,31 @@ private fun ProfileContent(
             .verticalScroll(rememberScrollState())
             .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
     ) {
-        SectionLabel(text = stringResource(R.string.dog_section_dogs), color = AppTheme.colors.contentMuted)
-        Spacer(Modifier.height(AppSpacing.sm))
-        DogList(dogs = uiState.dogs, onSwitchDog = onSwitchDog)
+        if (uiState.dogs.isNotEmpty()) {
+            SectionLabel(text = stringResource(R.string.dog_section_dogs), color = AppTheme.colors.contentMuted)
+            Spacer(Modifier.height(AppSpacing.sm))
+            DogList(dogs = uiState.dogs, onSwitchDog = onSwitchDog)
+        }
         DashedButton(
             text = stringResource(R.string.dog_add_another),
             onClick = onAddDog,
             modifier = Modifier.padding(top = AppSpacing.lg),
         )
+        DeletedDogsSection(
+            dogs = uiState.deletedDogs,
+            onSwitchDog = onSwitchDog,
+            modifier = Modifier.padding(top = AppSpacing.xxl),
+        )
+    }
+}
+
+@Composable
+private fun DeletedDogsSection(dogs: List<DogListItemUiState>, onSwitchDog: (Long) -> Unit, modifier: Modifier = Modifier) {
+    if (dogs.isEmpty()) return
+    Column(modifier = modifier.fillMaxWidth()) {
+        SectionLabel(text = stringResource(R.string.dog_section_deleted), color = AppTheme.colors.contentMuted)
+        Spacer(Modifier.height(AppSpacing.sm))
+        DogList(dogs = dogs, onSwitchDog = onSwitchDog)
     }
 }
 
@@ -157,6 +181,6 @@ private fun DogScreenPreview() {
 @Composable
 private fun DogScreenNoDogPreview() {
     WalkLoggerTheme {
-        DogScreen(uiState = DogUiState.NoDog, onSwitchDog = {}, onAddDog = {}, onEditDog = {})
+        DogScreen(uiState = DogUiState.NoDog(), onSwitchDog = {}, onAddDog = {}, onEditDog = {})
     }
 }

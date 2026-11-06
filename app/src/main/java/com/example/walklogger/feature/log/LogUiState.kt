@@ -15,12 +15,13 @@ data class LogUiState(
     val canStartLiveWalk: Boolean,
     /** Null until a dog has been registered. */
     val activeDogName: String? = null,
+    val isActiveDogDeleted: Boolean = false,
 ) {
     val averageRating: Double? =
         walks.mapNotNull { it.rating }.takeIf { it.isNotEmpty() }?.average()
 
-    /** Walks can only be logged for a registered dog. */
-    val canAddWalk: Boolean get() = activeDogName != null
+    /** Walks can only be logged for a registered dog that is not deleted. */
+    val canAddWalk: Boolean get() = activeDogName != null && !isActiveDogDeleted
 }
 
 data class DayUiState(

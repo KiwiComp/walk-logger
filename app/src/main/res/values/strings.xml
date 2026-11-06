@@ -21,6 +21,8 @@
     <string name="dog_add_first">+ Add your dog</string>
     <string name="dog_add_another">+ Add another dog</string>
     <string name="dog_section_dogs">Dogs</string>
+    <string name="dog_section_deleted">Deleted dogs</string>
+    <string name="dog_name_deleted">%1$s (deleted)</string>
     <string name="dog_active">Active</string>
     <string name="dog_switch">Switch</string>
     <string name="dog_switch_to">Switch to %1$s</string>
@@ -44,7 +46,7 @@
     <string name="edit_dog_title">Edit dog</string>
     <string name="edit_dog_delete">Delete</string>
     <string name="edit_dog_delete_confirm_title">Delete this dog?</string>
-    <string name="edit_dog_delete_confirm_message">The dog is removed from the app. This can\'t be undone.</string>
+    <string name="edit_dog_delete_confirm_message">The dog can no longer log walks. Its history stays under Deleted dogs on the Dogs tab. This can\'t be undone.</string>
     <string name="edit_dog_delete_confirm">Delete</string>
 
     <plurals name="walk_count">
@@ -55,6 +57,7 @@
     <string name="walk_duration_minutes">%1$d min</string>
     <string name="log_no_dog_message">Register a dog on the Dogs tab before logging walks.</string>
     <string name="log_no_dog_action">Dogs</string>
+    <string name="log_deleted_dog_message">Walks can\'t be logged for a deleted dog. Switch dog on the Dogs tab.</string>
     <string name="add_walk_for_day">+ Add a walk for %1$s</string>
 
     <string name="equipment_collar">Collar</string>

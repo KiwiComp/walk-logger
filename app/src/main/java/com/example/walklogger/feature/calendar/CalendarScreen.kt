@@ -58,7 +58,9 @@ fun CalendarRoute(
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
-    val noDogMessage = stringResource(R.string.log_no_dog_message)
+    val noDogMessage = stringResource(
+        if (uiState.isActiveDogDeleted) R.string.log_deleted_dog_message else R.string.log_no_dog_message,
+    )
     val noDogAction = stringResource(R.string.log_no_dog_action)
     CalendarScreen(
         uiState = uiState,
@@ -109,7 +111,7 @@ fun CalendarScreen(
                 )
             },
             actions = {
-                DogBadge(name = uiState.activeDogName)
+                DogBadge(name = uiState.activeDogName, isDeleted = uiState.isActiveDogDeleted)
                 HeaderIconButton(
                     icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
                     contentDescription = stringResource(R.string.calendar_next_month),

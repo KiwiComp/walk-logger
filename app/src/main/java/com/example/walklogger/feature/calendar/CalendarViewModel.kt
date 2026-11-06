@@ -78,6 +78,7 @@ class CalendarViewModel @Inject constructor(
             isCurrentMonth = month == YearMonth.from(today),
             canStartLiveWalk = date == today,
             activeDogName = activeDog?.name,
+            isActiveDogDeleted = activeDog?.isDeleted == true,
         )
     }
 }

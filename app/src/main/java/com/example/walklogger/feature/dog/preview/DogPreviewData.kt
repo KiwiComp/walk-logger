@@ -15,5 +15,6 @@ internal object DogPreviewData {
             DogListItemUiState(id = 1, name = "Sixten", isActive = true),
             DogListItemUiState(id = 2, name = "Mira", isActive = false),
         ),
+        deletedDogs = listOf(DogListItemUiState(id = 3, name = "Rex", isActive = false)),
     )
 }

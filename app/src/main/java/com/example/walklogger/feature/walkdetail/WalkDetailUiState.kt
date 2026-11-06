@@ -23,6 +23,8 @@ data class WalkDetailUiState(
     val startTime: LocalTime? = null,
     val endTime: LocalTime? = null,
     val dogName: String? = null,
+    /** A deleted dog's walks are read-only. */
+    val isDogDeleted: Boolean = false,
     val handlers: List<String> = emptyList(),
     val equipment: Equipment? = null,
     val rating: Int? = null,
@@ -43,5 +45,7 @@ data class WalkDetailUiState(
 
     val hasWeather: Boolean = listOf(rain, temperature, wind, snow).any { it != null }
 
-    val canDiscard: Boolean = !isLoading && !isDiscarding && !isDiscarded
+    val canEdit: Boolean = !isLoading && !isDogDeleted
+
+    val canDiscard: Boolean = !isLoading && !isDogDeleted && !isDiscarding && !isDiscarded
 }

@@ -6,18 +6,22 @@ import kotlinx.coroutines.flow.Flow
 
 /** Single source of truth for registered dogs and which one is active. */
 interface DogRepository {
-    /** All dogs in registration order. */
+    /** Dogs that are not deleted, in registration order. */
     fun observeDogs(): Flow<List<Dog>>
 
-    /** The dog walks are logged for; null until a dog has been registered. */
+    /** Every dog in registration order, including deleted ones. */
+    fun observeAllDogs(): Flow<List<Dog>>
+
+    /** The dog whose walks are shown; null when no dog is left. A deleted dog is active only if explicitly selected. */
     fun observeActiveDog(): Flow<Dog?>
 
-    /** Registers a dog and returns its id. The first dog registered becomes active. */
+    /** Registers a dog and returns its id. It becomes active if no dog is active or the active one is deleted. */
     suspend fun registerDog(name: String, breed: String, birthDate: LocalDate?, weightKg: Double?): Long
 
     suspend fun setActiveDog(id: Long)
 
     suspend fun updateDog(id: Long, name: String, breed: String, birthDate: LocalDate?, weightKg: Double?)
 
+    /** Keeps the dog and its walks but marks it deleted. An active dog hands over to the first remaining dog. */
     suspend fun deleteDog(id: Long)
 }

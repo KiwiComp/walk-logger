@@ -84,4 +84,5 @@ internal fun DogEntity.toModel(): Dog = Dog(
     breed = breed,
     birthDate = birthDate?.let(LocalDate::ofEpochDay),
     weightKg = weightKg,
+    isDeleted = isHidden,
 )

@@ -171,4 +171,17 @@ class WalkDetailViewModelTest {
         }
         assertEquals(listOf(R.string.error_walk_not_found), shown)
     }
+
+    @Test
+    fun `a deleted dog's walk keeps its name and is read-only`() = runTest {
+        dogRepository.addDogs(Dog(id = 3, name = "Sixten", isDeleted = true))
+        walkRepository.addWalks(completeWalk())
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertEquals("Sixten", state.dogName)
+            assertTrue(state.isDogDeleted)
+            assertFalse(state.canEdit)
+            assertFalse(state.canDiscard)
+        }
+    }
 }

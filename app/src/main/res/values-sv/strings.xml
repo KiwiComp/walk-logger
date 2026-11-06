@@ -19,6 +19,8 @@
     <string name="dog_add_first">+ Lägg till din hund</string>
     <string name="dog_add_another">+ Lägg till en hund till</string>
     <string name="dog_section_dogs">Hundar</string>
+    <string name="dog_section_deleted">Borttagna hundar</string>
+    <string name="dog_name_deleted">%1$s (borttagen)</string>
     <string name="dog_active">Aktiv</string>
     <string name="dog_switch">Byt</string>
     <string name="dog_switch_to">Byt till %1$s</string>
@@ -42,7 +44,7 @@
     <string name="edit_dog_title">Redigera hund</string>
     <string name="edit_dog_delete">Ta bort</string>
     <string name="edit_dog_delete_confirm_title">Ta bort hunden?</string>
-    <string name="edit_dog_delete_confirm_message">Hunden tas bort från appen. Det kan inte ångras.</string>
+    <string name="edit_dog_delete_confirm_message">Hunden kan inte längre logga promenader. Dess historik finns kvar under Borttagna hundar på fliken Hundar. Det kan inte ångras.</string>
     <string name="edit_dog_delete_confirm">Ta bort</string>
 
     <plurals name="walk_count">
@@ -53,6 +55,7 @@
     <string name="walk_duration_minutes">%1$d min</string>
     <string name="log_no_dog_message">Registrera en hund under fliken Hundar innan du loggar promenader.</string>
     <string name="log_no_dog_action">Hundar</string>
+    <string name="log_deleted_dog_message">Det går inte att logga promenader för en borttagen hund. Byt hund på fliken Hundar.</string>
     <string name="add_walk_for_day">+ Lägg till en promenad för %1$s</string>
 
     <string name="equipment_collar">Halsband</string>

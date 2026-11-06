@@ -17,6 +17,8 @@ data class RegisterDogUiState(
     val isSaved: Boolean = false,
     val isDeleting: Boolean = false,
     val isDeleted: Boolean = false,
+    /** True while the dog being edited is out on a timed walk; it can't be deleted until the walk ends. */
+    val hasActiveWalk: Boolean = false,
 ) {
     val weightKg: Double? = weight.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it > 0 }
 
@@ -25,5 +27,6 @@ data class RegisterDogUiState(
     val canSave: Boolean =
         name.isNotBlank() && !isWeightInvalid && !isLoading && !isSaving && !isSaved && !isDeleting && !isDeleted
 
-    val canDelete: Boolean = isEditing && !isLoading && !isSaving && !isSaved && !isDeleting && !isDeleted
+    val canDelete: Boolean =
+        isEditing && !isLoading && !isSaving && !isSaved && !isDeleting && !isDeleted && !hasActiveWalk
 }
