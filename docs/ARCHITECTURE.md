@@ -56,7 +56,8 @@ com.example.walklogger
 │                              component/ (DogList);
 │                              registerdog/ RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight)
 │
-├── domain/                    optional use cases (pure Kotlin, injectable)
+├── domain/                    optional use cases (pure Kotlin, injectable); ObserveWalkHistoryUseCase gives Log and
+│                              Calendar the active dog's completed walks
 │
 ├── core/
 │   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern) – no Android deps;
