@@ -31,12 +31,12 @@ class LogViewModelTest {
     private val dogRepository = FakeDogRepository()
 
     /** Lazy so viewModelScope picks up the rule's Main dispatcher. */
-    private val viewModel by lazy { LogViewModel(ObserveWalkHistoryUseCase(repository), dogRepository, clock) }
+    private val viewModel by lazy { LogViewModel(ObserveWalkHistoryUseCase(repository, dogRepository), dogRepository, clock) }
 
-    private fun walk(id: Long, start: LocalDateTime, minutes: Long = 30, rating: Int? = null, finished: Boolean = true) =
+    private fun walk(id: Long, start: LocalDateTime, minutes: Long = 30, rating: Int? = null, finished: Boolean = true, dogId: Long = 1) =
         Walk(
             id = id,
-            dogId = 1,
+            dogId = dogId,
             handlers = listOf("Kim"),
             startTime = start.toEpochSecond(ZoneOffset.UTC) * 1000,
             endTime = if (finished) start.plusMinutes(minutes).toEpochSecond(ZoneOffset.UTC) * 1000 else null,
@@ -71,6 +71,7 @@ class LogViewModelTest {
 
     @Test
     fun `walks on the selected day are listed earliest first`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"))
         repository.addWalks(
             walk(id = 1, start = today.atTime(11, 30), minutes = 17, rating = 4),
             walk(id = 2, start = today.atTime(7, 5), minutes = 38, rating = 6),
@@ -88,6 +89,7 @@ class LogViewModelTest {
 
     @Test
     fun `active walks are excluded`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"))
         repository.addWalks(walk(id = 1, start = today.atTime(8, 0), finished = false))
         viewModel.uiState.test {
             val state = expectMostRecentItem()
@@ -98,6 +100,7 @@ class LogViewModelTest {
 
     @Test
     fun `selecting a day shows its walks`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"))
         val friday = today.minusDays(1)
         repository.addWalks(walk(id = 1, start = friday.atTime(9, 0)))
         viewModel.uiState.test {
@@ -109,6 +112,35 @@ class LogViewModelTest {
             assertEquals(friday, state.week.single { it.isSelected }.date)
             assertEquals(today, state.week.single { it.isToday }.date)
             assertEquals(false, state.canStartLiveWalk)
+        }
+    }
+
+    @Test
+    fun `only the active dog's walks are shown and switching dog switches them`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"), Dog(id = 2, name = "Sixten"))
+        dogRepository.setActiveDog(1)
+        repository.addWalks(
+            walk(id = 1, start = today.atTime(8, 0), dogId = 1),
+            walk(id = 2, start = today.minusDays(1).atTime(8, 0), dogId = 2),
+        )
+        viewModel.uiState.test {
+            val mira = expectMostRecentItem()
+            assertEquals(listOf(1L), mira.walks.map { it.id })
+            assertEquals(false, mira.week.single { it.date == today.minusDays(1) }.hasWalks)
+            dogRepository.setActiveDog(2)
+            val sixten = expectMostRecentItem()
+            assertEquals(emptyList<WalkUiState>(), sixten.walks)
+            assertEquals(true, sixten.week.single { it.date == today.minusDays(1) }.hasWalks)
+        }
+    }
+
+    @Test
+    fun `no walks are shown without an active dog`() = runTest {
+        repository.addWalks(walk(id = 1, start = today.atTime(8, 0)))
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertEquals(emptyList<WalkUiState>(), state.walks)
+            assertEquals(false, state.week.single { it.date == today }.hasWalks)
         }
     }
 }

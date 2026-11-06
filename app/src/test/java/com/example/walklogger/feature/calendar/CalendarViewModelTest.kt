@@ -33,12 +33,12 @@ class CalendarViewModelTest {
     private val dogRepository = FakeDogRepository()
 
     /** Lazy so viewModelScope picks up the rule's Main dispatcher. */
-    private val viewModel by lazy { CalendarViewModel(ObserveWalkHistoryUseCase(repository), dogRepository, clock) }
+    private val viewModel by lazy { CalendarViewModel(ObserveWalkHistoryUseCase(repository, dogRepository), dogRepository, clock) }
 
-    private fun walk(id: Long, start: LocalDateTime, rating: Int? = null, finished: Boolean = true) =
+    private fun walk(id: Long, start: LocalDateTime, rating: Int? = null, finished: Boolean = true, dogId: Long = 1) =
         Walk(
             id = id,
-            dogId = 1,
+            dogId = dogId,
             handlers = listOf("Kim"),
             startTime = start.toEpochSecond(ZoneOffset.UTC) * 1000,
             endTime = if (finished) start.plusMinutes(30).toEpochSecond(ZoneOffset.UTC) * 1000 else null,
@@ -74,6 +74,7 @@ class CalendarViewModelTest {
 
     @Test
     fun `days carry their walk count and rounded average rating`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"))
         repository.addWalks(
             walk(id = 1, start = today.atTime(7, 5), rating = 6),
             walk(id = 2, start = today.atTime(11, 30), rating = 3),
@@ -96,6 +97,7 @@ class CalendarViewModelTest {
 
     @Test
     fun `walks on the selected day are listed earliest first`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"))
         repository.addWalks(
             walk(id = 1, start = today.atTime(11, 30), rating = 4),
             walk(id = 2, start = today.atTime(7, 5), rating = 6),
@@ -111,6 +113,7 @@ class CalendarViewModelTest {
 
     @Test
     fun `selecting a day shows its walks`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"))
         val friday = today.minusDays(1)
         repository.addWalks(walk(id = 1, start = friday.atTime(9, 0)))
         viewModel.uiState.test {
@@ -166,6 +169,38 @@ class CalendarViewModelTest {
             viewModel.showNextMonth()
             expectNoEvents()
             assertEquals(today, viewModel.uiState.value.selectedDate)
+        }
+    }
+
+    @Test
+    fun `only the active dog's walks are shown and switching dog switches them`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"), Dog(id = 2, name = "Sixten"))
+        dogRepository.setActiveDog(1)
+        repository.addWalks(
+            walk(id = 1, start = today.atTime(8, 0), rating = 6, dogId = 1),
+            walk(id = 2, start = today.atTime(9, 0), rating = 2, dogId = 2),
+            walk(id = 3, start = today.minusDays(1).atTime(8, 0), dogId = 2),
+        )
+        viewModel.uiState.test {
+            val mira = expectMostRecentItem()
+            assertEquals(listOf(1L), mira.walks.map { it.id })
+            assertEquals(1, mira.monthWalkCount)
+            assertEquals(6, mira.days.single { it.date == today }.rating)
+            dogRepository.setActiveDog(2)
+            val sixten = expectMostRecentItem()
+            assertEquals(listOf(2L), sixten.walks.map { it.id })
+            assertEquals(2, sixten.monthWalkCount)
+            assertEquals(2, sixten.days.single { it.date == today }.rating)
+        }
+    }
+
+    @Test
+    fun `no walks are shown without an active dog`() = runTest {
+        repository.addWalks(walk(id = 1, start = today.atTime(8, 0)))
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertEquals(emptyList<CalendarWalkUiState>(), state.walks)
+            assertEquals(0, state.monthWalkCount)
         }
     }
 }
