@@ -30,7 +30,7 @@ it. Never weaken, ignore or skip a test or a style rule to make a check pass.
 
 ## CI
 
-- `.github/workflows/pull-request-checks.yml` runs checks 2–5 on every pull request to and push to `main`.
+- `.github/workflows/pull-request-checks.yml` runs checks 2–5 on every pull request to `main`.
 - `.github/workflows/instrumented-tests.yml` runs check 6 on an emulator, only when started by hand
   with `confirm` set to `run`. Never start it (`gh workflow run`, or any other way) unless the
   developer explicitly asks for it in the current message: each run costs Actions minutes.
