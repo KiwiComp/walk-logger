@@ -7,7 +7,10 @@ import com.example.walklogger.core.model.WeatherCondition
 import java.io.IOException
 import java.time.Instant
 
-/** [WeatherRepository] for unit tests: answers with [weather] and records each request in [requests]. */
+/**
+ * [WeatherRepository] for unit tests: answers with [weather] and records each request in [requests];
+ * times before [oldestAvailable] are out of reach.
+ */
 class FakeWeatherRepository : WeatherRepository {
 
     var weather = WalkWeather(
@@ -22,7 +25,11 @@ class FakeWeatherRepository : WeatherRepository {
     /** While on, every request throws. */
     var fail: Boolean = false
 
+    var oldestAvailable: Instant = Instant.MIN
+
     val requests = mutableListOf<Pair<Coordinates, Instant>>()
+
+    override fun isAvailable(time: Instant): Boolean = time >= oldestAvailable
 
     override suspend fun weatherAt(coordinates: Coordinates, time: Instant): WalkWeather {
         requests += coordinates to time

@@ -1,4 +1,4 @@
-package com.example.walklogger.core.location
+package com.example.walklogger.service
 
 import android.app.Service
 import android.content.Context

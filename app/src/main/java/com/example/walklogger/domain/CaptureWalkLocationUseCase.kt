@@ -1,8 +1,8 @@
 package com.example.walklogger.domain
 
 import com.example.walklogger.core.common.runCatchingCancellable
+import com.example.walklogger.core.data.LocationRepository
 import com.example.walklogger.core.data.PlaceRepository
-import com.example.walklogger.core.location.LocationProvider
 import com.example.walklogger.core.model.WalkLocation
 import javax.inject.Inject
 import kotlinx.coroutines.flow.first
@@ -12,18 +12,18 @@ import kotlinx.coroutines.flow.first
  * the walk ends. Never asks for permission and never fails; without a position the fetch looks it up as usual.
  */
 class CaptureWalkLocationUseCase @Inject constructor(
-    private val locationProvider: LocationProvider,
+    private val locationRepository: LocationRepository,
     private val placeRepository: PlaceRepository,
 ) {
     suspend operator fun invoke(walkId: Long) {
-        if (!locationProvider.hasPermission()) return
+        if (!locationRepository.hasPermission()) return
         runCatchingCancellable {
             if (placeRepository.activeWalkLocation.first()?.walkId ==
                 walkId
             ) {
                 return@runCatchingCancellable
             }
-            val coordinates = locationProvider.currentLocation() ?: return@runCatchingCancellable
+            val coordinates = locationRepository.currentLocation() ?: return@runCatchingCancellable
             placeRepository.saveActiveWalkLocation(WalkLocation(walkId, coordinates))
         }
     }

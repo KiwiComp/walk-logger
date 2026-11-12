@@ -33,7 +33,7 @@
         </activity>
 
         <service
-            android:name=".core.location.WalkLocationService"
+            android:name=".service.WalkLocationService"
             android:exported="false"
             android:foregroundServiceType="location" />
     </application>

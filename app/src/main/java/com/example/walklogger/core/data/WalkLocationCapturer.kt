@@ -1,4 +1,4 @@
-package com.example.walklogger.core.location
+package com.example.walklogger.core.data
 
 /** Stores where an active walk is, in a way that survives the screen being locked right after the start. */
 interface WalkLocationCapturer {

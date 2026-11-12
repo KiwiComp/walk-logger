@@ -68,9 +68,14 @@ com.example.walklogger
 ├── domain/                    optional use cases (pure Kotlin, injectable); ObserveWalkHistoryUseCase gives Log and
 │                              Calendar the active dog's completed walks; FetchWalkWeatherUseCase fetches the weather for
 │                              the hour containing a walk's middle, from the active walk's start position, the device location
-│                              or else the saved place, and only within the free forecast's 92 days;
+│                              or else the saved place, and only for times WeatherRepository can still reach;
 │                              CaptureWalkLocationUseCase stores the start position; LocationPermissionUseCase decides
-│                              whether to ask for location (once, wherever it is asked)
+│                              whether to ask for location (once, wherever it is asked); use cases depend only on
+│                              repositories, never on network, location or database classes
+│
+├── service/                   app-layer Android services: WalkLocationService, a `location` foreground service that runs
+│                              CaptureWalkLocationUseCase so the start position is captured with a locked screen, started by
+│                              ServiceWalkLocationCapturer (bound to core/data's WalkLocationCapturer, like NiA's SyncManager)
 │
 ├── core/
 │   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern, WalkWeather with its
@@ -78,13 +83,13 @@ com.example.walklogger
 │   │                          StoolEdits holds the stool answer rules the forms and the timer share
 │   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository /
 │   │                          MedicalConcernRepository interfaces + Room-backed implementations, mappers;
-│   │                          WeatherRepository (Open-Meteo forecast, WMO codes mapped in WeatherMappers) and
+│   │                          WeatherRepository (Open-Meteo forecast, WMO codes mapped in WeatherMappers, and how far back
+│   │                          it reaches), LocationRepository (device location over core/location), WalkLocationCapturer
+│   │                          (implemented in service/) and
 │   │                          PlaceRepository (geocoding search, the saved place, the active walk's start position, whether
 │   │                          location has been asked for)
 │   ├── network/               Retrofit APIs for Open-Meteo's forecast and geocoding, their @Serializable DTOs
-│   ├── location/              LocationProvider (fused location; accepts coarse or fine permission); WalkLocationCapturer
-│   │                          starts WalkLocationService, a `location` foreground service that captures the start position
-│   │                          so it works with a locked screen
+│   ├── location/              LocationProvider (fused location; accepts coarse or fine permission), read through LocationRepository
 │   ├── database/              Room database, DAOs, entities, type converters; walks join behaviour issues and medical
 │   │                          concerns through walk_behaviour_issues / walk_medical_concerns; the defaults are
 │   │                          seeded on create (SeedCallback) and on the migration that added each table;

@@ -21,7 +21,7 @@ import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeHandlerRepository
-import com.example.walklogger.testing.FakeLocationProvider
+import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWalkRepository
@@ -56,7 +56,7 @@ class LogPastWalkViewModelTest {
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val walkRepository = FakeWalkRepository()
     private val userMessages = UserMessages()
-    private val locationProvider = FakeLocationProvider()
+    private val locationRepository = FakeLocationRepository()
     private val placeRepository = FakePlaceRepository()
     private val weatherRepository = FakeWeatherRepository()
     private var walkId: Long? = null
@@ -72,12 +72,11 @@ class LogPastWalkViewModelTest {
             userMessages = userMessages,
             clock = clock,
             fetchWalkWeather = FetchWalkWeatherUseCase(
-                locationProvider,
+                locationRepository,
                 placeRepository,
                 weatherRepository,
-                clock,
             ),
-            locationPermission = LocationPermissionUseCase(locationProvider, placeRepository),
+            locationPermission = LocationPermissionUseCase(locationRepository, placeRepository),
             placeRepository = placeRepository,
         )
     }

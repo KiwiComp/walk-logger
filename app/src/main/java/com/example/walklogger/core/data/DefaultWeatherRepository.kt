@@ -5,6 +5,8 @@ import com.example.walklogger.core.common.di.WalkLoggerDispatchers
 import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.network.OpenMeteoForecastApi
+import java.time.Clock
+import java.time.Duration
 import java.time.Instant
 import java.time.ZoneOffset
 import java.time.format.DateTimeFormatter
@@ -15,8 +17,13 @@ import kotlinx.coroutines.withContext
 
 class DefaultWeatherRepository @Inject constructor(
     private val api: OpenMeteoForecastApi,
+    private val clock: Clock,
     @Dispatcher(WalkLoggerDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : WeatherRepository {
+
+    override fun isAvailable(time: Instant): Boolean = time >= clock.instant()
+        .truncatedTo(ChronoUnit.DAYS)
+        .minus(Duration.ofDays(OpenMeteoForecastApi.MAX_PAST_DAYS))
 
     override suspend fun weatherAt(coordinates: Coordinates, time: Instant): WalkWeather =
         withContext(ioDispatcher) {
