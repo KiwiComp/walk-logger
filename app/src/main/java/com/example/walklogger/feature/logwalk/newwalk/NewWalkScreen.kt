@@ -31,6 +31,7 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
 import com.example.walklogger.feature.logwalk.component.FormSection
+import com.example.walklogger.feature.logwalk.component.LocationPermissionRequest
 import com.example.walklogger.feature.logwalk.component.SelectableChip
 import com.example.walklogger.feature.logwalk.component.labelRes
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
@@ -51,6 +52,10 @@ fun NewWalkRoute(
     LaunchedEffect(uiState.startedWalkId) {
         uiState.startedWalkId?.let(onWalkStarted)
     }
+    LocationPermissionRequest(
+        shouldRequest = uiState.shouldRequestLocationPermission,
+        onResult = { viewModel.onLocationPermissionAnswered() },
+    )
     NewWalkScreen(
         uiState = uiState,
         onBack = onBack,

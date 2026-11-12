@@ -7,8 +7,10 @@ import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.location.WalkLocationCapturer
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.domain.LocationPermissionUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -30,6 +32,8 @@ class NewWalkViewModel @AssistedInject constructor(
     private val dogRepository: DogRepository,
     private val handlerRepository: HandlerRepository,
     private val walkRepository: WalkRepository,
+    private val walkLocationCapturer: WalkLocationCapturer,
+    private val locationPermission: LocationPermissionUseCase,
     private val userMessages: UserMessages,
 ) : ViewModel() {
 
@@ -66,6 +70,7 @@ class NewWalkViewModel @AssistedInject constructor(
                 selectedHandlers = selected,
                 equipment = equipment,
                 isStarting = start.isStarting,
+                shouldRequestLocationPermission = start.shouldRequestLocationPermission,
                 startedWalkId = start.walkId,
             )
         }.stateIn(
@@ -89,27 +94,55 @@ class NewWalkViewModel @AssistedInject constructor(
 
     fun selectEquipment(value: Equipment) = equipment.update { value }
 
-    /** Stores the walk with the start time set to now; [NewWalkUiState.startedWalkId] follows. */
+    /**
+     * Stores the walk with the start time set to now; [NewWalkUiState.startedWalkId] follows. The first
+     * start asks for location instead and stores the walk once the user has answered.
+     */
     fun startWalk() {
-        val state = uiState.value
-        if (!state.canStart) return
+        if (!uiState.value.canStart) return
         start.update { it.copy(isStarting = true) }
         viewModelScope.launch {
-            runCatchingCancellable {
-                val dog = checkNotNull(dogRepository.observeActiveDog().first()) { "starting a walk needs an active dog" }
-                walkRepository.startWalk(
-                    dogId = dog.id,
-                    handlers = state.handlers.filter { it in state.selectedHandlers },
-                    equipment = state.equipment,
-                )
+            if (locationPermission.shouldRequest()) {
+                start.update { it.copy(shouldRequestLocationPermission = true) }
+            } else {
+                storeWalk()
             }
-                .onSuccess { walkId -> start.update { StartState(isStarting = false, walkId = walkId) } }
-                .onFailure {
-                    start.update { StartState() }
-                    userMessages.show(R.string.error_start_walk)
-                }
         }
     }
 
-    private data class StartState(val isStarting: Boolean = false, val walkId: Long? = null)
+    /** The walk starts whatever the answer; without permission the weather falls back to the saved place. */
+    fun onLocationPermissionAnswered() {
+        if (!start.value.shouldRequestLocationPermission) return
+        start.update { it.copy(shouldRequestLocationPermission = false) }
+        viewModelScope.launch {
+            runCatchingCancellable { locationPermission.markRequested() }
+            storeWalk()
+        }
+    }
+
+    private suspend fun storeWalk() {
+        val state = uiState.value
+        runCatchingCancellable {
+            val dog = checkNotNull(dogRepository.observeActiveDog().first()) { "starting a walk needs an active dog" }
+            walkRepository.startWalk(
+                dogId = dog.id,
+                handlers = state.handlers.filter { it in state.selectedHandlers },
+                equipment = state.equipment,
+            )
+        }
+            .onSuccess { walkId ->
+                walkLocationCapturer.capture(walkId)
+                start.update { StartState(walkId = walkId) }
+            }
+            .onFailure {
+                start.update { StartState() }
+                userMessages.show(R.string.error_start_walk)
+            }
+    }
+
+    private data class StartState(
+        val isStarting: Boolean = false,
+        val shouldRequestLocationPermission: Boolean = false,
+        val walkId: Long? = null,
+    )
 }

@@ -1,13 +1,20 @@
 package com.example.walklogger.feature.logwalk.finishwalk
 
+import com.example.walklogger.testing.FakeWeatherRepository
+import com.example.walklogger.testing.FakePlaceRepository
+import com.example.walklogger.testing.FakeLocationProvider
+import com.example.walklogger.domain.FetchWalkWeatherUseCase
+import com.example.walklogger.domain.LocationPermissionUseCase
 import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
+import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.WalkLocation
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
@@ -44,6 +51,9 @@ class FinishWalkViewModelTest {
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val walkRepository = FakeWalkRepository()
     private val userMessages = UserMessages()
+    private val locationProvider = FakeLocationProvider()
+    private val placeRepository = FakePlaceRepository()
+    private val weatherRepository = FakeWeatherRepository()
     private val walk = Walk(
         id = 1,
         dogId = 1,
@@ -62,6 +72,9 @@ class FinishWalkViewModelTest {
             walkRepository = walkRepository,
             userMessages = userMessages,
             clock = clock,
+            fetchWalkWeather = FetchWalkWeatherUseCase(locationProvider, placeRepository, weatherRepository, clock),
+            locationPermission = LocationPermissionUseCase(locationProvider, placeRepository),
+            placeRepository = placeRepository,
         )
     }
 
@@ -83,6 +96,44 @@ class FinishWalkViewModelTest {
             assertEquals(SaveBlocker.RATING, state.saveBlocker)
             assertNull(state.form.stool)
         }
+    }
+
+    @Test
+    fun `fetches the weather for the walk when it opens, and again when its times change`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            assertEquals(weatherRepository.weather, expectMostRecentItem().form.fetchedWeather)
+            viewModel.setStartTime(LocalTime.of(7, 0))
+            expectMostRecentItem()
+        }
+        assertEquals(2, weatherRepository.requests.size)
+    }
+
+    @Test
+    fun `saving stores the fetched weather`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.formActions.setRating(5)
+            viewModel.save()
+            assertTrue(expectMostRecentItem().isSaved)
+        }
+        assertEquals(weatherRepository.weather, walkRepository.observeWalks().first().single().weather)
+    }
+
+    @Test
+    fun `fetches for the position stored at the start and clears it once saved`() = runTest {
+        val start = Coordinates(59.86, 17.64)
+        placeRepository.walkLocation.value = WalkLocation(walkId = 1, start)
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.formActions.setRating(5)
+            viewModel.save()
+            assertTrue(expectMostRecentItem().isSaved)
+        }
+        assertEquals(start, weatherRepository.requests.single().first)
+        assertNull(placeRepository.walkLocation.value)
     }
 
     @Test

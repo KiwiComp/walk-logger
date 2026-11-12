@@ -1,5 +1,12 @@
 package com.example.walklogger.feature.logwalk.pastwalk
 
+import com.example.walklogger.core.model.WeatherCondition
+import com.example.walklogger.core.model.WalkWeather
+import com.example.walklogger.testing.FakeWeatherRepository
+import com.example.walklogger.testing.FakePlaceRepository
+import com.example.walklogger.testing.FakeLocationProvider
+import com.example.walklogger.domain.FetchWalkWeatherUseCase
+import com.example.walklogger.domain.LocationPermissionUseCase
 import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
@@ -7,15 +14,11 @@ import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
-import com.example.walklogger.core.model.Rain
-import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
-import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
-import com.example.walklogger.core.model.Wind
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
@@ -54,6 +57,9 @@ class LogPastWalkViewModelTest {
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val walkRepository = FakeWalkRepository()
     private val userMessages = UserMessages()
+    private val locationProvider = FakeLocationProvider()
+    private val placeRepository = FakePlaceRepository()
+    private val weatherRepository = FakeWeatherRepository()
     private var walkId: Long? = null
     private val viewModel by lazy {
         LogPastWalkViewModel(
@@ -66,6 +72,9 @@ class LogPastWalkViewModelTest {
             walkRepository = walkRepository,
             userMessages = userMessages,
             clock = clock,
+            fetchWalkWeather = FetchWalkWeatherUseCase(locationProvider, placeRepository, weatherRepository, clock),
+            locationPermission = LocationPermissionUseCase(locationProvider, placeRepository),
+            placeRepository = placeRepository,
         )
     }
 
@@ -185,10 +194,8 @@ class LogPastWalkViewModelTest {
             viewModel.formActions.toggleBehaviourIssue(BehaviourIssue(2, "Barking"))
             viewModel.formActions.toggleMedicalConcern(MedicalConcern(2, "Vomit"))
             viewModel.formActions.selectEquipment(Equipment.COLLAR)
-            viewModel.formActions.selectRain(Rain.LIGHT)
-            viewModel.formActions.selectTemperature(Temperature.COLD)
-            viewModel.formActions.selectWind(Wind.WINDY)
-            viewModel.formActions.selectSnow(Snow.NONE)
+            viewModel.formActions.setTemperature("-3")
+            viewModel.formActions.selectCondition(WeatherCondition.SNOW)
             viewModel.formActions.setOptionalRating(OptionalRating.ENERGY_LEVEL, 6)
             viewModel.formActions.selectStoolPassed(false)
             viewModel.formActions.setNotes(" Pulled at the gate ")
@@ -202,10 +209,7 @@ class LogPastWalkViewModelTest {
         assertEquals(date.atTime(18, 5).toInstant(zone).toEpochMilli(), walk.endTime)
         assertEquals(5, walk.rating)
         assertEquals(Equipment.COLLAR, walk.equipment)
-        assertEquals(Rain.LIGHT, walk.rain)
-        assertEquals(Temperature.COLD, walk.temperature)
-        assertEquals(Wind.WINDY, walk.wind)
-        assertEquals(Snow.NONE, walk.snow)
+        assertEquals(weatherRepository.weather.copy(temperatureCelsius = -3.0, condition = WeatherCondition.SNOW), walk.weather)
         assertEquals(mapOf(OptionalRating.ENERGY_LEVEL to 6), walk.optionalRatings)
         assertEquals(Stool(passed = false), walk.stool)
         assertEquals(listOf(BehaviourIssue(2, "Barking")), walk.behaviourIssues)
@@ -238,10 +242,7 @@ class LogPastWalkViewModelTest {
             notes = "Muddy",
             equipment = Equipment.COLLAR,
             rating = 3,
-            rain = Rain.HEAVY,
-            temperature = Temperature.COOL,
-            wind = Wind.BREEZE,
-            snow = Snow.LIGHT,
+            weather = WalkWeather(condition = WeatherCondition.HEAVY_RAIN, temperatureCelsius = 4.0, rainMm = 3.1),
             behaviourIssues = listOf(BehaviourIssue(1, "Pulling")),
             medicalConcerns = listOf(MedicalConcern(1, "Limping")),
             optionalRatings = mapOf(OptionalRating.RESPONSIVENESS to 4),
@@ -267,6 +268,31 @@ class LogPastWalkViewModelTest {
             assertEquals(3, state.form.rating)
             assertEquals("Muddy", state.form.notes)
             assertTrue(state.canSave)
+        }
+    }
+
+    @Test
+    fun `a new walk fetches the weather once both times are set`() = runTest {
+        handlerRepository.addHandlers("Anna")
+        viewModel.uiState.test {
+            viewModel.setStartTime(LocalTime.of(17, 40))
+            assertTrue(weatherRepository.requests.isEmpty())
+            viewModel.setEndTime(LocalTime.of(18, 5))
+            assertEquals(weatherRepository.weather, expectMostRecentItem().form.fetchedWeather)
+        }
+        assertEquals(1, weatherRepository.requests.size)
+    }
+
+    @Test
+    fun `editing keeps the stored weather and fetches only on request`() = runTest {
+        val original = seedLoggedWalk()
+        viewModel.uiState.test {
+            assertEquals(original.weather, expectMostRecentItem().form.weather)
+            viewModel.setStartTime(LocalTime.of(8, 0))
+            expectMostRecentItem()
+            assertTrue(weatherRepository.requests.isEmpty())
+            viewModel.formActions.fetchWeather()
+            assertEquals(weatherRepository.weather, expectMostRecentItem().form.fetchedWeather)
         }
     }
 

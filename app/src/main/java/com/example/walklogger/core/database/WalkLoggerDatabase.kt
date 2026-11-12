@@ -26,7 +26,7 @@ import com.example.walklogger.core.database.entity.WalkMedicalConcernEntity
         MedicalConcernEntity::class,
         WalkMedicalConcernEntity::class,
     ],
-    version = 10,
+    version = 11,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = WalkLoggerDatabase.Migration1To2::class),
@@ -38,6 +38,7 @@ import com.example.walklogger.core.database.entity.WalkMedicalConcernEntity
         AutoMigration(from = 7, to = 8),
         AutoMigration(from = 8, to = 9),
         AutoMigration(from = 9, to = 10),
+        AutoMigration(from = 10, to = 11, spec = WalkLoggerDatabase.Migration10To11::class),
     ],
 )
 @TypeConverters(StringListConverter::class)
@@ -72,6 +73,13 @@ abstract class WalkLoggerDatabase : RoomDatabase() {
             db.seedDefaultMedicalConcerns()
         }
     }
+
+    /** The coarse, hand-picked weather is dropped for the fetched values; old answers are not carried over. */
+    @DeleteColumn(tableName = "walks", columnName = "rain")
+    @DeleteColumn(tableName = "walks", columnName = "temperature")
+    @DeleteColumn(tableName = "walks", columnName = "wind")
+    @DeleteColumn(tableName = "walks", columnName = "snow")
+    class Migration10To11 : AutoMigrationSpec
 
     /** Seeds the default issues and concerns when the database is first created. */
     class SeedCallback : Callback() {

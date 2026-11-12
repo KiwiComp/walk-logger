@@ -11,6 +11,7 @@ import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.WalkWeather
 import java.time.LocalDate
 
 // Entity <-> domain model mapping. Keeps Room types out of the rest of the app.
@@ -32,10 +33,15 @@ internal fun WalkEntity.toModel(
     notes = notes,
     equipment = equipment,
     rating = rating,
-    rain = rain,
-    temperature = temperature,
-    wind = wind,
-    snow = snow,
+    weather = WalkWeather(
+        condition = weatherCondition,
+        isDay = weatherIsDay ?: true,
+        temperatureCelsius = temperatureCelsius,
+        rainMm = rainMm,
+        snowfallCm = snowfallCm,
+        windSpeedMs = windSpeedMs,
+        windGustsMs = windGustsMs,
+    ).takeUnless { it.isEmpty },
     behaviourIssues = behaviourIssues,
     medicalConcerns = medicalConcerns,
     optionalRatings = buildMap {
@@ -59,10 +65,13 @@ internal fun Walk.toEntity(): WalkEntity = WalkEntity(
     notes = notes,
     equipment = equipment,
     rating = rating,
-    rain = rain,
-    temperature = temperature,
-    wind = wind,
-    snow = snow,
+    weatherCondition = weather?.condition,
+    weatherIsDay = weather?.isDay,
+    temperatureCelsius = weather?.temperatureCelsius,
+    rainMm = weather?.rainMm,
+    snowfallCm = weather?.snowfallCm,
+    windSpeedMs = weather?.windSpeedMs,
+    windGustsMs = weather?.windGustsMs,
     reactivity = optionalRatings[OptionalRating.REACTIVITY],
     energyLevel = optionalRatings[OptionalRating.ENERGY_LEVEL],
     responsiveness = optionalRatings[OptionalRating.RESPONSIVENESS],

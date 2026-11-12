@@ -4,13 +4,10 @@ import androidx.room.ColumnInfo
 import androidx.room.Entity
 import androidx.room.PrimaryKey
 import com.example.walklogger.core.model.Equipment
-import com.example.walklogger.core.model.Rain
-import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
-import com.example.walklogger.core.model.Temperature
-import com.example.walklogger.core.model.Wind
+import com.example.walklogger.core.model.WeatherCondition
 
 @Entity(tableName = "walks")
 data class WalkEntity(
@@ -23,10 +20,13 @@ data class WalkEntity(
     @ColumnInfo(defaultValue = "") val notes: String = "",
     val equipment: Equipment? = null,
     val rating: Int? = null,
-    val rain: Rain? = null,
-    val temperature: Temperature? = null,
-    val wind: Wind? = null,
-    val snow: Snow? = null,
+    val weatherCondition: WeatherCondition? = null,
+    val weatherIsDay: Boolean? = null,
+    val temperatureCelsius: Double? = null,
+    val rainMm: Double? = null,
+    val snowfallCm: Double? = null,
+    val windSpeedMs: Double? = null,
+    val windGustsMs: Double? = null,
     val reactivity: Int? = null,
     val energyLevel: Int? = null,
     val responsiveness: Int? = null,

@@ -1,5 +1,7 @@
 package com.example.walklogger.feature.walkdetail
 
+import com.example.walklogger.core.model.WeatherCondition
+import com.example.walklogger.core.model.WalkWeather
 import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
@@ -7,7 +9,6 @@ import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
-import com.example.walklogger.core.model.Rain
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.Walk
@@ -59,6 +60,8 @@ class WalkDetailViewModelTest {
         walkRepository.addWalks(walk)
     }
 
+    private val weather = WalkWeather(condition = WeatherCondition.LIGHT_RAIN, temperatureCelsius = 6.5, rainMm = 0.4)
+
     private fun completeWalk() = Walk(
         id = 1,
         dogId = 3,
@@ -70,7 +73,7 @@ class WalkDetailViewModelTest {
         rating = 5,
         optionalRatings = mapOf(OptionalRating.REACTIVITY to 6),
         stool = Stool(passed = true, colour = StoolColour.RED_STREAKED),
-        rain = Rain.LIGHT,
+        weather = weather,
         behaviourIssues = listOf(issue),
         medicalConcerns = listOf(concern),
     )
@@ -100,8 +103,7 @@ class WalkDetailViewModelTest {
             assertEquals(5, state.rating)
             assertEquals(mapOf(OptionalRating.REACTIVITY to 6), state.optionalRatings)
             assertEquals(Stool(passed = true, colour = StoolColour.RED_STREAKED), state.stool)
-            assertEquals(Rain.LIGHT, state.rain)
-            assertTrue(state.hasWeather)
+            assertEquals(weather, state.weather)
             assertEquals(listOf(issue), state.behaviourIssues)
             assertEquals(listOf(concern), state.medicalConcerns)
             assertEquals("Windy", state.notes)
@@ -110,10 +112,10 @@ class WalkDetailViewModelTest {
     }
 
     @Test
-    fun `weather counts as recorded only when some condition is set`() = runTest {
-        seedWalk(completeWalk().copy(rain = null))
+    fun `a walk without weather shows none`() = runTest {
+        seedWalk(completeWalk().copy(weather = null))
         viewModel.uiState.test {
-            assertFalse(expectMostRecentItem().hasWeather)
+            assertNull(expectMostRecentItem().weather)
         }
     }
 

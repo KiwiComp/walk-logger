@@ -200,6 +200,28 @@ class WalkLoggerDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migrate10To11_replacesHandPickedWeatherWithEmptyFetchedColumnsAndKeepsWalks() {
+        helper.createDatabase(DB_NAME, 10).use { db ->
+            db.execSQL("INSERT INTO walks (id, startTime, rating, rain, temperature, wind, snow) VALUES (1, 100, 5, 'LIGHT', 'COLD', 'WINDY', 'NONE')")
+        }
+
+        val db = helper.runMigrationsAndValidate(DB_NAME, 11, true)
+
+        db.query(
+            "SELECT rating, weatherCondition, weatherIsDay, temperatureCelsius, rainMm, snowfallCm, windSpeedMs, windGustsMs " +
+                "FROM walks WHERE id = 1",
+        ).use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(5, cursor.getInt(0))
+            (1..7).forEach { assertTrue(cursor.isNull(it)) }
+        }
+        db.query("PRAGMA table_info(walks)").use { cursor ->
+            val columns = buildList { while (cursor.moveToNext()) add(cursor.getString(cursor.getColumnIndexOrThrow("name"))) }
+            assertTrue(columns.none { it in setOf("rain", "temperature", "wind", "snow") })
+        }
+    }
+
     private companion object {
         const val DB_NAME = "migration-test.db"
     }

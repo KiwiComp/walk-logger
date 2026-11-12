@@ -11,6 +11,8 @@ data class NewWalkUiState(
     val selectedHandlers: Set<String> = emptySet(),
     val equipment: Equipment = Equipment.COLLAR,
     val isStarting: Boolean = false,
+    /** The first start asks for location before the walk is stored. */
+    val shouldRequestLocationPermission: Boolean = false,
     /** Set once the walk is stored; the timer screen opens for it. */
     val startedWalkId: Long? = null,
 ) {

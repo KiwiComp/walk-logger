@@ -1,17 +1,15 @@
 package com.example.walklogger.feature.walkdetail.preview
 
+import com.example.walklogger.core.model.WeatherCondition
+import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
-import com.example.walklogger.core.model.Rain
-import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
-import com.example.walklogger.core.model.Temperature
-import com.example.walklogger.core.model.Wind
 import com.example.walklogger.feature.walkdetail.WalkDetailUiState
 import java.time.LocalDate
 import java.time.LocalTime
@@ -36,10 +34,14 @@ internal object WalkDetailPreviewData {
             OptionalRating.ENGAGEMENT to 4,
             OptionalRating.DISTRACTION to 6,
         ),
-        rain = Rain.LIGHT,
-        temperature = Temperature.COOL,
-        wind = Wind.WINDY,
-        snow = Snow.NONE,
+        weather = WalkWeather(
+            condition = WeatherCondition.LIGHT_RAIN,
+            temperatureCelsius = 6.5,
+            rainMm = 0.4,
+            snowfallCm = 0.0,
+            windSpeedMs = 8.2,
+            windGustsMs = 14.6,
+        ),
         behaviourIssues = listOf(
             BehaviourIssue(1, "Pulling", key = "pulling"),
             BehaviourIssue(2, "Barking", key = "barking"),

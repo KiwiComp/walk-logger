@@ -5,6 +5,7 @@ import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
+import com.example.walklogger.core.data.PlaceRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
@@ -49,6 +50,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
     @Assisted private val walkId: Long,
     dogRepository: DogRepository,
     private val walkRepository: WalkRepository,
+    private val placeRepository: PlaceRepository,
     private val userMessages: UserMessages,
     private val clock: Clock,
 ) : ViewModel() {
@@ -181,7 +183,10 @@ class ActiveWalkViewModel @AssistedInject constructor(
         stoolSaver.cancel()
         viewModelScope.launch {
             runCatchingCancellable { walkRepository.deleteWalk(walkId) }
-                .onSuccess { outcome.update { Outcome(isDiscarded = true) } }
+                .onSuccess {
+                    runCatchingCancellable { placeRepository.clearActiveWalkLocation() }
+                    outcome.update { Outcome(isDiscarded = true) }
+                }
                 .onFailure {
                     noteSaver = saveNotes()
                     stoolSaver = saveStool()

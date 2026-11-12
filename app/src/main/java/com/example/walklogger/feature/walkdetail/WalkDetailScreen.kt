@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.walkdetail
 
+import com.example.walklogger.feature.logwalk.component.WeatherSummary
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -315,42 +316,17 @@ private fun OptionalRatingDetails(ratings: Map<OptionalRating, Int>) {
 @Composable
 private fun WeatherDetails(uiState: WalkDetailUiState) {
     DetailSection(label = stringResource(R.string.log_past_walk_weather)) {
-        if (!uiState.hasWeather) {
+        val weather = uiState.weather
+        if (weather == null) {
             DetailPlaceholder(text = stringResource(R.string.walk_detail_not_recorded))
         } else {
-            FlowRow(
-                horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
-                verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
-                maxItemsInEachRow = GridColumns,
-            ) {
-                uiState.rain?.let {
-                    DetailField(
-                        label = stringResource(R.string.weather_rain),
-                        value = stringResource(it.labelRes),
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                uiState.snow?.let {
-                    DetailField(
-                        label = stringResource(R.string.weather_snow),
-                        value = stringResource(it.labelRes),
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                uiState.temperature?.let {
-                    DetailField(
-                        label = stringResource(R.string.weather_temperature),
-                        value = stringResource(it.labelRes),
-                        modifier = Modifier.weight(1f),
-                    )
-                }
-                uiState.wind?.let {
-                    DetailField(
-                        label = stringResource(R.string.weather_wind),
-                        value = stringResource(it.labelRes),
-                        modifier = Modifier.weight(1f),
-                    )
-                }
+            Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
+                WeatherSummary(weather = weather)
+                Text(
+                    text = stringResource(R.string.weather_attribution),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AppTheme.colors.contentMuted,
+                )
             }
         }
     }

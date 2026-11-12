@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.logwalk.component
 
+import androidx.annotation.DrawableRes
 import androidx.annotation.StringRes
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.res.stringResource
@@ -8,13 +9,11 @@ import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
-import com.example.walklogger.core.model.Rain
-import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
-import com.example.walklogger.core.model.Temperature
-import com.example.walklogger.core.model.Wind
+import com.example.walklogger.core.model.TemperatureBand
+import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.feature.logwalk.SaveBlocker
 
 
@@ -33,34 +32,48 @@ internal val OptionalRating.labelRes: Int
         OptionalRating.DISTRACTION -> R.string.optional_rating_distraction
     }
 
-internal val Rain.labelRes: Int
+internal val WeatherCondition.labelRes: Int
     @StringRes get() = when (this) {
-        Rain.NONE -> R.string.rain_none
-        Rain.LIGHT -> R.string.rain_light
-        Rain.HEAVY -> R.string.rain_heavy
+        WeatherCondition.CLEAR -> R.string.weather_condition_clear
+        WeatherCondition.PARTLY_CLOUDY -> R.string.weather_condition_partly_cloudy
+        WeatherCondition.CLOUDY -> R.string.weather_condition_cloudy
+        WeatherCondition.FOG -> R.string.weather_condition_fog
+        WeatherCondition.LIGHT_RAIN -> R.string.weather_condition_light_rain
+        WeatherCondition.RAIN -> R.string.weather_condition_rain
+        WeatherCondition.HEAVY_RAIN -> R.string.weather_condition_heavy_rain
+        WeatherCondition.FREEZING_RAIN -> R.string.weather_condition_freezing_rain
+        WeatherCondition.LIGHT_SNOW -> R.string.weather_condition_light_snow
+        WeatherCondition.SNOW -> R.string.weather_condition_snow
+        WeatherCondition.HEAVY_SNOW -> R.string.weather_condition_heavy_snow
+        WeatherCondition.THUNDERSTORM -> R.string.weather_condition_thunderstorm
     }
 
-internal val Temperature.labelRes: Int
-    @StringRes get() = when (this) {
-        Temperature.COLD -> R.string.temperature_cold
-        Temperature.COOL -> R.string.temperature_cool
-        Temperature.NEUTRAL -> R.string.temperature_neutral
-        Temperature.WARM -> R.string.temperature_warm
-        Temperature.HOT -> R.string.temperature_hot
-    }
+/** Clear and partly cloudy skies have a night variant; the rest look the same day and night. */
+@DrawableRes
+internal fun WeatherCondition.iconRes(isDay: Boolean): Int = when (this) {
+    WeatherCondition.CLEAR -> if (isDay) R.drawable.ic_weather_sunny else R.drawable.ic_weather_clear_night
+    WeatherCondition.PARTLY_CLOUDY -> if (isDay) R.drawable.ic_weather_partly_cloudy_day else R.drawable.ic_weather_partly_cloudy_night
+    WeatherCondition.CLOUDY -> R.drawable.ic_weather_cloud
+    WeatherCondition.FOG -> R.drawable.ic_weather_foggy
+    WeatherCondition.LIGHT_RAIN -> R.drawable.ic_weather_rainy_light
+    WeatherCondition.RAIN -> R.drawable.ic_weather_rainy
+    WeatherCondition.HEAVY_RAIN -> R.drawable.ic_weather_rainy_heavy
+    WeatherCondition.FREEZING_RAIN -> R.drawable.ic_weather_weather_mix
+    WeatherCondition.LIGHT_SNOW -> R.drawable.ic_weather_weather_snowy
+    WeatherCondition.SNOW -> R.drawable.ic_weather_snowing
+    WeatherCondition.HEAVY_SNOW -> R.drawable.ic_weather_snowing_heavy
+    WeatherCondition.THUNDERSTORM -> R.drawable.ic_weather_thunderstorm
+}
 
-internal val Wind.labelRes: Int
+internal val TemperatureBand.labelRes: Int
     @StringRes get() = when (this) {
-        Wind.STILL -> R.string.wind_still
-        Wind.BREEZE -> R.string.wind_breeze
-        Wind.WINDY -> R.string.wind_windy
-    }
-
-internal val Snow.labelRes: Int
-    @StringRes get() = when (this) {
-        Snow.NONE -> R.string.snow_none
-        Snow.LIGHT -> R.string.snow_light
-        Snow.HEAVY -> R.string.snow_heavy
+        TemperatureBand.EXTREMELY_COLD -> R.string.temperature_band_extremely_cold
+        TemperatureBand.VERY_COLD -> R.string.temperature_band_very_cold
+        TemperatureBand.COLD -> R.string.temperature_band_cold
+        TemperatureBand.COOL -> R.string.temperature_band_cool
+        TemperatureBand.MILD -> R.string.temperature_band_mild
+        TemperatureBand.WARM -> R.string.temperature_band_warm
+        TemperatureBand.VERY_WARM -> R.string.temperature_band_very_warm
     }
 
 internal val StoolQuantity.labelRes: Int

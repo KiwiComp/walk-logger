@@ -10,15 +10,13 @@ import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
-import com.example.walklogger.core.model.Rain
-import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
-import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
-import com.example.walklogger.core.model.Wind
+import com.example.walklogger.core.model.WalkWeather
+import com.example.walklogger.core.model.WeatherCondition
 import java.time.Clock
 import java.time.Instant
 import java.time.ZoneOffset
@@ -57,10 +55,15 @@ class DefaultWalkRepositoryTest {
         notes = "Pulled at the gate",
         equipment = Equipment.COLLAR,
         rating = 5,
-        rain = Rain.LIGHT,
-        temperature = Temperature.COLD,
-        wind = Wind.WINDY,
-        snow = Snow.NONE,
+        weather = WalkWeather(
+            condition = WeatherCondition.PARTLY_CLOUDY,
+            isDay = false,
+            temperatureCelsius = -4.5,
+            rainMm = 0.0,
+            snowfallCm = 0.2,
+            windSpeedMs = 6.1,
+            windGustsMs = 11.3,
+        ),
         behaviourIssues = listOf(pulling, barking),
         medicalConcerns = listOf(limping, vomit),
         optionalRatings = mapOf(OptionalRating.REACTIVITY to 2, OptionalRating.DISTRACTION to 6),
