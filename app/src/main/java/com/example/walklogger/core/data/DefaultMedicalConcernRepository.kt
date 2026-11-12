@@ -20,16 +20,28 @@ class DefaultMedicalConcernRepository @Inject constructor(
 ) : MedicalConcernRepository {
 
     override fun observeMedicalConcerns(): Flow<List<MedicalConcern>> =
-        medicalConcernDao.observeMedicalConcerns().map { concerns -> concerns.map { it.toModel() } }
-
-    override suspend fun addMedicalConcern(name: String): MedicalConcern = withContext(ioDispatcher) {
-        val trimmed = name.trim()
-        require(trimmed.isNotEmpty()) { "concern name must not be blank" }
-        val existing = medicalConcernDao.findByName(trimmed)
-        when {
-            existing == null -> MedicalConcern(id = medicalConcernDao.insertMedicalConcern(MedicalConcernEntity(name = trimmed)), name = trimmed)
-            existing.isHidden -> existing.toModel().also { medicalConcernDao.setHidden(existing.id, false) }
-            else -> existing.toModel()
+        medicalConcernDao.observeMedicalConcerns().map { concerns ->
+            concerns.map { it.toModel() }
         }
-    }
+
+    override suspend fun addMedicalConcern(name: String): MedicalConcern =
+        withContext(ioDispatcher) {
+            val trimmed = name.trim()
+            require(trimmed.isNotEmpty()) { "concern name must not be blank" }
+            val existing = medicalConcernDao.findByName(trimmed)
+            when {
+                existing == null -> MedicalConcern(
+                    id = medicalConcernDao.insertMedicalConcern(
+                        MedicalConcernEntity(name = trimmed),
+                    ),
+                    name = trimmed,
+                )
+
+                existing.isHidden -> existing.toModel().also {
+                    medicalConcernDao.setHidden(existing.id, false)
+                }
+
+                else -> existing.toModel()
+            }
+        }
 }

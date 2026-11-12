@@ -13,6 +13,10 @@ import com.example.walklogger.core.ui.theme.AppTheme
 @Composable
 fun EmptyTabContent(message: String, modifier: Modifier = Modifier) {
     Box(modifier = modifier.fillMaxSize(), contentAlignment = Alignment.Center) {
-        Text(text = message, style = MaterialTheme.typography.bodyMedium, color = AppTheme.colors.contentMuted)
+        Text(
+            text = message,
+            style = MaterialTheme.typography.bodyMedium,
+            color = AppTheme.colors.contentMuted,
+        )
     }
 }

@@ -25,7 +25,9 @@ class WeatherMappersTest {
             WeatherCondition.HEAVY_SNOW to listOf(75, 86),
             WeatherCondition.THUNDERSTORM to listOf(95, 96, 99),
         )
-        expected.forEach { (condition, codes) -> codes.forEach { assertEquals("code $it", condition, weatherConditionOf(it)) } }
+        expected.forEach { (condition, codes) ->
+            codes.forEach { assertEquals("code $it", condition, weatherConditionOf(it)) }
+        }
         assertNull(weatherConditionOf(4))
     }
 
@@ -59,6 +61,8 @@ class WeatherMappersTest {
     @Test
     fun `a missing hour or an hour without values gives no weather`() {
         assertNull(NetworkHourly(time = emptyList()).toWalkWeather(index = 0))
-        assertNull(NetworkHourly(time = listOf(1), temperature = listOf(null)).toWalkWeather(index = 0))
+        assertNull(
+            NetworkHourly(time = listOf(1), temperature = listOf(null)).toWalkWeather(index = 0),
+        )
     }
 }

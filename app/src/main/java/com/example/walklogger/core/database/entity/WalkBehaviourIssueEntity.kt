@@ -11,8 +11,18 @@ import androidx.room.Index
     primaryKeys = ["walkId", "issueId"],
     indices = [Index("issueId")],
     foreignKeys = [
-        ForeignKey(entity = WalkEntity::class, parentColumns = ["id"], childColumns = ["walkId"], onDelete = ForeignKey.CASCADE),
-        ForeignKey(entity = BehaviourIssueEntity::class, parentColumns = ["id"], childColumns = ["issueId"], onDelete = ForeignKey.CASCADE),
+        ForeignKey(
+            entity = WalkEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["walkId"],
+            onDelete = ForeignKey.CASCADE,
+        ),
+        ForeignKey(
+            entity = BehaviourIssueEntity::class,
+            parentColumns = ["id"],
+            childColumns = ["issueId"],
+            onDelete = ForeignKey.CASCADE,
+        ),
     ],
 )
 data class WalkBehaviourIssueEntity(

@@ -13,6 +13,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -37,8 +38,7 @@ import com.example.walklogger.feature.logwalk.component.labelRes
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 import java.time.LocalDate
 
-
-
+@Suppress("ktlint:compose:parameter-naming")
 @Composable
 fun NewWalkRoute(
     date: LocalDate,
@@ -46,11 +46,13 @@ fun NewWalkRoute(
     onWalkStarted: (walkId: Long) -> Unit,
     onLogPastWalk: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: NewWalkViewModel = hiltViewModel<NewWalkViewModel, NewWalkViewModel.Factory> { it.create(date) },
+    viewModel: NewWalkViewModel =
+        hiltViewModel<NewWalkViewModel, NewWalkViewModel.Factory> { it.create(date) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnWalkStarted by rememberUpdatedState(onWalkStarted)
     LaunchedEffect(uiState.startedWalkId) {
-        uiState.startedWalkId?.let(onWalkStarted)
+        uiState.startedWalkId?.let(currentOnWalkStarted)
     }
     LocationPermissionRequest(
         shouldRequest = uiState.shouldRequestLocationPermission,
@@ -59,9 +61,9 @@ fun NewWalkRoute(
     NewWalkScreen(
         uiState = uiState,
         onBack = onBack,
-        onHandlerToggled = viewModel::toggleHandler,
+        onHandlerToggle = viewModel::toggleHandler,
         onAddHandler = viewModel::addHandler,
-        onEquipmentSelected = viewModel::selectEquipment,
+        onEquipmentSelect = viewModel::selectEquipment,
         onStartWalk = viewModel::startWalk,
         onLogPastWalk = { onLogPastWalk(uiState.date) },
         modifier = modifier,
@@ -72,9 +74,9 @@ fun NewWalkRoute(
 fun NewWalkScreen(
     uiState: NewWalkUiState,
     onBack: () -> Unit,
-    onHandlerToggled: (String) -> Unit,
+    onHandlerToggle: (String) -> Unit,
     onAddHandler: (String) -> Unit,
-    onEquipmentSelected: (Equipment) -> Unit,
+    onEquipmentSelect: (Equipment) -> Unit,
     onStartWalk: () -> Unit,
     onLogPastWalk: () -> Unit,
     modifier: Modifier = Modifier,
@@ -104,7 +106,7 @@ fun NewWalkScreen(
                     items = uiState.handlers,
                     isSelected = { it in uiState.selectedHandlers },
                     label = { it },
-                    onToggle = onHandlerToggled,
+                    onToggle = onHandlerToggle,
                     addLabel = stringResource(R.string.new_walk_add_handler),
                     onAdd = { showAddHandler = true },
                 )
@@ -113,12 +115,16 @@ fun NewWalkScreen(
                 SegmentedToggle(
                     options = Equipment.entries,
                     selected = uiState.equipment,
-                    onSelect = onEquipmentSelected,
+                    onSelect = onEquipmentSelect,
                     label = { stringResource(it.labelRes) },
                 )
             }
             AfterWalkNote()
-            StartWalkButton(summary = uiState.summary(), enabled = uiState.canStart, onClick = onStartWalk)
+            StartWalkButton(
+                summary = uiState.summary(),
+                enabled = uiState.canStart,
+                onClick = onStartWalk,
+            )
             LogPastWalkButton(onClick = onLogPastWalk)
         }
     }
@@ -150,9 +156,9 @@ private fun NewWalkScreenPreview() {
         NewWalkScreen(
             uiState = LogWalkPreviewData.newWalk,
             onBack = {},
-            onHandlerToggled = {},
+            onHandlerToggle = {},
             onAddHandler = {},
-            onEquipmentSelected = {},
+            onEquipmentSelect = {},
             onStartWalk = {},
             onLogPastWalk = {},
         )
@@ -166,9 +172,9 @@ private fun NewWalkScreenNoHandlerPreview() {
         NewWalkScreen(
             uiState = LogWalkPreviewData.newWalk.copy(selectedHandlers = emptySet()),
             onBack = {},
-            onHandlerToggled = {},
+            onHandlerToggle = {},
             onAddHandler = {},
-            onEquipmentSelected = {},
+            onEquipmentSelect = {},
             onStartWalk = {},
             onLogPastWalk = {},
         )

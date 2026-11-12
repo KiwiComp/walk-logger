@@ -5,8 +5,8 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.text.KeyboardOptions
@@ -17,6 +17,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -36,6 +37,7 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import java.time.LocalDate
 
+@Suppress("ktlint:compose:parameter-naming")
 @Composable
 fun RegisterDogRoute(
     dogId: Long?,
@@ -46,10 +48,12 @@ fun RegisterDogRoute(
         hiltViewModel<RegisterDogViewModel, RegisterDogViewModel.Factory> { it.create(dogId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnDone by rememberUpdatedState(onDone)
+    val currentOnNotFound by rememberUpdatedState(onNotFound)
     LaunchedEffect(uiState.isSaved, uiState.isDeleted, uiState.isNotFound) {
         when {
-            uiState.isSaved || uiState.isDeleted -> onDone()
-            uiState.isNotFound -> onNotFound()
+            uiState.isSaved || uiState.isDeleted -> currentOnDone()
+            uiState.isNotFound -> currentOnNotFound()
         }
     }
     RegisterDogScreen(
@@ -131,7 +135,9 @@ fun RegisterDogScreen(
                 label = stringResource(R.string.register_dog_weight),
                 suffix = stringResource(R.string.register_dog_weight_unit),
                 isError = uiState.isWeightInvalid,
-                supportingText = stringResource(R.string.register_dog_weight_error).takeIf { uiState.isWeightInvalid },
+                supportingText = stringResource(R.string.register_dog_weight_error).takeIf {
+                    uiState.isWeightInvalid
+                },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
             )
         }

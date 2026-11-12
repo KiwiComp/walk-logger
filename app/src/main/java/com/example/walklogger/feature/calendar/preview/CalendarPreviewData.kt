@@ -7,7 +7,6 @@ import com.example.walklogger.feature.calendar.CalendarWalkUiState
 import java.time.LocalTime
 import java.time.YearMonth
 
-
 /** Fixed content for `@Preview`s only; never reaches the running app. */
 internal object CalendarPreviewData {
     private val month = YearMonth.of(2026, 9)

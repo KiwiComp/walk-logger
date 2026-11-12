@@ -16,6 +16,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -35,9 +36,9 @@ import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WeatherStatus
-import com.example.walklogger.feature.logwalk.component.LocationPermissionRequest
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
 import com.example.walklogger.feature.logwalk.component.FormSection
+import com.example.walklogger.feature.logwalk.component.LocationPermissionRequest
 import com.example.walklogger.feature.logwalk.component.SelectableChip
 import com.example.walklogger.feature.logwalk.component.WalkFormContent
 import com.example.walklogger.feature.logwalk.component.WhenSection
@@ -46,8 +47,7 @@ import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 import java.time.LocalDate
 import java.time.LocalTime
 
-
-
+@Suppress("ktlint:compose:parameter-naming")
 @Composable
 fun LogPastWalkRoute(
     date: LocalDate,
@@ -57,13 +57,17 @@ fun LogPastWalkRoute(
     onNotFound: () -> Unit,
     modifier: Modifier = Modifier,
     viewModel: LogPastWalkViewModel =
-        hiltViewModel<LogPastWalkViewModel, LogPastWalkViewModel.Factory> { it.create(date, walkId) },
+        hiltViewModel<LogPastWalkViewModel, LogPastWalkViewModel.Factory> {
+            it.create(date, walkId)
+        },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnSaved by rememberUpdatedState(onSaved)
+    val currentOnNotFound by rememberUpdatedState(onNotFound)
     LaunchedEffect(uiState.isSaved, uiState.isNotFound) {
         when {
-            uiState.isSaved -> onSaved()
-            uiState.isNotFound -> onNotFound()
+            uiState.isSaved -> currentOnSaved()
+            uiState.isNotFound -> currentOnNotFound()
         }
     }
     LocationPermissionRequest(
@@ -77,7 +81,7 @@ fun LogPastWalkRoute(
         onDateChange = viewModel::setDate,
         onStartTimeChange = viewModel::setStartTime,
         onEndTimeChange = viewModel::setEndTime,
-        onHandlerToggled = viewModel::toggleHandler,
+        onHandlerToggle = viewModel::toggleHandler,
         onAddHandler = viewModel::addHandler,
         onSave = viewModel::save,
         modifier = modifier,
@@ -92,7 +96,7 @@ fun LogPastWalkScreen(
     onDateChange: (LocalDate) -> Unit,
     onStartTimeChange: (LocalTime) -> Unit,
     onEndTimeChange: (LocalTime) -> Unit,
-    onHandlerToggled: (String) -> Unit,
+    onHandlerToggle: (String) -> Unit,
     onAddHandler: (String) -> Unit,
     onSave: () -> Unit,
     modifier: Modifier = Modifier,
@@ -100,7 +104,9 @@ fun LogPastWalkScreen(
     var showAddHandler by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
-            title = stringResource(if (uiState.isEditing) R.string.edit_walk_title else R.string.log_past_walk_title),
+            title = stringResource(
+                if (uiState.isEditing) R.string.edit_walk_title else R.string.log_past_walk_title,
+            ),
             navigationIcon = {
                 HeaderIconButton(
                     icon = Icons.Filled.Close,
@@ -135,7 +141,7 @@ fun LogPastWalkScreen(
                     items = uiState.handlers,
                     isSelected = { it in uiState.selectedHandlers },
                     label = { it },
-                    onToggle = onHandlerToggled,
+                    onToggle = onHandlerToggle,
                     addLabel = stringResource(R.string.new_walk_add_handler),
                     onAdd = { showAddHandler = true },
                 )
@@ -183,7 +189,7 @@ private fun LogPastWalkScreenPreview(uiState: LogPastWalkUiState) {
             onDateChange = {},
             onStartTimeChange = {},
             onEndTimeChange = {},
-            onHandlerToggled = {},
+            onHandlerToggle = {},
             onAddHandler = {},
             onSave = {},
         )
@@ -192,20 +198,30 @@ private fun LogPastWalkScreenPreview(uiState: LogPastWalkUiState) {
 
 @Preview(showBackground = true, heightDp = 1200)
 @Composable
-private fun LogPastWalkScreenDefaultPreview() = LogPastWalkScreenPreview(LogWalkPreviewData.logPastWalk)
+private fun LogPastWalkScreenDefaultPreview() =
+    LogPastWalkScreenPreview(LogWalkPreviewData.logPastWalk)
 
 @Preview(showBackground = true, heightDp = 1200)
 @Composable
 private fun LogPastWalkScreenCompletePreview() {
     val walk = LogWalkPreviewData.logPastWalk
-    LogPastWalkScreenPreview(walk.copy(form = walk.form.copy(rating = 5, notes = "Calm on the lead, one barking dog at the gate.")))
+    LogPastWalkScreenPreview(
+        walk.copy(
+            form = walk.form.copy(
+                rating = 5,
+                notes = "Calm on the lead, one barking dog at the gate.",
+            ),
+        ),
+    )
 }
 
 @Preview(showBackground = true, heightDp = 1200)
 @Composable
 private fun LogPastWalkScreenEditPreview() {
     val walk = LogWalkPreviewData.logPastWalk
-    LogPastWalkScreenPreview(walk.copy(isEditing = true, form = walk.form.copy(rating = 5, notes = "Calm on the lead.")))
+    LogPastWalkScreenPreview(
+        walk.copy(isEditing = true, form = walk.form.copy(rating = 5, notes = "Calm on the lead.")),
+    )
 }
 
 @Preview(showBackground = true, heightDp = 1200)

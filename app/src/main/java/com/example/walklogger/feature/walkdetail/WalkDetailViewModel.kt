@@ -25,7 +25,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-
 /** Shows the stored walk [walkId] as it is now, so an edit pushed on top is reflected on return. */
 @HiltViewModel(assistedFactory = WalkDetailViewModel.Factory::class)
 class WalkDetailViewModel @AssistedInject constructor(
@@ -54,7 +53,11 @@ class WalkDetailViewModel @AssistedInject constructor(
 
     /** Once discarded the walk is gone from the repository; only the discard flags remain while the screen leaves. */
     val uiState: StateFlow<WalkDetailUiState> =
-        combine(walkRepository.observeWalk(walkId), dogRepository.observeAllDogs(), discard) { walk, dogs, discard ->
+        combine(walkRepository.observeWalk(walkId), dogRepository.observeAllDogs(), discard) {
+                walk,
+                dogs,
+                discard,
+            ->
             if (walk == null) {
                 discard
             } else {
@@ -100,5 +103,6 @@ class WalkDetailViewModel @AssistedInject constructor(
         )
     }
 
-    private fun Long.toLocalDateTime(): LocalDateTime = Instant.ofEpochMilli(this).atZone(clock.zone).toLocalDateTime()
+    private fun Long.toLocalDateTime(): LocalDateTime =
+        Instant.ofEpochMilli(this).atZone(clock.zone).toLocalDateTime()
 }

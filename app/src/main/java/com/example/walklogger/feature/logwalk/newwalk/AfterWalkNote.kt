@@ -27,7 +27,9 @@ internal fun AfterWalkNote(modifier: Modifier = Modifier) {
         color = AppTheme.colors.contentMuted,
         modifier = modifier
             .fillMaxWidth()
-            .drawBehind { drawRect(color = outlineColor, style = Stroke(width = 3f, pathEffect = dash)) }
+            .drawBehind {
+                drawRect(color = outlineColor, style = Stroke(width = 3f, pathEffect = dash))
+            }
             .padding(AppSpacing.xl),
     )
 }

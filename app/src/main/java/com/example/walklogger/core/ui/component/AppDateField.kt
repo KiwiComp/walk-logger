@@ -54,8 +54,13 @@ fun AppDateField(
     )
     if (showPicker) {
         val pickerState = rememberDatePickerState(
-            initialSelectedDateMillis = date?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
-            selectableDates = remember(maxDate) { maxDate?.let(::UpToDate) ?: DatePickerDefaults.AllDates },
+            initialSelectedDateMillis = date?.atStartOfDay(
+                ZoneOffset.UTC,
+            )?.toInstant()?.toEpochMilli(),
+            selectableDates = remember(maxDate) {
+                maxDate?.let(::UpToDate)
+                    ?: DatePickerDefaults.AllDates
+            },
         )
         DatePickerDialog(
             onDismissRequest = { showPicker = false },
@@ -81,12 +86,14 @@ fun AppDateField(
 }
 
 private class UpToDate(private val max: LocalDate) : SelectableDates {
-    override fun isSelectableDate(utcTimeMillis: Long): Boolean = !utcTimeMillis.toLocalDate().isAfter(max)
+    override fun isSelectableDate(utcTimeMillis: Long): Boolean =
+        !utcTimeMillis.toLocalDate().isAfter(max)
     override fun isSelectableYear(year: Int): Boolean = year <= max.year
 }
 
 // DatePicker reports UTC midnight of the chosen day.
-private fun Long.toLocalDate(): LocalDate = Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
+private fun Long.toLocalDate(): LocalDate =
+    Instant.ofEpochMilli(this).atZone(ZoneOffset.UTC).toLocalDate()
 
 @Preview(showBackground = true)
 @Composable

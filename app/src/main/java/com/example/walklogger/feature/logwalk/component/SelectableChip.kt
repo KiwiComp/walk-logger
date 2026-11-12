@@ -59,21 +59,32 @@ internal fun <T> SelectableChip(
         verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) {
         items.forEach { item ->
-            Chip(text = label(item), isSelected = isSelected(item), onToggle = { onToggle(item) }, size = size)
+            Chip(text = label(item), isSelected = isSelected(item), onToggle = {
+                onToggle(item)
+            }, size = size)
         }
         AddChip(text = addLabel, onClick = onAdd, chipSize = size)
     }
 }
 
 @Composable
-private fun Chip(text: String, isSelected: Boolean, onToggle: () -> Unit, size: SelectableChipSize) {
+private fun Chip(
+    text: String,
+    isSelected: Boolean,
+    onToggle: () -> Unit,
+    size: SelectableChipSize,
+) {
     val shape = MaterialTheme.shapes.extraSmall
     Box(
         modifier = Modifier
             .height(AppSize.chipHeight)
             .clip(shape)
             .background(if (isSelected) AppTheme.colors.action else AppTheme.colors.card)
-            .border(1.dp, if (isSelected) AppTheme.colors.action else AppTheme.colors.outline, shape)
+            .border(
+                1.dp,
+                if (isSelected) AppTheme.colors.action else AppTheme.colors.outline,
+                shape,
+            )
             .toggleable(value = isSelected, role = Role.Checkbox, onValueChange = { onToggle() })
             .padding(horizontal = AppSpacing.lg),
         contentAlignment = Alignment.Center,

@@ -53,7 +53,10 @@ internal fun PlaceSearchDialog(
                     value = query,
                     onValueChange = { query = it },
                     placeholder = stringResource(R.string.weather_place_search_hint),
-                    keyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Words, imeAction = ImeAction.Search),
+                    keyboardOptions = KeyboardOptions(
+                        capitalization = KeyboardCapitalization.Words,
+                        imeAction = ImeAction.Search,
+                    ),
                     keyboardActions = KeyboardActions(onSearch = { onSearch(query) }),
                 )
                 val message = when {
@@ -63,7 +66,11 @@ internal fun PlaceSearchDialog(
                     else -> null
                 }
                 message?.let {
-                    Text(text = stringResource(it), style = MaterialTheme.typography.bodySmall, color = AppTheme.colors.contentMuted)
+                    Text(
+                        text = stringResource(it),
+                        style = MaterialTheme.typography.bodySmall,
+                        color = AppTheme.colors.contentMuted,
+                    )
                 }
                 Column(modifier = Modifier.verticalScroll(rememberScrollState())) {
                     search.results.orEmpty().forEach { place ->
@@ -73,7 +80,11 @@ internal fun PlaceSearchDialog(
             }
         },
         confirmButton = {
-            TextButton(onClick = { onSearch(query) }, enabled = query.isNotBlank() && !search.isSearching) {
+            TextButton(
+                onClick = { onSearch(query) },
+                enabled =
+                    query.isNotBlank() && !search.isSearching,
+            ) {
                 Text(stringResource(R.string.weather_place_search_action))
             }
         },
@@ -93,9 +104,17 @@ private fun PlaceRow(place: Place, onClick: () -> Unit) {
             .clickable(role = Role.Button, onClick = onClick)
             .padding(vertical = AppSpacing.sm),
     ) {
-        Text(text = place.name, style = MaterialTheme.typography.bodyLarge, color = AppTheme.colors.content)
+        Text(
+            text = place.name,
+            style = MaterialTheme.typography.bodyLarge,
+            color = AppTheme.colors.content,
+        )
         place.region?.let {
-            Text(text = it, style = MaterialTheme.typography.bodySmall, color = AppTheme.colors.contentMuted)
+            Text(
+                text = it,
+                style = MaterialTheme.typography.bodySmall,
+                color = AppTheme.colors.contentMuted,
+            )
         }
     }
 }

@@ -52,7 +52,12 @@ internal fun WalkEntity.toModel(
         distraction?.let { put(OptionalRating.DISTRACTION, it) }
     },
     stool = stoolPassed?.let { passed ->
-        Stool(passed = passed, quantity = stoolQuantity, texture = stoolTexture, colour = stoolColour)
+        Stool(
+            passed = passed,
+            quantity = stoolQuantity,
+            texture = stoolTexture,
+            colour = stoolColour,
+        )
     },
 )
 
@@ -83,9 +88,11 @@ internal fun Walk.toEntity(): WalkEntity = WalkEntity(
     stoolColour = stool?.colour,
 )
 
-internal fun BehaviourIssueEntity.toModel(): BehaviourIssue = BehaviourIssue(id = id, name = name, key = key)
+internal fun BehaviourIssueEntity.toModel(): BehaviourIssue =
+    BehaviourIssue(id = id, name = name, key = key)
 
-internal fun MedicalConcernEntity.toModel(): MedicalConcern = MedicalConcern(id = id, name = name, key = key)
+internal fun MedicalConcernEntity.toModel(): MedicalConcern =
+    MedicalConcern(id = id, name = name, key = key)
 
 internal fun DogEntity.toModel(): Dog = Dog(
     id = id,

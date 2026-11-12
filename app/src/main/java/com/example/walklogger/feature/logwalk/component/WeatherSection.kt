@@ -48,7 +48,9 @@ internal fun WeatherSection(
         actionLabel = if (weather != null) stringResource(R.string.form_section_clear) else null,
         onAction = actions::clearWeather,
         leadingActionLabel = form.fetchedWeather?.let {
-            stringResource(if (form.isWeatherEditing) R.string.weather_done else R.string.weather_edit)
+            stringResource(
+                if (form.isWeatherEditing) R.string.weather_done else R.string.weather_edit,
+            )
         },
         onLeadingAction = actions::toggleWeatherEditing,
         modifier = modifier,
@@ -82,7 +84,9 @@ internal fun WeatherSection(
                     onValueChange = actions::setTemperature,
                     label = stringResource(R.string.weather_temperature),
                     suffix = stringResource(R.string.weather_temperature_unit),
-                    supportingText = form.temperatureCelsius?.let { stringResource(TemperatureBand.of(it).labelRes) },
+                    supportingText = form.temperatureCelsius?.let {
+                        stringResource(TemperatureBand.of(it).labelRes)
+                    },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
                 )
                 Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
@@ -129,7 +133,11 @@ private val WeatherStatus.messageRes: Int?
 
 @Composable
 private fun MutedText(text: String) {
-    Text(text = text, style = MaterialTheme.typography.bodySmall, color = AppTheme.colors.contentMuted)
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = AppTheme.colors.contentMuted,
+    )
 }
 
 @Preview(showBackground = true)
@@ -178,7 +186,10 @@ private fun WeatherSectionFailedPreview() {
 private fun WeatherSectionWithoutLocationPreview() {
     WalkLoggerTheme {
         WeatherSection(
-            form = WalkFormState(isWeatherExpanded = true, weatherStatus = WeatherStatus.NO_LOCATION),
+            form = WalkFormState(
+                isWeatherExpanded = true,
+                weatherStatus = WeatherStatus.NO_LOCATION,
+            ),
             actions = LogWalkPreviewData.formActions,
             modifier = Modifier.padding(AppSpacing.lg),
         )

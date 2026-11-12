@@ -19,7 +19,7 @@ internal fun MedicalSection(
     expanded: Boolean,
     onToggle: () -> Unit,
     onClear: () -> Unit,
-    onConcernToggled: (MedicalConcern) -> Unit,
+    onConcernToggle: (MedicalConcern) -> Unit,
     onAddConcern: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -27,7 +27,13 @@ internal fun MedicalSection(
         label = stringResource(R.string.log_past_walk_medical),
         expanded = expanded,
         onToggle = onToggle,
-        actionLabel = if (selectedIds.isNotEmpty()) stringResource(R.string.form_section_clear) else null,
+        actionLabel = if (selectedIds.isNotEmpty()) {
+            stringResource(
+                R.string.form_section_clear,
+            )
+        } else {
+            null
+        },
         onAction = onClear,
         modifier = modifier,
     ) {
@@ -35,7 +41,7 @@ internal fun MedicalSection(
             items = concerns,
             isSelected = { it.id in selectedIds },
             label = { it.label() },
-            onToggle = onConcernToggled,
+            onToggle = onConcernToggle,
             addLabel = stringResource(R.string.medical_other_concern),
             onAdd = onAddConcern,
             size = SelectableChipSize.Compact,
@@ -53,7 +59,7 @@ private fun MedicalSectionPreview() {
             expanded = true,
             onToggle = {},
             onClear = {},
-            onConcernToggled = {},
+            onConcernToggle = {},
             onAddConcern = {},
             modifier = Modifier.padding(AppSpacing.lg),
         )

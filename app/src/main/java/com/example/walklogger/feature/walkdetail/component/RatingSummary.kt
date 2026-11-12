@@ -32,9 +32,15 @@ internal fun RatingSummary(rating: Int, modifier: Modifier = Modifier) {
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
         verticalAlignment = Alignment.CenterVertically,
     ) {
-        Walk.RATING_RANGE.forEach { value -> RatingCell(value = value, isSelected = value == rating) }
+        Walk.RATING_RANGE.forEach { value ->
+            RatingCell(value = value, isSelected = value == rating)
+        }
         Spacer(Modifier.weight(1f))
-        Text(text = rating.toString(), style = MaterialTheme.typography.headlineLarge, color = AppTheme.colors.content)
+        Text(
+            text = rating.toString(),
+            style = MaterialTheme.typography.headlineLarge,
+            color = AppTheme.colors.content,
+        )
     }
 }
 
@@ -46,7 +52,11 @@ private fun RatingCell(value: Int, isSelected: Boolean) {
             .size(CellSize)
             .clip(shape)
             .background(if (isSelected) AppTheme.colors.action else AppTheme.colors.card)
-            .border(1.dp, if (isSelected) AppTheme.colors.action else AppTheme.colors.outline, shape),
+            .border(
+                1.dp,
+                if (isSelected) AppTheme.colors.action else AppTheme.colors.outline,
+                shape,
+            ),
         contentAlignment = Alignment.Center,
     ) {
         Text(

@@ -39,7 +39,6 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 
-
 private val DayCellHeight = 76.dp
 private val WalkDotSize = 6.dp
 private val TodayDotSize = 12.dp
@@ -48,14 +47,14 @@ private val TodayDotSize = 12.dp
 @Composable
 internal fun WeekStrip(
     days: List<DayUiState>,
-    onDaySelected: (LocalDate) -> Unit,
+    onDaySelect: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     Row(
         modifier = modifier.fillMaxWidth(),
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) {
-        days.forEach { day -> DayCell(day = day, onClick = { onDaySelected(day.date) }) }
+        days.forEach { day -> DayCell(day = day, onClick = { onDaySelect(day.date) }) }
     }
 }
 
@@ -68,15 +67,29 @@ private fun RowScope.DayCell(day: DayUiState, onClick: () -> Unit) {
         else -> AppTheme.colors.onHeader
     }
     val locale = LocalConfiguration.current.locales[0]
-    val date = remember(locale, day.date) { day.date.format(DateTimeFormatter.ofPattern("EEEE d MMMM", locale)) }
-    val description = if (day.isToday) stringResource(R.string.day_today_description, date) else date
-    val walksState = stringResource(if (day.hasWalks) R.string.day_has_walks else R.string.day_no_walks)
+    val date =
+        remember(locale, day.date) {
+            day.date.format(DateTimeFormatter.ofPattern("EEEE d MMMM", locale))
+        }
+    val description = if (day.isToday) {
+        stringResource(
+            R.string.day_today_description,
+            date,
+        )
+    } else {
+        date
+    }
+    val walksState =
+        stringResource(if (day.hasWalks) R.string.day_has_walks else R.string.day_no_walks)
     Column(
         modifier = Modifier
             .weight(1f)
             .height(DayCellHeight)
             .background(background)
-            .border(1.dp, if (day.isSelected) AppTheme.colors.onHeader else AppTheme.colors.outlineOnHeader)
+            .border(
+                1.dp,
+                if (day.isSelected) AppTheme.colors.onHeader else AppTheme.colors.outlineOnHeader,
+            )
             .selectable(
                 selected = day.isSelected,
                 enabled = day.isEnabled,
@@ -121,7 +134,7 @@ private fun WeekStripPreview() {
     WalkLoggerTheme {
         WeekStrip(
             days = LogPreviewData.uiState.week,
-            onDaySelected = {},
+            onDaySelect = {},
             modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg),
         )
     }

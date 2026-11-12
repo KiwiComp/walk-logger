@@ -33,7 +33,13 @@ internal fun OptionalRatingsSection(
         hint = stringResource(R.string.log_past_walk_optional_ratings_scale),
         expanded = expanded,
         onToggle = onToggle,
-        actionLabel = if (ratings.isNotEmpty()) stringResource(R.string.form_section_clear) else null,
+        actionLabel = if (ratings.isNotEmpty()) {
+            stringResource(
+                R.string.form_section_clear,
+            )
+        } else {
+            null
+        },
         onAction = onClear,
         modifier = modifier,
     ) {

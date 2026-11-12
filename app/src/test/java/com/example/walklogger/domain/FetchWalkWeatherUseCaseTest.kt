@@ -21,7 +21,13 @@ class FetchWalkWeatherUseCaseTest {
     private val locationProvider = FakeLocationProvider()
     private val placeRepository = FakePlaceRepository()
     private val weatherRepository = FakeWeatherRepository()
-    private val useCase = FetchWalkWeatherUseCase(locationProvider, placeRepository, weatherRepository, Clock.fixed(now, ZoneOffset.UTC))
+    private val useCase =
+        FetchWalkWeatherUseCase(
+            locationProvider,
+            placeRepository,
+            weatherRepository,
+            Clock.fixed(now, ZoneOffset.UTC),
+        )
     private val uppsala = Place("Uppsala", null, Coordinates(59.86, 17.64))
 
     private fun walkEndingAgo(ago: Duration): Pair<Long, Long> {
@@ -47,7 +53,12 @@ class FetchWalkWeatherUseCaseTest {
         locationProvider.isGranted = true
         locationProvider.location = null
         useCase(start, end)
-        assertEquals(listOf(uppsala.coordinates, uppsala.coordinates), weatherRepository.requests.map { it.first })
+        assertEquals(
+            listOf(uppsala.coordinates, uppsala.coordinates),
+            weatherRepository.requests.map {
+                it.first
+            },
+        )
     }
 
     @Test
@@ -65,7 +76,12 @@ class FetchWalkWeatherUseCaseTest {
         val (start, end) = walkEndingAgo(Duration.ofHours(1))
         useCase(start, end, walkId = 5)
         useCase(start, end)
-        assertEquals(listOf(locationProvider.location, locationProvider.location), weatherRepository.requests.map { it.first })
+        assertEquals(
+            listOf(locationProvider.location, locationProvider.location),
+            weatherRepository.requests.map {
+                it.first
+            },
+        )
     }
 
     @Test

@@ -47,6 +47,7 @@ private fun AppSwitchStyle.colors(): SwitchColors = when (this) {
         uncheckedTrackColor = AppTheme.colors.chip,
         uncheckedBorderColor = AppTheme.colors.outline,
     )
+
     AppSwitchStyle.Inverse -> SwitchDefaults.colors(
         checkedThumbColor = AppTheme.colors.onHeader,
         checkedTrackColor = AppTheme.colors.action,

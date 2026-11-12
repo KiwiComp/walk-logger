@@ -23,6 +23,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
@@ -51,12 +52,11 @@ import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 import java.time.Duration
 import java.time.format.DateTimeFormatter
 
-
-
 private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-private const val NoteMinLines = 2
+private const val NOTE_MIN_LINES = 2
 
 /** The ways off this screen are ending or discarding the walk; system back asks to discard. */
+@Suppress("ktlint:compose:parameter-naming")
 @Composable
 fun ActiveWalkRoute(
     walkId: Long,
@@ -64,23 +64,27 @@ fun ActiveWalkRoute(
     onWalkDiscarded: () -> Unit,
     onNotFound: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: ActiveWalkViewModel = hiltViewModel<ActiveWalkViewModel, ActiveWalkViewModel.Factory> { it.create(walkId) },
+    viewModel: ActiveWalkViewModel =
+        hiltViewModel<ActiveWalkViewModel, ActiveWalkViewModel.Factory> { it.create(walkId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnWalkEnded by rememberUpdatedState(onWalkEnded)
+    val currentOnWalkDiscarded by rememberUpdatedState(onWalkDiscarded)
+    val currentOnNotFound by rememberUpdatedState(onNotFound)
     LaunchedEffect(uiState.isEnded, uiState.isDiscarded, uiState.isNotFound) {
         when {
-            uiState.isEnded -> onWalkEnded(walkId)
-            uiState.isDiscarded -> onWalkDiscarded()
-            uiState.isNotFound -> onNotFound()
+            uiState.isEnded -> currentOnWalkEnded(walkId)
+            uiState.isDiscarded -> currentOnWalkDiscarded()
+            uiState.isNotFound -> currentOnNotFound()
         }
     }
     ActiveWalkScreen(
         uiState = uiState,
         onNoteChange = viewModel::setNote,
         onStoolPassedChange = viewModel::setStoolPassed,
-        onStoolQuantitySelected = viewModel::selectStoolQuantity,
-        onStoolTextureSelected = viewModel::selectStoolTexture,
-        onStoolColourSelected = viewModel::selectStoolColour,
+        onStoolQuantitySelect = viewModel::selectStoolQuantity,
+        onStoolTextureSelect = viewModel::selectStoolTexture,
+        onStoolColourSelect = viewModel::selectStoolColour,
         onStoolFold = viewModel::foldStool,
         onStoolExpand = viewModel::expandStool,
         onEndWalk = viewModel::endWalk,
@@ -94,9 +98,9 @@ fun ActiveWalkScreen(
     uiState: ActiveWalkUiState,
     onNoteChange: (String) -> Unit,
     onStoolPassedChange: (Boolean) -> Unit,
-    onStoolQuantitySelected: (StoolQuantity) -> Unit,
-    onStoolTextureSelected: (StoolTexture) -> Unit,
-    onStoolColourSelected: (StoolColour?) -> Unit,
+    onStoolQuantitySelect: (StoolQuantity) -> Unit,
+    onStoolTextureSelect: (StoolTexture) -> Unit,
+    onStoolColourSelect: (StoolColour?) -> Unit,
     onStoolFold: () -> Unit,
     onStoolExpand: () -> Unit,
     onEndWalk: () -> Unit,
@@ -126,8 +130,9 @@ fun ActiveWalkScreen(
                 verticalAlignment = Alignment.CenterVertically,
             ) {
                 SectionLabel(
-                    text = uiState.dogName?.let { stringResource(R.string.active_walk_out_with, it) }
-                        ?: stringResource(R.string.active_walk_title),
+                    text =
+                        uiState.dogName?.let { stringResource(R.string.active_walk_out_with, it) }
+                            ?: stringResource(R.string.active_walk_title),
                     color = AppTheme.colors.onHeaderMuted,
                 )
                 HeaderIconButton(
@@ -150,7 +155,10 @@ fun ActiveWalkScreen(
                 color = AppTheme.colors.onHeaderMuted,
             )
             Spacer(Modifier.height(AppSpacing.xxxl))
-            SectionLabel(text = stringResource(R.string.active_walk_quick_note), color = AppTheme.colors.onHeaderMuted)
+            SectionLabel(
+                text = stringResource(R.string.active_walk_quick_note),
+                color = AppTheme.colors.onHeaderMuted,
+            )
             Spacer(Modifier.height(AppSpacing.sm))
             AppTextField(
                 value = uiState.note,
@@ -158,16 +166,16 @@ fun ActiveWalkScreen(
                 style = AppTextFieldStyle.Inverse,
                 placeholder = stringResource(R.string.active_walk_quick_note_placeholder),
                 singleLine = false,
-                minLines = NoteMinLines,
+                minLines = NOTE_MIN_LINES,
             )
             Spacer(Modifier.height(AppSpacing.xxxl))
             ActiveStoolSection(
                 stool = uiState.stool,
                 expanded = uiState.isStoolExpanded,
                 onPassedChange = onStoolPassedChange,
-                onQuantitySelected = onStoolQuantitySelected,
-                onTextureSelected = onStoolTextureSelected,
-                onColourSelected = onStoolColourSelected,
+                onQuantitySelect = onStoolQuantitySelect,
+                onTextureSelect = onStoolTextureSelect,
+                onColourSelect = onStoolColourSelect,
                 onFold = onStoolFold,
                 onExpand = onStoolExpand,
             )
@@ -210,7 +218,13 @@ private fun Duration.toClockText(): String {
     val hours = toHours()
     val minutes = toMinutes() % 60
     val seconds = seconds % 60
-    return if (hours > 0) "%d:%02d:%02d".format(hours, minutes, seconds) else "%02d:%02d".format(minutes, seconds)
+    return if (hours >
+        0
+    ) {
+        "%d:%02d:%02d".format(hours, minutes, seconds)
+    } else {
+        "%02d:%02d".format(minutes, seconds)
+    }
 }
 
 @Preview(heightDp = 800)
@@ -221,9 +235,9 @@ private fun ActiveWalkScreenPreview() {
             uiState = LogWalkPreviewData.activeWalk,
             onNoteChange = {},
             onStoolPassedChange = {},
-            onStoolQuantitySelected = {},
-            onStoolTextureSelected = {},
-            onStoolColourSelected = {},
+            onStoolQuantitySelect = {},
+            onStoolTextureSelect = {},
+            onStoolColourSelect = {},
             onStoolFold = {},
             onStoolExpand = {},
             onEndWalk = {},
@@ -240,9 +254,9 @@ private fun ActiveWalkScreenLoadingPreview() {
             uiState = ActiveWalkUiState(),
             onNoteChange = {},
             onStoolPassedChange = {},
-            onStoolQuantitySelected = {},
-            onStoolTextureSelected = {},
-            onStoolColourSelected = {},
+            onStoolQuantitySelect = {},
+            onStoolTextureSelect = {},
+            onStoolColourSelect = {},
             onStoolFold = {},
             onStoolExpand = {},
             onEndWalk = {},

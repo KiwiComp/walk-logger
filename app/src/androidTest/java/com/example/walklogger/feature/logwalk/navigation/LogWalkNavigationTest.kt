@@ -70,7 +70,11 @@ class LogWalkNavigationTest {
         navController.popBackStack<LogDestination>(inclusive = false)
 
         assertTrue(navController.currentDestination!!.hasRoute<LogDestination>())
-        assertTrue(navController.currentBackStack.value.none { it.destination.hasRoute<NewWalkDestination>() })
+        assertTrue(
+            navController.currentBackStack.value.none {
+                it.destination.hasRoute<NewWalkDestination>()
+            },
+        )
     }
 
     @Test
@@ -82,7 +86,11 @@ class LogWalkNavigationTest {
         val entry = navController.currentBackStackEntry!!
         assertTrue(entry.destination.hasRoute<ActiveWalkDestination>())
         assertEquals(7L, entry.toRoute<ActiveWalkDestination>().walkId)
-        assertTrue(navController.currentBackStack.value.none { it.destination.hasRoute<NewWalkDestination>() })
+        assertTrue(
+            navController.currentBackStack.value.none {
+                it.destination.hasRoute<NewWalkDestination>()
+            },
+        )
     }
 
     @Test
@@ -90,7 +98,12 @@ class LogWalkNavigationTest {
         navController.navigateToActiveWalk(walkId = 7)
         navController.navigateToActiveWalk(walkId = 7)
 
-        assertEquals(1, navController.currentBackStack.value.count { it.destination.hasRoute<ActiveWalkDestination>() })
+        assertEquals(
+            1,
+            navController.currentBackStack.value.count {
+                it.destination.hasRoute<ActiveWalkDestination>()
+            },
+        )
     }
 
     @Test
@@ -102,7 +115,11 @@ class LogWalkNavigationTest {
         val entry = navController.currentBackStackEntry!!
         assertTrue(entry.destination.hasRoute<FinishWalkDestination>())
         assertEquals(7L, entry.toRoute<FinishWalkDestination>().walkId)
-        assertTrue(navController.currentBackStack.value.none { it.destination.hasRoute<ActiveWalkDestination>() })
+        assertTrue(
+            navController.currentBackStack.value.none {
+                it.destination.hasRoute<ActiveWalkDestination>()
+            },
+        )
         assertTrue(navController.previousBackStackEntry!!.destination.hasRoute<LogDestination>())
     }
 
@@ -114,8 +131,13 @@ class LogWalkNavigationTest {
         navController.popToTopLevel()
 
         assertTrue(navController.currentDestination!!.hasRoute<LogDestination>())
-        assertTrue(navController.currentBackStack.value.none { it.destination.hasRoute<WalkDetailDestination>() })
+        assertTrue(
+            navController.currentBackStack.value.none {
+                it.destination.hasRoute<WalkDetailDestination>()
+            },
+        )
     }
 
-    private fun onMain(block: () -> Unit) = InstrumentationRegistry.getInstrumentation().runOnMainSync(block)
+    private fun onMain(block: () -> Unit) =
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(block)
 }

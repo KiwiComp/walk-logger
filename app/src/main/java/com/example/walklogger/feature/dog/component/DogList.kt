@@ -29,8 +29,6 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.dog.DogListItemUiState
 import com.example.walklogger.feature.dog.preview.DogPreviewData
 
-
-
 private val DogAvatarSize = 44.dp
 
 /** Every registered dog with an "Active" tag or a "Switch" button. */
@@ -62,7 +60,11 @@ private fun DogRow(dog: DogListItemUiState, onSwitch: () -> Unit) {
                 .background(AppTheme.colors.actionLight),
         )
         Spacer(Modifier.width(AppSpacing.lg))
-        Text(text = dog.name, style = MaterialTheme.typography.bodyLarge, modifier = Modifier.weight(1f))
+        Text(
+            text = dog.name,
+            style = MaterialTheme.typography.bodyLarge,
+            modifier = Modifier.weight(1f),
+        )
         if (dog.isActive) {
             Text(
                 text = stringResource(R.string.dog_active),
@@ -90,6 +92,7 @@ private fun DogRow(dog: DogListItemUiState, onSwitch: () -> Unit) {
 @Composable
 private fun DogListPreview() {
     WalkLoggerTheme {
-        DogList(dogs = DogPreviewData.profile.dogs, onSwitchDog = {}, modifier = Modifier.padding(AppSpacing.lg))
+        DogList(dogs = DogPreviewData.profile.dogs, onSwitchDog = {
+        }, modifier = Modifier.padding(AppSpacing.lg))
     }
 }

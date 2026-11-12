@@ -32,8 +32,6 @@ import com.example.walklogger.feature.dog.component.DogList
 import com.example.walklogger.feature.dog.preview.DogPreviewData
 import java.text.NumberFormat
 
-
-
 @Composable
 fun DogRoute(
     onAddDog: () -> Unit,
@@ -63,7 +61,13 @@ fun DogScreen(
     Column(modifier = modifier.fillMaxSize()) {
         when (uiState) {
             DogUiState.Loading -> Unit
-            is DogUiState.NoDog -> NoDogContent(uiState = uiState, onSwitchDog = onSwitchDog, onAddDog = onAddDog)
+
+            is DogUiState.NoDog -> NoDogContent(
+                uiState = uiState,
+                onSwitchDog = onSwitchDog,
+                onAddDog = onAddDog,
+            )
+
             is DogUiState.Profile -> ProfileContent(
                 uiState = uiState,
                 onSwitchDog = onSwitchDog,
@@ -75,7 +79,11 @@ fun DogScreen(
 }
 
 @Composable
-private fun NoDogContent(uiState: DogUiState.NoDog, onSwitchDog: (Long) -> Unit, onAddDog: () -> Unit) {
+private fun NoDogContent(
+    uiState: DogUiState.NoDog,
+    onSwitchDog: (Long) -> Unit,
+    onAddDog: () -> Unit,
+) {
     WalkLoggerHeader(title = stringResource(R.string.dog_title))
     Column(
         modifier = Modifier
@@ -117,7 +125,11 @@ private fun ProfileContent(
     ) {
         val subtitle = uiState.active.subtitle()
         if (subtitle.isNotEmpty()) {
-            Text(text = subtitle, style = MaterialTheme.typography.bodyMedium, color = AppTheme.colors.onHeaderMuted)
+            Text(
+                text = subtitle,
+                style = MaterialTheme.typography.bodyMedium,
+                color = AppTheme.colors.onHeaderMuted,
+            )
         }
     }
     Column(
@@ -127,7 +139,10 @@ private fun ProfileContent(
             .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
     ) {
         if (uiState.dogs.isNotEmpty()) {
-            SectionLabel(text = stringResource(R.string.dog_section_dogs), color = AppTheme.colors.contentMuted)
+            SectionLabel(
+                text = stringResource(R.string.dog_section_dogs),
+                color = AppTheme.colors.contentMuted,
+            )
             Spacer(Modifier.height(AppSpacing.sm))
             DogList(dogs = uiState.dogs, onSwitchDog = onSwitchDog)
         }
@@ -145,10 +160,17 @@ private fun ProfileContent(
 }
 
 @Composable
-private fun DeletedDogsSection(dogs: List<DogListItemUiState>, onSwitchDog: (Long) -> Unit, modifier: Modifier = Modifier) {
+private fun DeletedDogsSection(
+    dogs: List<DogListItemUiState>,
+    onSwitchDog: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     if (dogs.isEmpty()) return
     Column(modifier = modifier.fillMaxWidth()) {
-        SectionLabel(text = stringResource(R.string.dog_section_deleted), color = AppTheme.colors.contentMuted)
+        SectionLabel(
+            text = stringResource(R.string.dog_section_deleted),
+            color = AppTheme.colors.contentMuted,
+        )
         Spacer(Modifier.height(AppSpacing.sm))
         DogList(dogs = dogs, onSwitchDog = onSwitchDog)
     }
@@ -159,7 +181,9 @@ private fun DeletedDogsSection(dogs: List<DogListItemUiState>, onSwitchDog: (Lon
 private fun DogProfileUiState.subtitle(): String {
     val locale = LocalConfiguration.current.locales[0]
     val weight = weightKg?.let { kg ->
-        val formatted = NumberFormat.getInstance(locale).apply { maximumFractionDigits = 1 }.format(kg)
+        val formatted = NumberFormat.getInstance(locale).apply {
+            maximumFractionDigits = 1
+        }.format(kg)
         stringResource(R.string.dog_weight_kg, formatted)
     }
     return listOfNotNull(

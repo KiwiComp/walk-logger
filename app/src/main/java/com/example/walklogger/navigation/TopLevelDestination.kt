@@ -16,7 +16,15 @@ enum class TopLevelDestination(
     val route: KClass<*>,
 ) {
     LOG(label = R.string.tab_log, icon = R.drawable.ic_tab_log, route = LogDestination::class),
-    CALENDAR(label = R.string.tab_calendar, icon = R.drawable.ic_tab_calendar, route = CalendarDestination::class),
-    PATTERNS(label = R.string.tab_patterns, icon = R.drawable.ic_tab_patterns, route = PatternsDestination::class),
+    CALENDAR(
+        label = R.string.tab_calendar,
+        icon = R.drawable.ic_tab_calendar,
+        route = CalendarDestination::class,
+    ),
+    PATTERNS(
+        label = R.string.tab_patterns,
+        icon = R.drawable.ic_tab_patterns,
+        route = PatternsDestination::class,
+    ),
     DOG(label = R.string.tab_dogs, icon = R.drawable.ic_tab_dog, route = DogDestination::class),
 }

@@ -12,6 +12,7 @@ internal enum class FormStyle {
 
     /** Light text on the header surface; the stool section during a walk. */
     Inverse,
+
     ;
 
     val text: Color

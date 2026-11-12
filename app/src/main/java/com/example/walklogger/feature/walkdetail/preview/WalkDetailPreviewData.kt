@@ -1,7 +1,5 @@
 package com.example.walklogger.feature.walkdetail.preview
 
-import com.example.walklogger.core.model.WeatherCondition
-import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
@@ -10,10 +8,11 @@ import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
+import com.example.walklogger.core.model.WalkWeather
+import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.feature.walkdetail.WalkDetailUiState
 import java.time.LocalDate
 import java.time.LocalTime
-
 
 /** Fixed content for `@Preview`s only; never reaches the running app. */
 internal object WalkDetailPreviewData {
@@ -26,7 +25,12 @@ internal object WalkDetailPreviewData {
         handlers = listOf("Kim"),
         equipment = Equipment.COLLAR,
         rating = 5,
-        stool = Stool(passed = true, quantity = StoolQuantity.LARGE, texture = StoolTexture.SOFT, colour = StoolColour.YELLOWY_BROWN),
+        stool = Stool(
+            passed = true,
+            quantity = StoolQuantity.LARGE,
+            texture = StoolTexture.SOFT,
+            colour = StoolColour.YELLOWY_BROWN,
+        ),
         optionalRatings = mapOf(
             OptionalRating.REACTIVITY to 6,
             OptionalRating.ENERGY_LEVEL to 5,
@@ -48,9 +52,11 @@ internal object WalkDetailPreviewData {
             BehaviourIssue(7, "Vehicle fright", key = "vehicle_fright"),
         ),
         medicalConcerns = listOf(MedicalConcern(4, "Limping", key = "limping")),
-        notes = "Wind put him on edge from the start. Barked at a passing van on Kungsgatan and pulled hard for " +
-            "the first ten minutes, then settled once we reached the park. Slight limp on the left hind leg for " +
-            "the last stretch — watch it tomorrow.",
+        notes =
+            "Wind put him on edge from the start. Barked at a passing van on Kungsgatan and " +
+                "pulled hard for the first ten minutes, then settled once we reached the park. " +
+                "Slight limp on the left hind leg for " +
+                "the last stretch — watch it tomorrow.",
     )
 
     val minimal = WalkDetailUiState(

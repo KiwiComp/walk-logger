@@ -15,7 +15,10 @@ class ServiceWalkLocationCapturer @Inject constructor(
         if (!locationProvider.hasPermission()) return
         // Refused when the app has just left the foreground; the weather fetch then looks the position up itself.
         try {
-            ContextCompat.startForegroundService(context, WalkLocationService.intent(context, walkId))
+            ContextCompat.startForegroundService(
+                context,
+                WalkLocationService.intent(context, walkId),
+            )
         } catch (refused: IllegalStateException) {
         }
     }

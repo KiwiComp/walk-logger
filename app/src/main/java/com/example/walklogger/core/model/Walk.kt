@@ -24,7 +24,9 @@ data class Walk(
 ) {
     init {
         require(handlers.isNotEmpty()) { "a walk needs at least one handler" }
-        require(rating == null || rating in RATING_RANGE) { "rating must be in $RATING_RANGE, was $rating" }
+        require(rating == null || rating in RATING_RANGE) {
+            "rating must be in $RATING_RANGE, was $rating"
+        }
         optionalRatings.forEach { (aspect, value) ->
             require(value in RATING_RANGE) { "$aspect rating must be in $RATING_RANGE, was $value" }
         }
@@ -50,7 +52,11 @@ data class Stool(
     val colour: StoolColour? = null,
 ) {
     init {
-        require(passed || listOf(quantity, texture, colour).all { it == null }) { "a stool that was not passed has no description" }
+        require(
+            passed || listOf(quantity, texture, colour).all {
+                it == null
+            },
+        ) { "a stool that was not passed has no description" }
     }
 }
 

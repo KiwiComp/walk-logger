@@ -16,6 +16,7 @@ import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -32,8 +33,8 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.WalkFormActions
-import com.example.walklogger.feature.logwalk.component.LocationPermissionRequest
 import com.example.walklogger.feature.logwalk.component.FormSection
+import com.example.walklogger.feature.logwalk.component.LocationPermissionRequest
 import com.example.walklogger.feature.logwalk.component.WalkFormContent
 import com.example.walklogger.feature.logwalk.component.WhenSection
 import com.example.walklogger.feature.logwalk.component.messageRes
@@ -42,23 +43,25 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-
-
 private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
+@Suppress("ktlint:compose:parameter-naming")
 @Composable
 fun FinishWalkRoute(
     walkId: Long,
     onSaved: () -> Unit,
     onNotFound: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: FinishWalkViewModel = hiltViewModel<FinishWalkViewModel, FinishWalkViewModel.Factory> { it.create(walkId) },
+    viewModel: FinishWalkViewModel =
+        hiltViewModel<FinishWalkViewModel, FinishWalkViewModel.Factory> { it.create(walkId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnSaved by rememberUpdatedState(onSaved)
+    val currentOnNotFound by rememberUpdatedState(onNotFound)
     LaunchedEffect(uiState.isSaved, uiState.isNotFound) {
         when {
-            uiState.isSaved -> onSaved()
-            uiState.isNotFound -> onNotFound()
+            uiState.isSaved -> currentOnSaved()
+            uiState.isNotFound -> currentOnNotFound()
         }
     }
     LocationPermissionRequest(

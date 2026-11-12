@@ -6,7 +6,13 @@ import org.junit.Test
 
 class StoolEditsTest {
 
-    private val described = Stool(passed = true, quantity = StoolQuantity.LARGE, texture = StoolTexture.SOFT, colour = StoolColour.GREY)
+    private val described =
+        Stool(
+            passed = true,
+            quantity = StoolQuantity.LARGE,
+            texture = StoolTexture.SOFT,
+            colour = StoolColour.GREY,
+        )
 
     @Test
     fun `yes starts an empty description`() {
@@ -31,7 +37,10 @@ class StoolEditsTest {
             .withQuantity(StoolQuantity.SMALL)
             .withTexture(StoolTexture.FIRM)
             .withColour(StoolColour.DARK_BROWN)
-        assertEquals(Stool(true, StoolQuantity.SMALL, StoolTexture.FIRM, StoolColour.DARK_BROWN), stool)
+        assertEquals(
+            Stool(true, StoolQuantity.SMALL, StoolTexture.FIRM, StoolColour.DARK_BROWN),
+            stool,
+        )
         assertEquals(Stool(true, StoolQuantity.SMALL, StoolTexture.FIRM), stool.withColour(null))
     }
 

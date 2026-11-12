@@ -32,10 +32,14 @@ abstract class DataModule {
     abstract fun bindsHandlerRepository(impl: DefaultHandlerRepository): HandlerRepository
 
     @Binds
-    abstract fun bindsBehaviourIssueRepository(impl: DefaultBehaviourIssueRepository): BehaviourIssueRepository
+    abstract fun bindsBehaviourIssueRepository(
+        impl: DefaultBehaviourIssueRepository,
+    ): BehaviourIssueRepository
 
     @Binds
-    abstract fun bindsMedicalConcernRepository(impl: DefaultMedicalConcernRepository): MedicalConcernRepository
+    abstract fun bindsMedicalConcernRepository(
+        impl: DefaultMedicalConcernRepository,
+    ): MedicalConcernRepository
 
     @Binds
     abstract fun bindsWeatherRepository(impl: DefaultWeatherRepository): WeatherRepository

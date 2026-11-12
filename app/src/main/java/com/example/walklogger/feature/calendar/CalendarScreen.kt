@@ -45,7 +45,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun CalendarRoute(
     onAddWalk: (LocalDate) -> Unit,
@@ -59,7 +58,11 @@ fun CalendarRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val noDogMessage = stringResource(
-        if (uiState.isActiveDogDeleted) R.string.log_deleted_dog_message else R.string.log_no_dog_message,
+        if (uiState.isActiveDogDeleted) {
+            R.string.log_deleted_dog_message
+        } else {
+            R.string.log_no_dog_message
+        },
     )
     val noDogAction = stringResource(R.string.log_no_dog_action)
     CalendarScreen(
@@ -67,11 +70,14 @@ fun CalendarRoute(
         onPreviousMonth = viewModel::showPreviousMonth,
         onNextMonth = viewModel::showNextMonth,
         onShowCurrentMonth = viewModel::showCurrentMonth,
-        onDaySelected = viewModel::selectDay,
+        onDaySelect = viewModel::selectDay,
         onAddWalk = {
             if (!uiState.canAddWalk) {
                 scope.launch {
-                    val result = snackbarHostState.showSnackbar(message = noDogMessage, actionLabel = noDogAction)
+                    val result = snackbarHostState.showSnackbar(
+                        message = noDogMessage,
+                        actionLabel = noDogAction,
+                    )
                     if (result == SnackbarResult.ActionPerformed) onGoToDogs()
                 }
             } else if (uiState.canStartLiveWalk) {
@@ -91,7 +97,7 @@ fun CalendarScreen(
     onPreviousMonth: () -> Unit,
     onNextMonth: () -> Unit,
     onShowCurrentMonth: () -> Unit,
-    onDaySelected: (LocalDate) -> Unit,
+    onDaySelect: (LocalDate) -> Unit,
     onAddWalk: () -> Unit,
     onWalkClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -102,7 +108,11 @@ fun CalendarScreen(
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = uiState.month.format(monthFormatter).replaceFirstChar { it.titlecase(locale) },
-            subtitle = pluralStringResource(R.plurals.walk_count, uiState.monthWalkCount, uiState.monthWalkCount),
+            subtitle = pluralStringResource(
+                R.plurals.walk_count,
+                uiState.monthWalkCount,
+                uiState.monthWalkCount,
+            ),
             navigationIcon = {
                 HeaderIconButton(
                     icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
@@ -121,7 +131,10 @@ fun CalendarScreen(
             },
         ) {
             Spacer(Modifier.height(AppSpacing.lg))
-            Row(modifier = Modifier.fillMaxWidth(), verticalAlignment = Alignment.CenterVertically) {
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                verticalAlignment = Alignment.CenterVertically,
+            ) {
                 RatingLegend()
                 Spacer(Modifier.weight(1f))
                 HeaderTextButton(
@@ -138,7 +151,7 @@ fun CalendarScreen(
                 .verticalScroll(rememberScrollState())
                 .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
         ) {
-            MonthGrid(days = uiState.days, onDaySelected = onDaySelected)
+            MonthGrid(days = uiState.days, onDaySelect = onDaySelect)
             Spacer(Modifier.height(AppSpacing.xxl))
             DayHeading(
                 title = uiState.selectedDate.format(dayHeadingFormatter),
@@ -169,7 +182,7 @@ private fun CalendarScreenPreview() {
             onPreviousMonth = {},
             onNextMonth = {},
             onShowCurrentMonth = {},
-            onDaySelected = {},
+            onDaySelect = {},
             onAddWalk = {},
             onWalkClick = {},
         )
@@ -185,7 +198,7 @@ private fun CalendarScreenPastMonthPreview() {
             onPreviousMonth = {},
             onNextMonth = {},
             onShowCurrentMonth = {},
-            onDaySelected = {},
+            onDaySelect = {},
             onAddWalk = {},
             onWalkClick = {},
         )
@@ -201,7 +214,7 @@ private fun CalendarScreenEmptyDayPreview() {
             onPreviousMonth = {},
             onNextMonth = {},
             onShowCurrentMonth = {},
-            onDaySelected = {},
+            onDaySelect = {},
             onAddWalk = {},
             onWalkClick = {},
         )

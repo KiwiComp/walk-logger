@@ -15,7 +15,13 @@ class PatternsViewModel @Inject constructor(dogRepository: DogRepository) : View
 
     val uiState: StateFlow<PatternsUiState> =
         dogRepository.observeActiveDog()
-            .map { dog -> PatternsUiState(activeDogName = dog?.name, isActiveDogDeleted = dog?.isDeleted == true) }
+            .map { dog ->
+                PatternsUiState(
+                    activeDogName = dog?.name,
+                    isActiveDogDeleted =
+                        dog?.isDeleted == true,
+                )
+            }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),

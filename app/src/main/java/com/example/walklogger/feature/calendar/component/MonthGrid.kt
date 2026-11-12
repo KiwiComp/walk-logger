@@ -40,21 +40,24 @@ import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 
-
-private const val DaysPerWeek = 7
+private const val DAYS_PER_WEEK = 7
 private val SelectedBorderWidth = 2.dp
+
 /** Ratings from here up sit on the dark blues, where [AppTheme.colors.content] would no longer be readable. */
-private const val FirstDarkRating = 5
+private const val FIRST_DARK_RATING = 5
 
 /** Monday-first month grid; each cell is tinted by its day's rating and shows the walk count. */
 @Composable
 internal fun MonthGrid(
     days: List<CalendarDayUiState>,
-    onDaySelected: (LocalDate) -> Unit,
+    onDaySelect: (LocalDate) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val locale = LocalConfiguration.current.locales[0]
-    Column(modifier = modifier.fillMaxWidth(), verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+    ) {
         Row(modifier = Modifier.fillMaxWidth().padding(bottom = AppSpacing.xs)) {
             DayOfWeek.entries.forEach { dayOfWeek ->
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
@@ -67,12 +70,21 @@ internal fun MonthGrid(
         }
         val leadingBlanks = days.first().date.dayOfWeek.value - DayOfWeek.MONDAY.value
         val cells: List<CalendarDayUiState?> = List(leadingBlanks) { null } + days
-        cells.chunked(DaysPerWeek).forEach { week ->
-            Row(modifier = Modifier.fillMaxWidth(), horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
+        cells.chunked(DAYS_PER_WEEK).forEach { week ->
+            Row(
+                modifier = Modifier.fillMaxWidth(),
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+            ) {
                 week.forEach { day ->
-                    if (day == null) Spacer(Modifier.weight(1f)) else DayCell(day, onClick = { onDaySelected(day.date) })
+                    if (day ==
+                        null
+                    ) {
+                        Spacer(Modifier.weight(1f))
+                    } else {
+                        DayCell(day, onClick = { onDaySelect(day.date) })
+                    }
                 }
-                repeat(DaysPerWeek - week.size) { Spacer(Modifier.weight(1f)) }
+                repeat(DAYS_PER_WEEK - week.size) { Spacer(Modifier.weight(1f)) }
             }
         }
     }
@@ -83,18 +95,24 @@ private fun RowScope.DayCell(day: CalendarDayUiState, onClick: () -> Unit) {
     val background = day.rating?.let { AppTheme.colors.ratingTints[it - 1] } ?: AppTheme.colors.chip
     val foreground = when {
         !day.isEnabled -> AppTheme.colors.contentMuted
-        day.rating != null && day.rating >= FirstDarkRating -> AppTheme.colors.onHeader
+        day.rating != null && day.rating >= FIRST_DARK_RATING -> AppTheme.colors.onHeader
         else -> AppTheme.colors.content
     }
     val locale = LocalConfiguration.current.locales[0]
-    val description = remember(locale, day.date) { day.date.format(DateTimeFormatter.ofPattern("EEEE d MMMM", locale)) }
+    val description =
+        remember(locale, day.date) {
+            day.date.format(DateTimeFormatter.ofPattern("EEEE d MMMM", locale))
+        }
     val walksState = pluralStringResource(R.plurals.walk_count, day.walkCount, day.walkCount)
     Column(
         modifier = Modifier
             .weight(1f)
             .aspectRatio(1f)
             .background(background)
-            .border(SelectedBorderWidth, if (day.isSelected) AppTheme.colors.selection else Color.Transparent)
+            .border(
+                SelectedBorderWidth,
+                if (day.isSelected) AppTheme.colors.selection else Color.Transparent,
+            )
             .selectable(
                 selected = day.isSelected,
                 enabled = day.isEnabled,
@@ -129,7 +147,7 @@ private fun MonthGridPreview() {
     WalkLoggerTheme {
         MonthGrid(
             days = CalendarPreviewData.uiState.days,
-            onDaySelected = {},
+            onDaySelect = {},
             modifier = Modifier.padding(AppSpacing.lg),
         )
     }

@@ -7,8 +7,18 @@ import org.junit.Assert.assertTrue
 import org.junit.Test
 
 class WalkTest {
-    private fun walk(endTime: Long? = null, rating: Int? = null, handlers: List<String> = listOf("Kim")) =
-        Walk(id = 1, dogId = 1, handlers = handlers, startTime = 0, endTime = endTime, rating = rating)
+    private fun walk(
+        endTime: Long? = null,
+        rating: Int? = null,
+        handlers: List<String> = listOf("Kim"),
+    ) = Walk(
+        id = 1,
+        dogId = 1,
+        handlers = handlers,
+        startTime = 0,
+        endTime = endTime,
+        rating = rating,
+    )
 
     @Test
     fun `walk without end time is active`() {
@@ -40,8 +50,15 @@ class WalkTest {
     @Test
     fun `stool that was not passed cannot be described`() {
         Stool(passed = false)
-        Stool(passed = true, quantity = StoolQuantity.SMALL, texture = StoolTexture.HARD, colour = StoolColour.BLACK)
-        assertThrows(IllegalArgumentException::class.java) { Stool(passed = false, colour = StoolColour.GREY) }
+        Stool(
+            passed = true,
+            quantity = StoolQuantity.SMALL,
+            texture = StoolTexture.HARD,
+            colour = StoolColour.BLACK,
+        )
+        assertThrows(IllegalArgumentException::class.java) {
+            Stool(passed = false, colour = StoolColour.GREY)
+        }
     }
 
     @Test

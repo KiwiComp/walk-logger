@@ -18,14 +18,20 @@ internal val DefaultBehaviourIssues = linkedMapOf(
 
 internal fun SupportSQLiteDatabase.seedDefaultBehaviourIssues() {
     DefaultBehaviourIssues.forEach { (key, name) ->
-        execSQL("INSERT OR IGNORE INTO behaviour_issues (name, `key`) VALUES (?, ?)", arrayOf(name, key))
+        execSQL(
+            "INSERT OR IGNORE INTO behaviour_issues (name, `key`) VALUES (?, ?)",
+            arrayOf(name, key),
+        )
     }
 }
 
 /** The version 6 seed, frozen so the shipped 5→6 migration keeps producing the rows it always did. */
 internal fun SupportSQLiteDatabase.seedDefaultBehaviourIssuesV6() {
     DefaultBehaviourIssues.values.forEach { name ->
-        execSQL("INSERT OR IGNORE INTO behaviour_issues (name, isDefault) VALUES (?, 1)", arrayOf(name))
+        execSQL(
+            "INSERT OR IGNORE INTO behaviour_issues (name, isDefault) VALUES (?, 1)",
+            arrayOf(name),
+        )
     }
 }
 

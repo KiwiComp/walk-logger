@@ -22,15 +22,29 @@ class FakeWalkRepository : WalkRepository {
 
     override fun observeWalks(): Flow<List<Walk>> = walks
 
-    override fun observeWalk(id: Long): Flow<Walk?> = walks.map { list -> list.find { it.id == id } }
+    override fun observeWalk(id: Long): Flow<Walk?> = walks.map { list ->
+        list.find { it.id == id }
+    }
 
     override fun observeActiveWalk(): Flow<Walk?> = walks.map { list -> list.find { it.isActive } }
 
-    override suspend fun startWalk(dogId: Long, handlers: List<String>, equipment: Equipment): Long {
+    override suspend fun startWalk(
+        dogId: Long,
+        handlers: List<String>,
+        equipment: Equipment,
+    ): Long {
         failures.check()
         val id = nextId++
         walks.update {
-            it + Walk(id = id, dogId = dogId, handlers = handlers, equipment = equipment, startTime = 0, endTime = null)
+            it +
+                Walk(
+                    id = id,
+                    dogId = dogId,
+                    handlers = handlers,
+                    equipment = equipment,
+                    startTime = 0,
+                    endTime = null,
+                )
         }
         return id
     }

@@ -19,7 +19,7 @@ internal fun BehaviourSection(
     expanded: Boolean,
     onToggle: () -> Unit,
     onClear: () -> Unit,
-    onIssueToggled: (BehaviourIssue) -> Unit,
+    onIssueToggle: (BehaviourIssue) -> Unit,
     onAddIssue: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -27,7 +27,13 @@ internal fun BehaviourSection(
         label = stringResource(R.string.log_past_walk_behaviour),
         expanded = expanded,
         onToggle = onToggle,
-        actionLabel = if (selectedIds.isNotEmpty()) stringResource(R.string.form_section_clear) else null,
+        actionLabel = if (selectedIds.isNotEmpty()) {
+            stringResource(
+                R.string.form_section_clear,
+            )
+        } else {
+            null
+        },
         onAction = onClear,
         modifier = modifier,
     ) {
@@ -35,7 +41,7 @@ internal fun BehaviourSection(
             items = issues,
             isSelected = { it.id in selectedIds },
             label = { it.label() },
-            onToggle = onIssueToggled,
+            onToggle = onIssueToggle,
             addLabel = stringResource(R.string.behaviour_other_issue),
             onAdd = onAddIssue,
             size = SelectableChipSize.Compact,
@@ -53,7 +59,7 @@ private fun BehaviourSectionPreview() {
             expanded = true,
             onToggle = {},
             onClear = {},
-            onIssueToggled = {},
+            onIssueToggle = {},
             onAddIssue = {},
             modifier = Modifier.padding(AppSpacing.lg),
         )

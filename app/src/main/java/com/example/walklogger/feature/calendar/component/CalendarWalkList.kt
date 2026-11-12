@@ -27,13 +27,16 @@ import com.example.walklogger.feature.calendar.CalendarWalkUiState
 import com.example.walklogger.feature.calendar.preview.CalendarPreviewData
 import java.time.format.DateTimeFormatter
 
-
 private val TimeColumnWidth = 56.dp
 private val StartTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 /** The selected day's walks as one compact line each, separated by rules. Tapping a row opens the walk for editing. */
 @Composable
-internal fun CalendarWalkList(walks: List<CalendarWalkUiState>, onWalkClick: (Long) -> Unit, modifier: Modifier = Modifier) {
+internal fun CalendarWalkList(
+    walks: List<CalendarWalkUiState>,
+    onWalkClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
     Column(modifier = modifier) {
         walks.forEachIndexed { index, walk ->
             if (index > 0) HorizontalDivider(color = AppTheme.colors.outline)

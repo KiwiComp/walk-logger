@@ -21,7 +21,9 @@ class WalkLoggerAppViewModelTest {
 
     @Test
     fun `nothing to resume without an active walk`() = runTest {
-        walkRepository.addWalks(Walk(id = 1, dogId = 1, handlers = listOf("Anna"), startTime = 0, endTime = 1))
+        walkRepository.addWalks(
+            Walk(id = 1, dogId = 1, handlers = listOf("Anna"), startTime = 0, endTime = 1),
+        )
         viewModel.walkToResume.test {
             assertNull(expectMostRecentItem())
         }
@@ -29,7 +31,9 @@ class WalkLoggerAppViewModelTest {
 
     @Test
     fun `an active walk is offered once and cleared after resuming`() = runTest {
-        walkRepository.addWalks(Walk(id = 7, dogId = 1, handlers = listOf("Anna"), startTime = 0, endTime = null))
+        walkRepository.addWalks(
+            Walk(id = 7, dogId = 1, handlers = listOf("Anna"), startTime = 0, endTime = null),
+        )
         viewModel.walkToResume.test {
             assertEquals(7L, expectMostRecentItem())
             viewModel.onWalkResumed()

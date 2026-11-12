@@ -36,7 +36,8 @@ fun DashedButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifie
                 drawOutline(
                     color = outlineColor,
                     outline = shape.createOutline(size, layoutDirection, this),
-                    style = Stroke(width = 3f, pathEffect = dash))
+                    style = Stroke(width = 3f, pathEffect = dash),
+                )
             }
             .clickable(role = Role.Button, onClick = onClick),
         contentAlignment = Alignment.Center,

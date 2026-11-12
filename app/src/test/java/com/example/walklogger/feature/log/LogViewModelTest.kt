@@ -31,18 +31,32 @@ class LogViewModelTest {
     private val dogRepository = FakeDogRepository()
 
     /** Lazy so viewModelScope picks up the rule's Main dispatcher. */
-    private val viewModel by lazy { LogViewModel(ObserveWalkHistoryUseCase(repository, dogRepository), dogRepository, clock) }
+    private val viewModel by lazy {
+        LogViewModel(ObserveWalkHistoryUseCase(repository, dogRepository), dogRepository, clock)
+    }
 
-    private fun walk(id: Long, start: LocalDateTime, minutes: Long = 30, rating: Int? = null, finished: Boolean = true, dogId: Long = 1) =
-        Walk(
-            id = id,
-            dogId = dogId,
-            handlers = listOf("Kim"),
-            startTime = start.toEpochSecond(ZoneOffset.UTC) * 1000,
-            endTime = if (finished) start.plusMinutes(minutes).toEpochSecond(ZoneOffset.UTC) * 1000 else null,
-            equipment = Equipment.HARNESS,
-            rating = rating,
-        )
+    private fun walk(
+        id: Long,
+        start: LocalDateTime,
+        minutes: Long = 30,
+        rating: Int? = null,
+        finished: Boolean = true,
+        dogId: Long = 1,
+    ) = Walk(
+        id = id,
+        dogId = dogId,
+        handlers = listOf("Kim"),
+        startTime = start.toEpochSecond(ZoneOffset.UTC) * 1000,
+        endTime = if (finished) {
+            start.plusMinutes(
+                minutes,
+            ).toEpochSecond(ZoneOffset.UTC) * 1000
+        } else {
+            null
+        },
+        equipment = Equipment.HARNESS,
+        rating = rating,
+    )
 
     @Test
     fun `today is selected and the week runs Monday to Sunday`() = runTest {
@@ -50,9 +64,19 @@ class LogViewModelTest {
             val state = expectMostRecentItem()
             assertEquals(today, state.selectedDate)
             assertEquals((7..13).map { LocalDate.of(2026, 9, it) }, state.week.map { it.date })
-            assertEquals(listOf(false, false, false, false, false, true, false), state.week.map { it.isSelected })
+            assertEquals(
+                listOf(false, false, false, false, false, true, false),
+                state.week.map {
+                    it.isSelected
+                },
+            )
             assertEquals(List(7) { false }, state.week.map { it.hasWalks })
-            assertEquals(listOf(true, true, true, true, true, true, false), state.week.map { it.isEnabled })
+            assertEquals(
+                listOf(true, true, true, true, true, true, false),
+                state.week.map {
+                    it.isEnabled
+                },
+            )
             assertEquals(today, state.week.single { it.isToday }.date)
             assertEquals(emptyList<WalkUiState>(), state.walks)
             assertNull(state.averageRating)
@@ -83,7 +107,12 @@ class LogViewModelTest {
             assertEquals(LocalTime.of(7, 5), state.walks[0].startTime)
             assertEquals(Duration.ofMinutes(38), state.walks[0].duration)
             assertEquals(5.0, state.averageRating!!, 0.0)
-            assertEquals(listOf(false, false, false, false, true, true, false), state.week.map { it.hasWalks })
+            assertEquals(
+                listOf(false, false, false, false, true, true, false),
+                state.week.map {
+                    it.hasWalks
+                },
+            )
         }
     }
 

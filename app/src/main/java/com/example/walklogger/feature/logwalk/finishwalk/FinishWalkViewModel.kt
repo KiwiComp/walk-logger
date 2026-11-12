@@ -33,8 +33,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-
-
 /** Rates and describes the walk with [walkId], which the timer screen has already finished. */
 @HiltViewModel(assistedFactory = FinishWalkViewModel.Factory::class)
 class FinishWalkViewModel @AssistedInject constructor(
@@ -115,7 +113,11 @@ class FinishWalkViewModel @AssistedInject constructor(
         val state = screen.value
         val start = state.startTime ?: return
         val end = state.endTime ?: return
-        form.onTimesChanged(state.date.atTime(start).toEpochMilli(), state.date.atTime(end).toEpochMilli(), autoFetch = true)
+        form.onTimesChanged(
+            state.date.atTime(start).toEpochMilli(),
+            state.date.atTime(end).toEpochMilli(),
+            autoFetch = true,
+        )
     }
 
     fun save() {
@@ -150,7 +152,9 @@ class FinishWalkViewModel @AssistedInject constructor(
 
     private fun FinishWalkUiState.prefilledFrom(walk: Walk): FinishWalkUiState {
         val start = walk.startTime.toLocalDateTime()
-        val end = checkNotNull(walk.endTime) { "walk ${walk.id} has not finished" }.toLocalDateTime()
+        val end = checkNotNull(walk.endTime) {
+            "walk ${walk.id} has not finished"
+        }.toLocalDateTime()
         return copy(
             date = start.toLocalDate(),
             startTime = start.toLocalTime(),
@@ -160,5 +164,6 @@ class FinishWalkViewModel @AssistedInject constructor(
         )
     }
 
-    private fun Long.toLocalDateTime(): LocalDateTime = Instant.ofEpochMilli(this).atZone(clock.zone).toLocalDateTime()
+    private fun Long.toLocalDateTime(): LocalDateTime =
+        Instant.ofEpochMilli(this).atZone(clock.zone).toLocalDateTime()
 }

@@ -17,5 +17,6 @@ data class NewWalkUiState(
     val startedWalkId: Long? = null,
 ) {
     /** A walk always has at least one handler. */
-    val canStart: Boolean get() = selectedHandlers.isNotEmpty() && !isStarting && startedWalkId == null
+    val canStart: Boolean get() = selectedHandlers.isNotEmpty() && !isStarting &&
+        startedWalkId == null
 }

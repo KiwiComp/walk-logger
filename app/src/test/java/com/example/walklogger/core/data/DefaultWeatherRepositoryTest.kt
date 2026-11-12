@@ -28,7 +28,10 @@ class DefaultWeatherRepositoryTest {
     @Test
     fun `asks for the hour containing the time and maps the response`() = runTest {
         val repository = DefaultWeatherRepository(api, StandardTestDispatcher(testScheduler))
-        val weather = repository.weatherAt(Coordinates(59.33, 18.07), Instant.parse("2026-11-08T10:42:10Z"))
+        val weather = repository.weatherAt(
+            Coordinates(59.33, 18.07),
+            Instant.parse("2026-11-08T10:42:10Z"),
+        )
         assertEquals(
             WalkWeather(
                 condition = WeatherCondition.CLEAR,

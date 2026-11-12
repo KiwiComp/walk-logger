@@ -26,7 +26,9 @@ fun PatternsScreen(uiState: PatternsUiState, modifier: Modifier = Modifier) {
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(R.string.patterns_title),
-            actions = { DogBadge(name = uiState.activeDogName, isDeleted = uiState.isActiveDogDeleted) },
+            actions = {
+                DogBadge(name = uiState.activeDogName, isDeleted = uiState.isActiveDogDeleted)
+            },
         )
         EmptyTabContent(message = stringResource(R.string.patterns_coming_soon))
     }

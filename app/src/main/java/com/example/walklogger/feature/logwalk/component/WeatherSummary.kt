@@ -24,7 +24,10 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 @Composable
 internal fun WeatherSummary(weather: WalkWeather, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             weather.condition?.let {
                 Icon(
                     painter = painterResource(it.iconRes(weather.isDay)),
@@ -34,7 +37,9 @@ internal fun WeatherSummary(weather: WalkWeather, modifier: Modifier = Modifier)
             }
             val headline = listOfNotNull(
                 weather.condition?.let { stringResource(it.labelRes) },
-                weather.temperatureCelsius?.let { stringResource(R.string.weather_temperature_value, formatWeatherValue(it)) },
+                weather.temperatureCelsius?.let {
+                    stringResource(R.string.weather_temperature_value, formatWeatherValue(it))
+                },
             )
             if (headline.isNotEmpty()) {
                 Text(
@@ -56,7 +61,11 @@ internal fun WeatherSummary(weather: WalkWeather, modifier: Modifier = Modifier)
         weather.windSpeedMs?.let { speed ->
             SummaryLine(
                 weather.windGustsMs?.let { gusts ->
-                    stringResource(R.string.weather_wind_value, formatWeatherValue(speed), formatWeatherValue(gusts))
+                    stringResource(
+                        R.string.weather_wind_value,
+                        formatWeatherValue(speed),
+                        formatWeatherValue(gusts),
+                    )
                 } ?: stringResource(R.string.weather_wind_speed_value, formatWeatherValue(speed)),
             )
         }
@@ -65,7 +74,11 @@ internal fun WeatherSummary(weather: WalkWeather, modifier: Modifier = Modifier)
 
 @Composable
 private fun SummaryLine(text: String) {
-    Text(text = text, style = MaterialTheme.typography.bodySmall, color = AppTheme.colors.contentMuted)
+    Text(
+        text = text,
+        style = MaterialTheme.typography.bodySmall,
+        color = AppTheme.colors.contentMuted,
+    )
 }
 
 @Preview(showBackground = true)

@@ -40,9 +40,19 @@ internal fun StoolSummary(
 /** "No details" before any is picked. */
 @Composable
 private fun Stool?.summary(): String {
-    val parts = listOfNotNull(this?.quantity?.labelRes, this?.texture?.labelRes, this?.colour?.labelRes)
+    val parts = listOfNotNull(
+        this?.quantity?.labelRes,
+        this?.texture?.labelRes,
+        this?.colour?.labelRes,
+    )
         .map { stringResource(it) }
-    return if (parts.isEmpty()) stringResource(R.string.stool_no_details) else parts.joinToString(" · ")
+    return if (parts.isEmpty()) {
+        stringResource(
+            R.string.stool_no_details,
+        )
+    } else {
+        parts.joinToString(" · ")
+    }
 }
 
 @Preview(showBackground = true)
@@ -50,7 +60,12 @@ private fun Stool?.summary(): String {
 private fun StoolSummaryPreview() {
     WalkLoggerTheme {
         StoolSummary(
-            stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, texture = StoolTexture.FIRM, colour = StoolColour.MEDIUM_BROWN),
+            stool = Stool(
+                passed = true,
+                quantity = StoolQuantity.NORMAL,
+                texture = StoolTexture.FIRM,
+                colour = StoolColour.MEDIUM_BROWN,
+            ),
             onClick = {},
             modifier = Modifier.padding(AppSpacing.lg),
         )

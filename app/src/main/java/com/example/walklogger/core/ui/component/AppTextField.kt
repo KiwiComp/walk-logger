@@ -1,11 +1,12 @@
 package com.example.walklogger.core.ui.component
 
+import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
-import androidx.compose.foundation.relocation.BringIntoViewRequester
-import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.relocation.BringIntoViewRequester
+import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -18,7 +19,6 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.runtime.setValue
-import androidx.compose.foundation.background
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.focus.onFocusChanged
 import androidx.compose.ui.graphics.Color
@@ -53,7 +53,8 @@ fun AppTextField(
     readOnly: Boolean = false,
     singleLine: Boolean = true,
     minLines: Int = 1,
-    keyboardOptions: KeyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+    keyboardOptions: KeyboardOptions =
+        KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource? = null,
 ) {
@@ -65,6 +66,7 @@ fun AppTextField(
             outline = AppTheme.colors.outline,
             focusedOutline = AppTheme.colors.action,
         )
+
         AppTextFieldStyle.Inverse -> FieldColors(
             text = AppTheme.colors.onHeader,
             muted = AppTheme.colors.onHeaderMuted,
@@ -119,7 +121,9 @@ fun AppTextField(
                 .fillMaxWidth()
                 .bringIntoViewRequester(bringIntoViewRequester)
                 .onFocusChanged { isFocused = it.isFocused }
-                .onSizeChanged { if (isFocused) scope.launch { bringIntoViewRequester.bringIntoView() } },
+                .onSizeChanged {
+                    if (isFocused) scope.launch { bringIntoViewRequester.bringIntoView() }
+                },
         )
     }
 }

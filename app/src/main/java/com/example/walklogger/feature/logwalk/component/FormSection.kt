@@ -49,7 +49,15 @@ internal fun FormSection(
         Row(
             modifier = Modifier
                 .fillMaxWidth()
-                .then(if (onToggle != null) Modifier.clickable(role = Role.Button, onClick = onToggle) else Modifier),
+                .then(
+                    if (onToggle !=
+                        null
+                    ) {
+                        Modifier.clickable(role = Role.Button, onClick = onToggle)
+                    } else {
+                        Modifier
+                    },
+                ),
             horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
             verticalAlignment = Alignment.CenterVertically,
         ) {
@@ -59,7 +67,11 @@ internal fun FormSection(
                 style = MaterialTheme.typography.labelLarge,
             )
             if (hint != null) {
-                Text(text = hint, style = MaterialTheme.typography.bodySmall, color = AppTheme.colors.contentMuted)
+                Text(
+                    text = hint,
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AppTheme.colors.contentMuted,
+                )
             }
             Spacer(Modifier.weight(1f))
             if (leadingActionLabel != null && onLeadingAction != null) {
@@ -76,13 +88,25 @@ internal fun FormSection(
                     text = actionLabel.orEmpty(),
                     color = AppTheme.colors.action,
                     modifier = Modifier
-                        .then(if (actionLabel != null) Modifier.clickable(role = Role.Button, onClick = onAction) else Modifier)
+                        .then(
+                            if (actionLabel !=
+                                null
+                            ) {
+                                Modifier.clickable(role = Role.Button, onClick = onAction)
+                            } else {
+                                Modifier
+                            },
+                        )
                         .padding(horizontal = AppSpacing.sm, vertical = AppSpacing.xs),
                 )
             }
             if (onToggle != null) {
                 Icon(
-                    imageVector = if (expanded) Icons.Default.KeyboardArrowUp else Icons.Default.KeyboardArrowDown,
+                    imageVector = if (expanded) {
+                        Icons.Default.KeyboardArrowUp
+                    } else {
+                        Icons.Default.KeyboardArrowDown
+                    },
                     contentDescription = null,
                     tint = AppTheme.colors.contentMuted,
                 )
@@ -101,7 +125,11 @@ internal fun FormSection(
 @Composable
 private fun FormSectionPreview() {
     WalkLoggerTheme {
-        FormSection(label = "Rating", hint = "1 worst · 7 best", modifier = Modifier.padding(AppSpacing.lg)) {
+        FormSection(
+            label = "Rating",
+            hint = "1 worst · 7 best",
+            modifier = Modifier.padding(AppSpacing.lg),
+        ) {
             Text("content")
         }
     }

@@ -22,8 +22,4 @@ data class DogProfileUiState(
     val isDeleted: Boolean = false,
 )
 
-data class DogListItemUiState(
-    val id: Long,
-    val name: String,
-    val isActive: Boolean,
-)
+data class DogListItemUiState(val id: Long, val name: String, val isActive: Boolean)

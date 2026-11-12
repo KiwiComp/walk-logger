@@ -36,8 +36,10 @@ object DatabaseModule {
     fun providesHandlerDao(database: WalkLoggerDatabase): HandlerDao = database.handlerDao()
 
     @Provides
-    fun providesBehaviourIssueDao(database: WalkLoggerDatabase): BehaviourIssueDao = database.behaviourIssueDao()
+    fun providesBehaviourIssueDao(database: WalkLoggerDatabase): BehaviourIssueDao =
+        database.behaviourIssueDao()
 
     @Provides
-    fun providesMedicalConcernDao(database: WalkLoggerDatabase): MedicalConcernDao = database.medicalConcernDao()
+    fun providesMedicalConcernDao(database: WalkLoggerDatabase): MedicalConcernDao =
+        database.medicalConcernDao()
 }

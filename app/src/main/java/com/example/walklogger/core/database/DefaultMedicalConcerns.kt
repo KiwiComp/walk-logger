@@ -16,6 +16,9 @@ internal val DefaultMedicalConcerns = linkedMapOf(
 
 internal fun SupportSQLiteDatabase.seedDefaultMedicalConcerns() {
     DefaultMedicalConcerns.forEach { (key, name) ->
-        execSQL("INSERT OR IGNORE INTO medical_concerns (name, `key`) VALUES (?, ?)", arrayOf(name, key))
+        execSQL(
+            "INSERT OR IGNORE INTO medical_concerns (name, `key`) VALUES (?, ?)",
+            arrayOf(name, key),
+        )
     }
 }

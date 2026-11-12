@@ -14,18 +14,22 @@ import java.util.concurrent.TimeUnit
 import javax.inject.Inject
 import kotlinx.coroutines.tasks.await
 
-class FusedLocationProvider @Inject constructor(
-    @ApplicationContext private val context: Context,
-) : LocationProvider {
+class FusedLocationProvider @Inject constructor(@ApplicationContext private val context: Context) :
+    LocationProvider {
 
     private val client = LocationServices.getFusedLocationProviderClient(context)
 
-    override fun hasPermission(): Boolean =
-        isGranted(Manifest.permission.ACCESS_FINE_LOCATION) || isGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
+    override fun hasPermission(): Boolean = isGranted(Manifest.permission.ACCESS_FINE_LOCATION) ||
+        isGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
 
     override suspend fun currentLocation(): Coordinates? {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) != PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_COARSE_LOCATION) != PackageManager.PERMISSION_GRANTED
+        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) !=
+            PackageManager.PERMISSION_GRANTED &&
+            ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_COARSE_LOCATION,
+            ) !=
+            PackageManager.PERMISSION_GRANTED
         ) {
             return null
         }

@@ -9,7 +9,13 @@ class DogTest {
     @Test
     fun `only a name is required`() {
         Dog(id = 1, name = "Mira")
-        Dog(id = 1, name = "Mira", breed = "Border collie", birthDate = LocalDate.of(2023, 9, 2), weightKg = 18.5)
+        Dog(
+            id = 1,
+            name = "Mira",
+            breed = "Border collie",
+            birthDate = LocalDate.of(2023, 9, 2),
+            weightKg = 18.5,
+        )
     }
 
     @Test
@@ -20,7 +26,11 @@ class DogTest {
 
     @Test
     fun `weight must be positive`() {
-        assertThrows(IllegalArgumentException::class.java) { Dog(id = 1, name = "Mira", weightKg = 0.0) }
-        assertThrows(IllegalArgumentException::class.java) { Dog(id = 1, name = "Mira", weightKg = -1.0) }
+        assertThrows(IllegalArgumentException::class.java) {
+            Dog(id = 1, name = "Mira", weightKg = 0.0)
+        }
+        assertThrows(IllegalArgumentException::class.java) {
+            Dog(id = 1, name = "Mira", weightKg = -1.0)
+        }
     }
 }

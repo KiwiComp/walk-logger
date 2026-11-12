@@ -33,7 +33,8 @@ internal fun StartWalkButton(
     modifier: Modifier = Modifier,
 ) {
     val foreground = if (enabled) AppTheme.colors.onHeader else AppTheme.colors.contentMuted
-    val mutedForeground = if (enabled) AppTheme.colors.onHeaderMuted else AppTheme.colors.contentMuted
+    val mutedForeground =
+        if (enabled) AppTheme.colors.onHeaderMuted else AppTheme.colors.contentMuted
     Column(
         modifier = modifier
             .fillMaxWidth()
@@ -43,7 +44,10 @@ internal fun StartWalkButton(
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = AppSpacing.xxxl, vertical = AppSpacing.xxxl),
     ) {
-        SectionLabel(text = stringResource(R.string.new_walk_timer_starts_now), color = mutedForeground)
+        SectionLabel(
+            text = stringResource(R.string.new_walk_timer_starts_now),
+            color = mutedForeground,
+        )
         Spacer(Modifier.height(AppSpacing.md))
         Text(
             text = stringResource(R.string.new_walk_start),

@@ -7,7 +7,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-
 data class LogPastWalkUiState(
     /** Prefilled with the day chosen on the log screen; the times are always entered by hand. */
     val date: LocalDate,
@@ -30,7 +29,13 @@ data class LogPastWalkUiState(
 ) {
     /** Null until both times are set; zero or negative when the end is not after the start. */
     val durationMinutes: Int? =
-        if (startTime != null && endTime != null) Duration.between(startTime, endTime).toMinutes().toInt() else null
+        if (startTime != null &&
+            endTime != null
+        ) {
+            Duration.between(startTime, endTime).toMinutes().toInt()
+        } else {
+            null
+        }
 
     /** Latest day the date picker offers. */
     val maxDate: LocalDate = now.toLocalDate()

@@ -46,7 +46,7 @@ class NewWalkViewModel @AssistedInject constructor(
     private val equipment = MutableStateFlow(Equipment.COLLAR)
     private val start = MutableStateFlow(StartState())
 
-    /** The first stored handler is the usual walker, so it starts selected. */
+    // The first stored handler is the usual walker, so it starts selected.
     init {
         viewModelScope.launch {
             handlerRepository.observeHandlers().first().firstOrNull()?.let { first ->
@@ -123,7 +123,10 @@ class NewWalkViewModel @AssistedInject constructor(
     private suspend fun storeWalk() {
         val state = uiState.value
         runCatchingCancellable {
-            val dog = checkNotNull(dogRepository.observeActiveDog().first()) { "starting a walk needs an active dog" }
+            val dog =
+                checkNotNull(dogRepository.observeActiveDog().first()) {
+                    "starting a walk needs an active dog"
+                }
             walkRepository.startWalk(
                 dogId = dog.id,
                 handlers = state.handlers.filter { it in state.selectedHandlers },

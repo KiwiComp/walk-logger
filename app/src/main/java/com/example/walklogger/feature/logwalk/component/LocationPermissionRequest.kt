@@ -12,13 +12,24 @@ import androidx.compose.runtime.LaunchedEffect
  * user may still pick approximate, which is enough for the weather.
  */
 @Composable
-internal fun LocationPermissionRequest(shouldRequest: Boolean, onResult: (granted: Boolean) -> Unit) {
-    val launcher = rememberLauncherForActivityResult(ActivityResultContracts.RequestMultiplePermissions()) { results ->
-        onResult(results.values.any { it })
-    }
+internal fun LocationPermissionRequest(
+    shouldRequest: Boolean,
+    onResult: (granted: Boolean) -> Unit,
+) {
+    val launcher =
+        rememberLauncherForActivityResult(
+            ActivityResultContracts.RequestMultiplePermissions(),
+        ) { results ->
+            onResult(results.values.any { it })
+        }
     LaunchedEffect(shouldRequest) {
         if (shouldRequest) {
-            launcher.launch(arrayOf(Manifest.permission.ACCESS_FINE_LOCATION, Manifest.permission.ACCESS_COARSE_LOCATION))
+            launcher.launch(
+                arrayOf(
+                    Manifest.permission.ACCESS_FINE_LOCATION,
+                    Manifest.permission.ACCESS_COARSE_LOCATION,
+                ),
+            )
         }
     }
 }

@@ -1,19 +1,19 @@
 package com.example.walklogger.feature.logwalk.preview
 
-import com.example.walklogger.feature.logwalk.WeatherStatus
-import com.example.walklogger.core.model.Place
-import com.example.walklogger.core.model.WeatherCondition
-import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
+import com.example.walklogger.core.model.Place
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
+import com.example.walklogger.core.model.WalkWeather
+import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormState
+import com.example.walklogger.feature.logwalk.WeatherStatus
 import com.example.walklogger.feature.logwalk.activewalk.ActiveWalkUiState
 import com.example.walklogger.feature.logwalk.finishwalk.FinishWalkUiState
 import com.example.walklogger.feature.logwalk.newwalk.NewWalkUiState
@@ -22,7 +22,6 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
-
 
 /** Fixed content for `@Preview`s only; never reaches the running app. */
 internal object LogWalkPreviewData {
@@ -95,7 +94,12 @@ internal object LogWalkPreviewData {
         handlers = listOf("Anna"),
         form = WalkFormState(
             rating = 6,
-            stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, texture = StoolTexture.FIRM, colour = StoolColour.MEDIUM_BROWN),
+            stool = Stool(
+                passed = true,
+                quantity = StoolQuantity.NORMAL,
+                texture = StoolTexture.FIRM,
+                colour = StoolColour.MEDIUM_BROWN,
+            ),
             equipment = Equipment.HARNESS,
             fetchedWeather = WalkWeather(
                 condition = WeatherCondition.PARTLY_CLOUDY,
@@ -113,7 +117,8 @@ internal object LogWalkPreviewData {
             isWeatherExpanded = true,
             behaviourIssues = behaviourIssues,
             medicalConcerns = medicalConcerns,
-            notes = "Barked at the bin lorry, otherwise steady. Off-lead in the field for ten minutes.",
+            notes = "Barked at the bin lorry, otherwise steady. " +
+                "Off-lead in the field for ten minutes.",
         ),
         isLoading = false,
     )
