@@ -25,7 +25,8 @@ com.example.walklogger
 │   │                          WalkFormState + WalkFormEditor (implements WalkFormActions) hold the fields the after-walk
 │   │                          and past-walk forms share (rating to notes, incl. the issue/concern lists, prefill and
 │   │                          applyTo(walk)); each form ViewModel keeps one private and exposes only `formActions`;
-│   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk);
+│   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk; the first
+│   │                          Start walk asks for precise location, then starts the walk whatever the answer);
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
 │   │                          stored start, quick note, ActiveStoolSection: a switch for "passed stool" whose description rows
 │   │                          fold into a summary on Done (which turns into Edit), stored on every tap; end walk; system back is swallowed);
@@ -43,8 +44,8 @@ com.example.walklogger
 │   │                          FormStyle for the on-header variant the timer screen uses);
 │   │                          WeatherSection shows the fetched weather (WeatherSummary, also used by walk detail) with a
 │   │                          fetch button, a °C field and WeatherConditionPicker the handler can correct, the place row
-│   │                          (PlaceSearchDialog) when location is unavailable, and the Open-Meteo attribution; each Route
-│   │                          shows the location prompt through LocationPermissionRequest. WalkFormEditor fetches the weather
+│   │                          (PlaceSearchDialog) when location is unavailable, and the Open-Meteo attribution; the form Routes
+│   │                          ask once through LocationPermissionRequest if Start walk never asked. WalkFormEditor fetches the weather
 │   │                          when a new walk gets its times (again on new times until the handler edits it by hand);
 │   │                          an edited walk only fetches through the button;
 │   │                          the chosen day travels as a route argument into both form ViewModels
@@ -66,8 +67,10 @@ com.example.walklogger
 │
 ├── domain/                    optional use cases (pure Kotlin, injectable); ObserveWalkHistoryUseCase gives Log and
 │                              Calendar the active dog's completed walks; FetchWalkWeatherUseCase fetches the weather for
-│                              the hour containing a walk's middle, from the device location or else the saved place,
-│                              and only within the free forecast's 92 days
+│                              the hour containing a walk's middle, from the active walk's start position, the device location
+│                              or else the saved place, and only within the free forecast's 92 days;
+│                              CaptureWalkLocationUseCase stores the start position; LocationPermissionUseCase decides
+│                              whether to ask for location (once, wherever it is asked)
 │
 ├── core/
 │   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern, WalkWeather with its
@@ -76,15 +79,19 @@ com.example.walklogger
 │   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository /
 │   │                          MedicalConcernRepository interfaces + Room-backed implementations, mappers;
 │   │                          WeatherRepository (Open-Meteo forecast, WMO codes mapped in WeatherMappers) and
-│   │                          PlaceRepository (geocoding search, the saved place, whether location has been asked for)
+│   │                          PlaceRepository (geocoding search, the saved place, the active walk's start position, whether
+│   │                          location has been asked for)
 │   ├── network/               Retrofit APIs for Open-Meteo's forecast and geocoding, their @Serializable DTOs
-│   ├── location/              LocationProvider (fused location; accepts coarse or fine permission)
+│   ├── location/              LocationProvider (fused location; accepts coarse or fine permission); WalkLocationCapturer
+│   │                          starts WalkLocationService, a `location` foreground service that captures the start position
+│   │                          so it works with a locked screen
 │   ├── database/              Room database, DAOs, entities, type converters; walks join behaviour issues and medical
 │   │                          concerns through walk_behaviour_issues / walk_medical_concerns; the defaults are
 │   │                          seeded on create (SeedCallback) and on the migration that added each table;
 │   │                          seeded defaults carry a `key` that Labels.kt maps to a string resource (user-added
 │   │                          rows show their name), and `isHidden` soft-deletes without touching walk history
-│   ├── datastore/             Preferences DataStore (active dog id, the weather place, whether coarse location was asked for)
+│   ├── datastore/             Preferences DataStore (active dog id, the weather place, the active walk's start position,
+│   │                          whether location was asked for)
 │   ├── common/                runCatchingCancellable; di/ holds the injectable coroutine dispatchers and Clock
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
