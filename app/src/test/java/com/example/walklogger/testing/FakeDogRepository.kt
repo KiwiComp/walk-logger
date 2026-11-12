@@ -21,18 +21,30 @@ class FakeDogRepository : DogRepository {
 
     fun addDogs(vararg newDogs: Dog) = dogs.update { it + newDogs }
 
-    override fun observeDogs(): Flow<List<Dog>> = dogs.map { list -> list.filterNot { it.isDeleted } }
+    override fun observeDogs(): Flow<List<Dog>> = dogs.map { list ->
+        list.filterNot { it.isDeleted }
+    }
 
     override fun observeAllDogs(): Flow<List<Dog>> = dogs
 
-    override fun observeActiveDog(): Flow<Dog?> =
-        combine(dogs, activeDogId) { list, id -> list.find { it.id == id } ?: list.firstOrNull { !it.isDeleted } }
+    override fun observeActiveDog(): Flow<Dog?> = combine(dogs, activeDogId) { list, id ->
+        list.find { it.id == id }
+            ?: list.firstOrNull { !it.isDeleted }
+    }
 
-    override suspend fun registerDog(name: String, breed: String, birthDate: LocalDate?, weightKg: Double?): Long {
+    override suspend fun registerDog(
+        name: String,
+        breed: String,
+        birthDate: LocalDate?,
+        weightKg: Double?,
+    ): Long {
         failures.check()
         val active = observeActiveDog().first()
         val id = nextId++
-        dogs.update { it + Dog(id = id, name = name, breed = breed, birthDate = birthDate, weightKg = weightKg) }
+        dogs.update {
+            it +
+                Dog(id = id, name = name, breed = breed, birthDate = birthDate, weightKg = weightKg)
+        }
         if (active == null || active.isDeleted) activeDogId.value = id
         return id
     }
@@ -42,11 +54,28 @@ class FakeDogRepository : DogRepository {
         activeDogId.value = id
     }
 
-    override suspend fun updateDog(id: Long, name: String, breed: String, birthDate: LocalDate?, weightKg: Double?) {
+    override suspend fun updateDog(
+        id: Long,
+        name: String,
+        breed: String,
+        birthDate: LocalDate?,
+        weightKg: Double?,
+    ) {
         failures.check()
         dogs.update { list ->
             list.map { dog ->
-                if (dog.id == id) dog.copy(name = name, breed = breed, birthDate = birthDate, weightKg = weightKg) else dog
+                if (dog.id ==
+                    id
+                ) {
+                    dog.copy(
+                        name = name,
+                        breed = breed,
+                        birthDate = birthDate,
+                        weightKg = weightKg,
+                    )
+                } else {
+                    dog
+                }
             }
         }
     }

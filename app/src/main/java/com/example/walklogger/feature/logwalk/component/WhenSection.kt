@@ -35,8 +35,8 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-private const val DateWeight = 3f
-private const val TimeWeight = 2f
+private const val DATE_WEIGHT = 3f
+private const val TIME_WEIGHT = 2f
 private val DateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE d MMM")
 private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
@@ -61,26 +61,30 @@ internal fun WhenSection(
                 label = stringResource(R.string.log_past_walk_date),
                 formatter = DateFormatter,
                 maxDate = maxDate,
-                modifier = Modifier.weight(DateWeight),
+                modifier = Modifier.weight(DATE_WEIGHT),
             )
             TimeField(
                 time = startTime,
                 label = stringResource(R.string.log_past_walk_start),
                 dialogTitle = stringResource(R.string.log_past_walk_start_time),
                 onTimeChange = onStartTimeChange,
-                modifier = Modifier.weight(TimeWeight),
+                modifier = Modifier.weight(TIME_WEIGHT),
             )
             TimeField(
                 time = endTime,
                 label = stringResource(R.string.log_past_walk_end),
                 dialogTitle = stringResource(R.string.log_past_walk_end_time),
                 onTimeChange = onEndTimeChange,
-                modifier = Modifier.weight(TimeWeight),
+                modifier = Modifier.weight(TIME_WEIGHT),
             )
         }
         if (durationMinutes != null) {
             Text(
-                text = pluralStringResource(R.plurals.log_past_walk_duration_minutes, durationMinutes, durationMinutes),
+                text = pluralStringResource(
+                    R.plurals.log_past_walk_duration_minutes,
+                    durationMinutes,
+                    durationMinutes,
+                ),
                 style = MaterialTheme.typography.bodyMedium,
                 color = AppTheme.colors.contentMuted,
             )
@@ -109,7 +113,7 @@ private fun TimeField(
         val pickerState = rememberTimePickerState(
             initialHour = time?.hour ?: LocalTime.NOON.hour,
             initialMinute = time?.minute ?: 0,
-            is24Hour = true
+            is24Hour = true,
         )
         var displayMode by remember { mutableStateOf(TimePickerDisplayMode.Picker) }
         TimePickerDialog(

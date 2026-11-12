@@ -18,7 +18,11 @@ class CaptureWalkLocationUseCase @Inject constructor(
     suspend operator fun invoke(walkId: Long) {
         if (!locationProvider.hasPermission()) return
         runCatchingCancellable {
-            if (placeRepository.activeWalkLocation.first()?.walkId == walkId) return@runCatchingCancellable
+            if (placeRepository.activeWalkLocation.first()?.walkId ==
+                walkId
+            ) {
+                return@runCatchingCancellable
+            }
             val coordinates = locationProvider.currentLocation() ?: return@runCatchingCancellable
             placeRepository.saveActiveWalkLocation(WalkLocation(walkId, coordinates))
         }

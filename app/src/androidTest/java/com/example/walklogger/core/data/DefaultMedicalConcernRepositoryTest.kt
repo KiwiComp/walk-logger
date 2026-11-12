@@ -24,9 +24,13 @@ class DefaultMedicalConcernRepositoryTest {
 
     @Before
     fun setUp() {
-        database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), WalkLoggerDatabase::class.java)
-            .addCallback(WalkLoggerDatabase.SeedCallback())
-            .build()
+        database =
+            Room.inMemoryDatabaseBuilder(
+                ApplicationProvider.getApplicationContext(),
+                WalkLoggerDatabase::class.java,
+            )
+                .addCallback(WalkLoggerDatabase.SeedCallback())
+                .build()
         repository = DefaultMedicalConcernRepository(database.medicalConcernDao(), Dispatchers.IO)
     }
 

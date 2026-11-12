@@ -31,7 +31,10 @@ internal fun StoolColourField(colour: StoolColour, modifier: Modifier = Modifier
             style = MaterialTheme.typography.bodyMedium,
             color = AppTheme.colors.contentMuted,
         )
-        Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm), verticalAlignment = Alignment.CenterVertically) {
+        Row(
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+            verticalAlignment = Alignment.CenterVertically,
+        ) {
             StoolSwatch(colour = colour, size = SwatchSize)
             Text(
                 text = stringResource(colour.labelRes),
@@ -46,6 +49,9 @@ internal fun StoolColourField(colour: StoolColour, modifier: Modifier = Modifier
 @Composable
 private fun StoolColourFieldPreview() {
     WalkLoggerTheme {
-        StoolColourField(colour = StoolColour.RED_STREAKED, modifier = Modifier.padding(AppSpacing.lg))
+        StoolColourField(
+            colour = StoolColour.RED_STREAKED,
+            modifier = Modifier.padding(AppSpacing.lg),
+        )
     }
 }

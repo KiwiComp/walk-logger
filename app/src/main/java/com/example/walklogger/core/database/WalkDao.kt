@@ -36,10 +36,22 @@ interface WalkDao {
 
     /** Inserts the walk and the issues and concerns ticked on it as one unit. */
     @Transaction
-    suspend fun insertWalk(walk: WalkEntity, behaviourIssueIds: List<Long>, medicalConcernIds: List<Long>): Long {
+    suspend fun insertWalk(
+        walk: WalkEntity,
+        behaviourIssueIds: List<Long>,
+        medicalConcernIds: List<Long>,
+    ): Long {
         val id = insertWalk(walk)
-        insertWalkBehaviourIssues(behaviourIssueIds.map { WalkBehaviourIssueEntity(walkId = id, behaviourIssueId = it) })
-        insertWalkMedicalConcerns(medicalConcernIds.map { WalkMedicalConcernEntity(walkId = id, medicalConcernId = it) })
+        insertWalkBehaviourIssues(
+            behaviourIssueIds.map {
+                WalkBehaviourIssueEntity(walkId = id, behaviourIssueId = it)
+            },
+        )
+        insertWalkMedicalConcerns(
+            medicalConcernIds.map {
+                WalkMedicalConcernEntity(walkId = id, medicalConcernId = it)
+            },
+        )
         return id
     }
 
@@ -48,12 +60,24 @@ interface WalkDao {
 
     /** Replaces the walk row and its ticked issues and concerns as one unit. */
     @Transaction
-    suspend fun updateWalk(walk: WalkEntity, behaviourIssueIds: List<Long>, medicalConcernIds: List<Long>) {
+    suspend fun updateWalk(
+        walk: WalkEntity,
+        behaviourIssueIds: List<Long>,
+        medicalConcernIds: List<Long>,
+    ) {
         updateWalk(walk)
         deleteWalkBehaviourIssues(walk.id)
-        insertWalkBehaviourIssues(behaviourIssueIds.map { WalkBehaviourIssueEntity(walkId = walk.id, behaviourIssueId = it) })
+        insertWalkBehaviourIssues(
+            behaviourIssueIds.map {
+                WalkBehaviourIssueEntity(walkId = walk.id, behaviourIssueId = it)
+            },
+        )
         deleteWalkMedicalConcerns(walk.id)
-        insertWalkMedicalConcerns(medicalConcernIds.map { WalkMedicalConcernEntity(walkId = walk.id, medicalConcernId = it) })
+        insertWalkMedicalConcerns(
+            medicalConcernIds.map {
+                WalkMedicalConcernEntity(walkId = walk.id, medicalConcernId = it)
+            },
+        )
     }
 
     @Insert
@@ -72,10 +96,16 @@ interface WalkDao {
     suspend fun updateNotes(id: Long, notes: String)
 
     @Query(
-        "UPDATE walks SET stoolPassed = :passed, stoolQuantity = :quantity, stoolTexture = :texture, " +
-            "stoolColour = :colour WHERE id = :id",
+        "UPDATE walks SET stoolPassed = :passed, stoolQuantity = :quantity, " +
+            "stoolTexture = :texture, stoolColour = :colour WHERE id = :id",
     )
-    suspend fun updateStool(id: Long, passed: Boolean?, quantity: StoolQuantity?, texture: StoolTexture?, colour: StoolColour?)
+    suspend fun updateStool(
+        id: Long,
+        passed: Boolean?,
+        quantity: StoolQuantity?,
+        texture: StoolTexture?,
+        colour: StoolColour?,
+    )
 
     @Query("DELETE FROM walks WHERE id = :id")
     suspend fun deleteWalk(id: Long)

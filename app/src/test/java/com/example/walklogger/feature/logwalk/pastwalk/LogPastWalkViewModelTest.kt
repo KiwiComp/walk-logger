@@ -1,12 +1,5 @@
 package com.example.walklogger.feature.logwalk.pastwalk
 
-import com.example.walklogger.core.model.WeatherCondition
-import com.example.walklogger.core.model.WalkWeather
-import com.example.walklogger.testing.FakeWeatherRepository
-import com.example.walklogger.testing.FakePlaceRepository
-import com.example.walklogger.testing.FakeLocationProvider
-import com.example.walklogger.domain.FetchWalkWeatherUseCase
-import com.example.walklogger.domain.LocationPermissionUseCase
 import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
@@ -19,13 +12,20 @@ import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.WalkWeather
+import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.domain.FetchWalkWeatherUseCase
+import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeHandlerRepository
+import com.example.walklogger.testing.FakeLocationProvider
 import com.example.walklogger.testing.FakeMedicalConcernRepository
+import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWalkRepository
+import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import com.example.walklogger.testing.shownMessages
 import java.time.Clock
@@ -40,7 +40,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-
 
 class LogPastWalkViewModelTest {
 
@@ -72,7 +71,12 @@ class LogPastWalkViewModelTest {
             walkRepository = walkRepository,
             userMessages = userMessages,
             clock = clock,
-            fetchWalkWeather = FetchWalkWeatherUseCase(locationProvider, placeRepository, weatherRepository, clock),
+            fetchWalkWeather = FetchWalkWeatherUseCase(
+                locationProvider,
+                placeRepository,
+                weatherRepository,
+                clock,
+            ),
             locationPermission = LocationPermissionUseCase(locationProvider, placeRepository),
             placeRepository = placeRepository,
         )
@@ -108,8 +112,14 @@ class LogPastWalkViewModelTest {
             assertEquals("Sixten", state.dogName)
             assertEquals(listOf("Anna", "Jonas"), state.handlers)
             assertEquals(setOf("Anna"), state.selectedHandlers)
-            assertEquals(listOf(BehaviourIssue(1, "Pulling"), BehaviourIssue(2, "Barking")), state.form.behaviourIssues)
-            assertEquals(listOf(MedicalConcern(1, "Limping"), MedicalConcern(2, "Vomit")), state.form.medicalConcerns)
+            assertEquals(
+                listOf(BehaviourIssue(1, "Pulling"), BehaviourIssue(2, "Barking")),
+                state.form.behaviourIssues,
+            )
+            assertEquals(
+                listOf(MedicalConcern(1, "Limping"), MedicalConcern(2, "Vomit")),
+                state.form.medicalConcerns,
+            )
         }
     }
 
@@ -209,7 +219,13 @@ class LogPastWalkViewModelTest {
         assertEquals(date.atTime(18, 5).toInstant(zone).toEpochMilli(), walk.endTime)
         assertEquals(5, walk.rating)
         assertEquals(Equipment.COLLAR, walk.equipment)
-        assertEquals(weatherRepository.weather.copy(temperatureCelsius = -3.0, condition = WeatherCondition.SNOW), walk.weather)
+        assertEquals(
+            weatherRepository.weather.copy(
+                temperatureCelsius = -3.0,
+                condition = WeatherCondition.SNOW,
+            ),
+            walk.weather,
+        )
         assertEquals(mapOf(OptionalRating.ENERGY_LEVEL to 6), walk.optionalRatings)
         assertEquals(Stool(passed = false), walk.stool)
         assertEquals(listOf(BehaviourIssue(2, "Barking")), walk.behaviourIssues)
@@ -242,11 +258,19 @@ class LogPastWalkViewModelTest {
             notes = "Muddy",
             equipment = Equipment.COLLAR,
             rating = 3,
-            weather = WalkWeather(condition = WeatherCondition.HEAVY_RAIN, temperatureCelsius = 4.0, rainMm = 3.1),
+            weather = WalkWeather(
+                condition = WeatherCondition.HEAVY_RAIN,
+                temperatureCelsius = 4.0,
+                rainMm = 3.1,
+            ),
             behaviourIssues = listOf(BehaviourIssue(1, "Pulling")),
             medicalConcerns = listOf(MedicalConcern(1, "Limping")),
             optionalRatings = mapOf(OptionalRating.RESPONSIVENESS to 4),
-            stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, colour = StoolColour.DARK_BROWN),
+            stool = Stool(
+                passed = true,
+                quantity = StoolQuantity.NORMAL,
+                colour = StoolColour.DARK_BROWN,
+            ),
         )
         walkRepository.addWalks(walk)
         walkId = walk.id

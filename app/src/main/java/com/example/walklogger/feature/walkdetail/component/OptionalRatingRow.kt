@@ -44,7 +44,15 @@ internal fun OptionalRatingRow(label: String, value: Int, modifier: Modifier = M
                 Box(
                     Modifier
                         .size(SegmentSize)
-                        .background(if (point <= value) AppTheme.colors.action else AppTheme.colors.outline),
+                        .background(
+                            if (point <=
+                                value
+                            ) {
+                                AppTheme.colors.action
+                            } else {
+                                AppTheme.colors.outline
+                            },
+                        ),
                 )
             }
         }
@@ -62,6 +70,10 @@ internal fun OptionalRatingRow(label: String, value: Int, modifier: Modifier = M
 @Composable
 private fun OptionalRatingRowPreview() {
     WalkLoggerTheme {
-        OptionalRatingRow(label = "Reactivity", value = 6, modifier = Modifier.padding(AppSpacing.lg))
+        OptionalRatingRow(
+            label = "Reactivity",
+            value = 6,
+            modifier = Modifier.padding(AppSpacing.lg),
+        )
     }
 }

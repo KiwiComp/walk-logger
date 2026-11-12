@@ -7,7 +7,6 @@ import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 
-
 /** The form shown right after a timed walk; the times were recorded but can still be corrected. */
 data class FinishWalkUiState(
     /** The walk must have ended by now; refreshed by the ViewModel on every time edit. */
@@ -30,7 +29,13 @@ data class FinishWalkUiState(
 ) {
     /** Null until loaded; zero or negative when the end is not after the start. */
     val durationMinutes: Int? =
-        if (startTime != null && endTime != null) Duration.between(startTime, endTime).toMinutes().toInt() else null
+        if (startTime != null &&
+            endTime != null
+        ) {
+            Duration.between(startTime, endTime).toMinutes().toInt()
+        } else {
+            null
+        }
 
     /** Latest day the date picker offers. */
     val maxDate: LocalDate = now.toLocalDate()

@@ -46,18 +46,24 @@ class DogViewModel @Inject constructor(
         }
     }
 
-    private fun buildProfile(active: Dog, remaining: List<Dog>, deleted: List<Dog>) = DogUiState.Profile(
-        active = DogProfileUiState(
-            id = active.id,
-            name = active.name,
-            breed = active.breed,
-            ageYears = active.birthDate?.let { Period.between(it, LocalDate.now(clock)).years },
-            weightKg = active.weightKg,
-            isDeleted = active.isDeleted,
-        ),
-        dogs = remaining.map { it.toListItem(active) },
-        deletedDogs = deleted.map { it.toListItem(active) },
-    )
+    private fun buildProfile(active: Dog, remaining: List<Dog>, deleted: List<Dog>) =
+        DogUiState.Profile(
+            active = DogProfileUiState(
+                id = active.id,
+                name = active.name,
+                breed = active.breed,
+                ageYears = active.birthDate?.let { Period.between(it, LocalDate.now(clock)).years },
+                weightKg = active.weightKg,
+                isDeleted = active.isDeleted,
+            ),
+            dogs = remaining.map { it.toListItem(active) },
+            deletedDogs = deleted.map { it.toListItem(active) },
+        )
 
-    private fun Dog.toListItem(active: Dog?) = DogListItemUiState(id = id, name = name, isActive = id == active?.id)
+    private fun Dog.toListItem(active: Dog?) = DogListItemUiState(
+        id = id,
+        name = name,
+        isActive =
+            id == active?.id,
+    )
 }

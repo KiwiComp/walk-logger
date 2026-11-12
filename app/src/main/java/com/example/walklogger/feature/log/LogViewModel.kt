@@ -32,7 +32,11 @@ class LogViewModel @Inject constructor(
     private val selectedDate = MutableStateFlow(LocalDate.now(clock))
 
     val uiState: StateFlow<LogUiState> =
-        combine(selectedDate, observeWalkHistory(), dogRepository.observeActiveDog()) { date, walks, dog ->
+        combine(selectedDate, observeWalkHistory(), dogRepository.observeActiveDog()) {
+                date,
+                walks,
+                dog,
+            ->
             buildState(date, walks, dog)
         }.stateIn(
             scope = viewModelScope,

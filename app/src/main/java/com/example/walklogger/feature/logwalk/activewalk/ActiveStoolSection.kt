@@ -45,9 +45,9 @@ internal fun ActiveStoolSection(
     stool: Stool?,
     expanded: Boolean,
     onPassedChange: (Boolean) -> Unit,
-    onQuantitySelected: (StoolQuantity) -> Unit,
-    onTextureSelected: (StoolTexture) -> Unit,
-    onColourSelected: (StoolColour?) -> Unit,
+    onQuantitySelect: (StoolQuantity) -> Unit,
+    onTextureSelect: (StoolTexture) -> Unit,
+    onColourSelect: (StoolColour?) -> Unit,
     onFold: () -> Unit,
     onExpand: () -> Unit,
     modifier: Modifier = Modifier,
@@ -68,7 +68,9 @@ internal fun ActiveStoolSection(
             Spacer(Modifier.weight(1f))
             if (passed) {
                 SectionLabel(
-                    text = stringResource(if (expanded) R.string.stool_done else R.string.stool_edit),
+                    text = stringResource(
+                        if (expanded) R.string.stool_done else R.string.stool_edit,
+                    ),
                     color = AppTheme.colors.onHeader,
                     modifier = Modifier
                         .clickable(role = Role.Button, onClick = if (expanded) onFold else onExpand)
@@ -88,9 +90,9 @@ internal fun ActiveStoolSection(
                 if (expanded) {
                     StoolDescriptors(
                         stool = stool,
-                        onQuantitySelected = onQuantitySelected,
-                        onTextureSelected = onTextureSelected,
-                        onColourSelected = onColourSelected,
+                        onQuantitySelect = onQuantitySelect,
+                        onTextureSelect = onTextureSelect,
+                        onColourSelect = onColourSelect,
                         style = FormStyle.Inverse,
                     )
                 } else {
@@ -113,7 +115,10 @@ private fun ActiveStoolSectionOffPreview() {
 @Composable
 private fun ActiveStoolSectionExpandedPreview() {
     WalkLoggerTheme {
-        ActiveStoolSectionPreview(stool = Stool(passed = true, quantity = StoolQuantity.NORMAL), expanded = true)
+        ActiveStoolSectionPreview(
+            stool = Stool(passed = true, quantity = StoolQuantity.NORMAL),
+            expanded = true,
+        )
     }
 }
 
@@ -122,7 +127,12 @@ private fun ActiveStoolSectionExpandedPreview() {
 private fun ActiveStoolSectionFoldedPreview() {
     WalkLoggerTheme {
         ActiveStoolSectionPreview(
-            stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, texture = StoolTexture.FIRM, colour = StoolColour.MEDIUM_BROWN),
+            stool = Stool(
+                passed = true,
+                quantity = StoolQuantity.NORMAL,
+                texture = StoolTexture.FIRM,
+                colour = StoolColour.MEDIUM_BROWN,
+            ),
             expanded = false,
         )
     }
@@ -134,9 +144,9 @@ private fun ActiveStoolSectionPreview(stool: Stool?, expanded: Boolean) {
         stool = stool,
         expanded = expanded,
         onPassedChange = {},
-        onQuantitySelected = {},
-        onTextureSelected = {},
-        onColourSelected = {},
+        onQuantitySelect = {},
+        onTextureSelect = {},
+        onColourSelect = {},
         onFold = {},
         onExpand = {},
         modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg),

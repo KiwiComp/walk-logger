@@ -1,10 +1,5 @@
 package com.example.walklogger.feature.logwalk.finishwalk
 
-import com.example.walklogger.testing.FakeWeatherRepository
-import com.example.walklogger.testing.FakePlaceRepository
-import com.example.walklogger.testing.FakeLocationProvider
-import com.example.walklogger.domain.FetchWalkWeatherUseCase
-import com.example.walklogger.domain.LocationPermissionUseCase
 import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
@@ -16,11 +11,16 @@ import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkLocation
 import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.domain.FetchWalkWeatherUseCase
+import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
+import com.example.walklogger.testing.FakeLocationProvider
 import com.example.walklogger.testing.FakeMedicalConcernRepository
+import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWalkRepository
+import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import com.example.walklogger.testing.shownMessages
 import java.time.Clock
@@ -35,7 +35,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-
 
 class FinishWalkViewModelTest {
 
@@ -72,7 +71,12 @@ class FinishWalkViewModelTest {
             walkRepository = walkRepository,
             userMessages = userMessages,
             clock = clock,
-            fetchWalkWeather = FetchWalkWeatherUseCase(locationProvider, placeRepository, weatherRepository, clock),
+            fetchWalkWeather = FetchWalkWeatherUseCase(
+                locationProvider,
+                placeRepository,
+                weatherRepository,
+                clock,
+            ),
             locationPermission = LocationPermissionUseCase(locationProvider, placeRepository),
             placeRepository = placeRepository,
         )
@@ -99,15 +103,16 @@ class FinishWalkViewModelTest {
     }
 
     @Test
-    fun `fetches the weather for the walk when it opens, and again when its times change`() = runTest {
-        walkRepository.addWalks(walk)
-        viewModel.uiState.test {
-            assertEquals(weatherRepository.weather, expectMostRecentItem().form.fetchedWeather)
-            viewModel.setStartTime(LocalTime.of(7, 0))
-            expectMostRecentItem()
+    fun `fetches the weather for the walk when it opens, and again when its times change`() =
+        runTest {
+            walkRepository.addWalks(walk)
+            viewModel.uiState.test {
+                assertEquals(weatherRepository.weather, expectMostRecentItem().form.fetchedWeather)
+                viewModel.setStartTime(LocalTime.of(7, 0))
+                expectMostRecentItem()
+            }
+            assertEquals(2, weatherRepository.requests.size)
         }
-        assertEquals(2, weatherRepository.requests.size)
-    }
 
     @Test
     fun `saving stores the fetched weather`() = runTest {
@@ -118,7 +123,10 @@ class FinishWalkViewModelTest {
             viewModel.save()
             assertTrue(expectMostRecentItem().isSaved)
         }
-        assertEquals(weatherRepository.weather, walkRepository.observeWalks().first().single().weather)
+        assertEquals(
+            weatherRepository.weather,
+            walkRepository.observeWalks().first().single().weather,
+        )
     }
 
     @Test

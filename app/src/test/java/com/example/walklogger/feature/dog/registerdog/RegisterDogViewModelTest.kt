@@ -30,11 +30,21 @@ class RegisterDogViewModelTest {
     private val walkRepository = FakeWalkRepository()
     private val viewModel by lazy { editViewModel(dogId = null) }
 
-    private fun editViewModel(dogId: Long?) =
-        RegisterDogViewModel(dogId = dogId, dogRepository = repository, walkRepository = walkRepository, userMessages = userMessages)
+    private fun editViewModel(dogId: Long?) = RegisterDogViewModel(
+        dogId = dogId,
+        dogRepository = repository,
+        walkRepository = walkRepository,
+        userMessages = userMessages,
+    )
 
-    private fun ongoingWalk(dogId: Long) =
-        Walk(id = 1, dogId = dogId, handlers = listOf("Kim"), startTime = 0, endTime = null, equipment = Equipment.HARNESS)
+    private fun ongoingWalk(dogId: Long) = Walk(
+        id = 1,
+        dogId = dogId,
+        handlers = listOf("Kim"),
+        startTime = 0,
+        endTime = null,
+        equipment = Equipment.HARNESS,
+    )
 
     @Test
     fun `cannot save without a name`() = runTest {
@@ -76,7 +86,15 @@ class RegisterDogViewModelTest {
             assertTrue(expectMostRecentItem().isSaved)
         }
         assertEquals(
-            listOf(Dog(id = 1, name = "Sixten", breed = "Border collie", birthDate = birthDate, weightKg = 18.0)),
+            listOf(
+                Dog(
+                    id = 1,
+                    name = "Sixten",
+                    breed = "Border collie",
+                    birthDate = birthDate,
+                    weightKg = 18.0,
+                ),
+            ),
             repository.observeDogs().first(),
         )
     }
@@ -91,7 +109,15 @@ class RegisterDogViewModelTest {
     @Test
     fun `editing prefills the form from the stored dog`() = runTest {
         val birthDate = LocalDate.of(2023, 9, 2)
-        repository.addDogs(Dog(id = 7, name = "Sixten", breed = "Border collie", birthDate = birthDate, weightKg = 18.0))
+        repository.addDogs(
+            Dog(
+                id = 7,
+                name = "Sixten",
+                breed = "Border collie",
+                birthDate = birthDate,
+                weightKg = 18.0,
+            ),
+        )
         editViewModel(7).uiState.test {
             val state = expectMostRecentItem()
             assertEquals("Sixten", state.name)

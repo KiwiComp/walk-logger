@@ -8,7 +8,6 @@ import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
 
-
 /** Fixed content for `@Preview`s only; never reaches the running app. */
 internal object LogPreviewData {
     private val saturday = LocalDate.of(2026, 9, 12)

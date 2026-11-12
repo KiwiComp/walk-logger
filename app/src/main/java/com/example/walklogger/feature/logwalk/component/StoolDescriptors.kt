@@ -25,9 +25,9 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 @Composable
 internal fun StoolDescriptors(
     stool: Stool?,
-    onQuantitySelected: (StoolQuantity) -> Unit,
-    onTextureSelected: (StoolTexture) -> Unit,
-    onColourSelected: (StoolColour?) -> Unit,
+    onQuantitySelect: (StoolQuantity) -> Unit,
+    onTextureSelect: (StoolTexture) -> Unit,
+    onColourSelect: (StoolColour?) -> Unit,
     modifier: Modifier = Modifier,
     style: FormStyle = FormStyle.Default,
 ) {
@@ -36,7 +36,7 @@ internal fun StoolDescriptors(
             SegmentedToggle(
                 options = StoolQuantity.entries,
                 selected = stool?.quantity,
-                onSelect = onQuantitySelected,
+                onSelect = onQuantitySelect,
                 label = { stringResource(it.labelRes) },
                 size = SegmentedToggleSize.Compact,
             )
@@ -45,13 +45,13 @@ internal fun StoolDescriptors(
             SegmentedToggle(
                 options = StoolTexture.entries,
                 selected = stool?.texture,
-                onSelect = onTextureSelected,
+                onSelect = onTextureSelect,
                 label = { stringResource(it.labelRes) },
                 size = SegmentedToggleSize.Compact,
             )
         }
         DescriptorRow(label = stringResource(R.string.stool_colour), style = style) {
-            StoolColourPicker(selected = stool?.colour, onSelect = onColourSelected, style = style)
+            StoolColourPicker(selected = stool?.colour, onSelect = onColourSelect, style = style)
         }
     }
 }
@@ -69,10 +69,14 @@ private fun DescriptorRow(label: String, style: FormStyle, content: @Composable 
 private fun StoolDescriptorsPreview() {
     WalkLoggerTheme {
         StoolDescriptors(
-            stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, colour = StoolColour.MEDIUM_BROWN),
-            onQuantitySelected = {},
-            onTextureSelected = {},
-            onColourSelected = {},
+            stool = Stool(
+                passed = true,
+                quantity = StoolQuantity.NORMAL,
+                colour = StoolColour.MEDIUM_BROWN,
+            ),
+            onQuantitySelect = {},
+            onTextureSelect = {},
+            onColourSelect = {},
             modifier = Modifier.padding(AppSpacing.lg),
         )
     }
@@ -83,10 +87,14 @@ private fun StoolDescriptorsPreview() {
 private fun StoolDescriptorsInversePreview() {
     WalkLoggerTheme {
         StoolDescriptors(
-            stool = Stool(passed = true, texture = StoolTexture.SOFT, colour = StoolColour.WHITE_SPECKED),
-            onQuantitySelected = {},
-            onTextureSelected = {},
-            onColourSelected = {},
+            stool = Stool(
+                passed = true,
+                texture = StoolTexture.SOFT,
+                colour = StoolColour.WHITE_SPECKED,
+            ),
+            onQuantitySelect = {},
+            onTextureSelect = {},
+            onColourSelect = {},
             style = FormStyle.Inverse,
             modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg),
         )

@@ -12,7 +12,8 @@ import kotlinx.serialization.Serializable
 @Serializable
 data object LogDestination
 
-fun NavController.navigateToLog(navOptions: NavOptions? = null) = navigate(LogDestination, navOptions)
+fun NavController.navigateToLog(navOptions: NavOptions? = null) =
+    navigate(LogDestination, navOptions)
 
 fun NavGraphBuilder.logScreen(
     onAddWalk: (LocalDate) -> Unit,

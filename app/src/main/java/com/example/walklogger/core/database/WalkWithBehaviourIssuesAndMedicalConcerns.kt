@@ -15,13 +15,21 @@ data class WalkWithBehaviourIssuesAndMedicalConcerns(
     @Relation(
         parentColumn = "id",
         entityColumn = "id",
-        associateBy = Junction(WalkBehaviourIssueEntity::class, parentColumn = "walkId", entityColumn = "issueId"),
+        associateBy = Junction(
+            WalkBehaviourIssueEntity::class,
+            parentColumn = "walkId",
+            entityColumn = "issueId",
+        ),
     )
     val behaviourIssues: List<BehaviourIssueEntity>,
     @Relation(
         parentColumn = "id",
         entityColumn = "id",
-        associateBy = Junction(WalkMedicalConcernEntity::class, parentColumn = "walkId", entityColumn = "concernId"),
+        associateBy = Junction(
+            WalkMedicalConcernEntity::class,
+            parentColumn = "walkId",
+            entityColumn = "concernId",
+        ),
     )
     val medicalConcerns: List<MedicalConcernEntity>,
 )

@@ -19,7 +19,10 @@ class CaptureWalkLocationUseCaseTest {
     @Test
     fun `stores the device position for the walk`() = runTest {
         useCase(walkId = 4)
-        assertEquals(WalkLocation(4, locationProvider.location!!), placeRepository.walkLocation.value)
+        assertEquals(
+            WalkLocation(4, locationProvider.location!!),
+            placeRepository.walkLocation.value,
+        )
     }
 
     @Test
@@ -40,7 +43,10 @@ class CaptureWalkLocationUseCaseTest {
     fun `replaces a position left behind by another walk`() = runTest {
         placeRepository.walkLocation.value = WalkLocation(3, elsewhere)
         useCase(walkId = 4)
-        assertEquals(WalkLocation(4, locationProvider.location!!), placeRepository.walkLocation.value)
+        assertEquals(
+            WalkLocation(4, locationProvider.location!!),
+            placeRepository.walkLocation.value,
+        )
     }
 
     @Test

@@ -25,10 +25,10 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 @Composable
 internal fun StoolSection(
     stool: Stool?,
-    onPassedSelected: (Boolean) -> Unit,
-    onQuantitySelected: (StoolQuantity) -> Unit,
-    onTextureSelected: (StoolTexture) -> Unit,
-    onColourSelected: (StoolColour?) -> Unit,
+    onPassedSelect: (Boolean) -> Unit,
+    onQuantitySelect: (StoolQuantity) -> Unit,
+    onTextureSelect: (StoolTexture) -> Unit,
+    onColourSelect: (StoolColour?) -> Unit,
     onClear: () -> Unit,
     expanded: Boolean,
     onFold: () -> Unit,
@@ -40,7 +40,13 @@ internal fun StoolSection(
         label = stringResource(R.string.log_past_walk_stool),
         actionLabel = if (stool != null) stringResource(R.string.form_section_clear) else null,
         onAction = onClear,
-        leadingActionLabel = if (passed) stringResource(if (expanded) R.string.stool_done else R.string.stool_edit) else null,
+        leadingActionLabel = if (passed) {
+            stringResource(
+                if (expanded) R.string.stool_done else R.string.stool_edit,
+            )
+        } else {
+            null
+        },
         onLeadingAction = if (expanded) onFold else onExpand,
         modifier = modifier,
     ) {
@@ -48,16 +54,18 @@ internal fun StoolSection(
             SegmentedToggle(
                 options = listOf(true, false),
                 selected = stool?.passed,
-                onSelect = onPassedSelected,
-                label = { stringResource(if (it) R.string.stool_passed_yes else R.string.stool_passed_no) },
+                onSelect = onPassedSelect,
+                label = {
+                    stringResource(if (it) R.string.stool_passed_yes else R.string.stool_passed_no)
+                },
             )
             AnimatedVisibility(visible = passed) {
                 if (expanded) {
                     StoolDescriptors(
                         stool = stool,
-                        onQuantitySelected = onQuantitySelected,
-                        onTextureSelected = onTextureSelected,
-                        onColourSelected = onColourSelected,
+                        onQuantitySelect = onQuantitySelect,
+                        onTextureSelect = onTextureSelect,
+                        onColourSelect = onColourSelect,
                     )
                 } else {
                     StoolSummary(stool = stool, onClick = onExpand)
@@ -72,11 +80,16 @@ internal fun StoolSection(
 private fun StoolSectionPreview() {
     WalkLoggerTheme {
         StoolSection(
-            stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, texture = StoolTexture.FIRM, colour = StoolColour.MEDIUM_BROWN),
-            onPassedSelected = {},
-            onQuantitySelected = {},
-            onTextureSelected = {},
-            onColourSelected = {},
+            stool = Stool(
+                passed = true,
+                quantity = StoolQuantity.NORMAL,
+                texture = StoolTexture.FIRM,
+                colour = StoolColour.MEDIUM_BROWN,
+            ),
+            onPassedSelect = {},
+            onQuantitySelect = {},
+            onTextureSelect = {},
+            onColourSelect = {},
             onClear = {},
             expanded = true,
             onFold = {},
@@ -92,10 +105,10 @@ private fun StoolSectionUnansweredPreview() {
     WalkLoggerTheme {
         StoolSection(
             stool = null,
-            onPassedSelected = {},
-            onQuantitySelected = {},
-            onTextureSelected = {},
-            onColourSelected = {},
+            onPassedSelect = {},
+            onQuantitySelect = {},
+            onTextureSelect = {},
+            onColourSelect = {},
             onClear = {},
             expanded = true,
             onFold = {},
@@ -110,11 +123,16 @@ private fun StoolSectionUnansweredPreview() {
 private fun StoolSectionFoldedPreview() {
     WalkLoggerTheme {
         StoolSection(
-            stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, texture = StoolTexture.FIRM, colour = StoolColour.MEDIUM_BROWN),
-            onPassedSelected = {},
-            onQuantitySelected = {},
-            onTextureSelected = {},
-            onColourSelected = {},
+            stool = Stool(
+                passed = true,
+                quantity = StoolQuantity.NORMAL,
+                texture = StoolTexture.FIRM,
+                colour = StoolColour.MEDIUM_BROWN,
+            ),
+            onPassedSelect = {},
+            onQuantitySelect = {},
+            onTextureSelect = {},
+            onColourSelect = {},
             onClear = {},
             expanded = false,
             onFold = {},

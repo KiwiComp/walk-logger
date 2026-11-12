@@ -24,7 +24,9 @@ internal fun weatherConditionOf(wmoCode: Int): WeatherCondition? = when (wmoCode
 /** Rain includes showers, which Open-Meteo reports separately. Null when the hour is missing. */
 internal fun NetworkHourly.toWalkWeather(index: Int): WalkWeather? {
     if (index !in time.indices) return null
-    val rainMm = listOfNotNull(rain.getOrNull(index), showers.getOrNull(index)).takeIf { it.isNotEmpty() }?.sum()
+    val rainMm = listOfNotNull(rain.getOrNull(index), showers.getOrNull(index)).takeIf {
+        it.isNotEmpty()
+    }?.sum()
     return WalkWeather(
         condition = weatherCode.getOrNull(index)?.let(::weatherConditionOf),
         isDay = isDay.getOrNull(index) != 0,

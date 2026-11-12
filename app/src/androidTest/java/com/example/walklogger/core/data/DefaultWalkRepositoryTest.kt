@@ -67,15 +67,32 @@ class DefaultWalkRepositoryTest {
         behaviourIssues = listOf(pulling, barking),
         medicalConcerns = listOf(limping, vomit),
         optionalRatings = mapOf(OptionalRating.REACTIVITY to 2, OptionalRating.DISTRACTION to 6),
-        stool = Stool(passed = true, quantity = StoolQuantity.SMALL, texture = StoolTexture.MUSHY, colour = StoolColour.GREEN),
+        stool = Stool(
+            passed = true,
+            quantity = StoolQuantity.SMALL,
+            texture = StoolTexture.MUSHY,
+            colour = StoolColour.GREEN,
+        ),
     )
 
     @Before
     fun setUp() = runBlocking {
-        database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), WalkLoggerDatabase::class.java).build()
+        database =
+            Room.inMemoryDatabaseBuilder(
+                ApplicationProvider.getApplicationContext(),
+                WalkLoggerDatabase::class.java,
+            ).build()
         repository = DefaultWalkRepository(database.walkDao(), clock, Dispatchers.IO)
-        listOf(pulling, barking).forEach { database.behaviourIssueDao().insertBehaviourIssue(BehaviourIssueEntity(id = it.id, name = it.name)) }
-        listOf(limping, vomit).forEach { database.medicalConcernDao().insertMedicalConcern(MedicalConcernEntity(id = it.id, name = it.name)) }
+        listOf(pulling, barking).forEach {
+            database.behaviourIssueDao().insertBehaviourIssue(
+                BehaviourIssueEntity(id = it.id, name = it.name),
+            )
+        }
+        listOf(limping, vomit).forEach {
+            database.medicalConcernDao().insertMedicalConcern(
+                MedicalConcernEntity(id = it.id, name = it.name),
+            )
+        }
     }
 
     @After
@@ -124,7 +141,11 @@ class DefaultWalkRepositoryTest {
 
     @Test
     fun startWalk_thenFinishWalk_stampsBothTimesFromTheClock() = runBlocking {
-        val id = repository.startWalk(dogId = 7, handlers = listOf("Anna"), equipment = Equipment.HARNESS)
+        val id = repository.startWalk(
+            dogId = 7,
+            handlers = listOf("Anna"),
+            equipment = Equipment.HARNESS,
+        )
         val active = repository.observeActiveWalk().first()!!
         assertEquals(id, active.id)
         assertEquals(now.toEpochMilli(), active.startTime)
@@ -137,8 +158,13 @@ class DefaultWalkRepositoryTest {
 
     @Test
     fun updateStool_storesAndClearsTheAnswerOfAnActiveWalk() = runBlocking {
-        val id = repository.startWalk(dogId = 7, handlers = listOf("Anna"), equipment = Equipment.HARNESS)
-        val stool = Stool(passed = true, texture = StoolTexture.SOFT, colour = StoolColour.WHITE_SPECKED)
+        val id = repository.startWalk(
+            dogId = 7,
+            handlers = listOf("Anna"),
+            equipment = Equipment.HARNESS,
+        )
+        val stool =
+            Stool(passed = true, texture = StoolTexture.SOFT, colour = StoolColour.WHITE_SPECKED)
 
         repository.updateStool(id, stool)
         assertEquals(stool, repository.observeWalk(id).first()!!.stool)

@@ -49,7 +49,11 @@ abstract class WalkLoggerDatabase : RoomDatabase() {
     abstract fun behaviourIssueDao(): BehaviourIssueDao
     abstract fun medicalConcernDao(): MedicalConcernDao
 
-    @RenameColumn(tableName = "walks", fromColumnName = "startedAtMillis", toColumnName = "startTime")
+    @RenameColumn(
+        tableName = "walks",
+        fromColumnName = "startedAtMillis",
+        toColumnName = "startTime",
+    )
     @RenameColumn(tableName = "walks", fromColumnName = "endedAtMillis", toColumnName = "endTime")
     class Migration1To2 : AutoMigrationSpec
 

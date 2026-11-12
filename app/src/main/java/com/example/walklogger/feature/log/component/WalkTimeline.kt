@@ -5,8 +5,6 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
@@ -26,7 +24,6 @@ import com.example.walklogger.feature.log.WalkUiState
 import com.example.walklogger.feature.log.preview.LogPreviewData
 import java.time.format.DateTimeFormatter
 
-
 /** Width of the time column plus connector; content below the timeline aligns to it. */
 internal val TimelineGutter = 84.dp
 private val TimelineConnectorWidth = 16.dp
@@ -35,17 +32,30 @@ private val StartTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(
 
 /** The day's walks, each with its start time and a connector dot leading to a [WalkCard]. */
 @Composable
-internal fun WalkTimeline(walks: List<WalkUiState>, onWalkClick: (Long) -> Unit) {
-    Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xl)) {
+internal fun WalkTimeline(
+    walks: List<WalkUiState>,
+    onWalkClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(
+        modifier = modifier.padding(bottom = AppSpacing.xl),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.xl),
+    ) {
         walks.forEach { walk ->
             Row {
                 Column(
                     modifier = Modifier.width(TimelineGutter - TimelineConnectorWidth),
                     horizontalAlignment = Alignment.End,
                 ) {
-                    Text(text = walk.startTime.format(StartTimeFormatter), style = MaterialTheme.typography.titleMedium)
                     Text(
-                        text = stringResource(R.string.walk_duration_minutes, walk.duration.toMinutes()),
+                        text = walk.startTime.format(StartTimeFormatter),
+                        style = MaterialTheme.typography.titleMedium,
+                    )
+                    Text(
+                        text = stringResource(
+                            R.string.walk_duration_minutes,
+                            walk.duration.toMinutes(),
+                        ),
                         style = MaterialTheme.typography.bodySmall,
                         color = AppTheme.colors.contentMuted,
                     )
@@ -58,11 +68,12 @@ internal fun WalkTimeline(walks: List<WalkUiState>, onWalkClick: (Long) -> Unit)
                 ) {
                     Box(Modifier.size(TimelineDotSize).background(AppTheme.colors.action))
                 }
-                WalkCard(walk = walk, onClick = { onWalkClick(walk.id) }, modifier = Modifier.weight(1f))
+                WalkCard(walk = walk, onClick = {
+                    onWalkClick(walk.id)
+                }, modifier = Modifier.weight(1f))
             }
         }
     }
-    Spacer(Modifier.height(AppSpacing.xl))
 }
 
 @Preview(showBackground = true)

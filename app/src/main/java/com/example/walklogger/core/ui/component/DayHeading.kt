@@ -39,7 +39,9 @@ fun DayHeading(title: String, summary: String?, modifier: Modifier = Modifier) {
 @Composable
 fun walkSummary(walkCount: Int, averageRating: Double?): String {
     val count = pluralStringResource(R.plurals.walk_count, walkCount, walkCount)
-    val average = averageRating?.let { " " + stringResource(R.string.summary_average, it) }.orEmpty()
+    val average = averageRating?.let {
+        " " + stringResource(R.string.summary_average, it)
+    }.orEmpty()
     return count + average
 }
 
@@ -47,6 +49,9 @@ fun walkSummary(walkCount: Int, averageRating: Double?): String {
 @Composable
 private fun DayHeadingPreview() {
     WalkLoggerTheme {
-        DayHeading(title = "Saturday 12 Sep", summary = walkSummary(walkCount = 2, averageRating = 5.0))
+        DayHeading(
+            title = "Saturday 12 Sep",
+            summary = walkSummary(walkCount = 2, averageRating = 5.0),
+        )
     }
 }

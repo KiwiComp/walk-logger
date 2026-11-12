@@ -1,7 +1,5 @@
 package com.example.walklogger.feature.walkdetail
 
-import com.example.walklogger.core.model.WeatherCondition
-import com.example.walklogger.core.model.WalkWeather
 import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
@@ -12,6 +10,8 @@ import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.WalkWeather
+import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
@@ -29,7 +29,6 @@ import org.junit.Assert.assertNull
 import org.junit.Assert.assertTrue
 import org.junit.Rule
 import org.junit.Test
-
 
 class WalkDetailViewModelTest {
 
@@ -60,7 +59,8 @@ class WalkDetailViewModelTest {
         walkRepository.addWalks(walk)
     }
 
-    private val weather = WalkWeather(condition = WeatherCondition.LIGHT_RAIN, temperatureCelsius = 6.5, rainMm = 0.4)
+    private val weather =
+        WalkWeather(condition = WeatherCondition.LIGHT_RAIN, temperatureCelsius = 6.5, rainMm = 0.4)
 
     private fun completeWalk() = Walk(
         id = 1,

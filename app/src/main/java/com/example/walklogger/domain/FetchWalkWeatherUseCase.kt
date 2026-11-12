@@ -36,16 +36,28 @@ class FetchWalkWeatherUseCase @Inject constructor(
      * Values are taken from the hour that contains the middle of the walk. A position stored for
      * [walkId] when the walk started is used before asking the device.
      */
-    suspend operator fun invoke(startMillis: Long, endMillis: Long, walkId: Long? = null): WeatherFetchResult {
+    suspend operator fun invoke(
+        startMillis: Long,
+        endMillis: Long,
+        walkId: Long? = null,
+    ): WeatherFetchResult {
         val middle = Instant.ofEpochMilli(startMillis + (endMillis - startMillis) / 2)
-        val earliest = clock.instant().truncatedTo(ChronoUnit.DAYS).minus(Duration.ofDays(OpenMeteoForecastApi.MAX_PAST_DAYS))
+        val earliest = clock.instant()
+            .truncatedTo(ChronoUnit.DAYS)
+            .minus(Duration.ofDays(OpenMeteoForecastApi.MAX_PAST_DAYS))
         if (middle < earliest) return WeatherFetchResult.TooOld
         return runCatchingCancellable {
-            val coordinates = walkId?.let { id -> placeRepository.activeWalkLocation.first()?.takeIf { it.walkId == id }?.coordinates }
-                ?: (if (locationProvider.hasPermission()) locationProvider.currentLocation() else null)
+            val coordinates = walkId?.let { activeWalkCoordinates(it) }
+                ?: deviceCoordinates()
                 ?: placeRepository.savedPlace.first()?.coordinates
                 ?: return@runCatchingCancellable WeatherFetchResult.NoLocation
             WeatherFetchResult.Fetched(weatherRepository.weatherAt(coordinates, middle))
         }.getOrDefault(WeatherFetchResult.Failed)
     }
+
+    private suspend fun activeWalkCoordinates(walkId: Long) =
+        placeRepository.activeWalkLocation.first()?.takeIf { it.walkId == walkId }?.coordinates
+
+    private suspend fun deviceCoordinates() =
+        if (locationProvider.hasPermission()) locationProvider.currentLocation() else null
 }

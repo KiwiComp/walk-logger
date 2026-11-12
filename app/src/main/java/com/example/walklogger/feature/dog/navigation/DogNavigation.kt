@@ -9,7 +9,6 @@ import com.example.walklogger.feature.dog.DogRoute
 import com.example.walklogger.feature.dog.registerdog.RegisterDogRoute
 import kotlinx.serialization.Serializable
 
-
 @Serializable
 data object DogDestination
 
@@ -17,11 +16,11 @@ data object DogDestination
 @Serializable
 data class RegisterDogDestination(val dogId: Long? = null)
 
-fun NavController.navigateToDog(navOptions: NavOptions? = null) = navigate(DogDestination, navOptions)
+fun NavController.navigateToDog(navOptions: NavOptions? = null) =
+    navigate(DogDestination, navOptions)
 
 fun NavController.navigateToRegisterDog() = navigate(RegisterDogDestination())
 fun NavController.navigateToEditDog(dogId: Long) = navigate(RegisterDogDestination(dogId = dogId))
-
 
 fun NavGraphBuilder.dogScreen(onAddDog: () -> Unit, onEditDog: (dogId: Long) -> Unit) {
     composable<DogDestination> { DogRoute(onAddDog = onAddDog, onEditDog = onEditDog) }

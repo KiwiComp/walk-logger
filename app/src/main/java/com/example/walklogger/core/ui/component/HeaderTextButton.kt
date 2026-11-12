@@ -22,7 +22,12 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
  * keeps its height whether or not the button is needed.
  */
 @Composable
-fun HeaderTextButton(text: String, onClick: () -> Unit, modifier: Modifier = Modifier, visible: Boolean = true) {
+fun HeaderTextButton(
+    text: String,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier,
+    visible: Boolean = true,
+) {
     val shape = MaterialTheme.shapes.extraSmall
     SectionLabel(
         text = text,
@@ -40,6 +45,7 @@ fun HeaderTextButton(text: String, onClick: () -> Unit, modifier: Modifier = Mod
 @Composable
 private fun HeaderTextButtonPreview() {
     WalkLoggerTheme {
-        HeaderTextButton(text = "Today", onClick = {}, modifier = Modifier.background(AppTheme.colors.header))
+        HeaderTextButton(text = "Today", onClick = {
+        }, modifier = Modifier.background(AppTheme.colors.header))
     }
 }

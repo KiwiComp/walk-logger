@@ -33,18 +33,35 @@ class CalendarViewModelTest {
     private val dogRepository = FakeDogRepository()
 
     /** Lazy so viewModelScope picks up the rule's Main dispatcher. */
-    private val viewModel by lazy { CalendarViewModel(ObserveWalkHistoryUseCase(repository, dogRepository), dogRepository, clock) }
-
-    private fun walk(id: Long, start: LocalDateTime, rating: Int? = null, finished: Boolean = true, dogId: Long = 1) =
-        Walk(
-            id = id,
-            dogId = dogId,
-            handlers = listOf("Kim"),
-            startTime = start.toEpochSecond(ZoneOffset.UTC) * 1000,
-            endTime = if (finished) start.plusMinutes(30).toEpochSecond(ZoneOffset.UTC) * 1000 else null,
-            equipment = Equipment.HARNESS,
-            rating = rating,
+    private val viewModel by lazy {
+        CalendarViewModel(
+            ObserveWalkHistoryUseCase(repository, dogRepository),
+            dogRepository,
+            clock,
         )
+    }
+
+    private fun walk(
+        id: Long,
+        start: LocalDateTime,
+        rating: Int? = null,
+        finished: Boolean = true,
+        dogId: Long = 1,
+    ) = Walk(
+        id = id,
+        dogId = dogId,
+        handlers = listOf("Kim"),
+        startTime = start.toEpochSecond(ZoneOffset.UTC) * 1000,
+        endTime = if (finished) {
+            start.plusMinutes(
+                30,
+            ).toEpochSecond(ZoneOffset.UTC) * 1000
+        } else {
+            null
+        },
+        equipment = Equipment.HARNESS,
+        rating = rating,
+    )
 
     @Test
     fun `today is selected in the current month and future days are disabled`() = runTest {
@@ -54,7 +71,12 @@ class CalendarViewModelTest {
             assertEquals(today, state.selectedDate)
             assertEquals((1..30).map { LocalDate.of(2026, 9, it) }, state.days.map { it.date })
             assertEquals(today, state.days.single { it.isSelected }.date)
-            assertEquals((1..12).map { LocalDate.of(2026, 9, it) }, state.days.filter { it.isEnabled }.map { it.date })
+            assertEquals(
+                (1..12).map {
+                    LocalDate.of(2026, 9, it)
+                },
+                state.days.filter { it.isEnabled }.map { it.date },
+            )
             assertEquals(0, state.monthWalkCount)
             assertEquals(emptyList<CalendarWalkUiState>(), state.walks)
             assertTrue(state.isCurrentMonth)
@@ -128,25 +150,26 @@ class CalendarViewModelTest {
     }
 
     @Test
-    fun `previous month selects its first day and moving forward to the current month selects today`() = runTest {
-        viewModel.uiState.test {
-            awaitItem()
-            viewModel.showPreviousMonth()
-            val august = expectMostRecentItem()
-            assertEquals(YearMonth.of(2026, 8), august.month)
-            assertEquals(LocalDate.of(2026, 8, 1), august.selectedDate)
-            assertEquals(31, august.days.size)
-            assertTrue(august.days.all { it.isEnabled })
-            assertFalse(august.isCurrentMonth)
-            assertTrue(august.canShowNextMonth)
-            assertFalse(august.canStartLiveWalk)
-            viewModel.showNextMonth()
-            val september = expectMostRecentItem()
-            assertEquals(YearMonth.of(2026, 9), september.month)
-            assertEquals(today, september.selectedDate)
-            assertTrue(september.canStartLiveWalk)
+    fun `previous month selects its first day and moving forward to the current month selects today`() =
+        runTest {
+            viewModel.uiState.test {
+                awaitItem()
+                viewModel.showPreviousMonth()
+                val august = expectMostRecentItem()
+                assertEquals(YearMonth.of(2026, 8), august.month)
+                assertEquals(LocalDate.of(2026, 8, 1), august.selectedDate)
+                assertEquals(31, august.days.size)
+                assertTrue(august.days.all { it.isEnabled })
+                assertFalse(august.isCurrentMonth)
+                assertTrue(august.canShowNextMonth)
+                assertFalse(august.canStartLiveWalk)
+                viewModel.showNextMonth()
+                val september = expectMostRecentItem()
+                assertEquals(YearMonth.of(2026, 9), september.month)
+                assertEquals(today, september.selectedDate)
+                assertTrue(september.canStartLiveWalk)
+            }
         }
-    }
 
     @Test
     fun `today jumps back to the current month with today selected`() = runTest {

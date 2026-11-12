@@ -1,19 +1,19 @@
 package com.example.walklogger.navigation
 
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.consumeWindowInsets
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.Icon
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.NavigationBar
 import androidx.compose.material3.NavigationBarItem
 import androidx.compose.material3.NavigationBarItemDefaults
 import androidx.compose.material3.Scaffold
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
-import androidx.compose.material3.MaterialTheme
-import androidx.compose.foundation.layout.Column
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -24,6 +24,8 @@ import androidx.compose.ui.platform.LocalResources
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.unit.dp
+import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import androidx.navigation.NavDestination
 import androidx.navigation.NavDestination.Companion.hasRoute
 import androidx.navigation.NavDestination.Companion.hierarchy
@@ -32,8 +34,6 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navOptions
-import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
-import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.core.ui.component.AppSnackbarHost
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.feature.calendar.navigation.navigateToCalendar
@@ -44,7 +44,10 @@ import com.example.walklogger.feature.patterns.navigation.navigateToPatterns
 
 /** Root composable: scaffold + bottom bar + nav host. Each tab draws its own header. */
 @Composable
-fun WalkLoggerApp(viewModel: WalkLoggerAppViewModel = hiltViewModel()) {
+fun WalkLoggerApp(
+    modifier: Modifier = Modifier,
+    viewModel: WalkLoggerAppViewModel = hiltViewModel(),
+) {
     val navController = rememberNavController()
     val backStackEntry by navController.currentBackStackEntryAsState()
     val currentDestination = backStackEntry?.destination
@@ -64,7 +67,7 @@ fun WalkLoggerApp(viewModel: WalkLoggerAppViewModel = hiltViewModel()) {
     }
 
     Scaffold(
-        modifier = Modifier.fillMaxSize(),
+        modifier = modifier.fillMaxSize(),
         containerColor = AppTheme.colors.background,
         snackbarHost = { AppSnackbarHost(hostState = snackbarHostState) },
         bottomBar = {
@@ -72,7 +75,8 @@ fun WalkLoggerApp(viewModel: WalkLoggerAppViewModel = hiltViewModel()) {
             if (currentDestination?.isTopLevel() != false) {
                 WalkLoggerBottomBar(
                     isSelected = { destination ->
-                        currentDestination?.hierarchy?.any { it.hasRoute(destination.route) } == true
+                        currentDestination?.hierarchy?.any { it.hasRoute(destination.route) } ==
+                            true
                     },
                     onSelect = { destination -> navController.navigateToTopLevel(destination) },
                 )
@@ -150,5 +154,6 @@ internal fun NavHostController.popToTopLevel() {
     while (currentDestination?.isTopLevel() == false) popBackStack()
 }
 
-private fun NavDestination.isTopLevel(): Boolean =
-    TopLevelDestination.entries.any { hasRoute(it.route) }
+private fun NavDestination.isTopLevel(): Boolean = TopLevelDestination.entries.any {
+    hasRoute(it.route)
+}

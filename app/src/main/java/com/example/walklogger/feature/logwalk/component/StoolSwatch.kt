@@ -57,12 +57,22 @@ internal fun StoolSwatch(colour: StoolColour, size: Dp, modifier: Modifier = Mod
 private val StoolColour.baseColour
     get() = when (this) {
         StoolColour.LIGHT_BROWN -> StoolLightBrown
-        StoolColour.MEDIUM_BROWN, StoolColour.RED_STREAKED, StoolColour.WHITE_SPECKED -> StoolMediumBrown
+
+        StoolColour.MEDIUM_BROWN,
+        StoolColour.RED_STREAKED,
+        StoolColour.WHITE_SPECKED,
+        -> StoolMediumBrown
+
         StoolColour.DARK_BROWN -> StoolDarkBrown
+
         StoolColour.BLACK -> StoolBlack
+
         StoolColour.YELLOWY_BROWN -> StoolYellowyBrown
+
         StoolColour.BRIGHT_YELLOW -> StoolBrightYellow
+
         StoolColour.GREY -> StoolGrey
+
         StoolColour.GREEN -> StoolGreen
     }
 

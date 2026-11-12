@@ -23,7 +23,9 @@ class TemperatureBandTest {
             30.0 to TemperatureBand.VERY_WARM,
             38.0 to TemperatureBand.VERY_WARM,
         )
-        expected.forEach { (celsius, band) -> assertEquals("$celsius °C", band, TemperatureBand.of(celsius)) }
+        expected.forEach { (celsius, band) ->
+            assertEquals("$celsius °C", band, TemperatureBand.of(celsius))
+        }
     }
 
     @Test

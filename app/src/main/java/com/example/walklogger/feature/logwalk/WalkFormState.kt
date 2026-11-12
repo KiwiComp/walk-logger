@@ -68,7 +68,8 @@ data class WalkFormState(
         }
 
     /** Without fetched weather, entering it by hand is the only way, so the fields need no Edit tap. */
-    val showsManualWeather: Boolean get() = (isWeatherEditing || fetchedWeather == null) && weatherStatus != WeatherStatus.LOADING
+    val showsManualWeather: Boolean get() = (isWeatherEditing || fetchedWeather == null) &&
+        weatherStatus != WeatherStatus.LOADING
 
     /** What will be saved: the entered temperature and condition over the fetched precipitation and wind. */
     val weather: WalkWeather?

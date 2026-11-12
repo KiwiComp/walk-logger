@@ -18,18 +18,21 @@ class DefaultWeatherRepository @Inject constructor(
     @Dispatcher(WalkLoggerDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : WeatherRepository {
 
-    override suspend fun weatherAt(coordinates: Coordinates, time: Instant): WalkWeather = withContext(ioDispatcher) {
-        val hour = HOUR_FORMAT.format(time.truncatedTo(ChronoUnit.HOURS))
-        val forecast = api.hourlyForecast(
-            latitude = coordinates.latitude,
-            longitude = coordinates.longitude,
-            startHour = hour,
-            endHour = hour,
-        )
-        checkNotNull(forecast.hourly.toWalkWeather(index = 0)) { "no weather for $hour" }
-    }
+    override suspend fun weatherAt(coordinates: Coordinates, time: Instant): WalkWeather =
+        withContext(ioDispatcher) {
+            val hour = HOUR_FORMAT.format(time.truncatedTo(ChronoUnit.HOURS))
+            val forecast = api.hourlyForecast(
+                latitude = coordinates.latitude,
+                longitude = coordinates.longitude,
+                startHour = hour,
+                endHour = hour,
+            )
+            checkNotNull(forecast.hourly.toWalkWeather(index = 0)) { "no weather for $hour" }
+        }
 
     private companion object {
-        val HOUR_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern("yyyy-MM-dd'T'HH:mm").withZone(ZoneOffset.UTC)
+        val HOUR_FORMAT: DateTimeFormatter = DateTimeFormatter.ofPattern(
+            "yyyy-MM-dd'T'HH:mm",
+        ).withZone(ZoneOffset.UTC)
     }
 }

@@ -6,9 +6,9 @@ import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
+import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
 import com.example.walklogger.core.data.PlaceRepository
-import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.message.UserMessages
@@ -33,7 +33,6 @@ import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
-
 
 /**
  * [date] is the day chosen on the log screen; passed in directly so tests need no SavedStateHandle.
@@ -85,7 +84,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
     /** The walk being edited, kept so saving preserves its id and dog. */
     private var editedWalk: Walk? = null
 
-    /** Editing prefills from the stored walk; a new walk starts with the first (usual) handler selected. */
+    // Editing prefills from the stored walk; a new walk starts with the first (usual) handler selected.
     init {
         viewModelScope.launch {
             if (walkId != null) {
@@ -101,7 +100,15 @@ class LogPastWalkViewModel @AssistedInject constructor(
                 onTimesChanged()
             } else {
                 handlerRepository.observeHandlers().first().firstOrNull()?.let { first ->
-                    screen.update { if (it.selectedHandlers.isEmpty()) it.copy(selectedHandlers = setOf(first)) else it }
+                    screen.update {
+                        if (it.selectedHandlers.isEmpty()) {
+                            it.copy(
+                                selectedHandlers = setOf(first),
+                            )
+                        } else {
+                            it
+                        }
+                    }
                 }
             }
         }
@@ -138,19 +145,39 @@ class LogPastWalkViewModel @AssistedInject constructor(
         val state = screen.value
         val start = state.startTime ?: return
         val end = state.endTime ?: return
-        form.onTimesChanged(state.date.atTime(start).toEpochMilli(), state.date.atTime(end).toEpochMilli(), autoFetch = walkId == null)
+        form.onTimesChanged(
+            state.date.atTime(start).toEpochMilli(),
+            state.date.atTime(end).toEpochMilli(),
+            autoFetch =
+                walkId == null,
+        )
     }
 
     fun toggleHandler(handler: String) = screen.update { state ->
         val selected = state.selectedHandlers
-        state.copy(selectedHandlers = if (handler in selected) selected - handler else selected + handler)
+        state.copy(
+            selectedHandlers = if (handler in
+                selected
+            ) {
+                selected - handler
+            } else {
+                selected + handler
+            },
+        )
     }
 
     /** Stores the name (or finds the existing one) and selects it. */
     fun addHandler(name: String) {
         viewModelScope.launch {
             runCatchingCancellable { handlerRepository.addHandler(name) }
-                .onSuccess { stored -> screen.update { it.copy(selectedHandlers = it.selectedHandlers + stored) } }
+                .onSuccess { stored ->
+                    screen.update {
+                        it.copy(
+                            selectedHandlers =
+                                it.selectedHandlers + stored,
+                        )
+                    }
+                }
                 .onFailure { userMessages.show(R.string.error_add_name) }
         }
     }
@@ -163,7 +190,9 @@ class LogPastWalkViewModel @AssistedInject constructor(
             runCatchingCancellable {
                 val edited = editedWalk
                 val dogId = edited?.dogId
-                    ?: checkNotNull(dogRepository.observeActiveDog().first()) { "log past walk needs an active dog" }.id
+                    ?: checkNotNull(dogRepository.observeActiveDog().first()) {
+                        "log past walk needs an active dog"
+                    }.id
                 val walk = form.applyTo(
                     Walk(
                         id = edited?.id ?: 0,
@@ -173,7 +202,13 @@ class LogPastWalkViewModel @AssistedInject constructor(
                         endTime = state.date.atTime(state.endTime!!).toEpochMilli(),
                     ),
                 )
-                if (edited != null) walkRepository.updateWalk(walk) else walkRepository.logWalk(walk)
+                if (edited !=
+                    null
+                ) {
+                    walkRepository.updateWalk(walk)
+                } else {
+                    walkRepository.logWalk(walk)
+                }
             }
                 .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
@@ -187,7 +222,9 @@ class LogPastWalkViewModel @AssistedInject constructor(
 
     private fun LogPastWalkUiState.prefilledFrom(walk: Walk): LogPastWalkUiState {
         val start = walk.startTime.toLocalDateTime()
-        val end = checkNotNull(walk.endTime) { "walk ${walk.id} has not finished" }.toLocalDateTime()
+        val end = checkNotNull(walk.endTime) {
+            "walk ${walk.id} has not finished"
+        }.toLocalDateTime()
         return copy(
             date = start.toLocalDate(),
             startTime = start.toLocalTime(),
@@ -197,5 +234,6 @@ class LogPastWalkViewModel @AssistedInject constructor(
         )
     }
 
-    private fun Long.toLocalDateTime(): LocalDateTime = Instant.ofEpochMilli(this).atZone(clock.zone).toLocalDateTime()
+    private fun Long.toLocalDateTime(): LocalDateTime =
+        Instant.ofEpochMilli(this).atZone(clock.zone).toLocalDateTime()
 }

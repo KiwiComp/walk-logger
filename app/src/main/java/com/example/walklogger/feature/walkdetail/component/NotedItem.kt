@@ -28,7 +28,11 @@ internal fun NotedItem(label: String, modifier: Modifier = Modifier) {
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Box(Modifier.size(BulletSize).background(AppTheme.colors.action))
-        Text(text = label, style = MaterialTheme.typography.bodyLarge, color = AppTheme.colors.content)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyLarge,
+            color = AppTheme.colors.content,
+        )
     }
 }
 

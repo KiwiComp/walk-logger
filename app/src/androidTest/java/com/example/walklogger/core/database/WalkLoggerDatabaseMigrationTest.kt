@@ -21,12 +21,16 @@ class WalkLoggerDatabaseMigrationTest {
     @Test
     fun migrate1To2_renamesTimeColumnsAndKeepsRows() {
         helper.createDatabase(DB_NAME, 1).use { db ->
-            db.execSQL("INSERT INTO walks (id, startedAtMillis, endedAtMillis) VALUES (1, 100, 200)")
+            db.execSQL(
+                "INSERT INTO walks (id, startedAtMillis, endedAtMillis) VALUES (1, 100, 200)",
+            )
         }
 
         val db = helper.runMigrationsAndValidate(DB_NAME, 2, true)
 
-        db.query("SELECT startTime, endTime, handler, notes, rating FROM walks WHERE id = 1").use { cursor ->
+        db.query(
+            "SELECT startTime, endTime, handler, notes, rating FROM walks WHERE id = 1",
+        ).use { cursor ->
             assertTrue(cursor.moveToFirst())
             assertEquals(100L, cursor.getLong(0))
             assertEquals(200L, cursor.getLong(1))
@@ -106,7 +110,12 @@ class WalkLoggerDatabaseMigrationTest {
             assertEquals(1, cursor.getInt(0))
         }
         db.query("SELECT name, isDefault FROM behaviour_issues ORDER BY id").use { cursor ->
-            val names = buildList { while (cursor.moveToNext()) { assertEquals(1, cursor.getInt(1)); add(cursor.getString(0)) } }
+            val names = buildList {
+                while (cursor.moveToNext()) {
+                    assertEquals(1, cursor.getInt(1))
+                    add(cursor.getString(0))
+                }
+            }
             assertEquals(DefaultBehaviourIssues.values.toList(), names)
         }
         db.execSQL("INSERT INTO walk_behaviour_issues (walkId, issueId) VALUES (1, 1)")
@@ -120,7 +129,9 @@ class WalkLoggerDatabaseMigrationTest {
     fun migrate6To7_addsConcernTablesKeysSeededIssuesAndKeepsWalks() {
         helper.createDatabase(DB_NAME, 6).use { db ->
             db.execSQL("INSERT INTO walks (id, startTime) VALUES (1, 100)")
-            db.execSQL("INSERT INTO behaviour_issues (id, name, isDefault) VALUES (1, 'Pulling', 1), (2, 'Digging', 0)")
+            db.execSQL(
+                "INSERT INTO behaviour_issues (id, name, isDefault) VALUES (1, 'Pulling', 1), (2, 'Digging', 0)",
+            )
             db.execSQL("INSERT INTO walk_behaviour_issues (walkId, issueId) VALUES (1, 2)")
         }
 
@@ -140,12 +151,19 @@ class WalkLoggerDatabaseMigrationTest {
             assertTrue(cursor.isNull(1))
             assertEquals(0, cursor.getInt(2))
         }
-        db.query("SELECT COUNT(*) FROM walk_behaviour_issues WHERE walkId = 1 AND issueId = 2").use { cursor ->
+        db.query(
+            "SELECT COUNT(*) FROM walk_behaviour_issues WHERE walkId = 1 AND issueId = 2",
+        ).use { cursor ->
             assertTrue(cursor.moveToFirst())
             assertEquals(1, cursor.getInt(0))
         }
         db.query("SELECT name, `key`, isHidden FROM medical_concerns ORDER BY id").use { cursor ->
-            val rows = buildList { while (cursor.moveToNext()) { assertEquals(0, cursor.getInt(2)); add(cursor.getString(1) to cursor.getString(0)) } }
+            val rows = buildList {
+                while (cursor.moveToNext()) {
+                    assertEquals(0, cursor.getInt(2))
+                    add(cursor.getString(1) to cursor.getString(0))
+                }
+            }
             assertEquals(DefaultMedicalConcerns.toList(), rows)
         }
         db.execSQL("INSERT INTO walk_medical_concerns (walkId, concernId) VALUES (1, 1)")
@@ -163,7 +181,9 @@ class WalkLoggerDatabaseMigrationTest {
 
         val db = helper.runMigrationsAndValidate(DB_NAME, 8, true)
 
-        db.query("SELECT rating, reactivity, energyLevel, responsiveness, engagement, distraction FROM walks WHERE id = 1").use { cursor ->
+        db.query(
+            "SELECT rating, reactivity, energyLevel, responsiveness, engagement, distraction FROM walks WHERE id = 1",
+        ).use { cursor ->
             assertTrue(cursor.moveToFirst())
             assertEquals(5, cursor.getInt(0))
             (1..5).forEach { assertTrue(cursor.isNull(it)) }
@@ -178,7 +198,9 @@ class WalkLoggerDatabaseMigrationTest {
 
         val db = helper.runMigrationsAndValidate(DB_NAME, 9, true)
 
-        db.query("SELECT rating, stoolPassed, stoolQuantity, stoolTexture, stoolColour FROM walks WHERE id = 1").use { cursor ->
+        db.query(
+            "SELECT rating, stoolPassed, stoolQuantity, stoolTexture, stoolColour FROM walks WHERE id = 1",
+        ).use { cursor ->
             assertTrue(cursor.moveToFirst())
             assertEquals(5, cursor.getInt(0))
             (1..4).forEach { assertTrue(cursor.isNull(it)) }
@@ -203,21 +225,30 @@ class WalkLoggerDatabaseMigrationTest {
     @Test
     fun migrate10To11_replacesHandPickedWeatherWithEmptyFetchedColumnsAndKeepsWalks() {
         helper.createDatabase(DB_NAME, 10).use { db ->
-            db.execSQL("INSERT INTO walks (id, startTime, rating, rain, temperature, wind, snow) VALUES (1, 100, 5, 'LIGHT', 'COLD', 'WINDY', 'NONE')")
+            db.execSQL(
+                "INSERT INTO walks (id, startTime, rating, rain, temperature, wind, snow) VALUES (1, 100, 5, 'LIGHT', 'COLD', 'WINDY', 'NONE')",
+            )
         }
 
         val db = helper.runMigrationsAndValidate(DB_NAME, 11, true)
 
         db.query(
-            "SELECT rating, weatherCondition, weatherIsDay, temperatureCelsius, rainMm, snowfallCm, windSpeedMs, windGustsMs " +
-                "FROM walks WHERE id = 1",
+            "SELECT rating, weatherCondition, weatherIsDay, temperatureCelsius, rainMm, " +
+                "snowfallCm, windSpeedMs, windGustsMs FROM walks WHERE id = 1",
         ).use { cursor ->
             assertTrue(cursor.moveToFirst())
             assertEquals(5, cursor.getInt(0))
             (1..7).forEach { assertTrue(cursor.isNull(it)) }
         }
         db.query("PRAGMA table_info(walks)").use { cursor ->
-            val columns = buildList { while (cursor.moveToNext()) add(cursor.getString(cursor.getColumnIndexOrThrow("name"))) }
+            val columns =
+                buildList {
+                    while (cursor.moveToNext()) {
+                        add(
+                            cursor.getString(cursor.getColumnIndexOrThrow("name")),
+                        )
+                    }
+                }
             assertTrue(columns.none { it in setOf("rain", "temperature", "wind", "snow") })
         }
     }

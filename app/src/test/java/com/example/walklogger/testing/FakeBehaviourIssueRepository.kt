@@ -13,7 +13,12 @@ class FakeBehaviourIssueRepository : BehaviourIssueRepository {
 
     private val issues = MutableStateFlow<List<BehaviourIssue>>(emptyList())
 
-    fun addBehaviourIssues(vararg names: String) = names.forEach { name -> issues.update { it + BehaviourIssue(id = it.size + 1L, name = name) } }
+    fun addBehaviourIssues(vararg names: String) = names.forEach { name ->
+        issues.update {
+            it +
+                BehaviourIssue(id = it.size + 1L, name = name)
+        }
+    }
 
     override fun observeBehaviourIssues(): Flow<List<BehaviourIssue>> = issues
 
@@ -21,6 +26,12 @@ class FakeBehaviourIssueRepository : BehaviourIssueRepository {
         failures.check()
         val trimmed = name.trim()
         val existing = issues.value.find { it.name.equals(trimmed, ignoreCase = true) }
-        return existing ?: BehaviourIssue(id = issues.value.size + 1L, name = trimmed).also { new -> issues.update { it + new } }
+        return existing
+            ?: BehaviourIssue(id = issues.value.size + 1L, name = trimmed).also { new ->
+                issues.update {
+                    it +
+                        new
+                }
+            }
     }
 }

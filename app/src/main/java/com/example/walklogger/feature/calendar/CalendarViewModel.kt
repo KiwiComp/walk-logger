@@ -32,7 +32,11 @@ class CalendarViewModel @Inject constructor(
     private val selectedDate = MutableStateFlow(LocalDate.now(clock))
 
     val uiState: StateFlow<CalendarUiState> =
-        combine(selectedDate, observeWalkHistory(), dogRepository.observeActiveDog()) { date, walks, dog ->
+        combine(selectedDate, observeWalkHistory(), dogRepository.observeActiveDog()) {
+                date,
+                walks,
+                dog,
+            ->
             buildState(date, walks, dog)
         }.stateIn(
             scope = viewModelScope,
@@ -52,8 +56,13 @@ class CalendarViewModel @Inject constructor(
     fun showCurrentMonth() = selectedDate.update { landingDay(YearMonth.now(clock)) }
 
     /** Arriving in a month selects today if it is the current one, otherwise the 1st (never in the future). */
-    private fun landingDay(month: YearMonth): LocalDate =
-        if (month == YearMonth.now(clock)) LocalDate.now(clock) else month.atDay(1)
+    private fun landingDay(month: YearMonth): LocalDate = if (month ==
+        YearMonth.now(clock)
+    ) {
+        LocalDate.now(clock)
+    } else {
+        month.atDay(1)
+    }
 
     private fun buildState(date: LocalDate, walks: List<Walk>, activeDog: Dog?): CalendarUiState {
         val walksByDate = walks.groupBy { it.startDate(clock.zone) }
@@ -67,7 +76,9 @@ class CalendarViewModel @Inject constructor(
                 CalendarDayUiState(
                     date = day,
                     walkCount = dayWalks.size,
-                    rating = dayWalks.mapNotNull { it.rating }.takeIf { it.isNotEmpty() }?.average()?.roundToInt(),
+                    rating = dayWalks.mapNotNull {
+                        it.rating
+                    }.takeIf { it.isNotEmpty() }?.average()?.roundToInt(),
                     isSelected = day == date,
                     isEnabled = !day.isAfter(today),
                 )

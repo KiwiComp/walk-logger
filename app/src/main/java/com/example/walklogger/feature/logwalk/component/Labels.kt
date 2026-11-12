@@ -16,7 +16,6 @@ import com.example.walklogger.core.model.TemperatureBand
 import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.feature.logwalk.SaveBlocker
 
-
 internal val Equipment.labelRes: Int
     @StringRes get() = when (this) {
         Equipment.COLLAR -> R.string.equipment_collar
@@ -51,17 +50,34 @@ internal val WeatherCondition.labelRes: Int
 /** Clear and partly cloudy skies have a night variant; the rest look the same day and night. */
 @DrawableRes
 internal fun WeatherCondition.iconRes(isDay: Boolean): Int = when (this) {
-    WeatherCondition.CLEAR -> if (isDay) R.drawable.ic_weather_sunny else R.drawable.ic_weather_clear_night
-    WeatherCondition.PARTLY_CLOUDY -> if (isDay) R.drawable.ic_weather_partly_cloudy_day else R.drawable.ic_weather_partly_cloudy_night
+    WeatherCondition.CLEAR ->
+        if (isDay) R.drawable.ic_weather_sunny else R.drawable.ic_weather_clear_night
+
+    WeatherCondition.PARTLY_CLOUDY ->
+        if (isDay) {
+            R.drawable.ic_weather_partly_cloudy_day
+        } else {
+            R.drawable.ic_weather_partly_cloudy_night
+        }
+
     WeatherCondition.CLOUDY -> R.drawable.ic_weather_cloud
+
     WeatherCondition.FOG -> R.drawable.ic_weather_foggy
+
     WeatherCondition.LIGHT_RAIN -> R.drawable.ic_weather_rainy_light
+
     WeatherCondition.RAIN -> R.drawable.ic_weather_rainy
+
     WeatherCondition.HEAVY_RAIN -> R.drawable.ic_weather_rainy_heavy
+
     WeatherCondition.FREEZING_RAIN -> R.drawable.ic_weather_weather_mix
+
     WeatherCondition.LIGHT_SNOW -> R.drawable.ic_weather_weather_snowy
+
     WeatherCondition.SNOW -> R.drawable.ic_weather_snowing
+
     WeatherCondition.HEAVY_SNOW -> R.drawable.ic_weather_snowing_heavy
+
     WeatherCondition.THUNDERSTORM -> R.drawable.ic_weather_thunderstorm
 }
 
@@ -146,7 +162,9 @@ internal fun medicalConcernLabelRes(key: String?): Int? = when (key) {
 }
 
 @Composable
-internal fun BehaviourIssue.label(): String = behaviourIssueLabelRes(key)?.let { stringResource(it) } ?: name
+internal fun BehaviourIssue.label(): String =
+    behaviourIssueLabelRes(key)?.let { stringResource(it) } ?: name
 
 @Composable
-internal fun MedicalConcern.label(): String = medicalConcernLabelRes(key)?.let { stringResource(it) } ?: name
+internal fun MedicalConcern.label(): String =
+    medicalConcernLabelRes(key)?.let { stringResource(it) } ?: name

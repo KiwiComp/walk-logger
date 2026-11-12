@@ -11,6 +11,8 @@ import kotlinx.coroutines.test.UnconfinedTestDispatcher
 @OptIn(ExperimentalCoroutinesApi::class)
 fun TestScope.shownMessages(userMessages: UserMessages): List<Int> {
     val shown = mutableListOf<Int>()
-    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) { userMessages.messages.toList(shown) }
+    backgroundScope.launch(UnconfinedTestDispatcher(testScheduler)) {
+        userMessages.messages.toList(shown)
+    }
     return shown
 }

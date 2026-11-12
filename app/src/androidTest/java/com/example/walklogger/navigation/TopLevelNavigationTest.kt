@@ -60,7 +60,11 @@ class TopLevelNavigationTest {
         navController.navigateToTopLevel(TopLevelDestination.DOG)
 
         assertTrue(navController.currentDestination!!.hasRoute<DogDestination>())
-        assertTrue(navController.currentBackStack.value.none { it.destination.hasRoute<RegisterDogDestination>() })
+        assertTrue(
+            navController.currentBackStack.value.none {
+                it.destination.hasRoute<RegisterDogDestination>()
+            },
+        )
     }
 
     @Test
@@ -73,5 +77,6 @@ class TopLevelNavigationTest {
         assertTrue(navController.currentDestination!!.hasRoute<DogDestination>())
     }
 
-    private fun onMain(block: () -> Unit) = InstrumentationRegistry.getInstrumentation().runOnMainSync(block)
+    private fun onMain(block: () -> Unit) =
+        InstrumentationRegistry.getInstrumentation().runOnMainSync(block)
 }

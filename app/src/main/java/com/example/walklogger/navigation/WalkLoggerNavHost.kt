@@ -56,7 +56,9 @@ fun WalkLoggerNavHost(
             onAddDog = navController::navigateToRegisterDog,
             onEditDog = navController::navigateToEditDog,
         )
-        registerDogScreen(onDone = { navController.popBackStack() }, onNotFound = navController::popToTopLevel)
+        registerDogScreen(onDone = {
+            navController.popBackStack()
+        }, onNotFound = navController::popToTopLevel)
         newWalkScreen(
             onBack = { navController.popBackStack() },
             onWalkStarted = navController::navigateToActiveWalk,
@@ -68,7 +70,10 @@ fun WalkLoggerNavHost(
             onWalkDiscarded = navController::popToTopLevel,
             onNotFound = navController::popToTopLevel,
         )
-        finishWalkScreen(onSaved = navController::popToTopLevel, onNotFound = navController::popToTopLevel)
+        finishWalkScreen(
+            onSaved = navController::popToTopLevel,
+            onNotFound = navController::popToTopLevel,
+        )
         // Editing is pushed on top of the walk's detail screen, so every way out of the form lands back there.
         logPastWalkScreen(
             onClose = { navController.popBackStack() },

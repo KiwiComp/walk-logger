@@ -16,8 +16,16 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 @Composable
 internal fun DetailField(label: String, value: String, modifier: Modifier = Modifier) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
-        Text(text = label, style = MaterialTheme.typography.bodyMedium, color = AppTheme.colors.contentMuted)
-        Text(text = value, style = MaterialTheme.typography.bodyLarge, color = AppTheme.colors.content)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = AppTheme.colors.contentMuted,
+        )
+        Text(
+            text = value,
+            style = MaterialTheme.typography.bodyLarge,
+            color = AppTheme.colors.content,
+        )
     }
 }
 
@@ -25,6 +33,10 @@ internal fun DetailField(label: String, value: String, modifier: Modifier = Modi
 @Composable
 private fun DetailFieldPreview() {
     WalkLoggerTheme {
-        DetailField(label = "Date", value = "Tue 15 Sep", modifier = Modifier.padding(AppSpacing.lg))
+        DetailField(
+            label = "Date",
+            value = "Tue 15 Sep",
+            modifier = Modifier.padding(AppSpacing.lg),
+        )
     }
 }

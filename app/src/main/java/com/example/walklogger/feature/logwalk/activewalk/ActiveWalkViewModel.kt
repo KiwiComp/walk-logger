@@ -39,8 +39,6 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-
-
 /**
  * The walk in progress. Elapsed time is derived from the stored start time on every tick,
  * so it stays right after the app has been in the background or its process was killed.
@@ -153,8 +151,19 @@ class ActiveWalkViewModel @AssistedInject constructor(
     /** A null [value] removes the colour. */
     fun selectStoolColour(value: StoolColour?) = editStool { it.withColour(value) }
 
-    private fun editStool(edit: (Stool?) -> Stool?) =
-        stool.update { StoolEdit(edit(if (it != null) it.stool else uiState.value.stool)) }
+    private fun editStool(edit: (Stool?) -> Stool?) = stool.update {
+        StoolEdit(
+            edit(
+                if (it !=
+                    null
+                ) {
+                    it.stool
+                } else {
+                    uiState.value.stool
+                },
+            ),
+        )
+    }
 
     /** Stores the end time; the after-walk form then opens for the finished walk. */
     fun endWalk() {

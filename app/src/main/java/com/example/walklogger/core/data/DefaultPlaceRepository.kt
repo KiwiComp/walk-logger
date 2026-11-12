@@ -33,13 +33,16 @@ class DefaultPlaceRepository @Inject constructor(
         }
     }
 
-    override val locationPermissionRequested: Flow<Boolean> = preferences.locationPermissionRequested
+    override val locationPermissionRequested: Flow<Boolean> =
+        preferences.locationPermissionRequested
 
-    override suspend fun markLocationPermissionRequested() = preferences.setLocationPermissionRequested()
+    override suspend fun markLocationPermissionRequested() =
+        preferences.setLocationPermissionRequested()
 
     override val activeWalkLocation: Flow<WalkLocation?> = preferences.activeWalkLocation
 
-    override suspend fun saveActiveWalkLocation(location: WalkLocation) = preferences.setActiveWalkLocation(location)
+    override suspend fun saveActiveWalkLocation(location: WalkLocation) =
+        preferences.setActiveWalkLocation(location)
 
     override suspend fun clearActiveWalkLocation() = preferences.clearActiveWalkLocation()
 }

@@ -5,7 +5,9 @@ import androidx.compose.foundation.interaction.PressInteraction
 import androidx.compose.foundation.layout.padding
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
+import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.core.ui.theme.AppSpacing
@@ -21,8 +23,11 @@ fun AppPickerField(
     placeholder: String? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
+    val currentOnPress by rememberUpdatedState(onPress)
     LaunchedEffect(interactionSource) {
-        interactionSource.interactions.collect { if (it is PressInteraction.Release) onPress() }
+        interactionSource.interactions.collect {
+            if (it is PressInteraction.Release) currentOnPress()
+        }
     }
     AppTextField(
         value = value,
@@ -39,6 +44,7 @@ fun AppPickerField(
 @Composable
 private fun AppPickerFieldPreview() {
     WalkLoggerTheme {
-        AppPickerField(value = "17:40", label = "Start", onPress = {}, modifier = Modifier.padding(AppSpacing.lg))
+        AppPickerField(value = "17:40", label = "Start", onPress = {
+        }, modifier = Modifier.padding(AppSpacing.lg))
     }
 }

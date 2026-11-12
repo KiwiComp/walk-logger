@@ -46,8 +46,14 @@ internal fun WeatherConditionPicker(
                     .size(AppSize.chipHeight)
                     .clip(shape)
                     .background(if (isSelected) AppTheme.colors.action else AppTheme.colors.card)
-                    .border(1.dp, if (isSelected) AppTheme.colors.action else AppTheme.colors.outline, shape)
-                    .selectable(selected = isSelected, role = Role.RadioButton, onClick = { onSelect(condition) }),
+                    .border(
+                        1.dp,
+                        if (isSelected) AppTheme.colors.action else AppTheme.colors.outline,
+                        shape,
+                    )
+                    .selectable(selected = isSelected, role = Role.RadioButton, onClick = {
+                        onSelect(condition)
+                    }),
                 contentAlignment = Alignment.Center,
             ) {
                 Icon(

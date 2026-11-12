@@ -76,12 +76,14 @@ fun AppButton(
                 disabledContainerColor = AppTheme.colors.chip,
                 disabledContentColor = AppTheme.colors.contentMuted,
             )
+
             AppButtonStyle.Secondary -> ButtonDefaults.buttonColors(
                 containerColor = AppTheme.colors.card,
                 contentColor = AppTheme.colors.content,
                 disabledContainerColor = AppTheme.colors.chip,
                 disabledContentColor = AppTheme.colors.contentMuted,
             )
+
             AppButtonStyle.Tertiary -> ButtonDefaults.buttonColors(
                 containerColor = Color.Transparent,
                 contentColor = AppTheme.colors.onHeader,
@@ -91,7 +93,9 @@ fun AppButton(
         },
         border = when (style) {
             AppButtonStyle.Primary -> null
+
             AppButtonStyle.Secondary -> BorderStroke(1.dp, AppTheme.colors.outline)
+
             AppButtonStyle.Tertiary -> BorderStroke(
                 1.dp,
                 if (enabled) AppTheme.colors.outlineOnHeader else AppTheme.colors.onHeaderMuted,
@@ -125,8 +129,10 @@ private fun AppButtonPreview() {
     WalkLoggerTheme {
         Column(modifier = Modifier.padding(AppSpacing.lg)) {
             AppButton(text = "Save walk", onClick = {})
-            AppButton(text = "Save walk", onClick = {}, enabled = false, modifier = Modifier.padding(top = AppSpacing.lg))
-            AppButton(text = "Save walk", onClick = {}, loading = true, modifier = Modifier.padding(top = AppSpacing.lg))
+            AppButton(text = "Save walk", onClick = {
+            }, enabled = false, modifier = Modifier.padding(top = AppSpacing.lg))
+            AppButton(text = "Save walk", onClick = {
+            }, loading = true, modifier = Modifier.padding(top = AppSpacing.lg))
             AppButton(
                 text = "Save walk",
                 onClick = {},

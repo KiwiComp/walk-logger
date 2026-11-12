@@ -24,15 +24,20 @@ class DefaultDogRepository @Inject constructor(
     @param:Dispatcher(WalkLoggerDispatchers.IO) private val ioDispatcher: CoroutineDispatcher,
 ) : DogRepository {
 
-    override fun observeDogs(): Flow<List<Dog>> =
-        observeAllDogs().map { dogs -> dogs.filterNot { it.isDeleted } }
+    override fun observeDogs(): Flow<List<Dog>> = observeAllDogs().map { dogs ->
+        dogs.filterNot { it.isDeleted }
+    }
 
-    override fun observeAllDogs(): Flow<List<Dog>> =
-        dogDao.observeDogs().map { dogs -> dogs.map { it.toModel() } }
+    override fun observeAllDogs(): Flow<List<Dog>> = dogDao.observeDogs().map { dogs ->
+        dogs.map { it.toModel() }
+    }
 
     // Falls back to the first remaining dog so a stale or missing preference never hides a registered dog.
     override fun observeActiveDog(): Flow<Dog?> =
-        combine(observeAllDogs(), preferences.activeDogId) { dogs, activeId ->
+        combine(observeAllDogs(), preferences.activeDogId) {
+                dogs,
+                activeId,
+            ->
             dogs.find { it.id == activeId } ?: dogs.firstOrNull { !it.isDeleted }
         }
 
@@ -71,7 +76,7 @@ class DefaultDogRepository @Inject constructor(
                 breed = breed.trim(),
                 birthDate = birthDate?.toEpochDay(),
                 weightKg = weightKg,
-            )
+            ),
         )
     }
 
@@ -79,7 +84,13 @@ class DefaultDogRepository @Inject constructor(
         dogDao.setHidden(id = id)
         if (preferences.activeDogId.first() == id) {
             val next = observeDogs().first().firstOrNull()
-            if (next != null) preferences.setActiveDogId(next.id) else preferences.clearActiveDogId()
+            if (next !=
+                null
+            ) {
+                preferences.setActiveDogId(next.id)
+            } else {
+                preferences.clearActiveDogId()
+            }
         }
     }
 }

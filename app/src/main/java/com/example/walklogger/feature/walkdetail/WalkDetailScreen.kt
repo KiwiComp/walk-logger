@@ -1,6 +1,5 @@
 package com.example.walklogger.feature.walkdetail
 
-import com.example.walklogger.feature.logwalk.component.WeatherSummary
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
@@ -19,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
@@ -37,6 +37,7 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.FormSection
+import com.example.walklogger.feature.logwalk.component.WeatherSummary
 import com.example.walklogger.feature.logwalk.component.label
 import com.example.walklogger.feature.logwalk.component.labelRes
 import com.example.walklogger.feature.walkdetail.component.DetailField
@@ -48,13 +49,13 @@ import com.example.walklogger.feature.walkdetail.preview.WalkDetailPreviewData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 
-
 private val DateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE d MMM")
 private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
-private const val GridColumns = 2
-private const val DateWeight = 3f
-private const val TimeWeight = 2f
+private const val GRID_COLUMNS = 2
+private const val DATE_WEIGHT = 3f
+private const val TIME_WEIGHT = 2f
 
+@Suppress("ktlint:compose:parameter-naming")
 @Composable
 fun WalkDetailRoute(
     walkId: Long,
@@ -63,13 +64,16 @@ fun WalkDetailRoute(
     onDiscarded: () -> Unit,
     onNotFound: () -> Unit,
     modifier: Modifier = Modifier,
-    viewModel: WalkDetailViewModel = hiltViewModel<WalkDetailViewModel, WalkDetailViewModel.Factory> { it.create(walkId) },
+    viewModel: WalkDetailViewModel =
+        hiltViewModel<WalkDetailViewModel, WalkDetailViewModel.Factory> { it.create(walkId) },
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
+    val currentOnDiscarded by rememberUpdatedState(onDiscarded)
+    val currentOnNotFound by rememberUpdatedState(onNotFound)
     LaunchedEffect(uiState.isDiscarded, uiState.isNotFound) {
         when {
-            uiState.isDiscarded -> onDiscarded()
-            uiState.isNotFound -> onNotFound()
+            uiState.isDiscarded -> currentOnDiscarded()
+            uiState.isNotFound -> currentOnNotFound()
         }
     }
     WalkDetailScreen(
@@ -129,14 +133,18 @@ fun WalkDetailScreen(
                 HorizontalDivider(color = AppTheme.colors.outline)
                 DetailSection(
                     label = stringResource(R.string.log_past_walk_behaviour),
-                    hint = uiState.behaviourIssues.size.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.walk_detail_noted_count, it, it) },
+                    hint = uiState.behaviourIssues.size.takeIf {
+                        it > 0
+                    }?.let { pluralStringResource(R.plurals.walk_detail_noted_count, it, it) },
                 ) {
                     NotedGrid(labels = uiState.behaviourIssues.map { it.label() })
                 }
                 HorizontalDivider(color = AppTheme.colors.outline)
                 DetailSection(
                     label = stringResource(R.string.log_past_walk_medical),
-                    hint = uiState.medicalConcerns.size.takeIf { it > 0 }?.let { pluralStringResource(R.plurals.walk_detail_noted_count, it, it) },
+                    hint = uiState.medicalConcerns.size.takeIf {
+                        it > 0
+                    }?.let { pluralStringResource(R.plurals.walk_detail_noted_count, it, it) },
                 ) {
                     NotedGrid(labels = uiState.medicalConcerns.map { it.label() })
                 }
@@ -189,22 +197,24 @@ private fun WhenDetails(uiState: WalkDetailUiState) {
             DetailField(
                 label = stringResource(R.string.log_past_walk_date),
                 value = uiState.date?.format(DateFormatter).orEmpty(),
-                modifier = Modifier.weight(DateWeight),
+                modifier = Modifier.weight(DATE_WEIGHT),
             )
             DetailField(
                 label = stringResource(R.string.log_past_walk_start),
                 value = uiState.startTime?.format(TimeFormatter).orEmpty(),
-                modifier = Modifier.weight(TimeWeight),
+                modifier = Modifier.weight(TIME_WEIGHT),
             )
             DetailField(
                 label = stringResource(R.string.log_past_walk_end),
                 value = uiState.endTime?.format(TimeFormatter).orEmpty(),
-                modifier = Modifier.weight(TimeWeight),
+                modifier = Modifier.weight(TIME_WEIGHT),
             )
             DetailField(
                 label = stringResource(R.string.walk_detail_length),
-                value = uiState.durationMinutes?.let { stringResource(R.string.walk_duration_minutes, it) }.orEmpty(),
-                modifier = Modifier.weight(TimeWeight),
+                value = uiState.durationMinutes?.let {
+                    stringResource(R.string.walk_duration_minutes, it)
+                }.orEmpty(),
+                modifier = Modifier.weight(TIME_WEIGHT),
             )
         }
     }
@@ -213,23 +223,41 @@ private fun WhenDetails(uiState: WalkDetailUiState) {
 @Composable
 private fun WhoDetails(uiState: WalkDetailUiState) {
     Row(modifier = Modifier.padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xl)) {
-        FormSection(label = stringResource(R.string.log_past_walk_handler), modifier = Modifier.weight(1f)) {
+        FormSection(
+            label = stringResource(R.string.log_past_walk_handler),
+            modifier = Modifier.weight(1f),
+        ) {
             Text(
                 text = uiState.handlers.joinToString(),
                 style = MaterialTheme.typography.bodyLarge,
                 color = AppTheme.colors.content,
             )
         }
-        FormSection(label = stringResource(R.string.walk_detail_dog), modifier = Modifier.weight(1f)) {
+        FormSection(
+            label = stringResource(R.string.walk_detail_dog),
+            modifier = Modifier.weight(1f),
+        ) {
             Text(
                 text = uiState.dogName
-                    ?.let { if (uiState.isDogDeleted) stringResource(R.string.dog_name_deleted, it) else it }
+                    ?.let {
+                        if (uiState.isDogDeleted) {
+                            stringResource(
+                                R.string.dog_name_deleted,
+                                it,
+                            )
+                        } else {
+                            it
+                        }
+                    }
                     .orEmpty(),
                 style = MaterialTheme.typography.bodyLarge,
                 color = AppTheme.colors.content,
             )
         }
-        FormSection(label = stringResource(R.string.new_walk_equipment), modifier = Modifier.weight(1f)) {
+        FormSection(
+            label = stringResource(R.string.new_walk_equipment),
+            modifier = Modifier.weight(1f),
+        ) {
             Text(
                 text = uiState.equipment?.let { stringResource(it.labelRes) }.orEmpty(),
                 style = MaterialTheme.typography.bodyLarge,
@@ -257,18 +285,25 @@ private fun RatingDetails(uiState: WalkDetailUiState) {
 private fun StoolDetails(stool: Stool?) {
     DetailSection(label = stringResource(R.string.log_past_walk_stool)) {
         when {
-            stool == null -> DetailPlaceholder(text = stringResource(R.string.walk_detail_not_recorded))
-            !stool.passed -> DetailPlaceholder(text = stringResource(R.string.walk_detail_stool_none))
+            stool == null -> DetailPlaceholder(
+                text = stringResource(R.string.walk_detail_not_recorded),
+            )
+
+            !stool.passed -> DetailPlaceholder(
+                text = stringResource(R.string.walk_detail_stool_none),
+            )
+
             listOf(stool.quantity, stool.texture, stool.colour).all { it == null } ->
                 Text(
                     text = stringResource(R.string.stool_passed_yes),
                     style = MaterialTheme.typography.bodyLarge,
                     color = AppTheme.colors.content,
                 )
+
             else -> FlowRow(
                 horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
-                maxItemsInEachRow = GridColumns,
+                maxItemsInEachRow = GRID_COLUMNS,
             ) {
                 stool.quantity?.let {
                     DetailField(
@@ -294,7 +329,9 @@ private fun StoolDetails(stool: Stool?) {
 private fun OptionalRatingDetails(ratings: Map<OptionalRating, Int>) {
     DetailSection(
         label = stringResource(R.string.log_past_walk_optional_ratings),
-        hint = stringResource(R.string.log_past_walk_optional_ratings_scale).takeIf { ratings.isNotEmpty() },
+        hint = stringResource(R.string.log_past_walk_optional_ratings_scale).takeIf {
+            ratings.isNotEmpty()
+        },
     ) {
         if (ratings.isEmpty()) {
             DetailPlaceholder(text = stringResource(R.string.walk_detail_not_recorded))
@@ -340,7 +377,7 @@ private fun NotedGrid(labels: List<String>) {
         FlowRow(
             horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
             verticalArrangement = Arrangement.spacedBy(AppSpacing.lg),
-            maxItemsInEachRow = GridColumns,
+            maxItemsInEachRow = GRID_COLUMNS,
         ) {
             labels.forEach { NotedItem(label = it, modifier = Modifier.weight(1f)) }
         }
@@ -351,7 +388,8 @@ private fun NotedGrid(labels: List<String>) {
 @Composable
 private fun WalkDetailScreenPreview() {
     WalkLoggerTheme {
-        WalkDetailScreen(uiState = WalkDetailPreviewData.complete, onBack = {}, onEdit = {}, onDiscard = {})
+        WalkDetailScreen(uiState = WalkDetailPreviewData.complete, onBack = {
+        }, onEdit = {}, onDiscard = {})
     }
 }
 
@@ -359,6 +397,7 @@ private fun WalkDetailScreenPreview() {
 @Composable
 private fun WalkDetailScreenMinimalPreview() {
     WalkLoggerTheme {
-        WalkDetailScreen(uiState = WalkDetailPreviewData.minimal, onBack = {}, onEdit = {}, onDiscard = {})
+        WalkDetailScreen(uiState = WalkDetailPreviewData.minimal, onBack = {
+        }, onEdit = {}, onDiscard = {})
     }
 }

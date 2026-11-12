@@ -45,7 +45,15 @@ internal fun RatingScale(
             RatingCell(
                 value = value,
                 isSelected = isSelected,
-                onClick = { if (isSelected && onDeselect != null) onDeselect() else onRatingChange(value) },
+                onClick = {
+                    if (isSelected &&
+                        onDeselect != null
+                    ) {
+                        onDeselect()
+                    } else {
+                        onRatingChange(value)
+                    }
+                },
             )
         }
     }
@@ -60,7 +68,11 @@ private fun RowScope.RatingCell(value: Int, isSelected: Boolean, onClick: () -> 
             .aspectRatio(1f)
             .clip(shape)
             .background(if (isSelected) AppTheme.colors.action else AppTheme.colors.card)
-            .border(1.dp, if (isSelected) AppTheme.colors.action else AppTheme.colors.outline, shape)
+            .border(
+                1.dp,
+                if (isSelected) AppTheme.colors.action else AppTheme.colors.outline,
+                shape,
+            )
             .selectable(selected = isSelected, role = Role.RadioButton, onClick = onClick),
         contentAlignment = Alignment.Center,
     ) {

@@ -29,11 +29,11 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.log.WalkUiState
 import com.example.walklogger.feature.log.preview.LogPreviewData
 
-
 private val RatingBarWidth = 9.dp
 private val RatingBarHeight = 16.dp
+
 /** Every card reserves this many note lines so the timeline stays even; longer notes are cut with an ellipsis. */
-private const val NoteLines = 2
+private const val NOTE_LINES = 2
 
 /** One walk in the day's timeline: equipment chip, rating and note. Tapping it opens the walk for editing. */
 @Composable
@@ -60,8 +60,8 @@ internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier
             text = if (hasNote) walk.note else stringResource(R.string.calendar_no_description),
             style = MaterialTheme.typography.bodyLarge,
             color = if (hasNote) Color.Unspecified else AppTheme.colors.contentMuted,
-            minLines = NoteLines,
-            maxLines = NoteLines,
+            minLines = NOTE_LINES,
+            maxLines = NOTE_LINES,
             overflow = TextOverflow.Ellipsis,
         )
     }
@@ -69,12 +69,23 @@ internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier
 
 @Composable
 private fun RatingBar(rating: Int, max: Int = 7) {
-    Row(verticalAlignment = Alignment.CenterVertically, horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+    ) {
         repeat(max) { index ->
             Box(
                 Modifier
                     .size(width = RatingBarWidth, height = RatingBarHeight)
-                    .background(if (index < rating) AppTheme.colors.action else AppTheme.colors.outline),
+                    .background(
+                        if (index <
+                            rating
+                        ) {
+                            AppTheme.colors.action
+                        } else {
+                            AppTheme.colors.outline
+                        },
+                    ),
             )
         }
         Spacer(Modifier.width(AppSpacing.sm))
@@ -86,6 +97,7 @@ private fun RatingBar(rating: Int, max: Int = 7) {
 @Composable
 private fun WalkCardPreview() {
     WalkLoggerTheme {
-        WalkCard(walk = LogPreviewData.walk, onClick = {}, modifier = Modifier.padding(AppSpacing.lg))
+        WalkCard(walk = LogPreviewData.walk, onClick = {
+        }, modifier = Modifier.padding(AppSpacing.lg))
     }
 }

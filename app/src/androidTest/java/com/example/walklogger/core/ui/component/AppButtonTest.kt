@@ -25,15 +25,25 @@ class AppButtonTest {
 
     private val label = "Save walk"
 
-    private fun setButton(enabled: Boolean = true, loading: Boolean = false, onClick: () -> Unit = {}) {
+    private fun setButton(
+        enabled: Boolean = true,
+        loading: Boolean = false,
+        onClick: () -> Unit = {
+        },
+    ) {
         composeRule.setContent {
-            WalkLoggerTheme { AppButton(text = label, onClick = onClick, enabled = enabled, loading = loading) }
+            WalkLoggerTheme {
+                AppButton(text = label, onClick = onClick, enabled = enabled, loading = loading)
+            }
         }
     }
 
     private fun button() = composeRule.onNodeWithText(label)
 
-    private fun spinner() = composeRule.onNode(hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate), useUnmergedTree = true)
+    private fun spinner() = composeRule.onNode(
+        hasProgressBarRangeInfo(ProgressBarRangeInfo.Indeterminate),
+        useUnmergedTree = true,
+    )
 
     @Test
     fun showsLabelAndReportsClicks() {

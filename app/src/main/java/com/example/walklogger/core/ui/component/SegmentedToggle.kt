@@ -62,7 +62,11 @@ fun <T> SegmentedToggle(
     ) {
         options.forEachIndexed { index, option ->
             if (index > 0) {
-                Box(Modifier.width(DividerWidth).fillMaxHeight().background(AppTheme.colors.outline))
+                Box(
+                    Modifier.width(
+                        DividerWidth,
+                    ).fillMaxHeight().background(AppTheme.colors.outline),
+                )
             }
             Segment(
                 text = label(option),
@@ -75,7 +79,12 @@ fun <T> SegmentedToggle(
 }
 
 @Composable
-private fun RowScope.Segment(text: String, isSelected: Boolean, onClick: () -> Unit, size: SegmentedToggleSize) {
+private fun RowScope.Segment(
+    text: String,
+    isSelected: Boolean,
+    onClick: () -> Unit,
+    size: SegmentedToggleSize,
+) {
     Box(
         modifier = Modifier
             .weight(1f)

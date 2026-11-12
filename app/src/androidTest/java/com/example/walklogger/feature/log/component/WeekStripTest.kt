@@ -28,7 +28,6 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.runner.RunWith
 
-
 @RunWith(AndroidJUnit4::class)
 class WeekStripTest {
 
@@ -40,35 +39,46 @@ class WeekStripTest {
     private val english: Locale = Locale.ENGLISH
     private val swedish: Locale = Locale.forLanguageTag("sv")
 
-    private fun week(selected: LocalDate = today, withWalks: Set<LocalDate> = emptySet()) =
-        (0L until 7L).map { monday.plusDays(it) }.map { day ->
-            DayUiState(
-                date = day,
-                hasWalks = day in withWalks,
-                isSelected = day == selected,
-                isToday = day == today,
-                isEnabled = !day.isAfter(today),
-            )
-        }
+    private fun week(selected: LocalDate = today, withWalks: Set<LocalDate> = emptySet()) = (
+        0L until
+            7L
+        ).map { monday.plusDays(it) }.map { day ->
+        DayUiState(
+            date = day,
+            hasWalks = day in withWalks,
+            isSelected = day == selected,
+            isToday = day == today,
+            isEnabled = !day.isAfter(today),
+        )
+    }
 
     /** Renders the strip under [locale] so the test doesn't depend on the device language. */
     private fun setStrip(
         days: List<DayUiState>,
         locale: Locale = english,
-        onDaySelected: (LocalDate) -> Unit = {},
+        onDaySelect: (LocalDate) -> Unit = {},
     ) {
         composeRule.setContent {
-            val configuration = Configuration(LocalConfiguration.current).apply { setLocale(locale) }
+            val configuration = Configuration(LocalConfiguration.current).apply {
+                setLocale(locale)
+            }
             val context = LocalContext.current.createConfigurationContext(configuration)
-            CompositionLocalProvider(LocalConfiguration provides configuration, LocalContext provides context) {
-                WalkLoggerTheme { WeekStrip(days = days, onDaySelected = onDaySelected) }
+            CompositionLocalProvider(
+                LocalConfiguration provides configuration,
+                LocalContext provides context,
+            ) {
+                WalkLoggerTheme { WeekStrip(days = days, onDaySelect = onDaySelect) }
             }
         }
     }
 
     private fun localized(locale: Locale): Context {
         val base = InstrumentationRegistry.getInstrumentation().targetContext
-        return base.createConfigurationContext(Configuration(base.resources.configuration).apply { setLocale(locale) })
+        return base.createConfigurationContext(
+            Configuration(base.resources.configuration).apply {
+                setLocale(locale)
+            },
+        )
     }
 
     private fun LocalDate.description(locale: Locale = english): String =
@@ -102,7 +112,7 @@ class WeekStripTest {
     fun futureDaysAreDisabledAndIgnoreTaps() {
         val sunday = today.plusDays(1)
         var selected: LocalDate? = null
-        setStrip(week(), onDaySelected = { selected = it })
+        setStrip(week(), onDaySelect = { selected = it })
 
         day(sunday).assertIsNotEnabled().performClick()
 
@@ -114,7 +124,7 @@ class WeekStripTest {
     fun tappingADayReportsItsDate() {
         val friday = today.minusDays(1)
         var selected: LocalDate? = null
-        setStrip(week(), onDaySelected = { selected = it })
+        setStrip(week(), onDaySelect = { selected = it })
 
         day(friday).performClick()
 
@@ -146,8 +156,12 @@ class WeekStripTest {
         setStrip(week(withWalks = setOf(tuesday)), locale = swedish)
 
         composeRule.onNodeWithContentDescription("Idag, lördag 12 september").assertIsSelected()
-        composeRule.onNodeWithContentDescription("tisdag 8 september").assert(hasStateDescription("Har promenader"))
-        composeRule.onNodeWithContentDescription("måndag 7 september").assert(hasStateDescription("Inga promenader"))
+        composeRule.onNodeWithContentDescription(
+            "tisdag 8 september",
+        ).assert(hasStateDescription("Har promenader"))
+        composeRule.onNodeWithContentDescription(
+            "måndag 7 september",
+        ).assert(hasStateDescription("Inga promenader"))
         composeRule.onNode(hasText("MÅN")).assertExists()
     }
 }

@@ -38,9 +38,16 @@ class DefaultDogRepositoryTest {
 
     @Before
     fun setUp() {
-        database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), WalkLoggerDatabase::class.java).build()
+        database =
+            Room.inMemoryDatabaseBuilder(
+                ApplicationProvider.getApplicationContext(),
+                WalkLoggerDatabase::class.java,
+            ).build()
         dataStoreScope = CoroutineScope(Dispatchers.IO + SupervisorJob())
-        dataStore = PreferenceDataStoreFactory.create(scope = dataStoreScope) { folder.newFile("prefs.preferences_pb") }
+        dataStore =
+            PreferenceDataStoreFactory.create(scope = dataStoreScope) {
+                folder.newFile("prefs.preferences_pb")
+            }
         preferences = UserPreferencesDataSource(dataStore)
         repository = DefaultDogRepository(database.dogDao(), preferences, Dispatchers.IO)
     }
@@ -60,8 +67,18 @@ class DefaultDogRepositoryTest {
     @Test
     fun registerDog_storesTrimmedDetailsInRegistrationOrder() = runBlocking {
         val birthDate = LocalDate.of(2023, 9, 2)
-        val sixtenId = repository.registerDog(name = " Sixten ", breed = " Border collie ", birthDate = birthDate, weightKg = 18.0)
-        val miraId = repository.registerDog(name = "Mira", breed = "", birthDate = null, weightKg = null)
+        val sixtenId = repository.registerDog(
+            name = " Sixten ",
+            breed = " Border collie ",
+            birthDate = birthDate,
+            weightKg = 18.0,
+        )
+        val miraId = repository.registerDog(
+            name = "Mira",
+            breed = "",
+            birthDate = null,
+            weightKg = null,
+        )
 
         val dogs = repository.observeDogs().first()
         assertEquals(listOf(sixtenId, miraId), dogs.map { it.id })
@@ -75,7 +92,12 @@ class DefaultDogRepositoryTest {
 
     @Test
     fun firstRegisteredDogBecomesActive_laterOnesDoNot() = runBlocking {
-        val sixtenId = repository.registerDog(name = "Sixten", breed = "", birthDate = null, weightKg = null)
+        val sixtenId = repository.registerDog(
+            name = "Sixten",
+            breed = "",
+            birthDate = null,
+            weightKg = null,
+        )
         repository.registerDog(name = "Mira", breed = "", birthDate = null, weightKg = null)
 
         assertEquals(sixtenId, repository.observeActiveDog().first()?.id)
@@ -85,7 +107,12 @@ class DefaultDogRepositoryTest {
     @Test
     fun setActiveDog_switchesActiveDog() = runBlocking {
         repository.registerDog(name = "Sixten", breed = "", birthDate = null, weightKg = null)
-        val miraId = repository.registerDog(name = "Mira", breed = "", birthDate = null, weightKg = null)
+        val miraId = repository.registerDog(
+            name = "Mira",
+            breed = "",
+            birthDate = null,
+            weightKg = null,
+        )
 
         repository.setActiveDog(miraId)
 
@@ -104,8 +131,18 @@ class DefaultDogRepositoryTest {
 
     @Test
     fun deleteDog_keepsDogAsDeletedAndHandsOverActive() = runBlocking {
-        val sixtenId = repository.registerDog(name = "Sixten", breed = "", birthDate = null, weightKg = null)
-        val miraId = repository.registerDog(name = "Mira", breed = "", birthDate = null, weightKg = null)
+        val sixtenId = repository.registerDog(
+            name = "Sixten",
+            breed = "",
+            birthDate = null,
+            weightKg = null,
+        )
+        val miraId = repository.registerDog(
+            name = "Mira",
+            breed = "",
+            birthDate = null,
+            weightKg = null,
+        )
 
         repository.deleteDog(sixtenId)
 
@@ -116,7 +153,12 @@ class DefaultDogRepositoryTest {
 
     @Test
     fun deleteLastDog_clearsActiveDog() = runBlocking {
-        val sixtenId = repository.registerDog(name = "Sixten", breed = "", birthDate = null, weightKg = null)
+        val sixtenId = repository.registerDog(
+            name = "Sixten",
+            breed = "",
+            birthDate = null,
+            weightKg = null,
+        )
 
         repository.deleteDog(sixtenId)
 
@@ -126,7 +168,12 @@ class DefaultDogRepositoryTest {
 
     @Test
     fun deletedDog_canBeSelectedAsActive() = runBlocking {
-        val sixtenId = repository.registerDog(name = "Sixten", breed = "", birthDate = null, weightKg = null)
+        val sixtenId = repository.registerDog(
+            name = "Sixten",
+            breed = "",
+            birthDate = null,
+            weightKg = null,
+        )
         repository.deleteDog(sixtenId)
 
         repository.setActiveDog(sixtenId)
@@ -138,11 +185,21 @@ class DefaultDogRepositoryTest {
 
     @Test
     fun registerDog_takesOverFromDeletedActiveDog() = runBlocking {
-        val sixtenId = repository.registerDog(name = "Sixten", breed = "", birthDate = null, weightKg = null)
+        val sixtenId = repository.registerDog(
+            name = "Sixten",
+            breed = "",
+            birthDate = null,
+            weightKg = null,
+        )
         repository.deleteDog(sixtenId)
         repository.setActiveDog(sixtenId)
 
-        val miraId = repository.registerDog(name = "Mira", breed = "", birthDate = null, weightKg = null)
+        val miraId = repository.registerDog(
+            name = "Mira",
+            breed = "",
+            birthDate = null,
+            weightKg = null,
+        )
 
         assertEquals(miraId, repository.observeActiveDog().first()?.id)
     }

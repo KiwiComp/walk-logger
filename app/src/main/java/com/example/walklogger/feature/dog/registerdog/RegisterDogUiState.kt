@@ -25,8 +25,10 @@ data class RegisterDogUiState(
     val isWeightInvalid: Boolean = weight.isNotBlank() && weightKg == null
 
     val canSave: Boolean =
-        name.isNotBlank() && !isWeightInvalid && !isLoading && !isSaving && !isSaved && !isDeleting && !isDeleted
+        name.isNotBlank() && !isWeightInvalid && !isLoading && !isSaving && !isSaved &&
+            !isDeleting && !isDeleted
 
     val canDelete: Boolean =
-        isEditing && !isLoading && !isSaving && !isSaved && !isDeleting && !isDeleted && !hasActiveWalk
+        isEditing && !isLoading && !isSaving && !isSaved && !isDeleting && !isDeleted &&
+            !hasActiveWalk
 }

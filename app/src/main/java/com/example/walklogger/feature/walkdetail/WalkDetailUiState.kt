@@ -1,15 +1,14 @@
 package com.example.walklogger.feature.walkdetail
 
-import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.model.WalkWeather
 import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
-
 
 data class WalkDetailUiState(
     /** True until the walk has been read; every other field is empty meanwhile. */
@@ -35,7 +34,13 @@ data class WalkDetailUiState(
     val isDiscarded: Boolean = false,
 ) {
     val durationMinutes: Int? =
-        if (startTime != null && endTime != null) Duration.between(startTime, endTime).toMinutes().toInt() else null
+        if (startTime != null &&
+            endTime != null
+        ) {
+            Duration.between(startTime, endTime).toMinutes().toInt()
+        } else {
+            null
+        }
 
     val canEdit: Boolean = !isLoading && !isDogDeleted
 

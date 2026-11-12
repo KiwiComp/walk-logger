@@ -36,7 +36,6 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 import kotlinx.coroutines.launch
 
-
 @Composable
 fun LogRoute(
     onAddWalk: (LocalDate) -> Unit,
@@ -50,16 +49,23 @@ fun LogRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val scope = rememberCoroutineScope()
     val noDogMessage = stringResource(
-        if (uiState.isActiveDogDeleted) R.string.log_deleted_dog_message else R.string.log_no_dog_message,
+        if (uiState.isActiveDogDeleted) {
+            R.string.log_deleted_dog_message
+        } else {
+            R.string.log_no_dog_message
+        },
     )
     val noDogAction = stringResource(R.string.log_no_dog_action)
     LogScreen(
         uiState = uiState,
-        onDaySelected = viewModel::selectDay,
+        onDaySelect = viewModel::selectDay,
         onAddWalk = {
             if (!uiState.canAddWalk) {
                 scope.launch {
-                    val result = snackbarHostState.showSnackbar(message = noDogMessage, actionLabel = noDogAction)
+                    val result = snackbarHostState.showSnackbar(
+                        message = noDogMessage,
+                        actionLabel = noDogAction,
+                    )
                     if (result == SnackbarResult.ActionPerformed) onGoToDogs()
                 }
             } else if (uiState.canStartLiveWalk) {
@@ -76,7 +82,7 @@ fun LogRoute(
 @Composable
 fun LogScreen(
     uiState: LogUiState,
-    onDaySelected: (LocalDate) -> Unit,
+    onDaySelect: (LocalDate) -> Unit,
     onAddWalk: () -> Unit,
     onWalkClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
@@ -86,10 +92,12 @@ fun LogScreen(
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(R.string.log_title),
-            actions = { DogBadge(name = uiState.activeDogName, isDeleted = uiState.isActiveDogDeleted) },
+            actions = {
+                DogBadge(name = uiState.activeDogName, isDeleted = uiState.isActiveDogDeleted)
+            },
         ) {
             Spacer(Modifier.height(AppSpacing.xl))
-            WeekStrip(days = uiState.week, onDaySelected = onDaySelected)
+            WeekStrip(days = uiState.week, onDaySelect = onDaySelect)
         }
 
         Column(
@@ -99,8 +107,17 @@ fun LogScreen(
                 .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
         ) {
             DayHeading(
-                title = uiState.selectedDate.format(dayHeadingFormatter).replaceFirstChar { it.titlecase(locale) },
-                summary = if (uiState.walks.isEmpty()) null else walkSummary(uiState.walks.size, uiState.averageRating),
+                title = uiState.selectedDate.format(dayHeadingFormatter).replaceFirstChar {
+                    it.titlecase(locale)
+                },
+                summary = if (uiState.walks.isEmpty()) {
+                    null
+                } else {
+                    walkSummary(
+                        uiState.walks.size,
+                        uiState.averageRating,
+                    )
+                },
             )
             Spacer(Modifier.height(AppSpacing.lg))
             if (uiState.walks.isNotEmpty()) {
@@ -109,7 +126,7 @@ fun LogScreen(
             AddWalkButton(
                 dayLabel = uiState.selectedDate.dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
                 onClick = onAddWalk,
-                modifier = Modifier.padding(top = AppSpacing.lg)
+                modifier = Modifier.padding(top = AppSpacing.lg),
             )
         }
     }
@@ -121,7 +138,7 @@ private fun LogScreenPreview() {
     WalkLoggerTheme {
         LogScreen(
             uiState = LogPreviewData.uiState,
-            onDaySelected = {},
+            onDaySelect = {},
             onAddWalk = {},
             onWalkClick = {},
         )
@@ -134,7 +151,7 @@ private fun LogScreenEmptyPreview() {
     WalkLoggerTheme {
         LogScreen(
             uiState = LogPreviewData.uiState.copy(walks = emptyList()),
-            onDaySelected = {},
+            onDaySelect = {},
             onAddWalk = {},
             onWalkClick = {},
         )

@@ -24,9 +24,13 @@ class DefaultBehaviourIssueRepositoryTest {
 
     @Before
     fun setUp() {
-        database = Room.inMemoryDatabaseBuilder(ApplicationProvider.getApplicationContext(), WalkLoggerDatabase::class.java)
-            .addCallback(WalkLoggerDatabase.SeedCallback())
-            .build()
+        database =
+            Room.inMemoryDatabaseBuilder(
+                ApplicationProvider.getApplicationContext(),
+                WalkLoggerDatabase::class.java,
+            )
+                .addCallback(WalkLoggerDatabase.SeedCallback())
+                .build()
         repository = DefaultBehaviourIssueRepository(database.behaviourIssueDao(), Dispatchers.IO)
     }
 

@@ -13,7 +13,8 @@ class LocationPermissionUseCase @Inject constructor(
     fun hasPermission(): Boolean = locationProvider.hasPermission()
 
     /** False once the app has asked; after that a denied permission falls back to the saved place. */
-    suspend fun shouldRequest(): Boolean = !hasPermission() && !placeRepository.locationPermissionRequested.first()
+    suspend fun shouldRequest(): Boolean =
+        !hasPermission() && !placeRepository.locationPermissionRequested.first()
 
     suspend fun markRequested() = placeRepository.markLocationPermissionRequested()
 }

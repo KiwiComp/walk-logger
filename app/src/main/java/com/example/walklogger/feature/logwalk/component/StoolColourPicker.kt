@@ -28,7 +28,7 @@ import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
-private const val SwatchesPerRow = 5
+private const val SWATCHES_PER_ROW = 5
 private val RingWidth = 2.dp
 private val RingGap = 3.dp
 
@@ -49,7 +49,7 @@ internal fun StoolColourPicker(
             modifier = Modifier.fillMaxWidth().selectableGroup(),
             horizontalArrangement = Arrangement.SpaceBetween,
             verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
-            maxItemsInEachRow = SwatchesPerRow,
+            maxItemsInEachRow = SWATCHES_PER_ROW,
         ) {
             StoolColour.entries.forEach { colour ->
                 val isSelected = colour == selected
@@ -58,7 +58,17 @@ internal fun StoolColourPicker(
                     modifier = Modifier
                         .size(AppSize.chipHeight)
                         .clip(CircleShape)
-                        .then(if (isSelected) Modifier.border(RingWidth, style.action, CircleShape) else Modifier)
+                        .then(
+                            if (isSelected) {
+                                Modifier.border(
+                                    RingWidth,
+                                    style.action,
+                                    CircleShape,
+                                )
+                            } else {
+                                Modifier
+                            },
+                        )
                         .selectable(
                             selected = isSelected,
                             role = Role.RadioButton,

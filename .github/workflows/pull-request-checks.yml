@@ -1,4 +1,5 @@
-# Mirrors checks 1–3 of .claude/skills/verify/SKILL.md; instrumented tests live in instrumented-tests.yml.
+# Mirrors checks 2–5 of .claude/skills/verify/SKILL.md (check only, never spotlessApply);
+# instrumented tests live in instrumented-tests.yml.
 name: Pull request checks
 
 on:
@@ -16,7 +17,7 @@ permissions:
 
 jobs:
   build:
-    name: Build, unit tests and lint
+    name: Style, build, unit tests and lint
     runs-on: ubuntu-latest
     timeout-minutes: 30
     steps:
@@ -32,8 +33,8 @@ jobs:
         with:
           validate-wrappers: true
 
-      - name: Build, test and lint
-        run: ./gradlew --continue assembleDebug testDebugUnitTest lintDebug
+      - name: Style check, build, test and lint
+        run: ./gradlew --continue spotlessCheck assembleDebug testDebugUnitTest lintDebug
 
       - name: Upload reports
         if: always()

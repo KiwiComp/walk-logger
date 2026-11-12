@@ -10,12 +10,16 @@ class LabelsTest {
 
     @Test
     fun `every seeded behaviour issue has a localised label`() {
-        DefaultBehaviourIssues.keys.forEach { key -> assertNotNull(key, behaviourIssueLabelRes(key)) }
+        DefaultBehaviourIssues.keys.forEach { key ->
+            assertNotNull(key, behaviourIssueLabelRes(key))
+        }
     }
 
     @Test
     fun `every seeded medical concern has a localised label`() {
-        DefaultMedicalConcerns.keys.forEach { key -> assertNotNull(key, medicalConcernLabelRes(key)) }
+        DefaultMedicalConcerns.keys.forEach { key ->
+            assertNotNull(key, medicalConcernLabelRes(key))
+        }
     }
 
     @Test

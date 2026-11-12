@@ -21,7 +21,7 @@ import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormState
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 
-private const val NotesMinLines = 3
+private const val NOTES_MIN_LINES = 3
 
 /** The sections the after-walk and past-walk forms share, from equipment to notes. */
 @Composable
@@ -52,10 +52,10 @@ internal fun WalkFormContent(
         }
         StoolSection(
             stool = form.stool,
-            onPassedSelected = actions::selectStoolPassed,
-            onQuantitySelected = actions::selectStoolQuantity,
-            onTextureSelected = actions::selectStoolTexture,
-            onColourSelected = actions::selectStoolColour,
+            onPassedSelect = actions::selectStoolPassed,
+            onQuantitySelect = actions::selectStoolQuantity,
+            onTextureSelect = actions::selectStoolTexture,
+            onColourSelect = actions::selectStoolColour,
             onClear = actions::clearStool,
             expanded = form.isStoolExpanded,
             onFold = actions::foldStool,
@@ -75,7 +75,7 @@ internal fun WalkFormContent(
             expanded = form.isBehaviourIssuesExpanded,
             onToggle = actions::toggleBehaviourIssuesExpanded,
             onClear = actions::clearBehaviourIssues,
-            onIssueToggled = actions::toggleBehaviourIssue,
+            onIssueToggle = actions::toggleBehaviourIssue,
             onAddIssue = { showAddIssue = true },
         )
         MedicalSection(
@@ -84,7 +84,7 @@ internal fun WalkFormContent(
             expanded = form.isMedicalConcernsExpanded,
             onToggle = actions::toggleMedicalConcernsExpanded,
             onClear = actions::clearMedicalConcerns,
-            onConcernToggled = actions::toggleMedicalConcern,
+            onConcernToggle = actions::toggleMedicalConcern,
             onAddConcern = { showAddConcern = true },
         )
         FormSection(label = stringResource(R.string.log_past_walk_notes)) {
@@ -93,7 +93,7 @@ internal fun WalkFormContent(
                 onValueChange = actions::setNotes,
                 placeholder = stringResource(R.string.log_past_walk_notes_placeholder),
                 singleLine = false,
-                minLines = NotesMinLines,
+                minLines = NOTES_MIN_LINES,
             )
         }
     }

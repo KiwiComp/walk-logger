@@ -11,7 +11,6 @@ import com.example.walklogger.feature.logwalk.pastwalk.LogPastWalkRoute
 import java.time.LocalDate
 import kotlinx.serialization.Serializable
 
-
 /** [epochDay] is the day chosen on the log screen, see [java.time.LocalDate.toEpochDay]. */
 @Serializable
 data class NewWalkDestination(val epochDay: Long)
@@ -31,7 +30,8 @@ data class ActiveWalkDestination(val walkId: Long)
 @Serializable
 data class FinishWalkDestination(val walkId: Long)
 
-fun NavController.navigateToNewWalk(date: LocalDate) = navigate(NewWalkDestination(epochDay = date.toEpochDay()))
+fun NavController.navigateToNewWalk(date: LocalDate) =
+    navigate(NewWalkDestination(epochDay = date.toEpochDay()))
 
 /** Replaces the new-walk form, so back from the timer never lands on it. */
 fun NavController.navigateToActiveWalk(walkId: Long) = navigate(ActiveWalkDestination(walkId)) {

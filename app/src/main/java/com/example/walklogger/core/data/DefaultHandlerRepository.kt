@@ -23,7 +23,9 @@ class DefaultHandlerRepository @Inject constructor(
     override suspend fun addHandler(name: String): String = withContext(ioDispatcher) {
         val trimmed = name.trim()
         require(trimmed.isNotEmpty()) { "handler name must not be blank" }
-        val existing = handlerDao.observeHandlerNames().first().find { it.equals(trimmed, ignoreCase = true) }
+        val existing = handlerDao.observeHandlerNames().first().find {
+            it.equals(trimmed, ignoreCase = true)
+        }
         existing ?: trimmed.also { handlerDao.insertHandler(HandlerEntity(name = it)) }
     }
 }

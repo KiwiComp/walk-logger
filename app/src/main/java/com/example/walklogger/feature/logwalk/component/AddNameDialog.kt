@@ -18,7 +18,12 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /** Asks for a single name. [onConfirm] receives the untrimmed input; blank input can't be confirmed. */
 @Composable
-internal fun AddNameDialog(title: String, label: String, onConfirm: (String) -> Unit, onDismiss: () -> Unit) {
+internal fun AddNameDialog(
+    title: String,
+    label: String,
+    onConfirm: (String) -> Unit,
+    onDismiss: () -> Unit,
+) {
     var name by rememberSaveable { mutableStateOf("") }
     AlertDialog(
         onDismissRequest = onDismiss,
@@ -49,6 +54,7 @@ internal fun AddNameDialog(title: String, label: String, onConfirm: (String) -> 
 @Composable
 private fun AddNameDialogPreview() {
     WalkLoggerTheme {
-        AddNameDialog(title = "Who else is walking?", label = "Name", onConfirm = {}, onDismiss = {})
+        AddNameDialog(title = "Who else is walking?", label = "Name", onConfirm = {
+        }, onDismiss = {})
     }
 }

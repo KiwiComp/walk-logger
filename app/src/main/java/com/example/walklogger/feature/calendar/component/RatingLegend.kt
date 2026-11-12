@@ -34,7 +34,9 @@ internal fun RatingLegend(modifier: Modifier = Modifier) {
         )
         Spacer(Modifier.width(AppSpacing.sm))
         Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
-            AppTheme.colors.ratingTints.forEach { tint -> Box(Modifier.size(SwatchSize).background(tint)) }
+            AppTheme.colors.ratingTints.forEach { tint ->
+                Box(Modifier.size(SwatchSize).background(tint))
+            }
         }
         Spacer(Modifier.width(AppSpacing.sm))
         Text(

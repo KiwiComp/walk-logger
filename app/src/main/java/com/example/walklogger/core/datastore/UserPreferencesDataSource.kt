@@ -10,16 +10,14 @@ import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Place
 import com.example.walklogger.core.model.WalkLocation
-import kotlinx.coroutines.flow.Flow
-import kotlinx.coroutines.flow.map
 import javax.inject.Inject
 import javax.inject.Singleton
+import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.map
 
 /** Small user preferences that don't belong in a Room table. */
 @Singleton
-class UserPreferencesDataSource @Inject constructor(
-    private val dataStore: DataStore<Preferences>,
-) {
+class UserPreferencesDataSource @Inject constructor(private val dataStore: DataStore<Preferences>) {
     val activeDogId: Flow<Long?> = dataStore.data.map { it[ACTIVE_DOG_ID] }
 
     suspend fun setActiveDogId(id: Long) {
@@ -35,19 +33,32 @@ class UserPreferencesDataSource @Inject constructor(
         val name = prefs[WEATHER_PLACE_NAME] ?: return@map null
         val latitude = prefs[WEATHER_PLACE_LATITUDE] ?: return@map null
         val longitude = prefs[WEATHER_PLACE_LONGITUDE] ?: return@map null
-        Place(name = name, region = prefs[WEATHER_PLACE_REGION], coordinates = Coordinates(latitude, longitude))
+        Place(
+            name = name,
+            region = prefs[WEATHER_PLACE_REGION],
+            coordinates = Coordinates(latitude, longitude),
+        )
     }
 
     suspend fun setWeatherPlace(place: Place) {
         dataStore.edit {
             it[WEATHER_PLACE_NAME] = place.name
-            if (place.region != null) it[WEATHER_PLACE_REGION] = place.region else it.remove(WEATHER_PLACE_REGION)
+            if (place.region !=
+                null
+            ) {
+                it[WEATHER_PLACE_REGION] = place.region
+            } else {
+                it.remove(WEATHER_PLACE_REGION)
+            }
             it[WEATHER_PLACE_LATITUDE] = place.coordinates.latitude
             it[WEATHER_PLACE_LONGITUDE] = place.coordinates.longitude
         }
     }
 
-    val locationPermissionRequested: Flow<Boolean> = dataStore.data.map { it[LOCATION_PERMISSION_REQUESTED] ?: false }
+    val locationPermissionRequested: Flow<Boolean> = dataStore.data.map {
+        it[LOCATION_PERMISSION_REQUESTED]
+            ?: false
+    }
 
     suspend fun setLocationPermissionRequested() {
         dataStore.edit { it[LOCATION_PERMISSION_REQUESTED] = true }

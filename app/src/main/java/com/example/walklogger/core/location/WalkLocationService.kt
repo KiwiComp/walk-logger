@@ -30,7 +30,8 @@ class WalkLocationService : Service() {
 
     @Inject lateinit var captureWalkLocation: CaptureWalkLocationUseCase
 
-    @Inject @Dispatcher(WalkLoggerDispatchers.Default)
+    @Inject
+    @Dispatcher(WalkLoggerDispatchers.Default)
     lateinit var defaultDispatcher: CoroutineDispatcher
 
     private val scope by lazy { CoroutineScope(SupervisorJob() + defaultDispatcher) }
@@ -39,7 +40,12 @@ class WalkLocationService : Service() {
 
     override fun onStartCommand(intent: Intent?, flags: Int, startId: Int): Int {
         try {
-            ServiceCompat.startForeground(this, NOTIFICATION_ID, notification(), ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION)
+            ServiceCompat.startForeground(
+                this,
+                NOTIFICATION_ID,
+                notification(),
+                ServiceInfo.FOREGROUND_SERVICE_TYPE_LOCATION,
+            )
         } catch (revoked: SecurityException) {
             // Location permission was revoked after the service was requested.
             stopSelf(startId)

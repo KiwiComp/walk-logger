@@ -17,7 +17,17 @@ data class WalkWeather(
     val temperatureBand: TemperatureBand? get() = temperatureCelsius?.let(TemperatureBand::of)
 
     val isEmpty: Boolean
-        get() = listOf(condition, temperatureCelsius, rainMm, snowfallCm, windSpeedMs, windGustsMs).all { it == null }
+        get() = listOf(
+            condition,
+            temperatureCelsius,
+            rainMm,
+            snowfallCm,
+            windSpeedMs,
+            windGustsMs,
+        ).all {
+            it ==
+                null
+        }
 }
 
 enum class WeatherCondition {
