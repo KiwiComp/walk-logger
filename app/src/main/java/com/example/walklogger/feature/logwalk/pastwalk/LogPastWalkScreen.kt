@@ -34,6 +34,8 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.WalkFormActions
+import com.example.walklogger.feature.logwalk.WeatherStatus
+import com.example.walklogger.feature.logwalk.component.LocationPermissionRequest
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
 import com.example.walklogger.feature.logwalk.component.FormSection
 import com.example.walklogger.feature.logwalk.component.SelectableChip
@@ -64,6 +66,10 @@ fun LogPastWalkRoute(
             uiState.isNotFound -> onNotFound()
         }
     }
+    LocationPermissionRequest(
+        shouldRequest = uiState.form.shouldRequestLocationPermission,
+        onResult = viewModel.formActions::onLocationPermissionResult,
+    )
     LogPastWalkScreen(
         uiState = uiState,
         formActions = viewModel.formActions,
@@ -212,10 +218,10 @@ private fun LogPastWalkScreenEmptyPreview() {
             endTime = null,
             selectedHandlers = emptySet(),
             form = walk.form.copy(
-                rain = null,
-                temperature = null,
-                wind = null,
-                snow = null,
+                temperatureInput = "",
+                condition = null,
+                weatherStatus = WeatherStatus.IDLE,
+                isWeatherExpanded = false,
                 selectedBehaviourIssueIds = emptySet(),
                 isBehaviourIssuesExpanded = false,
                 selectedMedicalConcernIds = emptySet(),

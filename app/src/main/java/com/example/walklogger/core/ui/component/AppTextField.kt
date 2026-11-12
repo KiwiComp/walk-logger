@@ -6,6 +6,7 @@ import androidx.compose.foundation.relocation.bringIntoViewRequester
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.OutlinedTextField
@@ -53,6 +54,7 @@ fun AppTextField(
     singleLine: Boolean = true,
     minLines: Int = 1,
     keyboardOptions: KeyboardOptions = KeyboardOptions(capitalization = KeyboardCapitalization.Sentences),
+    keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource? = null,
 ) {
     val colors = when (style) {
@@ -94,6 +96,7 @@ fun AppTextField(
             singleLine = singleLine,
             minLines = minLines,
             keyboardOptions = keyboardOptions,
+            keyboardActions = keyboardActions,
             interactionSource = interactionSource,
             shape = MaterialTheme.shapes.extraSmall,
             textStyle = MaterialTheme.typography.bodyLarge,

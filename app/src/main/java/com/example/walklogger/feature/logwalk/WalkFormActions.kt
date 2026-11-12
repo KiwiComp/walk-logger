@@ -4,13 +4,11 @@ import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
-import com.example.walklogger.core.model.Rain
-import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.Place
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
-import com.example.walklogger.core.model.Temperature
-import com.example.walklogger.core.model.Wind
+import com.example.walklogger.core.model.WeatherCondition
 
 /** The events of the shared walk form; all the UI can reach of [WalkFormEditor]. */
 interface WalkFormActions {
@@ -34,11 +32,20 @@ interface WalkFormActions {
 
     fun selectEquipment(value: Equipment)
 
-    fun selectRain(value: Rain)
-    fun selectTemperature(value: Temperature)
-    fun selectWind(value: Wind)
-    fun selectSnow(value: Snow)
+    fun setTemperature(text: String)
+
+    /** Picking the selected condition again removes it. */
+    fun selectCondition(value: WeatherCondition)
+    fun fetchWeather()
+    fun onLocationPermissionResult(granted: Boolean)
+    fun openPlaceSearch()
+    fun searchPlaces(query: String)
+
+    /** Saves [place] as the fallback location and fetches the weather for it. */
+    fun selectPlace(place: Place)
+    fun closePlaceSearch()
     fun toggleWeather()
+    fun toggleWeatherEditing()
     fun clearWeather()
 
     fun toggleBehaviourIssue(issue: BehaviourIssue)

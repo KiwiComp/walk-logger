@@ -5,11 +5,15 @@ import com.example.walklogger.core.data.DefaultBehaviourIssueRepository
 import com.example.walklogger.core.data.DefaultDogRepository
 import com.example.walklogger.core.data.DefaultHandlerRepository
 import com.example.walklogger.core.data.DefaultMedicalConcernRepository
+import com.example.walklogger.core.data.DefaultPlaceRepository
 import com.example.walklogger.core.data.DefaultWalkRepository
+import com.example.walklogger.core.data.DefaultWeatherRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
+import com.example.walklogger.core.data.PlaceRepository
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.data.WeatherRepository
 import dagger.Binds
 import dagger.Module
 import dagger.hilt.InstallIn
@@ -32,4 +36,10 @@ abstract class DataModule {
 
     @Binds
     abstract fun bindsMedicalConcernRepository(impl: DefaultMedicalConcernRepository): MedicalConcernRepository
+
+    @Binds
+    abstract fun bindsWeatherRepository(impl: DefaultWeatherRepository): WeatherRepository
+
+    @Binds
+    abstract fun bindsPlaceRepository(impl: DefaultPlaceRepository): PlaceRepository
 }

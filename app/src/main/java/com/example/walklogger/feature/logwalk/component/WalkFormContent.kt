@@ -68,19 +68,7 @@ internal fun WalkFormContent(
             onClear = actions::clearOptionalRatings,
             onRatingChange = actions::setOptionalRating,
         )
-        WeatherSection(
-            rain = form.rain,
-            temperature = form.temperature,
-            wind = form.wind,
-            snow = form.snow,
-            expanded = form.isWeatherExpanded,
-            onToggle = actions::toggleWeather,
-            onClear = actions::clearWeather,
-            onRainSelected = actions::selectRain,
-            onTemperatureSelected = actions::selectTemperature,
-            onWindSelected = actions::selectWind,
-            onSnowSelected = actions::selectSnow,
-        )
+        WeatherSection(form = form, actions = actions)
         BehaviourSection(
             issues = form.behaviourIssues,
             selectedIds = form.selectedBehaviourIssueIds,

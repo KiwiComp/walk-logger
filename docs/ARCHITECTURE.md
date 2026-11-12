@@ -39,8 +39,14 @@ com.example.walklogger
 │   │                          BehaviourSection, MedicalSection, AddNameDialog and its AddHandlerDialog /
 │   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, StoolSection (Yes/No; Done folds the
 │   │                          description into StoolSummary, Edit opens it) with StoolDescriptors, StoolColourPicker and
-│   │                          StoolSwatch, OptionalRatingsSection, WeatherSection, WhenSection, Labels,
+│   │                          StoolSwatch, OptionalRatingsSection, WhenSection, Labels,
 │   │                          FormStyle for the on-header variant the timer screen uses);
+│   │                          WeatherSection shows the fetched weather (WeatherSummary, also used by walk detail) with a
+│   │                          fetch button, a °C field and WeatherConditionPicker the handler can correct, the place row
+│   │                          (PlaceSearchDialog) when location is unavailable, and the Open-Meteo attribution; each Route
+│   │                          shows the location prompt through LocationPermissionRequest. WalkFormEditor fetches the weather
+│   │                          when a new walk gets its times (again on new times until the handler edits it by hand);
+│   │                          an edited walk only fetches through the button;
 │   │                          the chosen day travels as a route argument into both form ViewModels
 │   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
 │   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
@@ -59,19 +65,26 @@ com.example.walklogger
 │                              registerdog/ RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight)
 │
 ├── domain/                    optional use cases (pure Kotlin, injectable); ObserveWalkHistoryUseCase gives Log and
-│                              Calendar the active dog's completed walks
+│                              Calendar the active dog's completed walks; FetchWalkWeatherUseCase fetches the weather for
+│                              the hour containing a walk's middle, from the device location or else the saved place,
+│                              and only within the free forecast's 92 days
 │
 ├── core/
-│   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern) – no Android deps;
+│   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern, WalkWeather with its
+│   │                          WeatherCondition and the TemperatureBand derived from °C) – no Android deps;
 │   │                          StoolEdits holds the stool answer rules the forms and the timer share
 │   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository /
-│   │                          MedicalConcernRepository interfaces + Room-backed implementations, mappers
+│   │                          MedicalConcernRepository interfaces + Room-backed implementations, mappers;
+│   │                          WeatherRepository (Open-Meteo forecast, WMO codes mapped in WeatherMappers) and
+│   │                          PlaceRepository (geocoding search, the saved place, whether location has been asked for)
+│   ├── network/               Retrofit APIs for Open-Meteo's forecast and geocoding, their @Serializable DTOs
+│   ├── location/              LocationProvider (fused location; accepts coarse or fine permission)
 │   ├── database/              Room database, DAOs, entities, type converters; walks join behaviour issues and medical
 │   │                          concerns through walk_behaviour_issues / walk_medical_concerns; the defaults are
 │   │                          seeded on create (SeedCallback) and on the migration that added each table;
 │   │                          seeded defaults carry a `key` that Labels.kt maps to a string resource (user-added
 │   │                          rows show their name), and `isHidden` soft-deletes without touching walk history
-│   ├── datastore/             Preferences DataStore (active dog id)
+│   ├── datastore/             Preferences DataStore (active dog id, the weather place, whether coarse location was asked for)
 │   ├── common/                runCatchingCancellable; di/ holds the injectable coroutine dispatchers and Clock
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,

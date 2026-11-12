@@ -1,17 +1,17 @@
 package com.example.walklogger.feature.logwalk.preview
 
+import com.example.walklogger.feature.logwalk.WeatherStatus
+import com.example.walklogger.core.model.Place
+import com.example.walklogger.core.model.WeatherCondition
+import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
-import com.example.walklogger.core.model.Rain
-import com.example.walklogger.core.model.Snow
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
-import com.example.walklogger.core.model.Temperature
-import com.example.walklogger.core.model.Wind
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormState
 import com.example.walklogger.feature.logwalk.activewalk.ActiveWalkUiState
@@ -62,10 +62,10 @@ internal object LogWalkPreviewData {
         selectedHandlers = setOf("Jonas"),
         form = WalkFormState(
             equipment = Equipment.COLLAR,
-            rain = Rain.LIGHT,
-            temperature = Temperature.COLD,
-            wind = Wind.WINDY,
-            snow = Snow.LIGHT,
+            temperatureInput = "-2",
+            condition = WeatherCondition.LIGHT_SNOW,
+            weatherStatus = WeatherStatus.TOO_OLD,
+            isWeatherExpanded = true,
             behaviourIssues = behaviourIssues,
             selectedBehaviourIssueIds = setOf(1L, 4L),
             isBehaviourIssuesExpanded = true,
@@ -97,10 +97,20 @@ internal object LogWalkPreviewData {
             rating = 6,
             stool = Stool(passed = true, quantity = StoolQuantity.NORMAL, texture = StoolTexture.FIRM, colour = StoolColour.MEDIUM_BROWN),
             equipment = Equipment.HARNESS,
-            rain = Rain.NONE,
-            temperature = Temperature.COOL,
-            wind = Wind.BREEZE,
-            snow = Snow.NONE,
+            fetchedWeather = WalkWeather(
+                condition = WeatherCondition.PARTLY_CLOUDY,
+                temperatureCelsius = 7.5,
+                rainMm = 0.0,
+                snowfallCm = 0.0,
+                windSpeedMs = 3.4,
+                windGustsMs = 7.9,
+            ),
+            temperatureInput = "7,5",
+            condition = WeatherCondition.PARTLY_CLOUDY,
+            hasLocationPermission = true,
+            hasWeatherTimes = true,
+            isWeatherCurrent = true,
+            isWeatherExpanded = true,
             behaviourIssues = behaviourIssues,
             medicalConcerns = medicalConcerns,
             notes = "Barked at the bin lorry, otherwise steady. Off-lead in the field for ten minutes.",
@@ -121,10 +131,15 @@ internal object LogWalkPreviewData {
         override fun selectStoolColour(value: StoolColour?) = Unit
         override fun clearStool() = Unit
         override fun selectEquipment(value: Equipment) = Unit
-        override fun selectRain(value: Rain) = Unit
-        override fun selectTemperature(value: Temperature) = Unit
-        override fun selectWind(value: Wind) = Unit
-        override fun selectSnow(value: Snow) = Unit
+        override fun setTemperature(text: String) = Unit
+        override fun selectCondition(value: WeatherCondition) = Unit
+        override fun fetchWeather() = Unit
+        override fun onLocationPermissionResult(granted: Boolean) = Unit
+        override fun openPlaceSearch() = Unit
+        override fun searchPlaces(query: String) = Unit
+        override fun selectPlace(place: Place) = Unit
+        override fun closePlaceSearch() = Unit
+        override fun toggleWeatherEditing() = Unit
         override fun toggleWeather() = Unit
         override fun clearWeather() = Unit
         override fun toggleBehaviourIssue(issue: BehaviourIssue) = Unit

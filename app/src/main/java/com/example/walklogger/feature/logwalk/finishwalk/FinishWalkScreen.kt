@@ -32,6 +32,7 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.WalkFormActions
+import com.example.walklogger.feature.logwalk.component.LocationPermissionRequest
 import com.example.walklogger.feature.logwalk.component.FormSection
 import com.example.walklogger.feature.logwalk.component.WalkFormContent
 import com.example.walklogger.feature.logwalk.component.WhenSection
@@ -60,6 +61,10 @@ fun FinishWalkRoute(
             uiState.isNotFound -> onNotFound()
         }
     }
+    LocationPermissionRequest(
+        shouldRequest = uiState.form.shouldRequestLocationPermission,
+        onResult = viewModel.formActions::onLocationPermissionResult,
+    )
     FinishWalkScreen(
         uiState = uiState,
         formActions = viewModel.formActions,

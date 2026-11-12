@@ -7,10 +7,13 @@ import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
+import com.example.walklogger.core.data.PlaceRepository
 import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.domain.FetchWalkWeatherUseCase
+import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormEditor
 import dagger.assisted.Assisted
@@ -47,6 +50,9 @@ class LogPastWalkViewModel @AssistedInject constructor(
     private val walkRepository: WalkRepository,
     private val userMessages: UserMessages,
     private val clock: Clock,
+    fetchWalkWeather: FetchWalkWeatherUseCase,
+    locationPermission: LocationPermissionUseCase,
+    placeRepository: PlaceRepository,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -54,7 +60,15 @@ class LogPastWalkViewModel @AssistedInject constructor(
         fun create(date: LocalDate, walkId: Long?): LogPastWalkViewModel
     }
 
-    private val form = WalkFormEditor(viewModelScope, behaviourIssueRepository, medicalConcernRepository, userMessages)
+    private val form = WalkFormEditor(
+        viewModelScope,
+        behaviourIssueRepository,
+        medicalConcernRepository,
+        userMessages,
+        fetchWalkWeather,
+        locationPermission,
+        placeRepository,
+    )
 
     val formActions: WalkFormActions get() = form
 
@@ -84,6 +98,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
                 editedWalk = walk
                 form.prefillFrom(walk)
                 screen.update { it.prefilledFrom(walk) }
+                onTimesChanged()
             } else {
                 handlerRepository.observeHandlers().first().firstOrNull()?.let { first ->
                     screen.update { if (it.selectedHandlers.isEmpty()) it.copy(selectedHandlers = setOf(first)) else it }
@@ -113,8 +128,18 @@ class LogPastWalkViewModel @AssistedInject constructor(
     fun setEndTime(time: LocalTime) = updateWhen { it.copy(endTime = time) }
 
     /** Re-reads the clock alongside the edit so a form left open still validates against the present. */
-    private fun updateWhen(edit: (LogPastWalkUiState) -> LogPastWalkUiState) =
+    private fun updateWhen(edit: (LogPastWalkUiState) -> LogPastWalkUiState) {
         screen.update { edit(it).copy(now = LocalDateTime.now(clock)) }
+        onTimesChanged()
+    }
+
+    /** A new walk fetches the weather for its times; an edited one only through the fetch button. */
+    private fun onTimesChanged() {
+        val state = screen.value
+        val start = state.startTime ?: return
+        val end = state.endTime ?: return
+        form.onTimesChanged(state.date.atTime(start).toEpochMilli(), state.date.atTime(end).toEpochMilli(), autoFetch = walkId == null)
+    }
 
     fun toggleHandler(handler: String) = screen.update { state ->
         val selected = state.selectedHandlers

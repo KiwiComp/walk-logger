@@ -4,23 +4,27 @@ import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
+import com.example.walklogger.core.data.PlaceRepository
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
-import com.example.walklogger.core.model.Rain
-import com.example.walklogger.core.model.Snow
+import com.example.walklogger.core.model.Place
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
-import com.example.walklogger.core.model.Temperature
 import com.example.walklogger.core.model.Walk
-import com.example.walklogger.core.model.Wind
+import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.core.model.withColour
 import com.example.walklogger.core.model.withPassed
 import com.example.walklogger.core.model.withQuantity
 import com.example.walklogger.core.model.withTexture
 import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.domain.FetchWalkWeatherUseCase
+import com.example.walklogger.domain.LocationPermissionUseCase
+import com.example.walklogger.feature.logwalk.component.formatWeatherValue
+import com.example.walklogger.domain.WeatherFetchResult
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -30,16 +34,41 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
-/** Holds the shared walk form for a ViewModel, which keeps it private and hands the UI only [WalkFormActions]. */
+/**
+ * Holds the shared walk form for a ViewModel, which keeps it private and hands the UI only [WalkFormActions].
+ * [walkId] is the active walk being finished, whose stored start position the weather fetch uses.
+ */
 class WalkFormEditor(
     private val scope: CoroutineScope,
     private val behaviourIssueRepository: BehaviourIssueRepository,
     private val medicalConcernRepository: MedicalConcernRepository,
     private val userMessages: UserMessages,
+    private val fetchWalkWeather: FetchWalkWeatherUseCase,
+    private val locationPermission: LocationPermissionUseCase,
+    private val placeRepository: PlaceRepository,
+    private val walkId: Long? = null,
 ) : WalkFormActions {
 
     /** What the user has entered; the issue and concern lists are overlaid from their repositories. */
-    private val input = MutableStateFlow(WalkFormState())
+    private val input = MutableStateFlow(WalkFormState(hasLocationPermission = locationPermission.hasPermission()))
+
+    /** Start and end in epoch millis, the times [fetchWeather] fetches for. */
+    private var times: Pair<Long, Long>? = null
+
+    /** The times [WalkFormState.fetchedWeather] was fetched for; null when it is missing or was entered by hand. */
+    private var fetchedFor: Pair<Long, Long>? = null
+
+    /** Set by [prefillFrom] when the stored weather came from the API, so it counts as fetched for the stored times. */
+    private var isPrefilledWeatherFetched = false
+
+    private var weatherJob: Job? = null
+    private var placeSearchJob: Job? = null
+
+    init {
+        scope.launch {
+            placeRepository.savedPlace.collect { place -> input.update { it.copy(place = place) } }
+        }
+    }
 
     /** Shared eagerly so [applyTo] reads current lists even while nothing is collecting. */
     val state: StateFlow<WalkFormState> =
@@ -52,25 +81,28 @@ class WalkFormEditor(
         }.stateIn(scope, SharingStarted.Eagerly, input.value)
 
     /** Opens the optional sections that have content; a stored stool answer starts folded. */
-    fun prefillFrom(walk: Walk) = input.update {
-        it.copy(
-            rating = walk.rating,
-            optionalRatings = walk.optionalRatings,
-            isOptionalRatingsExpanded = walk.optionalRatings.isNotEmpty(),
-            stool = walk.stool,
-            isStoolExpanded = false,
-            equipment = walk.equipment ?: it.equipment,
-            rain = walk.rain,
-            temperature = walk.temperature,
-            wind = walk.wind,
-            snow = walk.snow,
-            isWeatherExpanded = listOf(walk.rain, walk.temperature, walk.wind, walk.snow).any { it != null },
-            selectedBehaviourIssueIds = walk.behaviourIssues.map(BehaviourIssue::id).toSet(),
-            isBehaviourIssuesExpanded = walk.behaviourIssues.isNotEmpty(),
-            selectedMedicalConcernIds = walk.medicalConcerns.map(MedicalConcern::id).toSet(),
-            isMedicalConcernsExpanded = walk.medicalConcerns.isNotEmpty(),
-            notes = walk.notes,
-        )
+    fun prefillFrom(walk: Walk) {
+        isPrefilledWeatherFetched = walk.weather?.let { w -> listOf(w.rainMm, w.snowfallCm, w.windSpeedMs).any { it != null } } == true
+        input.update {
+            it.copy(
+                rating = walk.rating,
+                optionalRatings = walk.optionalRatings,
+                isOptionalRatingsExpanded = walk.optionalRatings.isNotEmpty(),
+                stool = walk.stool,
+                isStoolExpanded = false,
+                equipment = walk.equipment ?: it.equipment,
+                fetchedWeather = walk.weather,
+                temperatureInput = walk.weather?.temperatureCelsius?.let(::formatWeatherValue).orEmpty(),
+                condition = walk.weather?.condition,
+                isWeatherExpanded = walk.weather != null,
+                isWeatherEditing = false,
+                selectedBehaviourIssueIds = walk.behaviourIssues.map(BehaviourIssue::id).toSet(),
+                isBehaviourIssuesExpanded = walk.behaviourIssues.isNotEmpty(),
+                selectedMedicalConcernIds = walk.medicalConcerns.map(MedicalConcern::id).toSet(),
+                isMedicalConcernsExpanded = walk.medicalConcerns.isNotEmpty(),
+                notes = walk.notes,
+            )
+        }
     }
 
     /** [walk] with the form's fields written into it. */
@@ -82,10 +114,7 @@ class WalkFormEditor(
             rating = form.rating,
             optionalRatings = form.optionalRatings,
             stool = form.stool,
-            rain = form.rain,
-            temperature = form.temperature,
-            wind = form.wind,
-            snow = form.snow,
+            weather = form.weather,
             behaviourIssues = form.behaviourIssues.filter { it.id in form.selectedBehaviourIssueIds },
             medicalConcerns = form.medicalConcerns.filter { it.id in form.selectedMedicalConcernIds },
         )
@@ -123,17 +152,125 @@ class WalkFormEditor(
 
     override fun selectEquipment(value: Equipment) = input.update { it.copy(equipment = value) }
 
-    override fun selectRain(value: Rain) = input.update { it.copy(rain = value) }
+    /**
+     * Records the walk's times for [fetchWeather]. With [autoFetch] the weather is fetched for them,
+     * unless the handler has already changed it by hand.
+     */
+    fun onTimesChanged(startMillis: Long, endMillis: Long, autoFetch: Boolean) {
+        if (startMillis >= endMillis || times == startMillis to endMillis) return
+        times = startMillis to endMillis
+        if (isPrefilledWeatherFetched) {
+            fetchedFor = times
+            isPrefilledWeatherFetched = false
+        }
+        input.update {
+            it.copy(
+                hasWeatherTimes = true,
+                isWeatherCurrent = fetchedFor == times,
+                weatherStatus = if (it.weatherStatus == WeatherStatus.LOADING) it.weatherStatus else WeatherStatus.IDLE,
+            )
+        }
+        if (autoFetch && !input.value.isWeatherEditedManually) fetchWeather()
+    }
 
-    override fun selectTemperature(value: Temperature) = input.update { it.copy(temperature = value) }
+    override fun setTemperature(text: String) = input.update {
+        it.copy(temperatureInput = text.filter { c -> c.isDigit() || c in TEMPERATURE_SYMBOLS }.take(MAX_TEMPERATURE_LENGTH), isWeatherEditedManually = true)
+    }
 
-    override fun selectWind(value: Wind) = input.update { it.copy(wind = value) }
+    override fun selectCondition(value: WeatherCondition) = input.update {
+        it.copy(condition = if (it.condition == value) null else value, isWeatherEditedManually = true)
+    }
 
-    override fun selectSnow(value: Snow) = input.update { it.copy(snow = value) }
+    /** Asks for location the first time; the answer arrives in [onLocationPermissionResult], which fetches again. */
+    override fun fetchWeather() {
+        val (start, end) = times ?: return
+        weatherJob?.cancel()
+        weatherJob = scope.launch {
+            if (locationPermission.shouldRequest()) {
+                input.update { it.copy(shouldRequestLocationPermission = true) }
+                return@launch
+            }
+            input.update { it.copy(weatherStatus = WeatherStatus.LOADING, isWeatherExpanded = true) }
+            val result = fetchWalkWeather(start, end, walkId)
+            if (result is WeatherFetchResult.Fetched) fetchedFor = start to end
+            input.update {
+                it.withWeatherResult(result).copy(
+                    hasLocationPermission = locationPermission.hasPermission(),
+                    isWeatherCurrent = fetchedFor == times,
+                )
+            }
+        }
+    }
+
+    override fun onLocationPermissionResult(granted: Boolean) {
+        input.update { it.copy(shouldRequestLocationPermission = false, hasLocationPermission = granted) }
+        scope.launch {
+            locationPermission.markRequested()
+            fetchWeather()
+        }
+    }
+
+    override fun openPlaceSearch() = input.update { it.copy(placeSearch = PlaceSearch()) }
+
+    override fun searchPlaces(query: String) {
+        if (query.isBlank()) return
+        placeSearchJob?.cancel()
+        placeSearchJob = scope.launch {
+            input.update { it.copy(placeSearch = it.placeSearch?.copy(isSearching = true, isFailed = false)) }
+            runCatchingCancellable { placeRepository.searchPlaces(query) }
+                .onSuccess { places -> input.update { it.copy(placeSearch = it.placeSearch?.copy(results = places, isSearching = false)) } }
+                .onFailure { input.update { it.copy(placeSearch = it.placeSearch?.copy(isSearching = false, isFailed = true)) } }
+        }
+    }
+
+    override fun selectPlace(place: Place) {
+        placeSearchJob?.cancel()
+        input.update { it.copy(placeSearch = null) }
+        scope.launch {
+            runCatchingCancellable { placeRepository.savePlace(place) }
+                .onSuccess { fetchWeather() }
+                .onFailure { userMessages.show(R.string.error_save_place) }
+        }
+    }
+
+    override fun closePlaceSearch() {
+        placeSearchJob?.cancel()
+        input.update { it.copy(placeSearch = null) }
+    }
 
     override fun toggleWeather() = input.update { it.copy(isWeatherExpanded = !it.isWeatherExpanded) }
 
-    override fun clearWeather() = input.update { it.copy(rain = null, temperature = null, wind = null, snow = null) }
+    override fun toggleWeatherEditing() = input.update { it.copy(isWeatherEditing = !it.isWeatherEditing) }
+
+    override fun clearWeather() {
+        weatherJob?.cancel()
+        fetchedFor = null
+        input.update {
+            it.copy(
+                fetchedWeather = null,
+                isWeatherCurrent = false,
+                isWeatherEditing = false,
+                temperatureInput = "",
+                condition = null,
+                isWeatherEditedManually = true,
+                weatherStatus = WeatherStatus.IDLE,
+            )
+        }
+    }
+
+    private fun WalkFormState.withWeatherResult(result: WeatherFetchResult): WalkFormState = when (result) {
+        is WeatherFetchResult.Fetched -> copy(
+            fetchedWeather = result.weather,
+            temperatureInput = result.weather.temperatureCelsius?.let(::formatWeatherValue).orEmpty(),
+            condition = result.weather.condition,
+            isWeatherEditedManually = false,
+            isWeatherEditing = false,
+            weatherStatus = WeatherStatus.IDLE,
+        )
+        WeatherFetchResult.TooOld -> copy(weatherStatus = WeatherStatus.TOO_OLD)
+        WeatherFetchResult.NoLocation -> copy(weatherStatus = WeatherStatus.NO_LOCATION)
+        WeatherFetchResult.Failed -> copy(weatherStatus = WeatherStatus.FAILED)
+    }
 
     override fun toggleBehaviourIssue(issue: BehaviourIssue) = input.update { state ->
         val selected = state.selectedBehaviourIssueIds
@@ -174,4 +311,9 @@ class WalkFormEditor(
     override fun clearMedicalConcerns() = input.update { it.copy(selectedMedicalConcernIds = emptySet()) }
 
     override fun setNotes(notes: String) = input.update { it.copy(notes = notes.take(MAX_NOTES_LENGTH)) }
+
+    private companion object {
+        const val MAX_TEMPERATURE_LENGTH = 6
+        const val TEMPERATURE_SYMBOLS = "-.,"
+    }
 }
