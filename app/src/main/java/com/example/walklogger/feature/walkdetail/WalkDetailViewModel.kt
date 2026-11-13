@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.walkdetail
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
@@ -9,7 +10,6 @@ import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Walk
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.DiscardWalkUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -31,7 +31,6 @@ class WalkDetailViewModel @AssistedInject constructor(
     @Assisted private val walkId: Long,
     private val walkRepository: WalkRepository,
     dogRepository: DogRepository,
-    private val userMessages: UserMessages,
     private val clock: Clock,
     private val discardWalk: DiscardWalkUseCase,
 ) : ViewModel() {
@@ -47,7 +46,6 @@ class WalkDetailViewModel @AssistedInject constructor(
         viewModelScope.launch {
             if (walkRepository.observeWalk(walkId).first() == null) {
                 discard.update { it.copy(isNotFound = true) }
-                userMessages.show(R.string.error_walk_not_found)
             }
         }
     }
@@ -77,10 +75,15 @@ class WalkDetailViewModel @AssistedInject constructor(
             runCatchingCancellable { discardWalk(walkId) }
                 .onSuccess { discard.update { it.copy(isDiscarding = false, isDiscarded = true) } }
                 .onFailure {
-                    discard.update { it.copy(isDiscarding = false) }
-                    userMessages.show(R.string.error_delete_walk)
+                    discard.update {
+                        it.copy(isDiscarding = false, userMessage = R.string.error_delete_walk)
+                    }
                 }
         }
+    }
+
+    fun userMessageShown(@StringRes message: Int) = discard.update {
+        if (it.userMessage == message) it.copy(userMessage = null) else it
     }
 
     private fun WalkDetailUiState.detailsOf(walk: Walk, dog: Dog?): WalkDetailUiState {

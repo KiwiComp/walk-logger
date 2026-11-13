@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.logwalk.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -69,6 +70,7 @@ fun NavGraphBuilder.activeWalkScreen(
     onWalkEnded: (walkId: Long) -> Unit,
     onWalkDiscarded: () -> Unit,
     onNotFound: () -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     composable<ActiveWalkDestination> { entry ->
         ActiveWalkRoute(
@@ -76,6 +78,7 @@ fun NavGraphBuilder.activeWalkScreen(
             onWalkEnded = onWalkEnded,
             onWalkDiscarded = onWalkDiscarded,
             onNotFound = onNotFound,
+            snackbarHostState = snackbarHostState,
         )
     }
 }

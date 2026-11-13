@@ -79,7 +79,11 @@ fun WalkLoggerNavHost(
         activeWalkScreen(
             onWalkEnded = navController::navigateToFinishWalk,
             onWalkDiscarded = navController::popToTopLevel,
-            onNotFound = navController::popToTopLevel,
+            onNotFound = {
+                navController.popToTopLevel()
+                onShowMessage(R.string.error_walk_not_found)
+            },
+            snackbarHostState = snackbarHostState,
         )
         finishWalkScreen(
             onSaved = navController::popToTopLevel,
@@ -96,7 +100,11 @@ fun WalkLoggerNavHost(
             onBack = navController::popToTopLevel,
             onEdit = navController::navigateToEditWalk,
             onDiscarded = navController::popToTopLevel,
-            onNotFound = navController::popToTopLevel,
+            onNotFound = {
+                navController.popToTopLevel()
+                onShowMessage(R.string.error_walk_not_found)
+            },
+            snackbarHostState = snackbarHostState,
         )
     }
 }

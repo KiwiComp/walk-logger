@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.logwalk.activewalk
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
@@ -16,7 +17,6 @@ import com.example.walklogger.core.model.withColour
 import com.example.walklogger.core.model.withPassed
 import com.example.walklogger.core.model.withQuantity
 import com.example.walklogger.core.model.withTexture
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.DiscardWalkUseCase
 import com.example.walklogger.feature.logwalk.MAX_NOTES_LENGTH
 import dagger.assisted.Assisted
@@ -50,7 +50,6 @@ class ActiveWalkViewModel @AssistedInject constructor(
     dogRepository: DogRepository,
     private val walkRepository: WalkRepository,
     private val discardWalkUseCase: DiscardWalkUseCase,
-    private val userMessages: UserMessages,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -86,7 +85,6 @@ class ActiveWalkViewModel @AssistedInject constructor(
         viewModelScope.launch {
             if (walkRepository.observeWalk(walkId).first() == null) {
                 outcome.update { it.copy(isNotFound = true) }
-                userMessages.show(R.string.error_walk_not_found)
             }
         }
     }
@@ -122,6 +120,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 isEnded = outcome.isEnded,
                 isDiscarding = outcome.isDiscarding,
                 isDiscarded = outcome.isDiscarded,
+                userMessage = outcome.userMessage,
             )
         }.filterNotNull().stateIn(
             scope = viewModelScope,
@@ -175,8 +174,9 @@ class ActiveWalkViewModel @AssistedInject constructor(
             runCatchingCancellable { walkRepository.endWalk(walkId, state.note, state.stool) }
                 .onSuccess { outcome.update { Outcome(isEnded = true) } }
                 .onFailure {
-                    outcome.update { it.copy(isEnding = false) }
-                    userMessages.show(R.string.error_end_walk)
+                    outcome.update {
+                        it.copy(isEnding = false, userMessage = R.string.error_end_walk)
+                    }
                 }
         }
     }
@@ -193,24 +193,33 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 .onFailure {
                     noteSaver = saveNotes()
                     stoolSaver = saveStool()
-                    outcome.update { it.copy(isDiscarding = false) }
-                    userMessages.show(R.string.error_delete_walk)
+                    outcome.update {
+                        it.copy(isDiscarding = false, userMessage = R.string.error_delete_walk)
+                    }
                 }
         }
+    }
+
+    fun userMessageShown(@StringRes message: Int) = outcome.update {
+        if (it.userMessage == message) it.copy(userMessage = null) else it
+    }
+
+    private fun showMessage(@StringRes message: Int) = outcome.update {
+        it.copy(userMessage = message)
     }
 
     private fun saveNotes() = viewModelScope.launch {
         @OptIn(FlowPreview::class)
         note.filterNotNull().debounce(NOTE_SAVE_DELAY_MILLIS).collect {
             runCatchingCancellable { walkRepository.updateNotes(walkId, it) }
-                .onFailure { userMessages.show(R.string.error_save_note) }
+                .onFailure { showMessage(R.string.error_save_note) }
         }
     }
 
     private fun saveStool() = viewModelScope.launch {
         stool.filterNotNull().collect {
             runCatchingCancellable { walkRepository.updateStool(walkId, it.stool) }
-                .onFailure { userMessages.show(R.string.error_save_stool) }
+                .onFailure { showMessage(R.string.error_save_stool) }
         }
     }
 
@@ -227,6 +236,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
         val isDiscarding: Boolean = false,
         val isDiscarded: Boolean = false,
         val isNotFound: Boolean = false,
+        @param:StringRes val userMessage: Int? = null,
     )
 
     private companion object {

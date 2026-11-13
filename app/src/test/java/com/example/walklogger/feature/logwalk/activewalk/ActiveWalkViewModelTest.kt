@@ -11,13 +11,11 @@ import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkLocation
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.DiscardWalkUseCase
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
-import com.example.walklogger.testing.shownMessages
 import java.time.Clock
 import java.time.Duration
 import java.time.Instant
@@ -48,7 +46,6 @@ class ActiveWalkViewModelTest {
     private val dogRepository = FakeDogRepository()
     private val walkRepository = FakeWalkRepository()
     private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
-    private val userMessages = UserMessages()
     private val walk = Walk(
         id = 1,
         dogId = 1,
@@ -64,7 +61,6 @@ class ActiveWalkViewModelTest {
             dogRepository = dogRepository,
             walkRepository = walkRepository,
             discardWalkUseCase = DiscardWalkUseCase(walkRepository, activeWalkLocationRepository),
-            userMessages = userMessages,
             clock = clock,
         )
     }
@@ -264,7 +260,6 @@ class ActiveWalkViewModelTest {
     @Test
     fun `a failed end keeps the timer running and says so`() = runTest {
         walkRepository.addWalks(walk)
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             walkRepository.failures.failWrites = true
             viewModel.endWalk()
@@ -272,15 +267,14 @@ class ActiveWalkViewModelTest {
             assertFalse(state.isEnding)
             assertFalse(state.isEnded)
             assertTrue(state.canEnd)
+            assertEquals(R.string.error_end_walk, viewModel.uiState.value.userMessage)
             cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(listOf(R.string.error_end_walk), shown)
     }
 
     @Test
     fun `a failed discard keeps the walk and its note keeps saving`() = runTest {
         walkRepository.addWalks(walk)
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             walkRepository.failures.failWrites = true
             viewModel.discardWalk()
@@ -289,15 +283,14 @@ class ActiveWalkViewModelTest {
             viewModel.setNote("Pulled at the gate")
             advanceTimeBy(1_000)
             assertEquals("Pulled at the gate", walkRepository.observeWalk(1).first()!!.notes)
+            assertEquals(R.string.error_delete_walk, viewModel.uiState.value.userMessage)
             cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(listOf(R.string.error_delete_walk), shown)
     }
 
     @Test
     fun `a failed note save says so and later notes are still stored`() = runTest {
         walkRepository.addWalks(walk)
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             walkRepository.failures.failWrites = true
             viewModel.setNote("Pulled")
@@ -306,30 +299,39 @@ class ActiveWalkViewModelTest {
             viewModel.setNote("Pulled at the gate")
             advanceTimeBy(1_000)
             assertEquals("Pulled at the gate", walkRepository.observeWalk(1).first()!!.notes)
+            assertEquals(R.string.error_save_note, viewModel.uiState.value.userMessage)
             cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(listOf(R.string.error_save_note), shown)
     }
 
     @Test
     fun `a failed stool save says so`() = runTest {
         walkRepository.addWalks(walk)
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             walkRepository.failures.failWrites = true
             viewModel.setStoolPassed(true)
+            assertEquals(R.string.error_save_stool, viewModel.uiState.value.userMessage)
             cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(listOf(R.string.error_save_stool), shown)
     }
 
     @Test
-    fun `a missing walk closes the screen and says so`() = runTest {
-        val shown = shownMessages(userMessages)
+    fun `a shown message is cleared`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            walkRepository.failures.failWrites = true
+            viewModel.endWalk()
+            viewModel.userMessageShown(R.string.error_end_walk)
+            assertNull(expectMostRecentItem().userMessage)
+            cancelAndIgnoreRemainingEvents()
+        }
+    }
+
+    @Test
+    fun `a missing walk closes the screen`() = runTest {
         viewModel.uiState.test {
             assertTrue(expectMostRecentItem().isNotFound)
             cancelAndIgnoreRemainingEvents()
         }
-        assertEquals(listOf(R.string.error_walk_not_found), shown)
     }
 }
