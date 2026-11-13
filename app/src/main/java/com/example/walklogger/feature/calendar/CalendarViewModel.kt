@@ -5,10 +5,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.groupByStartDate
+import com.example.walklogger.core.model.startLocalTime
 import com.example.walklogger.domain.ObserveWalkHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
-import java.time.Instant
 import java.time.LocalDate
 import java.time.YearMonth
 import java.time.ZoneId
@@ -65,7 +66,7 @@ class CalendarViewModel @Inject constructor(
     }
 
     private fun buildState(date: LocalDate, walks: List<Walk>, activeDog: Dog?): CalendarUiState {
-        val walksByDate = walks.groupBy { it.startDate(clock.zone) }
+        val walksByDate = walks.groupByStartDate(clock.zone)
         val today = LocalDate.now(clock)
         val month = YearMonth.from(date)
         return CalendarUiState(
@@ -83,9 +84,7 @@ class CalendarViewModel @Inject constructor(
                     isEnabled = !day.isAfter(today),
                 )
             },
-            walks = walksByDate[date].orEmpty()
-                .sortedBy { it.startTime }
-                .map { it.toUiState(clock.zone) },
+            walks = walksByDate[date].orEmpty().map { it.toUiState(clock.zone) },
             isCurrentMonth = month == YearMonth.from(today),
             canStartLiveWalk = date == today,
             activeDogName = activeDog?.name,
@@ -94,12 +93,9 @@ class CalendarViewModel @Inject constructor(
     }
 }
 
-private fun Walk.startDate(zone: ZoneId): LocalDate =
-    Instant.ofEpochMilli(startTime).atZone(zone).toLocalDate()
-
 private fun Walk.toUiState(zone: ZoneId) = CalendarWalkUiState(
     id = id,
-    startTime = Instant.ofEpochMilli(startTime).atZone(zone).toLocalTime(),
+    startTime = startLocalTime(zone),
     equipment = equipment,
     rating = rating,
     note = notes,

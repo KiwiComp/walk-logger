@@ -40,6 +40,7 @@ import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.ui.component.AppButton
 import com.example.walklogger.core.ui.component.AppButtonStyle
+import com.example.walklogger.core.ui.component.AppConfirmDialog
 import com.example.walklogger.core.ui.component.AppTextField
 import com.example.walklogger.core.ui.component.AppTextFieldStyle
 import com.example.walklogger.core.ui.component.HeaderIconButton
@@ -190,7 +191,10 @@ fun ActiveWalkScreen(
         )
     }
     if (showDiscardConfirm) {
-        DiscardWalkDialog(
+        AppConfirmDialog(
+            title = stringResource(R.string.active_walk_discard_confirm_title),
+            message = stringResource(R.string.active_walk_discard_confirm_message),
+            confirmLabel = stringResource(R.string.active_walk_discard_confirm),
             onConfirm = {
                 showDiscardConfirm = false
                 onDiscardWalk()

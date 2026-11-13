@@ -13,11 +13,9 @@ import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.SnackbarHostState
-import androidx.compose.material3.SnackbarResult
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
-import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
@@ -33,6 +31,7 @@ import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
+import com.example.walklogger.core.ui.component.addWalkClick
 import com.example.walklogger.core.ui.component.walkSummary
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -43,7 +42,6 @@ import com.example.walklogger.feature.calendar.preview.CalendarPreviewData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
-import kotlinx.coroutines.launch
 
 @Composable
 fun CalendarRoute(
@@ -56,36 +54,23 @@ fun CalendarRoute(
     viewModel: CalendarViewModel = hiltViewModel(),
 ) {
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
-    val scope = rememberCoroutineScope()
-    val noDogMessage = stringResource(
-        if (uiState.isActiveDogDeleted) {
-            R.string.log_deleted_dog_message
-        } else {
-            R.string.log_no_dog_message
-        },
+    val onAddWalkClick = addWalkClick(
+        date = uiState.selectedDate,
+        canAddWalk = uiState.canAddWalk,
+        isActiveDogDeleted = uiState.isActiveDogDeleted,
+        canStartLiveWalk = uiState.canStartLiveWalk,
+        snackbarHostState = snackbarHostState,
+        onAddWalk = onAddWalk,
+        onLogPastWalk = onLogPastWalk,
+        onGoToDogs = onGoToDogs,
     )
-    val noDogAction = stringResource(R.string.log_no_dog_action)
     CalendarScreen(
         uiState = uiState,
         onPreviousMonth = viewModel::showPreviousMonth,
         onNextMonth = viewModel::showNextMonth,
         onShowCurrentMonth = viewModel::showCurrentMonth,
         onDaySelect = viewModel::selectDay,
-        onAddWalk = {
-            if (!uiState.canAddWalk) {
-                scope.launch {
-                    val result = snackbarHostState.showSnackbar(
-                        message = noDogMessage,
-                        actionLabel = noDogAction,
-                    )
-                    if (result == SnackbarResult.ActionPerformed) onGoToDogs()
-                }
-            } else if (uiState.canStartLiveWalk) {
-                onAddWalk(uiState.selectedDate)
-            } else {
-                onLogPastWalk(uiState.selectedDate)
-            }
-        },
+        onAddWalk = onAddWalkClick,
         onWalkClick = onOpenWalk,
         modifier = modifier,
     )

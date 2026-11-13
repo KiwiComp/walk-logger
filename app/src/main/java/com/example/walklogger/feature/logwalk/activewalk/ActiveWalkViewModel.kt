@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
-import com.example.walklogger.core.common.toLocalDateTime
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Stool
@@ -12,6 +11,7 @@ import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.startLocalTime
 import com.example.walklogger.core.model.withColour
 import com.example.walklogger.core.model.withPassed
 import com.example.walklogger.core.model.withQuantity
@@ -113,7 +113,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 dogName = dog?.name,
                 handlers = walk.handlers,
                 equipment = walk.equipment,
-                startTime = walk.startTime.toLocalDateTime(clock.zone).toLocalTime(),
+                startTime = walk.startLocalTime(clock.zone),
                 elapsed = Duration.between(walk.startInstant(), now),
                 note = edits.note ?: walk.notes,
                 stool = if (edits.stool != null) edits.stool.stool else walk.stool,

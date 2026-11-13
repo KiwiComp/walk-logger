@@ -5,12 +5,13 @@ import androidx.lifecycle.viewModelScope
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.groupByStartDate
+import com.example.walklogger.core.model.startLocalTime
 import com.example.walklogger.domain.ObserveWalkHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
 import java.time.DayOfWeek
 import java.time.Duration
-import java.time.Instant
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
@@ -47,7 +48,7 @@ class LogViewModel @Inject constructor(
     fun selectDay(date: LocalDate) = selectedDate.update { date }
 
     private fun buildState(date: LocalDate, walks: List<Walk>, activeDog: Dog?): LogUiState {
-        val walksByDate = walks.groupBy { it.startDate(clock.zone) }
+        val walksByDate = walks.groupByStartDate(clock.zone)
         val today = LocalDate.now(clock)
         val monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
         return LogUiState(
@@ -61,9 +62,7 @@ class LogViewModel @Inject constructor(
                     isEnabled = !day.isAfter(today),
                 )
             },
-            walks = walksByDate[date].orEmpty()
-                .sortedBy { it.startTime }
-                .map { it.toUiState(clock.zone) },
+            walks = walksByDate[date].orEmpty().map { it.toUiState(clock.zone) },
             canStartLiveWalk = date == today,
             activeDogName = activeDog?.name,
             isActiveDogDeleted = activeDog?.isDeleted == true,
@@ -71,12 +70,9 @@ class LogViewModel @Inject constructor(
     }
 }
 
-private fun Walk.startDate(zone: ZoneId): LocalDate =
-    Instant.ofEpochMilli(startTime).atZone(zone).toLocalDate()
-
 private fun Walk.toUiState(zone: ZoneId) = WalkUiState(
     id = id,
-    startTime = Instant.ofEpochMilli(startTime).atZone(zone).toLocalTime(),
+    startTime = startLocalTime(zone),
     duration = Duration.ofMillis(checkNotNull(endTime) { "walk $id has not finished" } - startTime),
     equipment = equipment,
     rating = rating,

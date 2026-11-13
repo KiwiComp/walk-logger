@@ -28,6 +28,7 @@ import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.AppButton
+import com.example.walklogger.core.ui.component.AppConfirmDialog
 import com.example.walklogger.core.ui.component.AppDateField
 import com.example.walklogger.core.ui.component.AppTextField
 import com.example.walklogger.core.ui.component.HeaderIconButton
@@ -154,7 +155,10 @@ fun RegisterDogScreen(
     }
 
     if (showDeleteConfirm) {
-        DeleteDogDialog(
+        AppConfirmDialog(
+            title = stringResource(R.string.edit_dog_delete_confirm_title),
+            message = stringResource(R.string.edit_dog_delete_confirm_message),
+            confirmLabel = stringResource(R.string.edit_dog_delete_confirm),
             onConfirm = {
                 showDeleteConfirm = false
                 onDelete()
