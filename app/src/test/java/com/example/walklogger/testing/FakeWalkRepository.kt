@@ -73,10 +73,12 @@ class FakeWalkRepository : WalkRepository {
         walks.update { list -> list.map { if (it.id == walkId) it.copy(stool = stool) else it } }
     }
 
-    override suspend fun finishWalk(walkId: Long) {
+    override suspend fun endWalk(walkId: Long, notes: String, stool: Stool?) {
         failures.check()
         walks.update { list ->
-            list.map { if (it.id == walkId) it.copy(endTime = 1) else it }
+            list.map {
+                if (it.id == walkId) it.copy(notes = notes, stool = stool, endTime = 1) else it
+            }
         }
     }
 

@@ -4,7 +4,6 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
-import com.example.walklogger.core.data.ActiveWalkLocationRepository
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.LocationRepository
@@ -14,6 +13,7 @@ import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
+import com.example.walklogger.domain.SaveWalkUseCase
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormEditor
 import dagger.assisted.Assisted
@@ -47,7 +47,7 @@ class FinishWalkViewModel @AssistedInject constructor(
     fetchWalkWeather: FetchWalkWeatherUseCase,
     locationPermission: LocationPermissionUseCase,
     locationRepository: LocationRepository,
-    private val activeWalkLocationRepository: ActiveWalkLocationRepository,
+    private val saveWalk: SaveWalkUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -129,7 +129,7 @@ class FinishWalkViewModel @AssistedInject constructor(
         screen.update { it.copy(isSaving = true) }
         viewModelScope.launch {
             runCatchingCancellable {
-                walkRepository.updateWalk(
+                saveWalk(
                     form.applyTo(
                         stored.copy(
                             startTime = state.date.atTime(state.startTime!!).toEpochMilli(),
@@ -138,11 +138,7 @@ class FinishWalkViewModel @AssistedInject constructor(
                     ),
                 )
             }
-                .onSuccess {
-                    // A position left behind is harmless: no other walk has this id.
-                    runCatchingCancellable { activeWalkLocationRepository.clear() }
-                    screen.update { it.copy(isSaving = false, isSaved = true) }
-                }
+                .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
                     screen.update { it.copy(isSaving = false) }
                     userMessages.show(R.string.error_save_walk)

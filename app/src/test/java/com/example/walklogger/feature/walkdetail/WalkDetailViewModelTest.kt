@@ -13,6 +13,8 @@ import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.domain.DiscardWalkUseCase
+import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
@@ -48,6 +50,7 @@ class WalkDetailViewModelTest {
             dogRepository = dogRepository,
             userMessages = userMessages,
             clock = clock,
+            discardWalk = DiscardWalkUseCase(walkRepository, FakeActiveWalkLocationRepository()),
         )
     }
 

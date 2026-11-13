@@ -9,6 +9,7 @@ import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.domain.DiscardWalkUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -33,6 +34,7 @@ class WalkDetailViewModel @AssistedInject constructor(
     dogRepository: DogRepository,
     private val userMessages: UserMessages,
     private val clock: Clock,
+    private val discardWalk: DiscardWalkUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -73,7 +75,7 @@ class WalkDetailViewModel @AssistedInject constructor(
         if (!uiState.value.canDiscard) return
         discard.update { it.copy(isDiscarding = true) }
         viewModelScope.launch {
-            runCatchingCancellable { walkRepository.deleteWalk(walkId) }
+            runCatchingCancellable { discardWalk(walkId) }
                 .onSuccess { discard.update { it.copy(isDiscarding = false, isDiscarded = true) } }
                 .onFailure {
                     discard.update { it.copy(isDiscarding = false) }

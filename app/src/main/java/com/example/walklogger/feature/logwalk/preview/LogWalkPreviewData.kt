@@ -56,6 +56,7 @@ internal object LogWalkPreviewData {
         now = LocalDateTime.of(2026, 9, 14, 20, 0),
         startTime = LocalTime.of(17, 40),
         endTime = LocalTime.of(18, 5),
+        dogId = 1,
         dogName = "Sixten",
         handlers = handlers,
         selectedHandlers = setOf("Jonas"),

@@ -19,8 +19,8 @@ class FakeActiveWalkLocationRepository : ActiveWalkLocationRepository {
         walkLocation.value = location
     }
 
-    override suspend fun clear() {
+    override suspend fun clearFor(walkId: Long) {
         failures.check()
-        walkLocation.value = null
+        if (walkLocation.value?.walkId == walkId) walkLocation.value = null
     }
 }

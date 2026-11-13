@@ -28,9 +28,6 @@ interface WalkDao {
     @Query("SELECT * FROM walks WHERE endTime IS NULL LIMIT 1")
     fun observeActiveWalk(): Flow<WalkWithBehaviourIssuesAndMedicalConcerns?>
 
-    @Query("SELECT * FROM walks WHERE id = :id")
-    suspend fun getWalk(id: Long): WalkEntity?
-
     @Insert
     suspend fun insertWalk(walk: WalkEntity): Long
 
@@ -106,6 +103,25 @@ interface WalkDao {
         texture: StoolTexture?,
         colour: StoolColour?,
     )
+
+    @Query("UPDATE walks SET endTime = :endTime WHERE id = :id")
+    suspend fun updateEndTime(id: Long, endTime: Long)
+
+    /** Stores the last note and stool answer together with the end time, so a walk never ends half-saved. */
+    @Transaction
+    suspend fun endWalk(
+        id: Long,
+        notes: String,
+        passed: Boolean?,
+        quantity: StoolQuantity?,
+        texture: StoolTexture?,
+        colour: StoolColour?,
+        endTime: Long,
+    ) {
+        updateNotes(id, notes)
+        updateStool(id, passed, quantity, texture, colour)
+        updateEndTime(id, endTime)
+    }
 
     @Query("DELETE FROM walks WHERE id = :id")
     suspend fun deleteWalk(id: Long)

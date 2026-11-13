@@ -14,6 +14,8 @@ data class LogPastWalkUiState(
     val now: LocalDateTime,
     val startTime: LocalTime? = null,
     val endTime: LocalTime? = null,
+    /** The active dog, shown in the header; a new walk is logged for it. */
+    val dogId: Long? = null,
     val dogName: String? = null,
     val handlers: List<String> = emptyList(),
     val selectedHandlers: Set<String> = emptySet(),
@@ -50,5 +52,6 @@ data class LogPastWalkUiState(
         else -> null
     }
 
-    val canSave: Boolean = saveBlocker == null && !isLoading && !isSaving && !isSaved
+    val canSave: Boolean = saveBlocker == null && (isEditing || dogId != null) &&
+        !isLoading && !isSaving && !isSaved
 }

@@ -82,10 +82,18 @@ class DefaultWalkRepository @Inject constructor(
         walkDao.updateStool(walkId, stool?.passed, stool?.quantity, stool?.texture, stool?.colour)
     }
 
-    override suspend fun finishWalk(walkId: Long) = withContext(ioDispatcher) {
-        val walk = walkDao.getWalk(walkId) ?: return@withContext
-        walkDao.updateWalk(walk.copy(endTime = clock.millis()))
-    }
+    override suspend fun endWalk(walkId: Long, notes: String, stool: Stool?) =
+        withContext(ioDispatcher) {
+            walkDao.endWalk(
+                id = walkId,
+                notes = notes,
+                passed = stool?.passed,
+                quantity = stool?.quantity,
+                texture = stool?.texture,
+                colour = stool?.colour,
+                endTime = clock.millis(),
+            )
+        }
 
     override suspend fun deleteWalk(id: Long) = withContext(ioDispatcher) {
         walkDao.deleteWalk(id)
