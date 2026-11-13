@@ -113,7 +113,8 @@ com.example.walklogger
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost,
 │                              AppConfirmDialog for discard and delete confirmations; addWalkClick decides what
 │                              AddWalkButton does on Log and Calendar)
-│                              + message/UserMessages, the app-wide snackbar queue
+│                              + message/UserMessageState, the message a ViewModel combines into its UiState,
+│                              and UserMessageEffect, which shows it in the app's snackbar
 ```
 
 ## Rules of thumb
@@ -144,10 +145,14 @@ com.example.walklogger
 - **Dimensions come from tokens.** Padding and gaps use `AppSpacing`, corners use `AppRadius`,
   sizes shared by several components use `AppSize`. Component-specific sizes (a dot, a cell
   height) are named `private val`s in the component's file, not tokens.
-- **Failures become snackbars.** ViewModels run every write in `runCatchingCancellable`; on failure they
-  reset their busy flag (`isSaving`, …) and post a string resource to `UserMessages`, which `WalkLoggerApp`
-  shows in its single `AppSnackbarHost`. A screen whose walk or dog no longer exists posts a message,
-  sets `isNotFound` and its Route calls `onNotFound`, which pops back to the tab.
+- **Failures become snackbars, via UiState.** ViewModels run every write in `runCatchingCancellable`; on
+  failure they reset their busy flag (`isSaving`, …) and call `show` on their `UserMessageState`, which is
+  combined into `UiState.userMessage`. The Route's `UserMessageEffect` shows it in `WalkLoggerApp`'s single
+  `AppSnackbarHost` and calls the ViewModel's `userMessageShown`
+  ([UI events](https://developer.android.com/topic/architecture/ui-layer/events)).
+  A screen whose walk or dog no longer exists only sets `isNotFound`; its Route calls `onNotFound`, and
+  `WalkLoggerNavHost` pops back to the tab and shows the message through `onShowMessage`, since it must
+  outlive the screen.
 - **Colours come from roles.** Read `AppTheme.colors` (`header`, `content`, `outline`, …), never a hue;
   the palette is private to `core/ui/theme`, so a dark theme or new palette only changes that package.
   Stool swatches are the exception: they depict real colours and stay fixed.

@@ -64,9 +64,6 @@ fun WalkLoggerApp(
 
     val snackbarHostState = remember { SnackbarHostState() }
     val resources = LocalResources.current
-    LaunchedEffect(viewModel, resources) {
-        viewModel.messages.collect { snackbarHostState.showSnackbar(resources.getString(it)) }
-    }
     val messageScope = rememberCoroutineScope()
     val showMessage: (Int) -> Unit = remember(messageScope, snackbarHostState, resources) {
         { message ->
