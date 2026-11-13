@@ -61,7 +61,7 @@ com.example.walklogger
 │   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk (when, handler, dog,
 │   │                          equipment, rating, stool, optional ratings, weather, behaviour, medical, notes; empty sections say so),
 │   │                          opened from a walk row on Log or Calendar; Edit pushes LogPastWalkScreen, Discard deletes the walk
-│   │                          (DiscardWalkDialog confirms first) and back returns to the tab; component/ holds the read-only
+│   │                          (AppConfirmDialog confirms first) and back returns to the tab; component/ holds the read-only
 │   │                          pieces (DetailField, DetailPlaceholder, RatingSummary, OptionalRatingRow, NotedItem)
 │   ├── patterns/              placeholder, same shape as calendar
 │   └── dog/                   DogViewModel + DogScreen (profile header, dog list, add-dog CTA, deleted dogs) composed from
@@ -87,7 +87,8 @@ com.example.walklogger
 ├── core/
 │   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern, WalkWeather with its
 │   │                          WeatherCondition and the TemperatureBand derived from °C) – no Android deps;
-│   │                          StoolEdits holds the stool answer rules the forms and the timer share
+│   │                          StoolEdits holds the stool answer rules the forms and the timer share; WalkDays gives a
+│   │                          walk's start day and time and groups walks by day, for Log and Calendar
 │   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository /
 │   │                          MedicalConcernRepository interfaces + Room-backed implementations, mappers;
 │   │                          WeatherRepository (Open-Meteo forecast, WMO codes mapped in WeatherMappers, and how far back
@@ -109,7 +110,9 @@ com.example.walklogger
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
 │                              SectionLabel, SegmentedToggle, AppSwitch, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
-│                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost)
+│                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost,
+│                              AppConfirmDialog for discard and delete confirmations; addWalkClick decides what
+│                              AddWalkButton does on Log and Calendar)
 │                              + message/UserMessages, the app-wide snackbar queue
 ```
 

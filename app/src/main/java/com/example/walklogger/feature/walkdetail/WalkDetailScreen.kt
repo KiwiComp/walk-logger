@@ -30,6 +30,7 @@ import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Stool
+import com.example.walklogger.core.ui.component.AppConfirmDialog
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
@@ -164,7 +165,10 @@ fun WalkDetailScreen(
         }
     }
     if (showDiscardConfirm) {
-        DiscardWalkDialog(
+        AppConfirmDialog(
+            title = stringResource(R.string.walk_detail_discard_confirm_title),
+            message = stringResource(R.string.walk_detail_discard_confirm_message),
+            confirmLabel = stringResource(R.string.walk_detail_discard_confirm),
             onConfirm = {
                 showDiscardConfirm = false
                 onDiscard()

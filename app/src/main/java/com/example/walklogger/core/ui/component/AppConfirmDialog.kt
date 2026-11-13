@@ -1,4 +1,4 @@
-package com.example.walklogger.feature.logwalk.activewalk
+package com.example.walklogger.core.ui.component
 
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.MaterialTheme
@@ -11,17 +11,24 @@ import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
+/** Asks before something that cannot be undone, such as discarding a walk; Cancel only closes it. */
 @Composable
-internal fun DiscardWalkDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
+fun AppConfirmDialog(
+    title: String,
+    message: String,
+    confirmLabel: String,
+    onConfirm: () -> Unit,
+    onDismiss: () -> Unit,
+) {
     AlertDialog(
         onDismissRequest = onDismiss,
         shape = MaterialTheme.shapes.extraSmall,
         containerColor = AppTheme.colors.background,
-        title = { Text(stringResource(R.string.active_walk_discard_confirm_title)) },
-        text = { Text(stringResource(R.string.active_walk_discard_confirm_message)) },
+        title = { Text(title) },
+        text = { Text(message) },
         confirmButton = {
             TextButton(onClick = onConfirm) {
-                Text(stringResource(R.string.active_walk_discard_confirm))
+                Text(confirmLabel)
             }
         },
         dismissButton = {
@@ -34,8 +41,14 @@ internal fun DiscardWalkDialog(onConfirm: () -> Unit, onDismiss: () -> Unit) {
 
 @Preview
 @Composable
-private fun DiscardWalkDialogPreview() {
+private fun AppConfirmDialogPreview() {
     WalkLoggerTheme {
-        DiscardWalkDialog(onConfirm = {}, onDismiss = {})
+        AppConfirmDialog(
+            title = stringResource(R.string.walk_detail_discard_confirm_title),
+            message = stringResource(R.string.walk_detail_discard_confirm_message),
+            confirmLabel = stringResource(R.string.walk_detail_discard_confirm),
+            onConfirm = {},
+            onDismiss = {},
+        )
     }
 }
