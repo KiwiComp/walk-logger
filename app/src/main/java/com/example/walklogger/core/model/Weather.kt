@@ -28,6 +28,9 @@ data class WalkWeather(
             it ==
                 null
         }
+
+    /** Precipitation and wind are only ever fetched, never entered by hand, so either means the weather was fetched. */
+    val isFetched: Boolean get() = listOf(rainMm, snowfallCm, windSpeedMs).any { it != null }
 }
 
 enum class WeatherCondition {

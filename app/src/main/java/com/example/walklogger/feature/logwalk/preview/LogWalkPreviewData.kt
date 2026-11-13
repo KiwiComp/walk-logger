@@ -13,6 +13,7 @@ import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormState
+import com.example.walklogger.feature.logwalk.WeatherFormState
 import com.example.walklogger.feature.logwalk.WeatherStatus
 import com.example.walklogger.feature.logwalk.activewalk.ActiveWalkUiState
 import com.example.walklogger.feature.logwalk.finishwalk.FinishWalkUiState
@@ -62,10 +63,12 @@ internal object LogWalkPreviewData {
         selectedHandlers = setOf("Jonas"),
         form = WalkFormState(
             equipment = Equipment.COLLAR,
-            temperatureInput = "-2",
-            condition = WeatherCondition.LIGHT_SNOW,
-            weatherStatus = WeatherStatus.TOO_OLD,
-            isWeatherExpanded = true,
+            weather = WeatherFormState(
+                temperatureInput = "-2",
+                condition = WeatherCondition.LIGHT_SNOW,
+                status = WeatherStatus.TOO_OLD,
+                isExpanded = true,
+            ),
             behaviourIssues = behaviourIssues,
             selectedBehaviourIssueIds = setOf(1L, 4L),
             isBehaviourIssuesExpanded = true,
@@ -102,20 +105,22 @@ internal object LogWalkPreviewData {
                 colour = StoolColour.MEDIUM_BROWN,
             ),
             equipment = Equipment.HARNESS,
-            fetchedWeather = WalkWeather(
+            weather = WeatherFormState(
+                fetchedWeather = WalkWeather(
+                    condition = WeatherCondition.PARTLY_CLOUDY,
+                    temperatureCelsius = 7.5,
+                    rainMm = 0.0,
+                    snowfallCm = 0.0,
+                    windSpeedMs = 3.4,
+                    windGustsMs = 7.9,
+                ),
+                temperatureInput = "7,5",
                 condition = WeatherCondition.PARTLY_CLOUDY,
-                temperatureCelsius = 7.5,
-                rainMm = 0.0,
-                snowfallCm = 0.0,
-                windSpeedMs = 3.4,
-                windGustsMs = 7.9,
+                hasLocationPermission = true,
+                hasTimes = true,
+                isCurrent = true,
+                isExpanded = true,
             ),
-            temperatureInput = "7,5",
-            condition = WeatherCondition.PARTLY_CLOUDY,
-            hasLocationPermission = true,
-            hasWeatherTimes = true,
-            isWeatherCurrent = true,
-            isWeatherExpanded = true,
             behaviourIssues = behaviourIssues,
             medicalConcerns = medicalConcerns,
             notes = "Barked at the bin lorry, otherwise steady. " +

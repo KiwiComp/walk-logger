@@ -19,6 +19,7 @@ import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+import com.example.walklogger.feature.logwalk.formatWeatherValue
 
 /** The weather of a walk in a few lines: condition and temperature, then precipitation and wind when known. */
 @Composable

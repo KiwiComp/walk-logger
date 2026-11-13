@@ -303,7 +303,10 @@ class LogPastWalkViewModelTest {
             viewModel.setStartTime(LocalTime.of(17, 40))
             assertTrue(weatherRepository.requests.isEmpty())
             viewModel.setEndTime(LocalTime.of(18, 5))
-            assertEquals(weatherRepository.weather, expectMostRecentItem().form.fetchedWeather)
+            assertEquals(
+                weatherRepository.weather,
+                expectMostRecentItem().form.weather.fetchedWeather,
+            )
         }
         assertEquals(1, weatherRepository.requests.size)
     }
@@ -312,12 +315,15 @@ class LogPastWalkViewModelTest {
     fun `editing keeps the stored weather and fetches only on request`() = runTest {
         val original = seedLoggedWalk()
         viewModel.uiState.test {
-            assertEquals(original.weather, expectMostRecentItem().form.weather)
+            assertEquals(original.weather, expectMostRecentItem().form.weather.walkWeather)
             viewModel.setStartTime(LocalTime.of(8, 0))
             expectMostRecentItem()
             assertTrue(weatherRepository.requests.isEmpty())
             viewModel.formActions.fetchWeather()
-            assertEquals(weatherRepository.weather, expectMostRecentItem().form.fetchedWeather)
+            assertEquals(
+                weatherRepository.weather,
+                expectMostRecentItem().form.weather.fetchedWeather,
+            )
         }
     }
 

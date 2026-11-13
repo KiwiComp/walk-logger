@@ -24,8 +24,8 @@ import com.example.walklogger.core.ui.component.AppTextField
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
-import com.example.walklogger.feature.logwalk.WalkFormActions
-import com.example.walklogger.feature.logwalk.WalkFormState
+import com.example.walklogger.feature.logwalk.WeatherFormActions
+import com.example.walklogger.feature.logwalk.WeatherFormState
 import com.example.walklogger.feature.logwalk.WeatherStatus
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 
@@ -36,28 +36,34 @@ import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
  */
 @Composable
 internal fun WeatherSection(
-    form: WalkFormState,
-    actions: WalkFormActions,
+    weather: WeatherFormState,
+    actions: WeatherFormActions,
     modifier: Modifier = Modifier,
 ) {
-    val weather = form.weather
+    val walkWeather = weather.walkWeather
     FormSection(
         label = stringResource(R.string.log_past_walk_weather),
-        expanded = form.isWeatherExpanded,
+        expanded = weather.isExpanded,
         onToggle = actions::toggleWeather,
-        actionLabel = if (weather != null) stringResource(R.string.form_section_clear) else null,
+        actionLabel = if (walkWeather !=
+            null
+        ) {
+            stringResource(R.string.form_section_clear)
+        } else {
+            null
+        },
         onAction = actions::clearWeather,
-        leadingActionLabel = form.fetchedWeather?.let {
+        leadingActionLabel = weather.fetchedWeather?.let {
             stringResource(
-                if (form.isWeatherEditing) R.string.weather_done else R.string.weather_edit,
+                if (weather.isEditing) R.string.weather_done else R.string.weather_edit,
             )
         },
         onLeadingAction = actions::toggleWeatherEditing,
         modifier = modifier,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
-            val statusMessage = form.weatherStatus.messageRes
-            if (weather != null || statusMessage != null || form.showsFetchWeather) {
+            val statusMessage = weather.status.messageRes
+            if (walkWeather != null || statusMessage != null || weather.showsFetch) {
                 Column(
                     modifier = Modifier
                         .fillMaxWidth()
@@ -65,26 +71,26 @@ internal fun WeatherSection(
                         .padding(AppSpacing.md),
                     verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
                 ) {
-                    weather?.let { WeatherSummary(weather = it) }
+                    walkWeather?.let { WeatherSummary(weather = it) }
                     statusMessage?.let { MutedText(stringResource(it)) }
-                    if (form.showsFetchWeather) {
+                    if (weather.showsFetch) {
                         AppButton(
                             text = stringResource(R.string.weather_fetch),
                             onClick = actions::fetchWeather,
                             style = AppButtonStyle.Secondary,
                             width = AppButtonWidth.Wrap,
-                            loading = form.weatherStatus == WeatherStatus.LOADING,
+                            loading = weather.status == WeatherStatus.LOADING,
                         )
                     }
                 }
             }
-            if (form.showsManualWeather) {
+            if (weather.showsManualEntry) {
                 AppTextField(
-                    value = form.temperatureInput,
+                    value = weather.temperatureInput,
                     onValueChange = actions::setTemperature,
                     label = stringResource(R.string.weather_temperature),
                     suffix = stringResource(R.string.weather_temperature_unit),
-                    supportingText = form.temperatureCelsius?.let {
+                    supportingText = weather.temperatureCelsius?.let {
                         stringResource(TemperatureBand.of(it).labelRes)
                     },
                     keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
@@ -96,15 +102,15 @@ internal fun WeatherSection(
                         color = AppTheme.colors.contentMuted,
                     )
                     WeatherConditionPicker(
-                        selected = form.condition,
-                        isDay = form.fetchedWeather?.isDay ?: true,
+                        selected = weather.condition,
+                        isDay = weather.fetchedWeather?.isDay ?: true,
                         onSelect = actions::selectCondition,
                     )
                 }
             }
-            if (!form.hasLocationPermission) {
+            if (!weather.hasLocationPermission) {
                 AppPickerField(
-                    value = form.place?.name.orEmpty(),
+                    value = weather.place?.name.orEmpty(),
                     label = stringResource(R.string.weather_place),
                     placeholder = stringResource(R.string.weather_place_search_title),
                     onPress = actions::openPlaceSearch,
@@ -113,7 +119,7 @@ internal fun WeatherSection(
             MutedText(stringResource(R.string.weather_attribution))
         }
     }
-    form.placeSearch?.let { search ->
+    weather.placeSearch?.let { search ->
         PlaceSearchDialog(
             search = search,
             onSearch = actions::searchPlaces,
@@ -145,7 +151,7 @@ private fun MutedText(text: String) {
 private fun WeatherSectionPreview() {
     WalkLoggerTheme {
         WeatherSection(
-            form = LogWalkPreviewData.finishWalk.form.copy(isWeatherExpanded = true),
+            weather = LogWalkPreviewData.finishWalk.form.weather.copy(isExpanded = true),
             actions = LogWalkPreviewData.formActions,
             modifier = Modifier.padding(AppSpacing.lg),
         )
@@ -157,7 +163,7 @@ private fun WeatherSectionPreview() {
 private fun WeatherSectionEditingPreview() {
     WalkLoggerTheme {
         WeatherSection(
-            form = LogWalkPreviewData.finishWalk.form.copy(isWeatherEditing = true),
+            weather = LogWalkPreviewData.finishWalk.form.weather.copy(isEditing = true),
             actions = LogWalkPreviewData.formActions,
             modifier = Modifier.padding(AppSpacing.lg),
         )
@@ -169,11 +175,11 @@ private fun WeatherSectionEditingPreview() {
 private fun WeatherSectionFailedPreview() {
     WalkLoggerTheme {
         WeatherSection(
-            form = WalkFormState(
-                isWeatherExpanded = true,
+            weather = WeatherFormState(
+                isExpanded = true,
                 hasLocationPermission = true,
-                hasWeatherTimes = true,
-                weatherStatus = WeatherStatus.FAILED,
+                hasTimes = true,
+                status = WeatherStatus.FAILED,
             ),
             actions = LogWalkPreviewData.formActions,
             modifier = Modifier.padding(AppSpacing.lg),
@@ -186,9 +192,9 @@ private fun WeatherSectionFailedPreview() {
 private fun WeatherSectionWithoutLocationPreview() {
     WalkLoggerTheme {
         WeatherSection(
-            form = WalkFormState(
-                isWeatherExpanded = true,
-                weatherStatus = WeatherStatus.NO_LOCATION,
+            weather = WeatherFormState(
+                isExpanded = true,
+                status = WeatherStatus.NO_LOCATION,
             ),
             actions = LogWalkPreviewData.formActions,
             modifier = Modifier.padding(AppSpacing.lg),
