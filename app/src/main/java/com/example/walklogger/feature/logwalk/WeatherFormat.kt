@@ -1,4 +1,4 @@
-package com.example.walklogger.feature.logwalk.component
+package com.example.walklogger.feature.logwalk
 
 import java.text.DecimalFormat
 import java.text.DecimalFormatSymbols

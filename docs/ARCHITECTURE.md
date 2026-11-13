@@ -25,6 +25,9 @@ com.example.walklogger
 │   │                          WalkFormState + WalkFormEditor (implements WalkFormActions) hold the fields the after-walk
 │   │                          and past-walk forms share (rating to notes, incl. the issue/concern lists, prefill and
 │   │                          applyTo(walk)); each form ViewModel keeps one private and exposes only `formActions`;
+│   │                          the weather section is its own WeatherFormState + WeatherFormEditor (implements
+│   │                          WeatherFormActions, which WalkFormActions extends and WalkFormEditor passes on), with
+│   │                          WeatherFormat for the shown numbers;
 │   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk; the first
 │   │                          Start walk asks for precise location, then starts the walk whatever the answer);
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
@@ -45,7 +48,7 @@ com.example.walklogger
 │   │                          WeatherSection shows the fetched weather (WeatherSummary, also used by walk detail) with a
 │   │                          fetch button, a °C field and WeatherConditionPicker the handler can correct, the place row
 │   │                          (PlaceSearchDialog) when location is unavailable, and the Open-Meteo attribution; the form Routes
-│   │                          ask once through LocationPermissionRequest if Start walk never asked. WalkFormEditor fetches the weather
+│   │                          ask once through LocationPermissionRequest if Start walk never asked. WeatherFormEditor fetches the weather
 │   │                          when a new walk gets its times (again on new times until the handler edits it by hand);
 │   │                          an edited walk only fetches through the button;
 │   │                          the chosen day travels as a route argument into both form ViewModels

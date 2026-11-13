@@ -108,7 +108,10 @@ class FinishWalkViewModelTest {
         runTest {
             walkRepository.addWalks(walk)
             viewModel.uiState.test {
-                assertEquals(weatherRepository.weather, expectMostRecentItem().form.fetchedWeather)
+                assertEquals(
+                    weatherRepository.weather,
+                    expectMostRecentItem().form.weather.fetchedWeather,
+                )
                 viewModel.setStartTime(LocalTime.of(7, 0))
                 expectMostRecentItem()
             }

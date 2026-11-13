@@ -65,7 +65,7 @@ fun FinishWalkRoute(
         }
     }
     LocationPermissionRequest(
-        shouldRequest = uiState.form.shouldRequestLocationPermission,
+        shouldRequest = uiState.form.weather.shouldRequestLocationPermission,
         onResult = viewModel.formActions::onLocationPermissionResult,
     )
     FinishWalkScreen(
