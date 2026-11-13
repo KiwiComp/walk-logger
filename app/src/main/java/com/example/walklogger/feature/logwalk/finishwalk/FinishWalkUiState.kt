@@ -2,18 +2,11 @@ package com.example.walklogger.feature.logwalk.finishwalk
 
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.feature.logwalk.WalkFormState
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
+import com.example.walklogger.feature.logwalk.WalkTimesState
 
 /** The form shown right after a timed walk; the times were recorded but can still be corrected. */
 data class FinishWalkUiState(
-    /** The walk must have ended by now; refreshed by the ViewModel on every time edit. */
-    val now: LocalDateTime,
-    val date: LocalDate = now.toLocalDate(),
-    val startTime: LocalTime? = null,
-    val endTime: LocalTime? = null,
+    val times: WalkTimesState,
     val dogName: String? = null,
     /** Chosen before the walk; not editable here. */
     val handlers: List<String> = emptyList(),
@@ -27,27 +20,9 @@ data class FinishWalkUiState(
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
 ) {
-    /** Null until loaded; zero or negative when the end is not after the start. */
-    val durationMinutes: Int? =
-        if (startTime != null &&
-            endTime != null
-        ) {
-            Duration.between(startTime, endTime).toMinutes().toInt()
-        } else {
-            null
-        }
-
-    /** Latest day the date picker offers. */
-    val maxDate: LocalDate = now.toLocalDate()
-
     /** The first thing still stopping the walk from being saved, in form order. */
-    val saveBlocker: SaveBlocker? = when {
-        durationMinutes == null -> SaveBlocker.TIMES
-        durationMinutes <= 0 -> SaveBlocker.END_BEFORE_START
-        date.atTime(endTime) > now -> SaveBlocker.IN_FUTURE
-        form.rating == null -> SaveBlocker.RATING
-        else -> null
-    }
+    val saveBlocker: SaveBlocker? =
+        times.blocker ?: if (form.rating == null) SaveBlocker.RATING else null
 
     val canSave: Boolean = saveBlocker == null && !isLoading && !isSaving && !isSaved
 }

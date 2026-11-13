@@ -2,18 +2,11 @@ package com.example.walklogger.feature.logwalk.pastwalk
 
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.feature.logwalk.WalkFormState
-import java.time.Duration
-import java.time.LocalDate
-import java.time.LocalDateTime
-import java.time.LocalTime
+import com.example.walklogger.feature.logwalk.WalkTimesState
 
 data class LogPastWalkUiState(
-    /** Prefilled with the day chosen on the log screen; the times are always entered by hand. */
-    val date: LocalDate,
-    /** The walk must have ended by now; refreshed by the ViewModel on every edit. */
-    val now: LocalDateTime,
-    val startTime: LocalTime? = null,
-    val endTime: LocalTime? = null,
+    /** The date starts as the day chosen on the log screen; the times are always entered by hand. */
+    val times: WalkTimesState,
     /** The active dog, shown in the header; a new walk is logged for it. */
     val dogId: Long? = null,
     val dogName: String? = null,
@@ -29,25 +22,10 @@ data class LogPastWalkUiState(
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
 ) {
-    /** Null until both times are set; zero or negative when the end is not after the start. */
-    val durationMinutes: Int? =
-        if (startTime != null &&
-            endTime != null
-        ) {
-            Duration.between(startTime, endTime).toMinutes().toInt()
-        } else {
-            null
-        }
-
-    /** Latest day the date picker offers. */
-    val maxDate: LocalDate = now.toLocalDate()
-
     /** The first thing still stopping the walk from being saved, in form order. */
     val saveBlocker: SaveBlocker? = when {
         selectedHandlers.isEmpty() -> SaveBlocker.HANDLER
-        durationMinutes == null -> SaveBlocker.TIMES
-        durationMinutes <= 0 -> SaveBlocker.END_BEFORE_START
-        date.atTime(endTime) > now -> SaveBlocker.IN_FUTURE
+        times.blocker != null -> times.blocker
         form.rating == null -> SaveBlocker.RATING
         else -> null
     }

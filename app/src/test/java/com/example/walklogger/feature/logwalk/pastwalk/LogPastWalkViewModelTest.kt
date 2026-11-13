@@ -93,10 +93,10 @@ class LogPastWalkViewModelTest {
     fun `date is prefilled and times are empty`() = runTest {
         viewModel.uiState.test {
             val state = expectMostRecentItem()
-            assertEquals(date, state.date)
-            assertNull(state.startTime)
-            assertNull(state.endTime)
-            assertNull(state.durationMinutes)
+            assertEquals(date, state.times.date)
+            assertNull(state.times.startTime)
+            assertNull(state.times.endTime)
+            assertNull(state.times.durationMinutes)
             assertNull(state.form.stool)
         }
     }
@@ -128,7 +128,7 @@ class LogPastWalkViewModelTest {
         viewModel.uiState.test {
             viewModel.setStartTime(LocalTime.of(17, 40))
             viewModel.setEndTime(LocalTime.of(18, 5))
-            assertEquals(25, expectMostRecentItem().durationMinutes)
+            assertEquals(25, expectMostRecentItem().times.durationMinutes)
         }
     }
 
@@ -156,7 +156,7 @@ class LogPastWalkViewModelTest {
     @Test
     fun `date picker is capped at today`() = runTest {
         viewModel.uiState.test {
-            assertEquals(date, expectMostRecentItem().maxDate)
+            assertEquals(date, expectMostRecentItem().times.maxDate)
         }
     }
 
@@ -286,9 +286,9 @@ class LogPastWalkViewModelTest {
             val state = expectMostRecentItem()
             assertTrue(state.isEditing)
             assertFalse(state.isLoading)
-            assertEquals(date.minusDays(2), state.date)
-            assertEquals(LocalTime.of(8, 15), state.startTime)
-            assertEquals(LocalTime.of(8, 50), state.endTime)
+            assertEquals(date.minusDays(2), state.times.date)
+            assertEquals(LocalTime.of(8, 15), state.times.startTime)
+            assertEquals(LocalTime.of(8, 50), state.times.endTime)
             assertEquals(setOf("Jonas"), state.selectedHandlers)
             assertEquals(3, state.form.rating)
             assertEquals("Muddy", state.form.notes)
