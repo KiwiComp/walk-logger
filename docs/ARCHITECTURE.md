@@ -27,7 +27,9 @@ com.example.walklogger
 │   │                          applyTo(walk)); each form ViewModel keeps one private and exposes only `formActions`;
 │   │                          the weather section is its own WeatherFormState + WeatherFormEditor (implements
 │   │                          WeatherFormActions, which WalkFormActions extends and WalkFormEditor passes on), with
-│   │                          WeatherFormat for the shown numbers;
+│   │                          WeatherFormat for the shown numbers; WalkTimesState + WalkTimesEditor hold the date and
+│   │                          times both forms share (duration, the time save blockers, passing the times on to the weather),
+│   │                          and HandlerSelectionEditor the handler chips the new-walk and past-walk screens share;
 │   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk; the first
 │   │                          Start walk asks for precise location, then starts the walk whatever the answer);
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
@@ -102,7 +104,8 @@ com.example.walklogger
 │   │                          rows show their name), and `isHidden` soft-deletes without touching walk history
 │   ├── datastore/             Preferences DataStore (active dog id, the weather place, the active walk's start position,
 │   │                          whether location was asked for)
-│   ├── common/                runCatchingCancellable; di/ holds the injectable coroutine dispatchers and Clock
+│   ├── common/                runCatchingCancellable; Time.kt converts stored epoch millis to and from local date-times;
+│   │                          di/ holds the injectable coroutine dispatchers and Clock
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
 │                              SectionLabel, SegmentedToggle, AppSwitch, DashedButton, AddWalkButton, DayHeading, EquipmentChip,

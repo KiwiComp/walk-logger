@@ -13,6 +13,7 @@ import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormState
+import com.example.walklogger.feature.logwalk.WalkTimesState
 import com.example.walklogger.feature.logwalk.WeatherFormState
 import com.example.walklogger.feature.logwalk.WeatherStatus
 import com.example.walklogger.feature.logwalk.activewalk.ActiveWalkUiState
@@ -53,10 +54,12 @@ internal object LogWalkPreviewData {
     )
 
     val logPastWalk = LogPastWalkUiState(
-        date = LocalDate.of(2026, 9, 12),
-        now = LocalDateTime.of(2026, 9, 14, 20, 0),
-        startTime = LocalTime.of(17, 40),
-        endTime = LocalTime.of(18, 5),
+        times = WalkTimesState(
+            date = LocalDate.of(2026, 9, 12),
+            now = LocalDateTime.of(2026, 9, 14, 20, 0),
+            startTime = LocalTime.of(17, 40),
+            endTime = LocalTime.of(18, 5),
+        ),
         dogId = 1,
         dogName = "Sixten",
         handlers = handlers,
@@ -90,10 +93,12 @@ internal object LogWalkPreviewData {
     )
 
     val finishWalk = FinishWalkUiState(
-        now = LocalDateTime.of(2026, 9, 12, 7, 39),
-        date = LocalDate.of(2026, 9, 12),
-        startTime = LocalTime.of(7, 5),
-        endTime = LocalTime.of(7, 39),
+        times = WalkTimesState(
+            date = LocalDate.of(2026, 9, 12),
+            now = LocalDateTime.of(2026, 9, 12, 7, 39),
+            startTime = LocalTime.of(7, 5),
+            endTime = LocalTime.of(7, 39),
+        ),
         dogName = "Sixten",
         handlers = listOf("Anna"),
         form = WalkFormState(

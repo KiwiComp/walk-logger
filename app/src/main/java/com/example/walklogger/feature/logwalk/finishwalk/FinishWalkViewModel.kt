@@ -16,14 +16,13 @@ import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.domain.SaveWalkUseCase
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormEditor
+import com.example.walklogger.feature.logwalk.WalkTimesEditor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
-import java.time.Instant
 import java.time.LocalDate
-import java.time.LocalDateTime
 import java.time.LocalTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -43,7 +42,7 @@ class FinishWalkViewModel @AssistedInject constructor(
     medicalConcernRepository: MedicalConcernRepository,
     private val walkRepository: WalkRepository,
     private val userMessages: UserMessages,
-    private val clock: Clock,
+    clock: Clock,
     fetchWalkWeather: FetchWalkWeatherUseCase,
     locationPermission: LocationPermissionUseCase,
     locationRepository: LocationRepository,
@@ -68,7 +67,11 @@ class FinishWalkViewModel @AssistedInject constructor(
 
     val formActions: WalkFormActions get() = form
 
-    private val screen = MutableStateFlow(FinishWalkUiState(now = LocalDateTime.now(clock)))
+    private val times = WalkTimesEditor(clock, LocalDate.now(clock)) { start, end ->
+        form.onTimesChanged(start, end, autoFetch = true)
+    }
+
+    private val screen = MutableStateFlow(FinishWalkUiState(times = times.state.value))
 
     /** The stored walk, kept so saving preserves its id, dog and handlers. */
     private var walk: Walk? = null
@@ -83,14 +86,19 @@ class FinishWalkViewModel @AssistedInject constructor(
             }
             walk = stored
             form.prefillFrom(stored)
-            screen.update { it.prefilledFrom(stored) }
-            onTimesChanged()
+            screen.update { it.copy(handlers = stored.handlers, isLoading = false) }
+            times.prefillFrom(stored)
         }
     }
 
     val uiState: StateFlow<FinishWalkUiState> =
-        combine(screen, form.state, dogRepository.observeActiveDog()) { screen, form, dog ->
-            screen.copy(form = form, dogName = dog?.name)
+        combine(
+            screen,
+            times.state,
+            form.state,
+            dogRepository.observeActiveDog(),
+        ) { screen, times, form, dog ->
+            screen.copy(times = times, form = form, dogName = dog?.name)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -99,44 +107,21 @@ class FinishWalkViewModel @AssistedInject constructor(
 
     fun toggleEditTimes() = screen.update { it.copy(isEditingTimes = !it.isEditingTimes) }
 
-    fun setDate(date: LocalDate) = updateWhen { it.copy(date = date) }
+    fun setDate(date: LocalDate) = times.setDate(date)
 
-    fun setStartTime(time: LocalTime) = updateWhen { it.copy(startTime = time) }
+    fun setStartTime(time: LocalTime) = times.setStartTime(time)
 
-    fun setEndTime(time: LocalTime) = updateWhen { it.copy(endTime = time) }
-
-    /** Re-reads the clock alongside the edit so a form left open still validates against the present. */
-    private fun updateWhen(edit: (FinishWalkUiState) -> FinishWalkUiState) {
-        screen.update { edit(it).copy(now = LocalDateTime.now(clock)) }
-        onTimesChanged()
-    }
-
-    private fun onTimesChanged() {
-        val state = screen.value
-        val start = state.startTime ?: return
-        val end = state.endTime ?: return
-        form.onTimesChanged(
-            state.date.atTime(start).toEpochMilli(),
-            state.date.atTime(end).toEpochMilli(),
-            autoFetch = true,
-        )
-    }
+    fun setEndTime(time: LocalTime) = times.setEndTime(time)
 
     fun save() {
-        val state = uiState.value
-        if (!state.canSave) return
+        if (!uiState.value.canSave) return
         val stored = checkNotNull(walk) { "walk $walkId has not loaded" }
+        val start = checkNotNull(times.startMillis)
+        val end = checkNotNull(times.endMillis)
         screen.update { it.copy(isSaving = true) }
         viewModelScope.launch {
             runCatchingCancellable {
-                saveWalk(
-                    form.applyTo(
-                        stored.copy(
-                            startTime = state.date.atTime(state.startTime!!).toEpochMilli(),
-                            endTime = state.date.atTime(state.endTime!!).toEpochMilli(),
-                        ),
-                    ),
-                )
+                saveWalk(form.applyTo(stored.copy(startTime = start, endTime = end)))
             }
                 .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
@@ -145,23 +130,4 @@ class FinishWalkViewModel @AssistedInject constructor(
                 }
         }
     }
-
-    private fun LocalDateTime.toEpochMilli(): Long = atZone(clock.zone).toInstant().toEpochMilli()
-
-    private fun FinishWalkUiState.prefilledFrom(walk: Walk): FinishWalkUiState {
-        val start = walk.startTime.toLocalDateTime()
-        val end = checkNotNull(walk.endTime) {
-            "walk ${walk.id} has not finished"
-        }.toLocalDateTime()
-        return copy(
-            date = start.toLocalDate(),
-            startTime = start.toLocalTime(),
-            endTime = end.toLocalTime(),
-            handlers = walk.handlers,
-            isLoading = false,
-        )
-    }
-
-    private fun Long.toLocalDateTime(): LocalDateTime =
-        Instant.ofEpochMilli(this).atZone(clock.zone).toLocalDateTime()
 }

@@ -126,11 +126,11 @@ fun LogPastWalkScreen(
         ) {
             FormSection(label = stringResource(R.string.log_past_walk_when)) {
                 WhenSection(
-                    date = uiState.date,
-                    maxDate = uiState.maxDate,
-                    startTime = uiState.startTime,
-                    endTime = uiState.endTime,
-                    durationMinutes = uiState.durationMinutes,
+                    date = uiState.times.date,
+                    maxDate = uiState.times.maxDate,
+                    startTime = uiState.times.startTime,
+                    endTime = uiState.times.endTime,
+                    durationMinutes = uiState.times.durationMinutes,
                     onDateChange = onDateChange,
                     onStartTimeChange = onStartTimeChange,
                     onEndTimeChange = onEndTimeChange,
@@ -230,8 +230,7 @@ private fun LogPastWalkScreenEmptyPreview() {
     val walk = LogWalkPreviewData.logPastWalk
     LogPastWalkScreenPreview(
         walk.copy(
-            startTime = null,
-            endTime = null,
+            times = walk.times.copy(startTime = null, endTime = null),
             selectedHandlers = emptySet(),
             form = walk.form.copy(
                 weather = WeatherFormState(),

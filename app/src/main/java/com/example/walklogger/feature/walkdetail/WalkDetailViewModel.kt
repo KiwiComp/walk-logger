@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
+import com.example.walklogger.core.common.toLocalDateTime
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Dog
@@ -15,8 +16,6 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
-import java.time.Instant
-import java.time.LocalDateTime
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -85,12 +84,12 @@ class WalkDetailViewModel @AssistedInject constructor(
     }
 
     private fun WalkDetailUiState.detailsOf(walk: Walk, dog: Dog?): WalkDetailUiState {
-        val start = walk.startTime.toLocalDateTime()
+        val start = walk.startTime.toLocalDateTime(clock.zone)
         return copy(
             isLoading = false,
             date = start.toLocalDate(),
             startTime = start.toLocalTime(),
-            endTime = walk.endTime?.toLocalDateTime()?.toLocalTime(),
+            endTime = walk.endTime?.toLocalDateTime(clock.zone)?.toLocalTime(),
             dogName = dog?.name,
             isDogDeleted = dog?.isDeleted == true,
             handlers = walk.handlers,
@@ -104,7 +103,4 @@ class WalkDetailViewModel @AssistedInject constructor(
             notes = walk.notes,
         )
     }
-
-    private fun Long.toLocalDateTime(): LocalDateTime =
-        Instant.ofEpochMilli(this).atZone(clock.zone).toLocalDateTime()
 }

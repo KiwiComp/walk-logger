@@ -122,11 +122,11 @@ fun FinishWalkScreen(
             if (uiState.isEditingTimes) {
                 FormSection(label = stringResource(R.string.log_past_walk_when)) {
                     WhenSection(
-                        date = uiState.date,
-                        maxDate = uiState.maxDate,
-                        startTime = uiState.startTime,
-                        endTime = uiState.endTime,
-                        durationMinutes = uiState.durationMinutes,
+                        date = uiState.times.date,
+                        maxDate = uiState.times.maxDate,
+                        startTime = uiState.times.startTime,
+                        endTime = uiState.times.endTime,
+                        durationMinutes = uiState.times.durationMinutes,
                         onDateChange = onDateChange,
                         onStartTimeChange = onStartTimeChange,
                         onEndTimeChange = onEndTimeChange,
@@ -176,9 +176,9 @@ private fun FinishWalkUiState.walkedBy(): String {
 /** "07:05 → 07:39 · 34 min · logged automatically", or nothing until the walk has loaded. */
 @Composable
 private fun FinishWalkUiState.timesSummary(): String {
-    val start = startTime ?: return ""
-    val end = endTime ?: return ""
-    val minutes = durationMinutes ?: return ""
+    val start = times.startTime ?: return ""
+    val end = times.endTime ?: return ""
+    val minutes = times.durationMinutes ?: return ""
     return stringResource(
         R.string.finish_walk_times_summary,
         start.format(TimeFormatter),

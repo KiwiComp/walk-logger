@@ -11,6 +11,7 @@ import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.LocationPermissionUseCase
+import com.example.walklogger.feature.logwalk.HandlerSelectionEditor
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -30,7 +31,7 @@ import kotlinx.coroutines.launch
 class NewWalkViewModel @AssistedInject constructor(
     @Assisted private val date: LocalDate,
     private val dogRepository: DogRepository,
-    private val handlerRepository: HandlerRepository,
+    handlerRepository: HandlerRepository,
     private val walkRepository: WalkRepository,
     private val walkLocationCapturer: WalkLocationCapturer,
     private val locationPermission: LocationPermissionUseCase,
@@ -42,32 +43,26 @@ class NewWalkViewModel @AssistedInject constructor(
         fun create(date: LocalDate): NewWalkViewModel
     }
 
-    private val selectedHandlers = MutableStateFlow<Set<String>>(emptySet())
+    private val handlers = HandlerSelectionEditor(viewModelScope, handlerRepository, userMessages)
     private val equipment = MutableStateFlow(Equipment.COLLAR)
     private val start = MutableStateFlow(StartState())
 
-    // The first stored handler is the usual walker, so it starts selected.
     init {
-        viewModelScope.launch {
-            handlerRepository.observeHandlers().first().firstOrNull()?.let { first ->
-                selectedHandlers.update { if (it.isEmpty()) setOf(first) else it }
-            }
-        }
+        handlers.preselectFirst()
     }
 
     val uiState: StateFlow<NewWalkUiState> =
         combine(
             dogRepository.observeActiveDog(),
-            handlerRepository.observeHandlers(),
-            selectedHandlers,
+            handlers.state,
             equipment,
             start,
-        ) { dog, handlers, selected, equipment, start ->
+        ) { dog, handlers, equipment, start ->
             NewWalkUiState(
                 date = date,
                 dogName = dog?.name,
-                handlers = handlers,
-                selectedHandlers = selected,
+                handlers = handlers.handlers,
+                selectedHandlers = handlers.selected,
                 equipment = equipment,
                 isStarting = start.isStarting,
                 shouldRequestLocationPermission = start.shouldRequestLocationPermission,
@@ -79,18 +74,10 @@ class NewWalkViewModel @AssistedInject constructor(
             initialValue = NewWalkUiState(date = date),
         )
 
-    fun toggleHandler(handler: String) = selectedHandlers.update { selected ->
-        if (handler in selected) selected - handler else selected + handler
-    }
+    fun toggleHandler(handler: String) = handlers.toggle(handler)
 
     /** Stores the name (or finds the existing one) and selects it. */
-    fun addHandler(name: String) {
-        viewModelScope.launch {
-            runCatchingCancellable { handlerRepository.addHandler(name) }
-                .onSuccess { stored -> selectedHandlers.update { it + stored } }
-                .onFailure { userMessages.show(R.string.error_add_name) }
-        }
-    }
+    fun addHandler(name: String) = handlers.add(name)
 
     fun selectEquipment(value: Equipment) = equipment.update { value }
 
@@ -122,6 +109,7 @@ class NewWalkViewModel @AssistedInject constructor(
 
     private suspend fun storeWalk() {
         val state = uiState.value
+        val selected = handlers.state.value.selectedInOrder
         runCatchingCancellable {
             val dog =
                 checkNotNull(dogRepository.observeActiveDog().first()) {
@@ -129,7 +117,7 @@ class NewWalkViewModel @AssistedInject constructor(
                 }
             walkRepository.startWalk(
                 dogId = dog.id,
-                handlers = state.handlers.filter { it in state.selectedHandlers },
+                handlers = selected,
                 equipment = state.equipment,
             )
         }

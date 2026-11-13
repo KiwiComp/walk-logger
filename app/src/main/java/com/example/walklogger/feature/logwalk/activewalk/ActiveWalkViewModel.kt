@@ -4,6 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
+import com.example.walklogger.core.common.toLocalDateTime
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Stool
@@ -112,7 +113,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 dogName = dog?.name,
                 handlers = walk.handlers,
                 equipment = walk.equipment,
-                startTime = walk.startInstant().atZone(clock.zone).toLocalTime(),
+                startTime = walk.startTime.toLocalDateTime(clock.zone).toLocalTime(),
                 elapsed = Duration.between(walk.startInstant(), now),
                 note = edits.note ?: walk.notes,
                 stool = if (edits.stool != null) edits.stool.stool else walk.stool,
