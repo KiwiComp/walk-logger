@@ -6,10 +6,13 @@ import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.core.network.OpenMeteoForecastApi
 import com.example.walklogger.core.network.OpenMeteoJson
 import com.example.walklogger.core.network.model.NetworkForecast
+import java.time.Clock
 import java.time.Instant
+import java.time.ZoneOffset
 import kotlinx.coroutines.test.StandardTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertFalse
 import org.junit.Assert.assertTrue
 import org.junit.Test
 
@@ -24,10 +27,11 @@ class DefaultWeatherRepositoryTest {
     """.trimIndent()
 
     private val api = FakeForecastApi(OpenMeteoJson.decodeFromString(response))
+    private val clock = Clock.fixed(Instant.parse("2026-11-09T12:00:00Z"), ZoneOffset.UTC)
 
     @Test
     fun `asks for the hour containing the time and maps the response`() = runTest {
-        val repository = DefaultWeatherRepository(api, StandardTestDispatcher(testScheduler))
+        val repository = DefaultWeatherRepository(api, clock, StandardTestDispatcher(testScheduler))
         val weather = repository.weatherAt(
             Coordinates(59.33, 18.07),
             Instant.parse("2026-11-08T10:42:10Z"),
@@ -48,9 +52,16 @@ class DefaultWeatherRepositoryTest {
     }
 
     @Test
+    fun `reaches back 92 days from the start of today`() = runTest {
+        val repository = DefaultWeatherRepository(api, clock, StandardTestDispatcher(testScheduler))
+        assertTrue(repository.isAvailable(Instant.parse("2026-08-09T00:00:00Z")))
+        assertFalse(repository.isAvailable(Instant.parse("2026-08-08T23:59:59Z")))
+    }
+
+    @Test
     fun `an empty response throws`() = runTest {
         api.forecast = OpenMeteoJson.decodeFromString("""{"hourly":{"time":[]}}""")
-        val repository = DefaultWeatherRepository(api, StandardTestDispatcher(testScheduler))
+        val repository = DefaultWeatherRepository(api, clock, StandardTestDispatcher(testScheduler))
         val result = runCatching { repository.weatherAt(Coordinates(0.0, 0.0), Instant.EPOCH) }
         assertTrue(result.exceptionOrNull() is IllegalStateException)
     }

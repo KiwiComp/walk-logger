@@ -6,8 +6,8 @@ import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
+import com.example.walklogger.core.data.WalkLocationCapturer
 import com.example.walklogger.core.data.WalkRepository
-import com.example.walklogger.core.location.WalkLocationCapturer
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.LocationPermissionUseCase

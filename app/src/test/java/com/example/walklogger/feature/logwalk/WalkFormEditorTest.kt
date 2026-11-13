@@ -18,15 +18,13 @@ import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
-import com.example.walklogger.testing.FakeLocationProvider
+import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.shownMessages
-import java.time.Clock
 import java.time.Duration
 import java.time.Instant
-import java.time.ZoneOffset
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -41,11 +39,10 @@ class WalkFormEditorTest {
     private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val userMessages = UserMessages()
-    private val locationProvider = FakeLocationProvider()
+    private val locationRepository = FakeLocationRepository()
     private val placeRepository = FakePlaceRepository()
     private val weatherRepository = FakeWeatherRepository()
     private val now = Instant.parse("2026-11-09T12:00:00Z")
-    private val clock = Clock.fixed(now, ZoneOffset.UTC)
     private val walk =
         Walk(id = 42, dogId = 7, handlers = listOf("Jonas"), startTime = 1_000, endTime = 2_000)
     private val start = now.minus(Duration.ofHours(2)).toEpochMilli()
@@ -55,7 +52,7 @@ class WalkFormEditorTest {
     private fun runEditorTest(body: suspend TestScope.(WalkFormEditor) -> Unit) =
         runTest(UnconfinedTestDispatcher()) {
             val fetchWalkWeather =
-                FetchWalkWeatherUseCase(locationProvider, placeRepository, weatherRepository, clock)
+                FetchWalkWeatherUseCase(locationRepository, placeRepository, weatherRepository)
             body(
                 WalkFormEditor(
                     backgroundScope,
@@ -63,7 +60,7 @@ class WalkFormEditorTest {
                     medicalConcernRepository,
                     userMessages,
                     fetchWalkWeather,
-                    LocationPermissionUseCase(locationProvider, placeRepository),
+                    LocationPermissionUseCase(locationRepository, placeRepository),
                     placeRepository,
                 ),
             )
@@ -208,7 +205,7 @@ class WalkFormEditorTest {
     @Test
     fun `the first fetch without permission asks for it, then falls back to the saved place`() =
         runEditorTest { editor ->
-            locationProvider.isGranted = false
+            locationRepository.isGranted = false
             val uppsala = Place("Uppsala", null, Coordinates(59.86, 17.64))
             placeRepository.savePlace(uppsala)
             editor.onTimesChanged(start, end, autoFetch = true)
@@ -231,7 +228,7 @@ class WalkFormEditorTest {
     @Test
     fun `without location or place the section says to choose a place, and choosing one fetches`() =
         runEditorTest { editor ->
-            locationProvider.isGranted = false
+            locationRepository.isGranted = false
             placeRepository.markLocationPermissionRequested()
             val uppsala = Place("Uppsala", "Uppsala län", Coordinates(59.86, 17.64))
             placeRepository.searchResults = listOf(uppsala)
@@ -263,6 +260,7 @@ class WalkFormEditorTest {
     @Test
     fun `walks older than the forecast reaches and failed fetches leave the weather to the handler`() =
         runEditorTest { editor ->
+            weatherRepository.oldestAvailable = now.minus(Duration.ofDays(92))
             val old = now.minus(Duration.ofDays(100)).toEpochMilli()
             editor.onTimesChanged(old, old + 3_600_000, autoFetch = true)
             assertEquals(WeatherStatus.TOO_OLD, editor.state.value.weatherStatus)
@@ -334,11 +332,12 @@ class WalkFormEditorTest {
             editor.onTimesChanged(start, end, autoFetch = true)
             assertTrue(editor.state.value.showsFetchWeather)
 
+            weatherRepository.oldestAvailable = now.minus(Duration.ofDays(92))
             val old = now.minus(Duration.ofDays(100)).toEpochMilli()
             editor.onTimesChanged(old, old + 3_600_000, autoFetch = true)
             assertFalse(editor.state.value.showsFetchWeather)
 
-            locationProvider.isGranted = false
+            locationRepository.isGranted = false
             placeRepository.markLocationPermissionRequested()
             editor.onTimesChanged(start, end, autoFetch = true)
             assertEquals(WeatherStatus.NO_LOCATION, editor.state.value.weatherStatus)

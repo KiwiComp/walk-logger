@@ -8,7 +8,7 @@ import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeHandlerRepository
-import com.example.walklogger.testing.FakeLocationProvider
+import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWalkLocationCapturer
 import com.example.walklogger.testing.FakeWalkRepository
@@ -35,7 +35,7 @@ class NewWalkViewModelTest {
     private val handlerRepository = FakeHandlerRepository()
     private val walkRepository = FakeWalkRepository()
     private val walkLocationCapturer = FakeWalkLocationCapturer()
-    private val locationProvider = FakeLocationProvider()
+    private val locationRepository = FakeLocationRepository()
     private val placeRepository = FakePlaceRepository()
     private val userMessages = UserMessages()
     private val viewModel by lazy {
@@ -45,7 +45,7 @@ class NewWalkViewModelTest {
             handlerRepository = handlerRepository,
             walkRepository = walkRepository,
             walkLocationCapturer = walkLocationCapturer,
-            locationPermission = LocationPermissionUseCase(locationProvider, placeRepository),
+            locationPermission = LocationPermissionUseCase(locationRepository, placeRepository),
             userMessages = userMessages,
         )
     }
@@ -191,13 +191,13 @@ class NewWalkViewModelTest {
     fun `the first start asks for location and starts the walk once answered`() = runTest {
         dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         handlerRepository.addHandlers("Kim")
-        locationProvider.isGranted = false
+        locationRepository.isGranted = false
         viewModel.uiState.test {
             viewModel.startWalk()
             assertTrue(expectMostRecentItem().shouldRequestLocationPermission)
             assertNull(walkRepository.observeActiveWalk().first())
 
-            locationProvider.isGranted = true
+            locationRepository.isGranted = true
             viewModel.onLocationPermissionAnswered()
             val state = expectMostRecentItem()
             assertFalse(state.shouldRequestLocationPermission)
@@ -212,7 +212,7 @@ class NewWalkViewModelTest {
     fun `a denied location still starts the walk`() = runTest {
         dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         handlerRepository.addHandlers("Kim")
-        locationProvider.isGranted = false
+        locationRepository.isGranted = false
         viewModel.uiState.test {
             viewModel.startWalk()
             expectMostRecentItem()
@@ -225,7 +225,7 @@ class NewWalkViewModelTest {
     fun `does not ask again once it has asked`() = runTest {
         dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         handlerRepository.addHandlers("Kim")
-        locationProvider.isGranted = false
+        locationRepository.isGranted = false
         placeRepository.markLocationPermissionRequested()
         viewModel.uiState.test {
             viewModel.startWalk()

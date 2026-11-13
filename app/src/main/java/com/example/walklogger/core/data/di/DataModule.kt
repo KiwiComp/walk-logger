@@ -4,12 +4,14 @@ import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DefaultBehaviourIssueRepository
 import com.example.walklogger.core.data.DefaultDogRepository
 import com.example.walklogger.core.data.DefaultHandlerRepository
+import com.example.walklogger.core.data.DefaultLocationRepository
 import com.example.walklogger.core.data.DefaultMedicalConcernRepository
 import com.example.walklogger.core.data.DefaultPlaceRepository
 import com.example.walklogger.core.data.DefaultWalkRepository
 import com.example.walklogger.core.data.DefaultWeatherRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
+import com.example.walklogger.core.data.LocationRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
 import com.example.walklogger.core.data.PlaceRepository
 import com.example.walklogger.core.data.WalkRepository
@@ -46,4 +48,7 @@ abstract class DataModule {
 
     @Binds
     abstract fun bindsPlaceRepository(impl: DefaultPlaceRepository): PlaceRepository
+
+    @Binds
+    abstract fun bindsLocationRepository(impl: DefaultLocationRepository): LocationRepository
 }
