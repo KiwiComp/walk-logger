@@ -3,15 +3,14 @@ package com.example.walklogger.feature.dog
 import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.Dog
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.MainDispatcherRule
-import com.example.walklogger.testing.shownMessages
 import java.time.Clock
 import java.time.LocalDate
 import java.time.ZoneOffset
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
+import org.junit.Assert.assertNull
 import org.junit.Rule
 import org.junit.Test
 
@@ -23,9 +22,8 @@ class DogViewModelTest {
     private val today = LocalDate.of(2026, 9, 12)
     private val clock = Clock.fixed(today.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
     private val repository = FakeDogRepository()
-    private val userMessages = UserMessages()
 
-    private val viewModel by lazy { DogViewModel(repository, userMessages, clock) }
+    private val viewModel by lazy { DogViewModel(repository, clock) }
 
     private val sixten =
         Dog(
@@ -40,7 +38,7 @@ class DogViewModelTest {
     @Test
     fun `no dog registered shows the empty state`() = runTest {
         viewModel.uiState.test {
-            assertEquals(DogUiState.NoDog(), expectMostRecentItem())
+            assertEquals(DogUiState(isLoading = false), expectMostRecentItem())
         }
     }
 
@@ -48,7 +46,7 @@ class DogViewModelTest {
     fun `first dog is active and its profile is shown`() = runTest {
         repository.addDogs(sixten, mira)
         viewModel.uiState.test {
-            val state = expectMostRecentItem() as DogUiState.Profile
+            val state = expectMostRecentItem()
             assertEquals(
                 DogProfileUiState(
                     id = 1,
@@ -73,7 +71,7 @@ class DogViewModelTest {
     fun `age is null without a birth date`() = runTest {
         repository.addDogs(mira)
         viewModel.uiState.test {
-            val state = expectMostRecentItem() as DogUiState.Profile
+            val state = expectMostRecentItem()
             assertEquals(
                 DogProfileUiState(
                     id = 2,
@@ -91,10 +89,13 @@ class DogViewModelTest {
     fun `switching dog changes the profile`() = runTest {
         repository.addDogs(sixten, mira)
         viewModel.uiState.test {
-            assertEquals("Sixten", (expectMostRecentItem() as DogUiState.Profile).active.name)
+            assertEquals(
+                "Sixten",
+                expectMostRecentItem().active?.name,
+            )
             viewModel.switchDog(2)
-            val state = expectMostRecentItem() as DogUiState.Profile
-            assertEquals("Mira", state.active.name)
+            val state = expectMostRecentItem()
+            assertEquals("Mira", state.active?.name)
             assertEquals(listOf(false, true), state.dogs.map { it.isActive })
         }
     }
@@ -102,20 +103,31 @@ class DogViewModelTest {
     @Test
     fun `a failed switch keeps the profile and says so`() = runTest {
         repository.addDogs(sixten, mira)
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             repository.failures.failWrites = true
             viewModel.switchDog(2)
-            assertEquals("Sixten", (expectMostRecentItem() as DogUiState.Profile).active.name)
+            val state = expectMostRecentItem()
+            assertEquals("Sixten", state.active?.name)
+            assertEquals(R.string.error_select_dog, state.userMessage)
         }
-        assertEquals(listOf(R.string.error_select_dog), shown)
+    }
+
+    @Test
+    fun `a shown message is cleared`() = runTest {
+        repository.addDogs(sixten, mira)
+        viewModel.uiState.test {
+            repository.failures.failWrites = true
+            viewModel.switchDog(2)
+            viewModel.userMessageShown(R.string.error_select_dog)
+            assertNull(expectMostRecentItem().userMessage)
+        }
     }
 
     @Test
     fun `deleted dogs are listed apart and can be selected as active`() = runTest {
         repository.addDogs(sixten, mira.copy(isDeleted = true))
         viewModel.uiState.test {
-            val before = expectMostRecentItem() as DogUiState.Profile
+            val before = expectMostRecentItem()
             assertEquals(
                 listOf(DogListItemUiState(id = 1, name = "Sixten", isActive = true)),
                 before.dogs,
@@ -125,9 +137,9 @@ class DogViewModelTest {
                 before.deletedDogs,
             )
             viewModel.switchDog(2)
-            val after = expectMostRecentItem() as DogUiState.Profile
-            assertEquals("Mira", after.active.name)
-            assertEquals(true, after.active.isDeleted)
+            val after = expectMostRecentItem()
+            assertEquals("Mira", after.active?.name)
+            assertEquals(true, after.active?.isDeleted)
             assertEquals(
                 listOf(DogListItemUiState(id = 2, name = "Mira", isActive = true)),
                 after.deletedDogs,
@@ -140,7 +152,8 @@ class DogViewModelTest {
         repository.addDogs(mira.copy(isDeleted = true))
         viewModel.uiState.test {
             assertEquals(
-                DogUiState.NoDog(
+                DogUiState(
+                    isLoading = false,
                     deletedDogs = listOf(
                         DogListItemUiState(id = 2, name = "Mira", isActive = false),
                     ),

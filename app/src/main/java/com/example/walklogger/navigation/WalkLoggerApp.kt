@@ -18,6 +18,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.rememberCoroutineScope
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalResources
@@ -41,6 +42,7 @@ import com.example.walklogger.feature.dog.navigation.navigateToDog
 import com.example.walklogger.feature.log.navigation.navigateToLog
 import com.example.walklogger.feature.logwalk.navigation.navigateToActiveWalk
 import com.example.walklogger.feature.patterns.navigation.navigateToPatterns
+import kotlinx.coroutines.launch
 
 /** Root composable: scaffold + bottom bar + nav host. Each tab draws its own header. */
 @Composable
@@ -64,6 +66,12 @@ fun WalkLoggerApp(
     val resources = LocalResources.current
     LaunchedEffect(viewModel, resources) {
         viewModel.messages.collect { snackbarHostState.showSnackbar(resources.getString(it)) }
+    }
+    val messageScope = rememberCoroutineScope()
+    val showMessage: (Int) -> Unit = remember(messageScope, snackbarHostState, resources) {
+        { message ->
+            messageScope.launch { snackbarHostState.showSnackbar(resources.getString(message)) }
+        }
     }
 
     Scaffold(
@@ -90,6 +98,7 @@ fun WalkLoggerApp(
         WalkLoggerNavHost(
             navController = navController,
             snackbarHostState = snackbarHostState,
+            onShowMessage = showMessage,
             modifier = Modifier
                 .padding(bottomPadding)
                 .consumeWindowInsets(bottomPadding),

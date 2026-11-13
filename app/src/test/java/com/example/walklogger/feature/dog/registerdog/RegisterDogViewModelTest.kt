@@ -5,11 +5,9 @@ import com.example.walklogger.R
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Walk
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
-import com.example.walklogger.testing.shownMessages
 import java.time.LocalDate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -26,7 +24,6 @@ class RegisterDogViewModelTest {
     val mainDispatcherRule = MainDispatcherRule()
 
     private val repository = FakeDogRepository()
-    private val userMessages = UserMessages()
     private val walkRepository = FakeWalkRepository()
     private val viewModel by lazy { editViewModel(dogId = null) }
 
@@ -34,7 +31,6 @@ class RegisterDogViewModelTest {
         dogId = dogId,
         dogRepository = repository,
         walkRepository = walkRepository,
-        userMessages = userMessages,
     )
 
     private fun ongoingWalk(dogId: Long) = Walk(
@@ -166,7 +162,6 @@ class RegisterDogViewModelTest {
 
     @Test
     fun `a failed save keeps the form open and says so`() = runTest {
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             viewModel.setName("Sixten")
             repository.failures.failWrites = true
@@ -175,15 +170,25 @@ class RegisterDogViewModelTest {
             assertFalse(state.isSaving)
             assertFalse(state.isSaved)
             assertTrue(state.canSave)
+            assertEquals(R.string.error_save_dog, state.userMessage)
         }
-        assertEquals(listOf(R.string.error_save_dog), shown)
+    }
+
+    @Test
+    fun `a shown message is cleared unless a newer one replaced it`() = runTest {
+        viewModel.setName("Sixten")
+        repository.failures.failWrites = true
+        viewModel.save()
+        viewModel.userMessageShown(R.string.error_delete_dog)
+        assertEquals(R.string.error_save_dog, viewModel.uiState.value.userMessage)
+        viewModel.userMessageShown(R.string.error_save_dog)
+        assertNull(viewModel.uiState.value.userMessage)
     }
 
     @Test
     fun `a failed delete keeps the dog and says so`() = runTest {
         repository.addDogs(Dog(id = 7, name = "Sixten"))
         val editing = editViewModel(7)
-        val shown = shownMessages(userMessages)
         editing.uiState.test {
             repository.failures.failWrites = true
             editing.delete()
@@ -191,17 +196,15 @@ class RegisterDogViewModelTest {
             assertFalse(state.isDeleting)
             assertFalse(state.isDeleted)
             assertTrue(state.canDelete)
+            assertEquals(R.string.error_delete_dog, state.userMessage)
         }
-        assertEquals(listOf(R.string.error_delete_dog), shown)
     }
 
     @Test
-    fun `editing a missing dog closes the screen and says so`() = runTest {
-        val shown = shownMessages(userMessages)
+    fun `editing a missing dog closes the screen`() = runTest {
         editViewModel(7).uiState.test {
             assertTrue(expectMostRecentItem().isNotFound)
         }
-        assertEquals(listOf(R.string.error_dog_not_found), shown)
     }
 
     @Test

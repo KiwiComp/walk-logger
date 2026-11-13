@@ -13,6 +13,7 @@ import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -34,6 +35,7 @@ import com.example.walklogger.core.ui.component.AppTextField
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
+import com.example.walklogger.core.ui.message.UserMessageEffect
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import java.time.LocalDate
@@ -44,6 +46,7 @@ fun RegisterDogRoute(
     dogId: Long?,
     onDone: () -> Unit,
     onNotFound: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: RegisterDogViewModel =
         hiltViewModel<RegisterDogViewModel, RegisterDogViewModel.Factory> { it.create(dogId) },
@@ -57,6 +60,11 @@ fun RegisterDogRoute(
             uiState.isNotFound -> currentOnNotFound()
         }
     }
+    UserMessageEffect(
+        message = uiState.userMessage,
+        snackbarHostState = snackbarHostState,
+        onConsume = viewModel::userMessageShown,
+    )
     RegisterDogScreen(
         uiState = uiState,
         onNameChange = viewModel::setName,

@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.dog.registerdog
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
@@ -7,7 +8,6 @@ import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Dog
-import com.example.walklogger.core.ui.message.UserMessages
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
@@ -26,7 +26,6 @@ class RegisterDogViewModel @AssistedInject constructor(
     @Assisted private val dogId: Long?,
     private val dogRepository: DogRepository,
     private val walkRepository: WalkRepository,
-    private val userMessages: UserMessages,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -45,7 +44,6 @@ class RegisterDogViewModel @AssistedInject constructor(
                 val dog = dogRepository.observeDogs().first().find { it.id == dogId }
                 if (dog == null) {
                     _uiState.update { it.copy(isNotFound = true) }
-                    userMessages.show(R.string.error_dog_not_found)
                 } else {
                     _uiState.update { it.prefilledFrom(dog) }
                 }
@@ -91,8 +89,9 @@ class RegisterDogViewModel @AssistedInject constructor(
             }
                 .onSuccess { _uiState.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
-                    _uiState.update { it.copy(isSaving = false) }
-                    userMessages.show(R.string.error_save_dog)
+                    _uiState.update {
+                        it.copy(isSaving = false, userMessage = R.string.error_save_dog)
+                    }
                 }
         }
     }
@@ -104,10 +103,15 @@ class RegisterDogViewModel @AssistedInject constructor(
             runCatchingCancellable { dogRepository.deleteDog(dogId) }
                 .onSuccess { _uiState.update { it.copy(isDeleting = false, isDeleted = true) } }
                 .onFailure {
-                    _uiState.update { it.copy(isDeleting = false) }
-                    userMessages.show(R.string.error_delete_dog)
+                    _uiState.update {
+                        it.copy(isDeleting = false, userMessage = R.string.error_delete_dog)
+                    }
                 }
         }
+    }
+
+    fun userMessageShown(@StringRes message: Int) = _uiState.update {
+        if (it.userMessage == message) it.copy(userMessage = null) else it
     }
 
     private fun RegisterDogUiState.prefilledFrom(dog: Dog) = copy(

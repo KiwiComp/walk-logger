@@ -1,17 +1,16 @@
 package com.example.walklogger.feature.dog
 
-sealed interface DogUiState {
-    data object Loading : DogUiState
+import androidx.annotation.StringRes
 
-    data class NoDog(val deletedDogs: List<DogListItemUiState> = emptyList()) : DogUiState
-
-    data class Profile(
-        val active: DogProfileUiState,
-        /** Every dog that is not deleted, in registration order, including the active one. */
-        val dogs: List<DogListItemUiState>,
-        val deletedDogs: List<DogListItemUiState> = emptyList(),
-    ) : DogUiState
-}
+data class DogUiState(
+    val isLoading: Boolean = true,
+    /** Null when no dog is active: none registered, or only deleted ones. */
+    val active: DogProfileUiState? = null,
+    /** Every dog that is not deleted, in registration order, including the active one. */
+    val dogs: List<DogListItemUiState> = emptyList(),
+    val deletedDogs: List<DogListItemUiState> = emptyList(),
+    @param:StringRes val userMessage: Int? = null,
+)
 
 data class DogProfileUiState(
     val id: Long,
