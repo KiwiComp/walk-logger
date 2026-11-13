@@ -3,8 +3,8 @@ package com.example.walklogger.domain
 import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Place
 import com.example.walklogger.core.model.WalkLocation
+import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeLocationRepository
-import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import java.time.Duration
 import java.time.Instant
@@ -17,10 +17,14 @@ class FetchWalkWeatherUseCaseTest {
 
     private val now = Instant.parse("2026-11-09T12:00:00Z")
     private val locationRepository = FakeLocationRepository()
-    private val placeRepository = FakePlaceRepository()
     private val weatherRepository = FakeWeatherRepository()
+    private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
     private val useCase =
-        FetchWalkWeatherUseCase(locationRepository, placeRepository, weatherRepository)
+        FetchWalkWeatherUseCase(
+            locationRepository,
+            weatherRepository,
+            activeWalkLocationRepository,
+        )
     private val uppsala = Place("Uppsala", null, Coordinates(59.86, 17.64))
 
     private fun walkEndingAgo(ago: Duration): Pair<Long, Long> {
@@ -39,7 +43,7 @@ class FetchWalkWeatherUseCaseTest {
 
     @Test
     fun `falls back to the saved place without permission or a fix`() = runTest {
-        placeRepository.savePlace(uppsala)
+        locationRepository.savePlace(uppsala)
         val (start, end) = walkEndingAgo(Duration.ofHours(1))
         locationRepository.isGranted = false
         useCase(start, end)
@@ -56,7 +60,7 @@ class FetchWalkWeatherUseCaseTest {
 
     @Test
     fun `uses the position stored when the walk started, even without permission`() = runTest {
-        placeRepository.saveActiveWalkLocation(WalkLocation(walkId = 4, uppsala.coordinates))
+        activeWalkLocationRepository.save(WalkLocation(walkId = 4, uppsala.coordinates))
         locationRepository.isGranted = false
         val (start, end) = walkEndingAgo(Duration.ofHours(1))
         assertTrue(useCase(start, end, walkId = 4) is WeatherFetchResult.Fetched)
@@ -65,7 +69,7 @@ class FetchWalkWeatherUseCaseTest {
 
     @Test
     fun `ignores a position stored for another walk`() = runTest {
-        placeRepository.saveActiveWalkLocation(WalkLocation(walkId = 4, uppsala.coordinates))
+        activeWalkLocationRepository.save(WalkLocation(walkId = 4, uppsala.coordinates))
         val (start, end) = walkEndingAgo(Duration.ofHours(1))
         useCase(start, end, walkId = 5)
         useCase(start, end)

@@ -9,7 +9,6 @@ import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeHandlerRepository
 import com.example.walklogger.testing.FakeLocationRepository
-import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWalkLocationCapturer
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
@@ -36,7 +35,6 @@ class NewWalkViewModelTest {
     private val walkRepository = FakeWalkRepository()
     private val walkLocationCapturer = FakeWalkLocationCapturer()
     private val locationRepository = FakeLocationRepository()
-    private val placeRepository = FakePlaceRepository()
     private val userMessages = UserMessages()
     private val viewModel by lazy {
         NewWalkViewModel(
@@ -45,7 +43,7 @@ class NewWalkViewModelTest {
             handlerRepository = handlerRepository,
             walkRepository = walkRepository,
             walkLocationCapturer = walkLocationCapturer,
-            locationPermission = LocationPermissionUseCase(locationRepository, placeRepository),
+            locationPermission = LocationPermissionUseCase(locationRepository),
             userMessages = userMessages,
         )
     }
@@ -205,7 +203,7 @@ class NewWalkViewModelTest {
             assertEquals(walk.id, state.startedWalkId)
             assertEquals(listOf(walk.id), walkLocationCapturer.capturedWalkIds)
         }
-        assertTrue(placeRepository.locationPermissionRequested.first())
+        assertTrue(locationRepository.locationPermissionRequested.first())
     }
 
     @Test
@@ -226,7 +224,7 @@ class NewWalkViewModelTest {
         dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         handlerRepository.addHandlers("Kim")
         locationRepository.isGranted = false
-        placeRepository.markLocationPermissionRequested()
+        locationRepository.markLocationPermissionRequested()
         viewModel.uiState.test {
             viewModel.startWalk()
             val state = expectMostRecentItem()

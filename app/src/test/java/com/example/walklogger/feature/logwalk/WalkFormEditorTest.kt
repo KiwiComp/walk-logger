@@ -17,10 +17,10 @@ import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
+import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
-import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.shownMessages
 import java.time.Duration
@@ -40,7 +40,6 @@ class WalkFormEditorTest {
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val userMessages = UserMessages()
     private val locationRepository = FakeLocationRepository()
-    private val placeRepository = FakePlaceRepository()
     private val weatherRepository = FakeWeatherRepository()
     private val now = Instant.parse("2026-11-09T12:00:00Z")
     private val walk =
@@ -52,7 +51,11 @@ class WalkFormEditorTest {
     private fun runEditorTest(body: suspend TestScope.(WalkFormEditor) -> Unit) =
         runTest(UnconfinedTestDispatcher()) {
             val fetchWalkWeather =
-                FetchWalkWeatherUseCase(locationRepository, placeRepository, weatherRepository)
+                FetchWalkWeatherUseCase(
+                    locationRepository,
+                    weatherRepository,
+                    FakeActiveWalkLocationRepository(),
+                )
             body(
                 WalkFormEditor(
                     backgroundScope,
@@ -60,8 +63,8 @@ class WalkFormEditorTest {
                     medicalConcernRepository,
                     userMessages,
                     fetchWalkWeather,
-                    LocationPermissionUseCase(locationRepository, placeRepository),
-                    placeRepository,
+                    LocationPermissionUseCase(locationRepository),
+                    locationRepository,
                 ),
             )
         }
@@ -207,7 +210,7 @@ class WalkFormEditorTest {
         runEditorTest { editor ->
             locationRepository.isGranted = false
             val uppsala = Place("Uppsala", null, Coordinates(59.86, 17.64))
-            placeRepository.savePlace(uppsala)
+            locationRepository.savePlace(uppsala)
             editor.onTimesChanged(start, end, autoFetch = true)
             assertTrue(editor.state.value.shouldRequestLocationPermission)
             assertTrue(weatherRepository.requests.isEmpty())
@@ -229,9 +232,9 @@ class WalkFormEditorTest {
     fun `without location or place the section says to choose a place, and choosing one fetches`() =
         runEditorTest { editor ->
             locationRepository.isGranted = false
-            placeRepository.markLocationPermissionRequested()
+            locationRepository.markLocationPermissionRequested()
             val uppsala = Place("Uppsala", "Uppsala län", Coordinates(59.86, 17.64))
-            placeRepository.searchResults = listOf(uppsala)
+            locationRepository.searchResults = listOf(uppsala)
             editor.onTimesChanged(start, end, autoFetch = true)
             assertEquals(WeatherStatus.NO_LOCATION, editor.state.value.weatherStatus)
 
@@ -249,7 +252,7 @@ class WalkFormEditorTest {
 
     @Test
     fun `a failed place search says so`() = runEditorTest { editor ->
-        placeRepository.failSearches = true
+        locationRepository.failSearches = true
         editor.openPlaceSearch()
         editor.searchPlaces("Upps")
         assertTrue(editor.state.value.placeSearch!!.isFailed)
@@ -338,7 +341,7 @@ class WalkFormEditorTest {
             assertFalse(editor.state.value.showsFetchWeather)
 
             locationRepository.isGranted = false
-            placeRepository.markLocationPermissionRequested()
+            locationRepository.markLocationPermissionRequested()
             editor.onTimesChanged(start, end, autoFetch = true)
             assertEquals(WeatherStatus.NO_LOCATION, editor.state.value.weatherStatus)
             assertFalse(editor.state.value.showsFetchWeather)
@@ -539,7 +542,7 @@ class WalkFormEditorTest {
     @Test
     fun `a place that cannot be saved says so`() = runEditorTest { editor ->
         val shown = shownMessages(userMessages)
-        placeRepository.failures.failWrites = true
+        locationRepository.failures.failWrites = true
         editor.selectPlace(Place("Uppsala", null, Coordinates(59.86, 17.64)))
         assertEquals(listOf(R.string.error_save_place), shown)
     }

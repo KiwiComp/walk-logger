@@ -1,8 +1,8 @@
 package com.example.walklogger.domain
 
 import com.example.walklogger.core.common.runCatchingCancellable
+import com.example.walklogger.core.data.ActiveWalkLocationRepository
 import com.example.walklogger.core.data.LocationRepository
-import com.example.walklogger.core.data.PlaceRepository
 import com.example.walklogger.core.data.WeatherRepository
 import com.example.walklogger.core.model.WalkWeather
 import java.time.Instant
@@ -24,8 +24,8 @@ sealed interface WeatherFetchResult {
 /** The weather for a walk, from the device location or, failing that, the saved place. */
 class FetchWalkWeatherUseCase @Inject constructor(
     private val locationRepository: LocationRepository,
-    private val placeRepository: PlaceRepository,
     private val weatherRepository: WeatherRepository,
+    private val activeWalkLocationRepository: ActiveWalkLocationRepository,
 ) {
     /**
      * Values are taken from the hour that contains the middle of the walk. A position stored for
@@ -41,14 +41,16 @@ class FetchWalkWeatherUseCase @Inject constructor(
         return runCatchingCancellable {
             val coordinates = walkId?.let { activeWalkCoordinates(it) }
                 ?: deviceCoordinates()
-                ?: placeRepository.savedPlace.first()?.coordinates
+                ?: locationRepository.savedPlace.first()?.coordinates
                 ?: return@runCatchingCancellable WeatherFetchResult.NoLocation
             WeatherFetchResult.Fetched(weatherRepository.weatherAt(coordinates, middle))
         }.getOrDefault(WeatherFetchResult.Failed)
     }
 
     private suspend fun activeWalkCoordinates(walkId: Long) =
-        placeRepository.activeWalkLocation.first()?.takeIf { it.walkId == walkId }?.coordinates
+        activeWalkLocationRepository.activeWalkLocation.first()?.takeIf {
+            it.walkId == walkId
+        }?.coordinates
 
     private suspend fun deviceCoordinates() =
         if (locationRepository.hasPermission()) locationRepository.currentLocation() else null
