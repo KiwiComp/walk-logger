@@ -17,6 +17,7 @@ import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
+import com.example.walklogger.domain.SaveWalkUseCase
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
@@ -77,6 +78,7 @@ class LogPastWalkViewModelTest {
             ),
             locationPermission = LocationPermissionUseCase(locationRepository),
             locationRepository = locationRepository,
+            saveWalk = SaveWalkUseCase(walkRepository, FakeActiveWalkLocationRepository()),
         )
     }
 
@@ -132,6 +134,7 @@ class LogPastWalkViewModelTest {
 
     @Test
     fun `save is blocked by the first missing input in form order`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         handlerRepository.addHandlers("Anna")
         viewModel.uiState.test {
             viewModel.toggleHandler("Anna")
@@ -346,6 +349,20 @@ class LogPastWalkViewModelTest {
         viewModel.uiState.test {
             viewModel.save()
             assertFalse(expectMostRecentItem().isSaved)
+        }
+        assertTrue(walkRepository.observeWalks().first().isEmpty())
+    }
+
+    @Test
+    fun `a new walk cannot be saved without an active dog`() = runTest {
+        handlerRepository.addHandlers("Anna")
+        viewModel.uiState.test {
+            fillInValidWalk()
+            val state = expectMostRecentItem()
+            assertNull(state.saveBlocker)
+            assertFalse(state.canSave)
+            viewModel.save()
+            assertFalse(viewModel.uiState.value.isSaving)
         }
         assertTrue(walkRepository.observeWalks().first().isEmpty())
     }

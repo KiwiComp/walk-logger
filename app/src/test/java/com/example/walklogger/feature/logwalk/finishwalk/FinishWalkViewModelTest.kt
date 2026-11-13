@@ -13,6 +13,7 @@ import com.example.walklogger.core.model.WalkLocation
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
+import com.example.walklogger.domain.SaveWalkUseCase
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
@@ -78,7 +79,7 @@ class FinishWalkViewModelTest {
             ),
             locationPermission = LocationPermissionUseCase(locationRepository),
             locationRepository = locationRepository,
-            activeWalkLocationRepository = activeWalkLocationRepository,
+            saveWalk = SaveWalkUseCase(walkRepository, activeWalkLocationRepository),
         )
     }
 

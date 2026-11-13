@@ -31,6 +31,8 @@ interface WalkRepository {
 
     /** Replaces the stool answer of the walk with [walkId]; used while a walk is still in progress. */
     suspend fun updateStool(walkId: Long, stool: Stool?)
-    suspend fun finishWalk(walkId: Long)
+
+    /** Ends the walk with [walkId] now, storing its last [notes] and [stool] in the same transaction. */
+    suspend fun endWalk(walkId: Long, notes: String, stool: Stool?)
     suspend fun deleteWalk(id: Long)
 }

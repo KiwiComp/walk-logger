@@ -140,7 +140,7 @@ class DefaultWalkRepositoryTest {
     }
 
     @Test
-    fun startWalk_thenFinishWalk_stampsBothTimesFromTheClock() = runBlocking {
+    fun startWalk_thenEndWalk_stampsBothTimesAndStoresTheLastAnswers() = runBlocking {
         val id = repository.startWalk(
             dogId = 7,
             handlers = listOf("Anna"),
@@ -150,10 +150,14 @@ class DefaultWalkRepositoryTest {
         assertEquals(id, active.id)
         assertEquals(now.toEpochMilli(), active.startTime)
 
-        repository.finishWalk(id)
+        val stool = Stool(passed = true, texture = StoolTexture.SOFT)
+        repository.endWalk(id, notes = "Pulled at the gate", stool = stool)
 
         assertNull(repository.observeActiveWalk().first())
-        assertEquals(now.toEpochMilli(), repository.observeWalk(id).first()!!.endTime)
+        val ended = repository.observeWalk(id).first()!!
+        assertEquals(now.toEpochMilli(), ended.endTime)
+        assertEquals("Pulled at the gate", ended.notes)
+        assertEquals(stool, ended.stool)
     }
 
     @Test

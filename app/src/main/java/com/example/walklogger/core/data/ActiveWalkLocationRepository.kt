@@ -9,5 +9,6 @@ interface ActiveWalkLocationRepository {
 
     suspend fun save(location: WalkLocation)
 
-    suspend fun clear()
+    /** Removes the stored position if it was stored for [walkId], so saving or discarding an older walk keeps the active walk's. */
+    suspend fun clearFor(walkId: Long)
 }

@@ -14,6 +14,7 @@ import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
+import com.example.walklogger.domain.SaveWalkUseCase
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormEditor
 import dagger.assisted.Assisted
@@ -42,7 +43,7 @@ import kotlinx.coroutines.launch
 class LogPastWalkViewModel @AssistedInject constructor(
     @Assisted date: LocalDate,
     @Assisted private val walkId: Long?,
-    private val dogRepository: DogRepository,
+    dogRepository: DogRepository,
     private val handlerRepository: HandlerRepository,
     behaviourIssueRepository: BehaviourIssueRepository,
     medicalConcernRepository: MedicalConcernRepository,
@@ -52,6 +53,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
     fetchWalkWeather: FetchWalkWeatherUseCase,
     locationPermission: LocationPermissionUseCase,
     locationRepository: LocationRepository,
+    private val saveWalk: SaveWalkUseCase,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -121,7 +123,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
             dogRepository.observeActiveDog(),
             handlerRepository.observeHandlers(),
         ) { screen, form, dog, handlers ->
-            screen.copy(form = form, dogName = dog?.name, handlers = handlers)
+            screen.copy(form = form, dogId = dog?.id, dogName = dog?.name, handlers = handlers)
         }.stateIn(
             scope = viewModelScope,
             started = SharingStarted.WhileSubscribed(5_000),
@@ -188,27 +190,17 @@ class LogPastWalkViewModel @AssistedInject constructor(
         screen.update { it.copy(isSaving = true) }
         viewModelScope.launch {
             runCatchingCancellable {
-                val edited = editedWalk
-                val dogId = edited?.dogId
-                    ?: checkNotNull(dogRepository.observeActiveDog().first()) {
-                        "log past walk needs an active dog"
-                    }.id
-                val walk = form.applyTo(
-                    Walk(
-                        id = edited?.id ?: 0,
-                        dogId = dogId,
-                        handlers = state.handlers.filter { it in state.selectedHandlers },
-                        startTime = state.date.atTime(state.startTime!!).toEpochMilli(),
-                        endTime = state.date.atTime(state.endTime!!).toEpochMilli(),
+                saveWalk(
+                    form.applyTo(
+                        Walk(
+                            id = editedWalk?.id ?: SaveWalkUseCase.UNSAVED,
+                            dogId = editedWalk?.dogId ?: checkNotNull(state.dogId),
+                            handlers = state.handlers.filter { it in state.selectedHandlers },
+                            startTime = state.date.atTime(state.startTime!!).toEpochMilli(),
+                            endTime = state.date.atTime(state.endTime!!).toEpochMilli(),
+                        ),
                     ),
                 )
-                if (edited !=
-                    null
-                ) {
-                    walkRepository.updateWalk(walk)
-                } else {
-                    walkRepository.logWalk(walk)
-                }
             }
                 .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
