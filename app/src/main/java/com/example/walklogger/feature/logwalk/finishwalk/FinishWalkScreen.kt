@@ -12,6 +12,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -29,6 +30,7 @@ import com.example.walklogger.core.ui.component.AppButton
 import com.example.walklogger.core.ui.component.AppButtonStyle
 import com.example.walklogger.core.ui.component.AppButtonWidth
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
+import com.example.walklogger.core.ui.message.UserMessageEffect
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -51,6 +53,7 @@ fun FinishWalkRoute(
     walkId: Long,
     onSaved: () -> Unit,
     onNotFound: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: FinishWalkViewModel =
         hiltViewModel<FinishWalkViewModel, FinishWalkViewModel.Factory> { it.create(walkId) },
@@ -67,6 +70,11 @@ fun FinishWalkRoute(
     LocationPermissionRequest(
         shouldRequest = uiState.form.weather.shouldRequestLocationPermission,
         onResult = viewModel.formActions::onLocationPermissionResult,
+    )
+    UserMessageEffect(
+        message = uiState.userMessage,
+        snackbarHostState = snackbarHostState,
+        onConsume = viewModel::userMessageShown,
     )
     FinishWalkScreen(
         uiState = uiState,

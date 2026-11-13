@@ -28,24 +28,20 @@ class DogViewModel @Inject constructor(
     private val userMessage = UserMessageState()
 
     val uiState: StateFlow<DogUiState> =
-        combine(
-            dogRepository.observeAllDogs(),
-            dogRepository.observeActiveDog(),
-            userMessage.message,
-        ) { dogs, active, message ->
+        combine(dogRepository.observeAllDogs(), dogRepository.observeActiveDog()) { dogs, active ->
             val (deleted, remaining) = dogs.partition { it.isDeleted }
             DogUiState(
                 isLoading = false,
                 active = active?.toProfile(),
                 dogs = if (active == null) emptyList() else remaining.map { it.toListItem(active) },
                 deletedDogs = deleted.map { it.toListItem(active) },
-                userMessage = message,
             )
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = DogUiState(),
-        )
+        }.combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = DogUiState(),
+            )
 
     fun switchDog(id: Long) {
         viewModelScope.launch {

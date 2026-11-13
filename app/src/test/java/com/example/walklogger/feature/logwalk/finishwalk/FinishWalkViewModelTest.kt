@@ -10,7 +10,6 @@ import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkLocation
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.domain.SaveWalkUseCase
@@ -23,7 +22,6 @@ import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.MainDispatcherRule
-import com.example.walklogger.testing.shownMessages
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
@@ -50,7 +48,6 @@ class FinishWalkViewModelTest {
     private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val walkRepository = FakeWalkRepository()
-    private val userMessages = UserMessages()
     private val locationRepository = FakeLocationRepository()
     private val weatherRepository = FakeWeatherRepository()
     private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
@@ -70,7 +67,6 @@ class FinishWalkViewModelTest {
             behaviourIssueRepository = behaviourIssueRepository,
             medicalConcernRepository = medicalConcernRepository,
             walkRepository = walkRepository,
-            userMessages = userMessages,
             clock = clock,
             fetchWalkWeather = FetchWalkWeatherUseCase(
                 locationRepository,
@@ -221,7 +217,6 @@ class FinishWalkViewModelTest {
     @Test
     fun `a failed save keeps the form open and says so`() = runTest {
         walkRepository.addWalks(walk)
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             viewModel.formActions.setRating(4)
             walkRepository.failures.failWrites = true
@@ -230,16 +225,14 @@ class FinishWalkViewModelTest {
             assertFalse(state.isSaving)
             assertFalse(state.isSaved)
             assertTrue(state.canSave)
+            assertEquals(R.string.error_save_walk, viewModel.uiState.value.userMessage)
         }
-        assertEquals(listOf(R.string.error_save_walk), shown)
     }
 
     @Test
-    fun `a missing walk closes the screen and says so`() = runTest {
-        val shown = shownMessages(userMessages)
+    fun `a missing walk closes the screen`() = runTest {
         viewModel.uiState.test {
             assertTrue(expectMostRecentItem().isNotFound)
         }
-        assertEquals(listOf(R.string.error_walk_not_found), shown)
     }
 }

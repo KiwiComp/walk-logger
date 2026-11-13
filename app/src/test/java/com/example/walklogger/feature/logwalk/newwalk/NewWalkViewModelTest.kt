@@ -4,7 +4,6 @@ import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeHandlerRepository
@@ -12,7 +11,6 @@ import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeWalkLocationCapturer
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
-import com.example.walklogger.testing.shownMessages
 import java.time.LocalDate
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -35,7 +33,6 @@ class NewWalkViewModelTest {
     private val walkRepository = FakeWalkRepository()
     private val walkLocationCapturer = FakeWalkLocationCapturer()
     private val locationRepository = FakeLocationRepository()
-    private val userMessages = UserMessages()
     private val viewModel by lazy {
         NewWalkViewModel(
             date = today,
@@ -44,7 +41,6 @@ class NewWalkViewModelTest {
             walkRepository = walkRepository,
             walkLocationCapturer = walkLocationCapturer,
             locationPermission = LocationPermissionUseCase(locationRepository),
-            userMessages = userMessages,
         )
     }
 
@@ -172,7 +168,6 @@ class NewWalkViewModelTest {
     fun `a failed start lets the user try again and says so`() = runTest {
         dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         handlerRepository.addHandlers("Kim")
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             walkRepository.failures.failWrites = true
             viewModel.startWalk()
@@ -180,9 +175,21 @@ class NewWalkViewModelTest {
             assertFalse(state.isStarting)
             assertNull(state.startedWalkId)
             assertTrue(state.canStart)
+            assertEquals(R.string.error_start_walk, viewModel.uiState.value.userMessage)
         }
-        assertEquals(listOf(R.string.error_start_walk), shown)
         assertTrue(walkLocationCapturer.capturedWalkIds.isEmpty())
+    }
+
+    @Test
+    fun `a shown message is cleared`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
+        handlerRepository.addHandlers("Kim")
+        viewModel.uiState.test {
+            walkRepository.failures.failWrites = true
+            viewModel.startWalk()
+            viewModel.userMessageShown(R.string.error_start_walk)
+            assertNull(expectMostRecentItem().userMessage)
+        }
     }
 
     @Test

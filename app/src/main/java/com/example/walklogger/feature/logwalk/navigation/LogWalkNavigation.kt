@@ -55,6 +55,7 @@ fun NavGraphBuilder.newWalkScreen(
     onBack: () -> Unit,
     onWalkStarted: (walkId: Long) -> Unit,
     onLogPastWalk: (LocalDate) -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     composable<NewWalkDestination> { entry ->
         NewWalkRoute(
@@ -62,6 +63,7 @@ fun NavGraphBuilder.newWalkScreen(
             onBack = onBack,
             onWalkStarted = onWalkStarted,
             onLogPastWalk = onLogPastWalk,
+            snackbarHostState = snackbarHostState,
         )
     }
 }
@@ -83,12 +85,17 @@ fun NavGraphBuilder.activeWalkScreen(
     }
 }
 
-fun NavGraphBuilder.finishWalkScreen(onSaved: () -> Unit, onNotFound: () -> Unit) {
+fun NavGraphBuilder.finishWalkScreen(
+    onSaved: () -> Unit,
+    onNotFound: () -> Unit,
+    snackbarHostState: SnackbarHostState,
+) {
     composable<FinishWalkDestination> { entry ->
         FinishWalkRoute(
             walkId = entry.toRoute<FinishWalkDestination>().walkId,
             onSaved = onSaved,
             onNotFound = onNotFound,
+            snackbarHostState = snackbarHostState,
         )
     }
 }
@@ -99,6 +106,7 @@ fun NavGraphBuilder.logPastWalkScreen(
     onLogged: () -> Unit,
     onUpdated: () -> Unit,
     onNotFound: () -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     composable<LogPastWalkDestination> { entry ->
         val destination = entry.toRoute<LogPastWalkDestination>()
@@ -108,6 +116,7 @@ fun NavGraphBuilder.logPastWalkScreen(
             onClose = onClose,
             onSaved = if (destination.walkId == null) onLogged else onUpdated,
             onNotFound = onNotFound,
+            snackbarHostState = snackbarHostState,
         )
     }
 }

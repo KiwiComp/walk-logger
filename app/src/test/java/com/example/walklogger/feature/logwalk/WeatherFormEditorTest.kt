@@ -5,13 +5,11 @@ import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Place
 import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.WeatherCondition
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeWeatherRepository
-import com.example.walklogger.testing.shownMessages
 import java.time.Duration
 import java.time.Instant
 import kotlinx.coroutines.test.TestScope
@@ -25,7 +23,7 @@ import org.junit.Test
 
 class WeatherFormEditorTest {
 
-    private val userMessages = UserMessages()
+    private val shown = mutableListOf<Int>()
     private val locationRepository = FakeLocationRepository()
     private val weatherRepository = FakeWeatherRepository()
     private val now = Instant.parse("2026-11-09T12:00:00Z")
@@ -45,7 +43,7 @@ class WeatherFormEditorTest {
                     ),
                     LocationPermissionUseCase(locationRepository),
                     locationRepository,
-                    userMessages,
+                    shown::add,
                 ),
             )
         }
@@ -312,7 +310,6 @@ class WeatherFormEditorTest {
 
     @Test
     fun `a place that cannot be saved says so`() = runEditorTest { editor ->
-        val shown = shownMessages(userMessages)
         locationRepository.failures.failWrites = true
         editor.selectPlace(Place("Uppsala", null, Coordinates(59.86, 17.64)))
         assertEquals(listOf(R.string.error_save_place), shown)

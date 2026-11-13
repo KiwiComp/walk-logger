@@ -12,7 +12,6 @@ import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.WeatherCondition
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
@@ -20,7 +19,6 @@ import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWeatherRepository
-import com.example.walklogger.testing.shownMessages
 import java.time.Duration
 import java.time.Instant
 import kotlinx.coroutines.test.TestScope
@@ -36,7 +34,7 @@ class WalkFormEditorTest {
 
     private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val medicalConcernRepository = FakeMedicalConcernRepository()
-    private val userMessages = UserMessages()
+    private val shown = mutableListOf<Int>()
     private val locationRepository = FakeLocationRepository()
     private val weatherRepository = FakeWeatherRepository()
     private val now = Instant.parse("2026-11-09T12:00:00Z")
@@ -59,7 +57,7 @@ class WalkFormEditorTest {
                     backgroundScope,
                     behaviourIssueRepository,
                     medicalConcernRepository,
-                    userMessages,
+                    shown::add,
                     fetchWalkWeather,
                     LocationPermissionUseCase(locationRepository),
                     locationRepository,
@@ -294,7 +292,6 @@ class WalkFormEditorTest {
 
     @Test
     fun `a failed add says so and selects nothing`() = runEditorTest { editor ->
-        val shown = shownMessages(userMessages)
         behaviourIssueRepository.failures.failWrites = true
         medicalConcernRepository.failures.failWrites = true
         editor.addBehaviourIssue("Digging")

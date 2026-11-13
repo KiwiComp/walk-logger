@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.logwalk.pastwalk
 
+import androidx.annotation.StringRes
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.feature.logwalk.WalkFormState
 import com.example.walklogger.feature.logwalk.WalkTimesState
@@ -21,6 +22,7 @@ data class LogPastWalkUiState(
     val isNotFound: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
+    @param:StringRes val userMessage: Int? = null,
 ) {
     /** The first thing still stopping the walk from being saved, in form order. */
     val saveBlocker: SaveBlocker? = when {

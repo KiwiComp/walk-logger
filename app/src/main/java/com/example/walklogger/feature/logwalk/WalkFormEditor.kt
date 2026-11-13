@@ -17,7 +17,6 @@ import com.example.walklogger.core.model.withColour
 import com.example.walklogger.core.model.withPassed
 import com.example.walklogger.core.model.withQuantity
 import com.example.walklogger.core.model.withTexture
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import kotlinx.coroutines.CoroutineScope
@@ -37,7 +36,7 @@ class WalkFormEditor private constructor(
     private val scope: CoroutineScope,
     private val behaviourIssueRepository: BehaviourIssueRepository,
     private val medicalConcernRepository: MedicalConcernRepository,
-    private val userMessages: UserMessages,
+    private val showMessage: (Int) -> Unit,
     private val weather: WeatherFormEditor,
 ) : WalkFormActions,
     WeatherFormActions by weather {
@@ -47,7 +46,7 @@ class WalkFormEditor private constructor(
         scope: CoroutineScope,
         behaviourIssueRepository: BehaviourIssueRepository,
         medicalConcernRepository: MedicalConcernRepository,
-        userMessages: UserMessages,
+        showMessage: (Int) -> Unit,
         fetchWalkWeather: FetchWalkWeatherUseCase,
         locationPermission: LocationPermissionUseCase,
         locationRepository: LocationRepository,
@@ -56,13 +55,13 @@ class WalkFormEditor private constructor(
         scope,
         behaviourIssueRepository,
         medicalConcernRepository,
-        userMessages,
+        showMessage,
         WeatherFormEditor(
             scope,
             fetchWalkWeather,
             locationPermission,
             locationRepository,
-            userMessages,
+            showMessage,
             walkId,
         ),
     )
@@ -184,7 +183,7 @@ class WalkFormEditor private constructor(
                         )
                     }
                 }
-                .onFailure { userMessages.show(R.string.error_add_name) }
+                .onFailure { showMessage(R.string.error_add_name) }
         }
     }
 
@@ -210,7 +209,7 @@ class WalkFormEditor private constructor(
                         )
                     }
                 }
-                .onFailure { userMessages.show(R.string.error_add_name) }
+                .onFailure { showMessage(R.string.error_add_name) }
         }
     }
 

@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.logwalk.pastwalk
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
@@ -11,7 +12,7 @@ import com.example.walklogger.core.data.LocationRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Walk
-import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.domain.SaveWalkUseCase
@@ -48,7 +49,6 @@ class LogPastWalkViewModel @AssistedInject constructor(
     behaviourIssueRepository: BehaviourIssueRepository,
     medicalConcernRepository: MedicalConcernRepository,
     private val walkRepository: WalkRepository,
-    private val userMessages: UserMessages,
     clock: Clock,
     fetchWalkWeather: FetchWalkWeatherUseCase,
     locationPermission: LocationPermissionUseCase,
@@ -61,11 +61,14 @@ class LogPastWalkViewModel @AssistedInject constructor(
         fun create(date: LocalDate, walkId: Long?): LogPastWalkViewModel
     }
 
+    /** Declared before the editors, which are handed [UserMessageState.show]. */
+    private val userMessage = UserMessageState()
+
     private val form = WalkFormEditor(
         viewModelScope,
         behaviourIssueRepository,
         medicalConcernRepository,
-        userMessages,
+        userMessage::show,
         fetchWalkWeather,
         locationPermission,
         locationRepository,
@@ -78,7 +81,8 @@ class LogPastWalkViewModel @AssistedInject constructor(
         form.onTimesChanged(start, end, autoFetch = walkId == null)
     }
 
-    private val handlers = HandlerSelectionEditor(viewModelScope, handlerRepository, userMessages)
+    private val handlers =
+        HandlerSelectionEditor(viewModelScope, handlerRepository, userMessage::show)
 
     private val screen = MutableStateFlow(
         LogPastWalkUiState(
@@ -100,7 +104,6 @@ class LogPastWalkViewModel @AssistedInject constructor(
             val walk = walkRepository.observeWalk(walkId).first()
             if (walk == null) {
                 screen.update { it.copy(isNotFound = true) }
-                userMessages.show(R.string.error_walk_not_found)
                 return@launch
             }
             editedWalk = walk
@@ -127,11 +130,14 @@ class LogPastWalkViewModel @AssistedInject constructor(
                 handlers = handlers.handlers,
                 selectedHandlers = handlers.selected,
             )
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = screen.value.copy(form = form.state.value),
-        )
+        }.combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = screen.value.copy(form = form.state.value),
+            )
+
+    fun userMessageShown(@StringRes message: Int) = userMessage.shown(message)
 
     fun setDate(date: LocalDate) = times.setDate(date)
 
@@ -160,7 +166,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
                 .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
                     screen.update { it.copy(isSaving = false) }
-                    userMessages.show(R.string.error_save_walk)
+                    userMessage.show(R.string.error_save_walk)
                 }
         }
     }

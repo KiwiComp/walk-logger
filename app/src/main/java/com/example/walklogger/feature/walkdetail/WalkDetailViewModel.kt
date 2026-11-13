@@ -10,6 +10,7 @@ import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.DiscardWalkUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -41,6 +42,7 @@ class WalkDetailViewModel @AssistedInject constructor(
     }
 
     private val discard = MutableStateFlow(WalkDetailUiState())
+    private val userMessage = UserMessageState()
 
     init {
         viewModelScope.launch {
@@ -62,11 +64,12 @@ class WalkDetailViewModel @AssistedInject constructor(
             } else {
                 discard.detailsOf(walk, dog = dogs.find { it.id == walk.dogId })
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = discard.value,
-        )
+        }.combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = discard.value,
+            )
 
     fun discard() {
         if (!uiState.value.canDiscard) return
@@ -75,16 +78,13 @@ class WalkDetailViewModel @AssistedInject constructor(
             runCatchingCancellable { discardWalk(walkId) }
                 .onSuccess { discard.update { it.copy(isDiscarding = false, isDiscarded = true) } }
                 .onFailure {
-                    discard.update {
-                        it.copy(isDiscarding = false, userMessage = R.string.error_delete_walk)
-                    }
+                    discard.update { it.copy(isDiscarding = false) }
+                    userMessage.show(R.string.error_delete_walk)
                 }
         }
     }
 
-    fun userMessageShown(@StringRes message: Int) = discard.update {
-        if (it.userMessage == message) it.copy(userMessage = null) else it
-    }
+    fun userMessageShown(@StringRes message: Int) = userMessage.shown(message)
 
     private fun WalkDetailUiState.detailsOf(walk: Walk, dog: Dog?): WalkDetailUiState {
         val start = walk.startTime.toLocalDateTime(clock.zone)

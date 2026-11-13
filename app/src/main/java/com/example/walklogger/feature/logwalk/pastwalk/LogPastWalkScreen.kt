@@ -11,6 +11,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -31,6 +32,7 @@ import com.example.walklogger.core.ui.component.AppButton
 import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
+import com.example.walklogger.core.ui.message.UserMessageEffect
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -55,6 +57,7 @@ fun LogPastWalkRoute(
     onClose: () -> Unit,
     onSaved: () -> Unit,
     onNotFound: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: LogPastWalkViewModel =
         hiltViewModel<LogPastWalkViewModel, LogPastWalkViewModel.Factory> {
@@ -73,6 +76,11 @@ fun LogPastWalkRoute(
     LocationPermissionRequest(
         shouldRequest = uiState.form.weather.shouldRequestLocationPermission,
         onResult = viewModel.formActions::onLocationPermissionResult,
+    )
+    UserMessageEffect(
+        message = uiState.userMessage,
+        snackbarHostState = snackbarHostState,
+        onConsume = viewModel::userMessageShown,
     )
     LogPastWalkScreen(
         uiState = uiState,

@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.logwalk.finishwalk
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
@@ -10,7 +11,7 @@ import com.example.walklogger.core.data.LocationRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Walk
-import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.domain.SaveWalkUseCase
@@ -41,7 +42,6 @@ class FinishWalkViewModel @AssistedInject constructor(
     behaviourIssueRepository: BehaviourIssueRepository,
     medicalConcernRepository: MedicalConcernRepository,
     private val walkRepository: WalkRepository,
-    private val userMessages: UserMessages,
     clock: Clock,
     fetchWalkWeather: FetchWalkWeatherUseCase,
     locationPermission: LocationPermissionUseCase,
@@ -54,11 +54,14 @@ class FinishWalkViewModel @AssistedInject constructor(
         fun create(walkId: Long): FinishWalkViewModel
     }
 
+    /** Declared before the editors, which are handed [UserMessageState.show]. */
+    private val userMessage = UserMessageState()
+
     private val form = WalkFormEditor(
         viewModelScope,
         behaviourIssueRepository,
         medicalConcernRepository,
-        userMessages,
+        userMessage::show,
         fetchWalkWeather,
         locationPermission,
         locationRepository,
@@ -81,7 +84,6 @@ class FinishWalkViewModel @AssistedInject constructor(
             val stored = walkRepository.observeWalk(walkId).first()
             if (stored == null) {
                 screen.update { it.copy(isNotFound = true) }
-                userMessages.show(R.string.error_walk_not_found)
                 return@launch
             }
             walk = stored
@@ -99,11 +101,14 @@ class FinishWalkViewModel @AssistedInject constructor(
             dogRepository.observeActiveDog(),
         ) { screen, times, form, dog ->
             screen.copy(times = times, form = form, dogName = dog?.name)
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = screen.value.copy(form = form.state.value),
-        )
+        }.combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = screen.value.copy(form = form.state.value),
+            )
+
+    fun userMessageShown(@StringRes message: Int) = userMessage.shown(message)
 
     fun toggleEditTimes() = screen.update { it.copy(isEditingTimes = !it.isEditingTimes) }
 
@@ -126,7 +131,7 @@ class FinishWalkViewModel @AssistedInject constructor(
                 .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
                     screen.update { it.copy(isSaving = false) }
-                    userMessages.show(R.string.error_save_walk)
+                    userMessage.show(R.string.error_save_walk)
                 }
         }
     }

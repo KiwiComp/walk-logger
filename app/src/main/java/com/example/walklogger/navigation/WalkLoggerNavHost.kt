@@ -74,6 +74,7 @@ fun WalkLoggerNavHost(
             onBack = { navController.popBackStack() },
             onWalkStarted = navController::navigateToActiveWalk,
             onLogPastWalk = navController::navigateToLogPastWalk,
+            snackbarHostState = snackbarHostState,
         )
         // Walk flows can start from the Log or Calendar tab; finishing one returns to whichever it was.
         activeWalkScreen(
@@ -87,14 +88,22 @@ fun WalkLoggerNavHost(
         )
         finishWalkScreen(
             onSaved = navController::popToTopLevel,
-            onNotFound = navController::popToTopLevel,
+            onNotFound = {
+                navController.popToTopLevel()
+                onShowMessage(R.string.error_walk_not_found)
+            },
+            snackbarHostState = snackbarHostState,
         )
         // Editing is pushed on top of the walk's detail screen, so every way out of the form lands back there.
         logPastWalkScreen(
             onClose = { navController.popBackStack() },
             onLogged = navController::popToTopLevel,
             onUpdated = { navController.popBackStack() },
-            onNotFound = navController::popToTopLevel,
+            onNotFound = {
+                navController.popToTopLevel()
+                onShowMessage(R.string.error_walk_not_found)
+            },
+            snackbarHostState = snackbarHostState,
         )
         walkDetailScreen(
             onBack = navController::popToTopLevel,

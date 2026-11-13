@@ -17,6 +17,7 @@ import com.example.walklogger.core.model.withColour
 import com.example.walklogger.core.model.withPassed
 import com.example.walklogger.core.model.withQuantity
 import com.example.walklogger.core.model.withTexture
+import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.DiscardWalkUseCase
 import com.example.walklogger.feature.logwalk.MAX_NOTES_LENGTH
 import dagger.assisted.Assisted
@@ -67,6 +68,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
     /** Starts folded, so a walk reopened with an answer shows only its summary. */
     private val isStoolExpanded = MutableStateFlow(false)
     private val outcome = MutableStateFlow(Outcome())
+    private val userMessage = UserMessageState()
 
     private val ticks = flow {
         while (true) {
@@ -120,13 +122,14 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 isEnded = outcome.isEnded,
                 isDiscarding = outcome.isDiscarding,
                 isDiscarded = outcome.isDiscarded,
-                userMessage = outcome.userMessage,
             )
-        }.filterNotNull().stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = ActiveWalkUiState(),
-        )
+        }.filterNotNull()
+            .combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = ActiveWalkUiState(),
+            )
 
     fun setNote(text: String) = note.update { text.take(MAX_NOTES_LENGTH) }
 
@@ -174,9 +177,8 @@ class ActiveWalkViewModel @AssistedInject constructor(
             runCatchingCancellable { walkRepository.endWalk(walkId, state.note, state.stool) }
                 .onSuccess { outcome.update { Outcome(isEnded = true) } }
                 .onFailure {
-                    outcome.update {
-                        it.copy(isEnding = false, userMessage = R.string.error_end_walk)
-                    }
+                    outcome.update { it.copy(isEnding = false) }
+                    userMessage.show(R.string.error_end_walk)
                 }
         }
     }
@@ -193,33 +195,26 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 .onFailure {
                     noteSaver = saveNotes()
                     stoolSaver = saveStool()
-                    outcome.update {
-                        it.copy(isDiscarding = false, userMessage = R.string.error_delete_walk)
-                    }
+                    outcome.update { it.copy(isDiscarding = false) }
+                    userMessage.show(R.string.error_delete_walk)
                 }
         }
     }
 
-    fun userMessageShown(@StringRes message: Int) = outcome.update {
-        if (it.userMessage == message) it.copy(userMessage = null) else it
-    }
-
-    private fun showMessage(@StringRes message: Int) = outcome.update {
-        it.copy(userMessage = message)
-    }
+    fun userMessageShown(@StringRes message: Int) = userMessage.shown(message)
 
     private fun saveNotes() = viewModelScope.launch {
         @OptIn(FlowPreview::class)
         note.filterNotNull().debounce(NOTE_SAVE_DELAY_MILLIS).collect {
             runCatchingCancellable { walkRepository.updateNotes(walkId, it) }
-                .onFailure { showMessage(R.string.error_save_note) }
+                .onFailure { userMessage.show(R.string.error_save_note) }
         }
     }
 
     private fun saveStool() = viewModelScope.launch {
         stool.filterNotNull().collect {
             runCatchingCancellable { walkRepository.updateStool(walkId, it.stool) }
-                .onFailure { showMessage(R.string.error_save_stool) }
+                .onFailure { userMessage.show(R.string.error_save_stool) }
         }
     }
 
@@ -236,7 +231,6 @@ class ActiveWalkViewModel @AssistedInject constructor(
         val isDiscarding: Boolean = false,
         val isDiscarded: Boolean = false,
         val isNotFound: Boolean = false,
-        @param:StringRes val userMessage: Int? = null,
     )
 
     private companion object {
