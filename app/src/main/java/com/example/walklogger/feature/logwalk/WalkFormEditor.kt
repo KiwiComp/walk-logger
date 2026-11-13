@@ -3,8 +3,8 @@ package com.example.walklogger.feature.logwalk
 import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.BehaviourIssueRepository
+import com.example.walklogger.core.data.LocationRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
-import com.example.walklogger.core.data.PlaceRepository
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
@@ -45,7 +45,7 @@ class WalkFormEditor(
     private val userMessages: UserMessages,
     private val fetchWalkWeather: FetchWalkWeatherUseCase,
     private val locationPermission: LocationPermissionUseCase,
-    private val placeRepository: PlaceRepository,
+    private val locationRepository: LocationRepository,
     private val walkId: Long? = null,
 ) : WalkFormActions {
 
@@ -67,7 +67,9 @@ class WalkFormEditor(
 
     init {
         scope.launch {
-            placeRepository.savedPlace.collect { place -> input.update { it.copy(place = place) } }
+            locationRepository.savedPlace.collect { place ->
+                input.update { it.copy(place = place) }
+            }
         }
     }
 
@@ -270,7 +272,7 @@ class WalkFormEditor(
             input.update {
                 it.copy(placeSearch = it.placeSearch?.copy(isSearching = true, isFailed = false))
             }
-            runCatchingCancellable { placeRepository.searchPlaces(query) }
+            runCatchingCancellable { locationRepository.searchPlaces(query) }
                 .onSuccess { places ->
                     input.update {
                         it.copy(
@@ -298,7 +300,7 @@ class WalkFormEditor(
         placeSearchJob?.cancel()
         input.update { it.copy(placeSearch = null) }
         scope.launch {
-            runCatchingCancellable { placeRepository.savePlace(place) }
+            runCatchingCancellable { locationRepository.savePlace(place) }
                 .onSuccess { fetchWeather() }
                 .onFailure { userMessages.show(R.string.error_save_place) }
         }

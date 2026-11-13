@@ -84,10 +84,10 @@ com.example.walklogger
 │   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository /
 │   │                          MedicalConcernRepository interfaces + Room-backed implementations, mappers;
 │   │                          WeatherRepository (Open-Meteo forecast, WMO codes mapped in WeatherMappers, and how far back
-│   │                          it reaches), LocationRepository (device location over core/location), WalkLocationCapturer
-│   │                          (implemented in service/) and
-│   │                          PlaceRepository (geocoding search, the saved place, the active walk's start position, whether
-│   │                          location has been asked for)
+│   │                          it reaches), LocationRepository (device location over core/location, whether location
+│   │                          has been asked for, and the saved place with its geocoding search as the fallback),
+│   │                          ActiveWalkLocationRepository (the active walk's start position) and WalkLocationCapturer
+│   │                          (implemented in service/)
 │   ├── network/               Retrofit APIs for Open-Meteo's forecast and geocoding, their @Serializable DTOs
 │   ├── location/              LocationProvider (fused location; accepts coarse or fine permission), read through LocationRepository
 │   ├── database/              Room database, DAOs, entities, type converters; walks join behaviour issues and medical

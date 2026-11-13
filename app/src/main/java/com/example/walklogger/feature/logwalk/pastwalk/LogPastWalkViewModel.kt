@@ -7,8 +7,8 @@ import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
+import com.example.walklogger.core.data.LocationRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
-import com.example.walklogger.core.data.PlaceRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.message.UserMessages
@@ -51,7 +51,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
     private val clock: Clock,
     fetchWalkWeather: FetchWalkWeatherUseCase,
     locationPermission: LocationPermissionUseCase,
-    placeRepository: PlaceRepository,
+    locationRepository: LocationRepository,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -66,7 +66,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
         userMessages,
         fetchWalkWeather,
         locationPermission,
-        placeRepository,
+        locationRepository,
     )
 
     val formActions: WalkFormActions get() = form

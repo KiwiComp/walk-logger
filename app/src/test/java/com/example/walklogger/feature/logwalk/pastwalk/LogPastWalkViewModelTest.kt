@@ -18,12 +18,12 @@ import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.feature.logwalk.SaveBlocker
+import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeHandlerRepository
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
-import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.MainDispatcherRule
@@ -57,7 +57,6 @@ class LogPastWalkViewModelTest {
     private val walkRepository = FakeWalkRepository()
     private val userMessages = UserMessages()
     private val locationRepository = FakeLocationRepository()
-    private val placeRepository = FakePlaceRepository()
     private val weatherRepository = FakeWeatherRepository()
     private var walkId: Long? = null
     private val viewModel by lazy {
@@ -73,11 +72,11 @@ class LogPastWalkViewModelTest {
             clock = clock,
             fetchWalkWeather = FetchWalkWeatherUseCase(
                 locationRepository,
-                placeRepository,
                 weatherRepository,
+                FakeActiveWalkLocationRepository(),
             ),
-            locationPermission = LocationPermissionUseCase(locationRepository, placeRepository),
-            placeRepository = placeRepository,
+            locationPermission = LocationPermissionUseCase(locationRepository),
+            locationRepository = locationRepository,
         )
     }
 

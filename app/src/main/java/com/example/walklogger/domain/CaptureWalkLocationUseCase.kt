@@ -1,8 +1,8 @@
 package com.example.walklogger.domain
 
 import com.example.walklogger.core.common.runCatchingCancellable
+import com.example.walklogger.core.data.ActiveWalkLocationRepository
 import com.example.walklogger.core.data.LocationRepository
-import com.example.walklogger.core.data.PlaceRepository
 import com.example.walklogger.core.model.WalkLocation
 import javax.inject.Inject
 import kotlinx.coroutines.flow.first
@@ -13,18 +13,18 @@ import kotlinx.coroutines.flow.first
  */
 class CaptureWalkLocationUseCase @Inject constructor(
     private val locationRepository: LocationRepository,
-    private val placeRepository: PlaceRepository,
+    private val activeWalkLocationRepository: ActiveWalkLocationRepository,
 ) {
     suspend operator fun invoke(walkId: Long) {
         if (!locationRepository.hasPermission()) return
         runCatchingCancellable {
-            if (placeRepository.activeWalkLocation.first()?.walkId ==
+            if (activeWalkLocationRepository.activeWalkLocation.first()?.walkId ==
                 walkId
             ) {
                 return@runCatchingCancellable
             }
             val coordinates = locationRepository.currentLocation() ?: return@runCatchingCancellable
-            placeRepository.saveActiveWalkLocation(WalkLocation(walkId, coordinates))
+            activeWalkLocationRepository.save(WalkLocation(walkId, coordinates))
         }
     }
 }

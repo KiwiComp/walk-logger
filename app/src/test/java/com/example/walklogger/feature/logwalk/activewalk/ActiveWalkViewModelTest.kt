@@ -12,8 +12,8 @@ import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkLocation
 import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeDogRepository
-import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import com.example.walklogger.testing.shownMessages
@@ -46,7 +46,7 @@ class ActiveWalkViewModelTest {
     private val clock = SteppingClock(start.plus(Duration.ofMinutes(34).plusSeconds(12)), zone)
     private val dogRepository = FakeDogRepository()
     private val walkRepository = FakeWalkRepository()
-    private val placeRepository = FakePlaceRepository()
+    private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
     private val userMessages = UserMessages()
     private val walk = Walk(
         id = 1,
@@ -62,7 +62,7 @@ class ActiveWalkViewModelTest {
             walkId = 1,
             dogRepository = dogRepository,
             walkRepository = walkRepository,
-            placeRepository = placeRepository,
+            activeWalkLocationRepository = activeWalkLocationRepository,
             userMessages = userMessages,
             clock = clock,
         )
@@ -125,7 +125,8 @@ class ActiveWalkViewModelTest {
     @Test
     fun `discarding deletes the walk and its stored position and reports it`() = runTest {
         walkRepository.addWalks(walk)
-        placeRepository.walkLocation.value = WalkLocation(walkId = 1, Coordinates(59.33, 18.07))
+        activeWalkLocationRepository.walkLocation.value =
+            WalkLocation(walkId = 1, Coordinates(59.33, 18.07))
         viewModel.uiState.test {
             viewModel.discardWalk()
             val state = expectMostRecentItem()
@@ -134,7 +135,7 @@ class ActiveWalkViewModelTest {
             assertFalse(state.canDiscard)
             assertNull(walkRepository.observeWalk(1).first())
             assertTrue(walkRepository.observeWalks().first().isEmpty())
-            assertNull(placeRepository.walkLocation.value)
+            assertNull(activeWalkLocationRepository.walkLocation.value)
         }
     }
 

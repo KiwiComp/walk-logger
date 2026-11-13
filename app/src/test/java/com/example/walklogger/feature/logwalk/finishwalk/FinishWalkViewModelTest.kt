@@ -14,11 +14,11 @@ import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.feature.logwalk.SaveBlocker
+import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
-import com.example.walklogger.testing.FakePlaceRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.MainDispatcherRule
@@ -51,8 +51,8 @@ class FinishWalkViewModelTest {
     private val walkRepository = FakeWalkRepository()
     private val userMessages = UserMessages()
     private val locationRepository = FakeLocationRepository()
-    private val placeRepository = FakePlaceRepository()
     private val weatherRepository = FakeWeatherRepository()
+    private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
     private val walk = Walk(
         id = 1,
         dogId = 1,
@@ -73,11 +73,12 @@ class FinishWalkViewModelTest {
             clock = clock,
             fetchWalkWeather = FetchWalkWeatherUseCase(
                 locationRepository,
-                placeRepository,
                 weatherRepository,
+                activeWalkLocationRepository,
             ),
-            locationPermission = LocationPermissionUseCase(locationRepository, placeRepository),
-            placeRepository = placeRepository,
+            locationPermission = LocationPermissionUseCase(locationRepository),
+            locationRepository = locationRepository,
+            activeWalkLocationRepository = activeWalkLocationRepository,
         )
     }
 
@@ -131,7 +132,7 @@ class FinishWalkViewModelTest {
     @Test
     fun `fetches for the position stored at the start and clears it once saved`() = runTest {
         val start = Coordinates(59.86, 17.64)
-        placeRepository.walkLocation.value = WalkLocation(walkId = 1, start)
+        activeWalkLocationRepository.walkLocation.value = WalkLocation(walkId = 1, start)
         walkRepository.addWalks(walk)
         viewModel.uiState.test {
             expectMostRecentItem()
@@ -140,7 +141,7 @@ class FinishWalkViewModelTest {
             assertTrue(expectMostRecentItem().isSaved)
         }
         assertEquals(start, weatherRepository.requests.single().first)
-        assertNull(placeRepository.walkLocation.value)
+        assertNull(activeWalkLocationRepository.walkLocation.value)
     }
 
     @Test
