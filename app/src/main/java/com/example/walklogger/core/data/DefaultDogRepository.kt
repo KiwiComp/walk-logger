@@ -32,6 +32,8 @@ class DefaultDogRepository @Inject constructor(
         dogs.map { it.toModel() }
     }
 
+    override fun observeDog(id: Long): Flow<Dog?> = dogDao.observeDog(id).map { it?.toModel() }
+
     // Falls back to the first remaining dog so a stale or missing preference never hides a registered dog.
     override fun observeActiveDog(): Flow<Dog?> =
         combine(observeAllDogs(), preferences.activeDogId) {

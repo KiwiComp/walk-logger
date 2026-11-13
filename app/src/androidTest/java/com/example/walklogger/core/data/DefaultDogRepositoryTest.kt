@@ -152,6 +152,21 @@ class DefaultDogRepositoryTest {
     }
 
     @Test
+    fun observeDog_findsTheDogByIdEvenWhenDeleted() = runBlocking {
+        val sixtenId = repository.registerDog(
+            name = "Sixten",
+            breed = "Labrador",
+            birthDate = null,
+            weightKg = null,
+        )
+
+        assertEquals("Labrador", repository.observeDog(sixtenId).first()?.breed)
+        repository.deleteDog(sixtenId)
+        assertEquals(true, repository.observeDog(sixtenId).first()?.isDeleted)
+        assertNull(repository.observeDog(99).first())
+    }
+
+    @Test
     fun deleteLastDog_clearsActiveDog() = runBlocking {
         val sixtenId = repository.registerDog(
             name = "Sixten",

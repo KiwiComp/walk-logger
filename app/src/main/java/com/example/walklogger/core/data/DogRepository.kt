@@ -12,6 +12,9 @@ interface DogRepository {
     /** Every dog in registration order, including deleted ones. */
     fun observeAllDogs(): Flow<List<Dog>>
 
+    /** The dog with [id], deleted or not; null when there is none. */
+    fun observeDog(id: Long): Flow<Dog?>
+
     /** The dog whose walks are shown; null when no dog is left. A deleted dog is active only if explicitly selected. */
     fun observeActiveDog(): Flow<Dog?>
 

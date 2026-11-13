@@ -27,6 +27,8 @@ class FakeDogRepository : DogRepository {
 
     override fun observeAllDogs(): Flow<List<Dog>> = dogs
 
+    override fun observeDog(id: Long): Flow<Dog?> = dogs.map { list -> list.find { it.id == id } }
+
     override fun observeActiveDog(): Flow<Dog?> = combine(dogs, activeDogId) { list, id ->
         list.find { it.id == id }
             ?: list.firstOrNull { !it.isDeleted }

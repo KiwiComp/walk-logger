@@ -42,7 +42,7 @@ class RegisterDogViewModel @AssistedInject constructor(
     init {
         if (dogId != null) {
             viewModelScope.launch {
-                val dog = dogRepository.observeDogs().first().find { it.id == dogId }
+                val dog = dogRepository.observeDog(dogId).first()
                 if (dog == null) {
                     _uiState.update { it.copy(isNotFound = true) }
                     userMessages.show(R.string.error_dog_not_found)
