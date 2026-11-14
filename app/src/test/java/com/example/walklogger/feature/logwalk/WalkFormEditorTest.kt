@@ -16,6 +16,7 @@ import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
+import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWeatherRepository
@@ -35,6 +36,8 @@ class WalkFormEditorTest {
     private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val shown = mutableListOf<Int>()
+    private val logged = mutableListOf<String>()
+    private val errorReporter = FakeErrorReporter()
     private val locationRepository = FakeLocationRepository()
     private val weatherRepository = FakeWeatherRepository()
     private val now = Instant.parse("2026-11-09T12:00:00Z")
@@ -51,13 +54,18 @@ class WalkFormEditorTest {
                     locationRepository,
                     weatherRepository,
                     FakeActiveWalkLocationRepository(),
+                    errorReporter,
                 )
             body(
                 WalkFormEditor(
                     backgroundScope,
                     behaviourIssueRepository,
                     medicalConcernRepository,
-                    shown::add,
+                    { _, message, log ->
+                        shown += message
+                        logged += log
+                    },
+                    errorReporter,
                     fetchWalkWeather,
                     LocationPermissionUseCase(locationRepository),
                     locationRepository,
@@ -299,5 +307,9 @@ class WalkFormEditorTest {
         assertTrue(editor.state.value.selectedBehaviourIssueIds.isEmpty())
         assertTrue(editor.state.value.selectedMedicalConcernIds.isEmpty())
         assertEquals(listOf(R.string.error_add_name, R.string.error_add_name), shown)
+        assertEquals(
+            listOf("Failed to add behaviour issue", "Failed to add medical concern"),
+            logged,
+        )
     }
 }

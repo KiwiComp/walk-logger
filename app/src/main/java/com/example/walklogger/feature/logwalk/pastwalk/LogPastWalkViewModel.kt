@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
+import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
@@ -54,6 +55,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
     locationPermission: LocationPermissionUseCase,
     locationRepository: LocationRepository,
     private val saveWalk: SaveWalkUseCase,
+    errorReporter: ErrorReporter,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -61,14 +63,15 @@ class LogPastWalkViewModel @AssistedInject constructor(
         fun create(date: LocalDate, walkId: Long?): LogPastWalkViewModel
     }
 
-    /** Declared before the editors, which are handed [UserMessageState.show]. */
-    private val userMessage = UserMessageState()
+    /** Declared before the editors, which are handed [UserMessageState.showAndReportError]. */
+    private val userMessage = UserMessageState(errorReporter)
 
     private val form = WalkFormEditor(
         viewModelScope,
         behaviourIssueRepository,
         medicalConcernRepository,
-        userMessage::show,
+        userMessage::showAndReportError,
+        errorReporter,
         fetchWalkWeather,
         locationPermission,
         locationRepository,
@@ -82,7 +85,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
     }
 
     private val handlers =
-        HandlerSelectionEditor(viewModelScope, handlerRepository, userMessage::show)
+        HandlerSelectionEditor(viewModelScope, handlerRepository, userMessage::showAndReportError)
 
     private val screen = MutableStateFlow(
         LogPastWalkUiState(
@@ -166,7 +169,11 @@ class LogPastWalkViewModel @AssistedInject constructor(
                 .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
                     screen.update { it.copy(isSaving = false) }
-                    userMessage.show(R.string.error_save_walk)
+                    userMessage.showAndReportError(
+                        it,
+                        R.string.error_save_walk,
+                        "Failed to save walk",
+                    )
                 }
         }
     }

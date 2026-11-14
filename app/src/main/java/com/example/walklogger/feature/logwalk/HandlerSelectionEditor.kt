@@ -25,7 +25,7 @@ data class HandlerSelectionState(
 class HandlerSelectionEditor(
     private val scope: CoroutineScope,
     private val handlerRepository: HandlerRepository,
-    private val showMessage: (Int) -> Unit,
+    private val showError: (Throwable, Int, String) -> Unit,
 ) {
     private val selected = MutableStateFlow<Set<String>>(emptySet())
 
@@ -55,7 +55,7 @@ class HandlerSelectionEditor(
         scope.launch {
             runCatchingCancellable { handlerRepository.addHandler(name) }
                 .onSuccess { stored -> selected.update { it + stored } }
-                .onFailure { showMessage(R.string.error_add_name) }
+                .onFailure { showError(it, R.string.error_add_name, "Failed to add handler") }
         }
     }
 }

@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
+import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
@@ -29,6 +30,7 @@ class RegisterDogViewModel @AssistedInject constructor(
     @Assisted private val dogId: Long?,
     private val dogRepository: DogRepository,
     private val walkRepository: WalkRepository,
+    errorReporter: ErrorReporter,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -39,7 +41,7 @@ class RegisterDogViewModel @AssistedInject constructor(
     private val form = MutableStateFlow(
         RegisterDogUiState(isEditing = dogId != null, isLoading = dogId != null),
     )
-    private val userMessage = UserMessageState()
+    private val userMessage = UserMessageState(errorReporter)
 
     /** Eager so the form's own checks can read [StateFlow.value] while nothing collects. */
     val uiState: StateFlow<RegisterDogUiState> =
@@ -98,7 +100,11 @@ class RegisterDogViewModel @AssistedInject constructor(
                 .onSuccess { form.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
                     form.update { it.copy(isSaving = false) }
-                    userMessage.show(R.string.error_save_dog)
+                    userMessage.showAndReportError(
+                        it,
+                        R.string.error_save_dog,
+                        "Failed to save dog",
+                    )
                 }
         }
     }
@@ -111,7 +117,11 @@ class RegisterDogViewModel @AssistedInject constructor(
                 .onSuccess { form.update { it.copy(isDeleting = false, isDeleted = true) } }
                 .onFailure {
                     form.update { it.copy(isDeleting = false) }
-                    userMessage.show(R.string.error_delete_dog)
+                    userMessage.showAndReportError(
+                        it,
+                        R.string.error_delete_dog,
+                        "Failed to delete dog",
+                    )
                 }
         }
     }

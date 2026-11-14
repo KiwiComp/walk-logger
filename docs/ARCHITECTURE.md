@@ -105,8 +105,10 @@ com.example.walklogger
 │   │                          rows show their name), and `isHidden` soft-deletes without touching walk history
 │   ├── datastore/             Preferences DataStore (active dog id, the weather place, the active walk's start position,
 │   │                          whether location was asked for)
-│   ├── common/                runCatchingCancellable; Time.kt converts stored epoch millis to and from local date-times;
-│   │                          di/ holds the injectable coroutine dispatchers and Clock
+│   ├── common/                runCatchingCancellable; ErrorReporter (+ reportUnlessOffline) for caught errors;
+│   │                          Time.kt converts stored epoch millis to and from local date-times;
+│   │                          di/ holds the injectable coroutine dispatchers and Clock; the ErrorReporter binding
+│   │                          lives per build type (logcat in src/debug, no-op in src/release)
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
 │                              SectionLabel, SegmentedToggle, AppSwitch, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
@@ -114,7 +116,7 @@ com.example.walklogger
 │                              AppConfirmDialog for discard and delete confirmations; addWalkClick decides what
 │                              AddWalkButton does on Log and Calendar)
 │                              + message/UserMessageState, the message a ViewModel combines into its UiState,
-│                              and UserMessageEffect, which shows it in the app's snackbar
+│                              reporting the error behind it, and UserMessageEffect, which shows it in the app's snackbar
 ```
 
 ## Rules of thumb
@@ -146,13 +148,16 @@ com.example.walklogger
   sizes shared by several components use `AppSize`. Component-specific sizes (a dot, a cell
   height) are named `private val`s in the component's file, not tokens.
 - **Failures become snackbars, via UiState.** ViewModels run every write in `runCatchingCancellable`; on
-  failure they reset their busy flag (`isSaving`, …) and call `show` on their `UserMessageState`, which is
-  combined into `UiState.userMessage`. The Route's `UserMessageEffect` shows it in `WalkLoggerApp`'s single
+  failure they reset their busy flag (`isSaving`, …) and call `showAndReportError` on their `UserMessageState`,
+  which reports the error and is combined into `UiState.userMessage`. The Route's `UserMessageEffect` shows it in `WalkLoggerApp`'s single
   `AppSnackbarHost` and calls the ViewModel's `userMessageShown`
   ([UI events](https://developer.android.com/topic/architecture/ui-layer/events)).
   A screen whose walk or dog no longer exists only sets `isNotFound`; its Route calls `onNotFound`, and
   `WalkLoggerNavHost` pops back to the tab and shows the message through `onShowMessage`, since it must
   outlive the screen.
+- **Caught errors are reported.** Failures with no message (use cases, best-effort writes) call
+  `ErrorReporter.report`; network failures use `reportUnlessOffline`, since being offline is expected.
+  Debug builds log to logcat; release builds report nothing, as errors can carry personal or location data.
 - **Colours come from roles.** Read `AppTheme.colors` (`header`, `content`, `outline`, …), never a hue;
   the palette is private to `core/ui/theme`, so a dark theme or new palette only changes that package.
   Stool swatches are the exception: they depict real colours and stay fixed.

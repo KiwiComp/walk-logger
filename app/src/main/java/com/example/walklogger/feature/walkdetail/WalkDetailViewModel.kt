@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
+import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.common.toLocalDateTime
 import com.example.walklogger.core.data.DogRepository
@@ -34,6 +35,7 @@ class WalkDetailViewModel @AssistedInject constructor(
     dogRepository: DogRepository,
     private val clock: Clock,
     private val discardWalk: DiscardWalkUseCase,
+    errorReporter: ErrorReporter,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -42,7 +44,7 @@ class WalkDetailViewModel @AssistedInject constructor(
     }
 
     private val discard = MutableStateFlow(WalkDetailUiState())
-    private val userMessage = UserMessageState()
+    private val userMessage = UserMessageState(errorReporter)
 
     init {
         viewModelScope.launch {
@@ -79,7 +81,11 @@ class WalkDetailViewModel @AssistedInject constructor(
                 .onSuccess { discard.update { it.copy(isDiscarding = false, isDiscarded = true) } }
                 .onFailure {
                     discard.update { it.copy(isDiscarding = false) }
-                    userMessage.show(R.string.error_delete_walk)
+                    userMessage.showAndReportError(
+                        it,
+                        R.string.error_delete_walk,
+                        "Failed to discard walk",
+                    )
                 }
         }
     }

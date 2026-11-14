@@ -17,6 +17,7 @@ import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
+import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWalkRepository
@@ -48,6 +49,7 @@ class FinishWalkViewModelTest {
     private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val walkRepository = FakeWalkRepository()
+    private val errorReporter = FakeErrorReporter()
     private val locationRepository = FakeLocationRepository()
     private val weatherRepository = FakeWeatherRepository()
     private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
@@ -72,10 +74,12 @@ class FinishWalkViewModelTest {
                 locationRepository,
                 weatherRepository,
                 activeWalkLocationRepository,
+                errorReporter,
             ),
             locationPermission = LocationPermissionUseCase(locationRepository),
             locationRepository = locationRepository,
-            saveWalk = SaveWalkUseCase(walkRepository, activeWalkLocationRepository),
+            saveWalk = SaveWalkUseCase(walkRepository, activeWalkLocationRepository, errorReporter),
+            errorReporter = errorReporter,
         )
     }
 
@@ -226,6 +230,7 @@ class FinishWalkViewModelTest {
             assertFalse(state.isSaved)
             assertTrue(state.canSave)
             assertEquals(R.string.error_save_walk, viewModel.uiState.value.userMessage)
+            assertEquals(listOf("Failed to save walk"), errorReporter.reported.map { it.second })
         }
     }
 

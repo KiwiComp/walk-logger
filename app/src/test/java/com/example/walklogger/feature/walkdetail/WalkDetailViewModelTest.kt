@@ -15,6 +15,7 @@ import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.domain.DiscardWalkUseCase
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeDogRepository
+import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.Clock
@@ -40,13 +41,19 @@ class WalkDetailViewModelTest {
     private val clock = Clock.fixed(date.atTime(20, 0).toInstant(zone), zone)
     private val dogRepository = FakeDogRepository()
     private val walkRepository = FakeWalkRepository()
+    private val errorReporter = FakeErrorReporter()
     private val viewModel by lazy {
         WalkDetailViewModel(
             walkId = 1,
             walkRepository = walkRepository,
             dogRepository = dogRepository,
             clock = clock,
-            discardWalk = DiscardWalkUseCase(walkRepository, FakeActiveWalkLocationRepository()),
+            discardWalk = DiscardWalkUseCase(
+                walkRepository,
+                FakeActiveWalkLocationRepository(),
+                errorReporter,
+            ),
+            errorReporter = errorReporter,
         )
     }
 
@@ -141,6 +148,7 @@ class WalkDetailViewModelTest {
             assertFalse(state.canDiscard)
         }
         assertTrue(walkRepository.observeWalks().first().isEmpty())
+        assertTrue(errorReporter.reported.isEmpty())
     }
 
     @Test
@@ -161,6 +169,7 @@ class WalkDetailViewModelTest {
             assertTrue(state.canDiscard)
             assertEquals(R.string.error_delete_walk, state.userMessage)
         }
+        assertEquals(listOf("Failed to discard walk"), errorReporter.reported.map { it.second })
     }
 
     @Test

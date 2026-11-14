@@ -13,10 +13,16 @@ class HandlerSelectionEditorTest {
 
     private val handlerRepository = FakeHandlerRepository()
     private val shown = mutableListOf<Int>()
+    private val logged = mutableListOf<String>()
 
     private fun runEditorTest(body: suspend TestScope.(HandlerSelectionEditor) -> Unit) =
         runTest(UnconfinedTestDispatcher()) {
-            body(HandlerSelectionEditor(backgroundScope, handlerRepository, shown::add))
+            body(
+                HandlerSelectionEditor(backgroundScope, handlerRepository) { _, message, log ->
+                    shown += message
+                    logged += log
+                },
+            )
         }
 
     @Test
@@ -52,5 +58,6 @@ class HandlerSelectionEditorTest {
         editor.add("Kim")
         assertTrue(editor.state.value.selected.isEmpty())
         assertEquals(listOf(R.string.error_add_name), shown)
+        assertEquals(listOf("Failed to add handler"), logged)
     }
 }

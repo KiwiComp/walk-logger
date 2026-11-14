@@ -14,6 +14,7 @@ import com.example.walklogger.core.model.WalkLocation
 import com.example.walklogger.domain.DiscardWalkUseCase
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeDogRepository
+import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.Clock
@@ -45,6 +46,7 @@ class ActiveWalkViewModelTest {
     private val clock = SteppingClock(start.plus(Duration.ofMinutes(34).plusSeconds(12)), zone)
     private val dogRepository = FakeDogRepository()
     private val walkRepository = FakeWalkRepository()
+    private val errorReporter = FakeErrorReporter()
     private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
     private val walk = Walk(
         id = 1,
@@ -60,8 +62,13 @@ class ActiveWalkViewModelTest {
             walkId = 1,
             dogRepository = dogRepository,
             walkRepository = walkRepository,
-            discardWalkUseCase = DiscardWalkUseCase(walkRepository, activeWalkLocationRepository),
+            discardWalkUseCase = DiscardWalkUseCase(
+                walkRepository,
+                activeWalkLocationRepository,
+                errorReporter,
+            ),
             clock = clock,
+            errorReporter = errorReporter,
         )
     }
 
@@ -268,6 +275,7 @@ class ActiveWalkViewModelTest {
             assertFalse(state.isEnded)
             assertTrue(state.canEnd)
             assertEquals(R.string.error_end_walk, viewModel.uiState.value.userMessage)
+            assertEquals(listOf("Failed to end walk"), errorReporter.reported.map { it.second })
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -284,6 +292,7 @@ class ActiveWalkViewModelTest {
             advanceTimeBy(1_000)
             assertEquals("Pulled at the gate", walkRepository.observeWalk(1).first()!!.notes)
             assertEquals(R.string.error_delete_walk, viewModel.uiState.value.userMessage)
+            assertEquals(listOf("Failed to discard walk"), errorReporter.reported.map { it.second })
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -300,6 +309,7 @@ class ActiveWalkViewModelTest {
             advanceTimeBy(1_000)
             assertEquals("Pulled at the gate", walkRepository.observeWalk(1).first()!!.notes)
             assertEquals(R.string.error_save_note, viewModel.uiState.value.userMessage)
+            assertEquals(listOf("Failed to save note"), errorReporter.reported.map { it.second })
             cancelAndIgnoreRemainingEvents()
         }
     }
@@ -311,6 +321,12 @@ class ActiveWalkViewModelTest {
             walkRepository.failures.failWrites = true
             viewModel.setStoolPassed(true)
             assertEquals(R.string.error_save_stool, viewModel.uiState.value.userMessage)
+            assertEquals(
+                listOf("Failed to save stool answer"),
+                errorReporter.reported.map {
+                    it.second
+                },
+            )
             cancelAndIgnoreRemainingEvents()
         }
     }

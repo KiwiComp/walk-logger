@@ -6,6 +6,7 @@ import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.testing.FakeDogRepository
+import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeHandlerRepository
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeWalkLocationCapturer
@@ -31,6 +32,7 @@ class NewWalkViewModelTest {
     private val dogRepository = FakeDogRepository()
     private val handlerRepository = FakeHandlerRepository()
     private val walkRepository = FakeWalkRepository()
+    private val errorReporter = FakeErrorReporter()
     private val walkLocationCapturer = FakeWalkLocationCapturer()
     private val locationRepository = FakeLocationRepository()
     private val viewModel by lazy {
@@ -41,6 +43,7 @@ class NewWalkViewModelTest {
             walkRepository = walkRepository,
             walkLocationCapturer = walkLocationCapturer,
             locationPermission = LocationPermissionUseCase(locationRepository),
+            errorReporter = errorReporter,
         )
     }
 
@@ -176,6 +179,7 @@ class NewWalkViewModelTest {
             assertNull(state.startedWalkId)
             assertTrue(state.canStart)
             assertEquals(R.string.error_start_walk, viewModel.uiState.value.userMessage)
+            assertEquals(listOf("Failed to start walk"), errorReporter.reported.map { it.second })
         }
         assertTrue(walkLocationCapturer.capturedWalkIds.isEmpty())
     }

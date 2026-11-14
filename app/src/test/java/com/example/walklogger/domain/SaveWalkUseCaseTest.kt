@@ -4,6 +4,7 @@ import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkLocation
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
+import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeWalkRepository
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runTest
@@ -16,7 +17,9 @@ class SaveWalkUseCaseTest {
 
     private val walkRepository = FakeWalkRepository()
     private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
-    private val saveWalk = SaveWalkUseCase(walkRepository, activeWalkLocationRepository)
+    private val errorReporter = FakeErrorReporter()
+    private val saveWalk =
+        SaveWalkUseCase(walkRepository, activeWalkLocationRepository, errorReporter)
     private val stockholm = Coordinates(59.33, 18.07)
 
     private fun walk(id: Long, dogId: Long = 3, notes: String = "") = Walk(
@@ -60,11 +63,17 @@ class SaveWalkUseCaseTest {
     }
 
     @Test
-    fun `a position that cannot be cleared does not fail the save`() = runTest {
+    fun `a position that cannot be cleared is reported and does not fail the save`() = runTest {
         walkRepository.addWalks(walk(id = 4))
         activeWalkLocationRepository.walkLocation.value = WalkLocation(4, stockholm)
         activeWalkLocationRepository.failures.failWrites = true
         saveWalk(walk(id = 4, notes = "Calm"))
         assertEquals("Calm", walkRepository.observeWalk(4).first()!!.notes)
+        assertEquals(
+            listOf("Failed to clear walk location"),
+            errorReporter.reported.map {
+                it.second
+            },
+        )
     }
 }
