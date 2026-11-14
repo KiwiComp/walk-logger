@@ -33,6 +33,7 @@ class FakeLocationRepository(
     override val locationPermissionRequested: Flow<Boolean> = requested
 
     override suspend fun markLocationPermissionRequested() {
+        failures.check()
         requested.value = true
     }
 

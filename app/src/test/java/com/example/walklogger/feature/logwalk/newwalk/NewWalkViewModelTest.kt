@@ -218,6 +218,25 @@ class NewWalkViewModelTest {
     }
 
     @Test
+    fun `a failure to remember the location question is reported and still starts the walk`() =
+        runTest {
+            dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
+            handlerRepository.addHandlers("Kim")
+            locationRepository.isGranted = false
+            viewModel.uiState.test {
+                viewModel.startWalk()
+                locationRepository.failures.failWrites = true
+                viewModel.onLocationPermissionAnswered()
+                val walk = walkRepository.observeActiveWalk().first()!!
+                assertEquals(walk.id, expectMostRecentItem().startedWalkId)
+            }
+            assertEquals(
+                listOf("Failed to mark location permission requested"),
+                errorReporter.reported.map { it.second },
+            )
+        }
+
+    @Test
     fun `a denied location still starts the walk`() = runTest {
         dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         handlerRepository.addHandlers("Kim")
