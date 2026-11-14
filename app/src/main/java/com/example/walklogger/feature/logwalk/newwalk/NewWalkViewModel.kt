@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.logwalk.newwalk
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
@@ -9,7 +10,7 @@ import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkLocationCapturer
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Equipment
-import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.feature.logwalk.HandlerSelectionEditor
 import dagger.assisted.Assisted
@@ -35,7 +36,6 @@ class NewWalkViewModel @AssistedInject constructor(
     private val walkRepository: WalkRepository,
     private val walkLocationCapturer: WalkLocationCapturer,
     private val locationPermission: LocationPermissionUseCase,
-    private val userMessages: UserMessages,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -43,7 +43,10 @@ class NewWalkViewModel @AssistedInject constructor(
         fun create(date: LocalDate): NewWalkViewModel
     }
 
-    private val handlers = HandlerSelectionEditor(viewModelScope, handlerRepository, userMessages)
+    /** Declared before the editor, which is handed [UserMessageState.show]. */
+    private val userMessage = UserMessageState()
+    private val handlers =
+        HandlerSelectionEditor(viewModelScope, handlerRepository, userMessage::show)
     private val equipment = MutableStateFlow(Equipment.COLLAR)
     private val start = MutableStateFlow(StartState())
 
@@ -68,11 +71,12 @@ class NewWalkViewModel @AssistedInject constructor(
                 shouldRequestLocationPermission = start.shouldRequestLocationPermission,
                 startedWalkId = start.walkId,
             )
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = NewWalkUiState(date = date),
-        )
+        }.combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = NewWalkUiState(date = date),
+            )
 
     fun toggleHandler(handler: String) = handlers.toggle(handler)
 
@@ -107,6 +111,8 @@ class NewWalkViewModel @AssistedInject constructor(
         }
     }
 
+    fun userMessageShown(@StringRes message: Int) = userMessage.shown(message)
+
     private suspend fun storeWalk() {
         val state = uiState.value
         val selected = handlers.state.value.selectedInOrder
@@ -127,7 +133,7 @@ class NewWalkViewModel @AssistedInject constructor(
             }
             .onFailure {
                 start.update { StartState() }
-                userMessages.show(R.string.error_start_walk)
+                userMessage.show(R.string.error_start_walk)
             }
     }
 

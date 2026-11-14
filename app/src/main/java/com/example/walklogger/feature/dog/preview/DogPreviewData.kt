@@ -6,7 +6,8 @@ import com.example.walklogger.feature.dog.DogUiState
 
 /** Fixed content for `@Preview`s only; never reaches the running app. */
 internal object DogPreviewData {
-    val profile = DogUiState.Profile(
+    val profile = DogUiState(
+        isLoading = false,
         active = DogProfileUiState(
             id = 1,
             name = "Sixten",

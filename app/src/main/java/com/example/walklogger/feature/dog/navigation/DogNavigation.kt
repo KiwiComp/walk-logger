@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.dog.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.NavOptions
@@ -22,16 +23,27 @@ fun NavController.navigateToDog(navOptions: NavOptions? = null) =
 fun NavController.navigateToRegisterDog() = navigate(RegisterDogDestination())
 fun NavController.navigateToEditDog(dogId: Long) = navigate(RegisterDogDestination(dogId = dogId))
 
-fun NavGraphBuilder.dogScreen(onAddDog: () -> Unit, onEditDog: (dogId: Long) -> Unit) {
-    composable<DogDestination> { DogRoute(onAddDog = onAddDog, onEditDog = onEditDog) }
+fun NavGraphBuilder.dogScreen(
+    onAddDog: () -> Unit,
+    onEditDog: (dogId: Long) -> Unit,
+    snackbarHostState: SnackbarHostState,
+) {
+    composable<DogDestination> {
+        DogRoute(onAddDog = onAddDog, onEditDog = onEditDog, snackbarHostState = snackbarHostState)
+    }
 }
 
-fun NavGraphBuilder.registerDogScreen(onDone: () -> Unit, onNotFound: () -> Unit) {
+fun NavGraphBuilder.registerDogScreen(
+    onDone: () -> Unit,
+    onNotFound: () -> Unit,
+    snackbarHostState: SnackbarHostState,
+) {
     composable<RegisterDogDestination> { entry ->
         RegisterDogRoute(
             dogId = entry.toRoute<RegisterDogDestination>().dogId,
             onDone = onDone,
             onNotFound = onNotFound,
+            snackbarHostState = snackbarHostState,
         )
     }
 }

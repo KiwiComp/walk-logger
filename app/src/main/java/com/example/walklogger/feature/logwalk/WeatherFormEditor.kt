@@ -6,7 +6,6 @@ import com.example.walklogger.core.data.LocationRepository
 import com.example.walklogger.core.model.Place
 import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.WeatherCondition
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.domain.WeatherFetchResult
@@ -27,7 +26,7 @@ class WeatherFormEditor(
     private val fetchWalkWeather: FetchWalkWeatherUseCase,
     private val locationPermission: LocationPermissionUseCase,
     private val locationRepository: LocationRepository,
-    private val userMessages: UserMessages,
+    private val showMessage: (Int) -> Unit,
     private val walkId: Long? = null,
 ) : WeatherFormActions {
 
@@ -179,7 +178,7 @@ class WeatherFormEditor(
         scope.launch {
             runCatchingCancellable { locationRepository.savePlace(place) }
                 .onSuccess { fetchWeather() }
-                .onFailure { userMessages.show(R.string.error_save_place) }
+                .onFailure { showMessage(R.string.error_save_place) }
         }
     }
 

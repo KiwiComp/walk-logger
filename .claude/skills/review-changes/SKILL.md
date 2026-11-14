@@ -35,7 +35,7 @@ Report, for example:
 - Coroutines: direct use of `Dispatchers.*` instead of the `@Dispatcher` qualifier;
   `catch (e: Exception)` or `runCatching` outside `core/common/RunCatchingCancellable.kt`; a
   ViewModel write not wrapped in `runCatchingCancellable`, or one whose failure does not reset the
-  busy flag and post to `UserMessages`.
+  busy flag and show a message through the ViewModel's `UserMessageState`.
 - Room: `fallbackToDestructiveMigration`; a schema change without a version bump, an
   `AutoMigration`, a new `app/schemas/*.json` and a case in `WalkLoggerDatabaseMigrationTest`; a
   hard delete where soft delete (`isHidden`) applies.

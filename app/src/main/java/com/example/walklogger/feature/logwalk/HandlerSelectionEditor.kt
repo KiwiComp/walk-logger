@@ -3,7 +3,6 @@ package com.example.walklogger.feature.logwalk
 import com.example.walklogger.R
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.HandlerRepository
-import com.example.walklogger.core.ui.message.UserMessages
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -26,7 +25,7 @@ data class HandlerSelectionState(
 class HandlerSelectionEditor(
     private val scope: CoroutineScope,
     private val handlerRepository: HandlerRepository,
-    private val userMessages: UserMessages,
+    private val showMessage: (Int) -> Unit,
 ) {
     private val selected = MutableStateFlow<Set<String>>(emptySet())
 
@@ -56,7 +55,7 @@ class HandlerSelectionEditor(
         scope.launch {
             runCatchingCancellable { handlerRepository.addHandler(name) }
                 .onSuccess { stored -> selected.update { it + stored } }
-                .onFailure { userMessages.show(R.string.error_add_name) }
+                .onFailure { showMessage(R.string.error_add_name) }
         }
     }
 }

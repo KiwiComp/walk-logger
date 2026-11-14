@@ -5,6 +5,7 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.compose.NavHost
+import com.example.walklogger.R
 import com.example.walklogger.feature.calendar.navigation.calendarScreen
 import com.example.walklogger.feature.dog.navigation.dogScreen
 import com.example.walklogger.feature.dog.navigation.navigateToEditDog
@@ -25,11 +26,15 @@ import com.example.walklogger.feature.patterns.navigation.patternsScreen
 import com.example.walklogger.feature.walkdetail.navigation.navigateToWalkDetail
 import com.example.walklogger.feature.walkdetail.navigation.walkDetailScreen
 
-/** App-level graph. Features contribute their destinations via extension functions. */
+/**
+ * App-level graph. Features contribute their destinations via extension functions.
+ * [onShowMessage] is for messages that outlive the screen that caused them, such as a missing record closing it.
+ */
 @Composable
 fun WalkLoggerNavHost(
     navController: NavHostController,
     snackbarHostState: SnackbarHostState,
+    onShowMessage: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
     NavHost(
@@ -55,37 +60,60 @@ fun WalkLoggerNavHost(
         dogScreen(
             onAddDog = navController::navigateToRegisterDog,
             onEditDog = navController::navigateToEditDog,
+            snackbarHostState = snackbarHostState,
         )
-        registerDogScreen(onDone = {
-            navController.popBackStack()
-        }, onNotFound = navController::popToTopLevel)
+        registerDogScreen(
+            onDone = { navController.popBackStack() },
+            onNotFound = {
+                navController.popToTopLevel()
+                onShowMessage(R.string.error_dog_not_found)
+            },
+            snackbarHostState = snackbarHostState,
+        )
         newWalkScreen(
             onBack = { navController.popBackStack() },
             onWalkStarted = navController::navigateToActiveWalk,
             onLogPastWalk = navController::navigateToLogPastWalk,
+            snackbarHostState = snackbarHostState,
         )
         // Walk flows can start from the Log or Calendar tab; finishing one returns to whichever it was.
         activeWalkScreen(
             onWalkEnded = navController::navigateToFinishWalk,
             onWalkDiscarded = navController::popToTopLevel,
-            onNotFound = navController::popToTopLevel,
+            onNotFound = {
+                navController.popToTopLevel()
+                onShowMessage(R.string.error_walk_not_found)
+            },
+            snackbarHostState = snackbarHostState,
         )
         finishWalkScreen(
             onSaved = navController::popToTopLevel,
-            onNotFound = navController::popToTopLevel,
+            onNotFound = {
+                navController.popToTopLevel()
+                onShowMessage(R.string.error_walk_not_found)
+            },
+            snackbarHostState = snackbarHostState,
         )
         // Editing is pushed on top of the walk's detail screen, so every way out of the form lands back there.
         logPastWalkScreen(
             onClose = { navController.popBackStack() },
             onLogged = navController::popToTopLevel,
             onUpdated = { navController.popBackStack() },
-            onNotFound = navController::popToTopLevel,
+            onNotFound = {
+                navController.popToTopLevel()
+                onShowMessage(R.string.error_walk_not_found)
+            },
+            snackbarHostState = snackbarHostState,
         )
         walkDetailScreen(
             onBack = navController::popToTopLevel,
             onEdit = navController::navigateToEditWalk,
             onDiscarded = navController::popToTopLevel,
-            onNotFound = navController::popToTopLevel,
+            onNotFound = {
+                navController.popToTopLevel()
+                onShowMessage(R.string.error_walk_not_found)
+            },
+            snackbarHostState = snackbarHostState,
         )
     }
 }

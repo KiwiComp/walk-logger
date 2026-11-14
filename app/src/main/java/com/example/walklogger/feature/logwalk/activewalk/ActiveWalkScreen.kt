@@ -18,6 +18,7 @@ import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
@@ -45,6 +46,7 @@ import com.example.walklogger.core.ui.component.AppTextField
 import com.example.walklogger.core.ui.component.AppTextFieldStyle
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.SectionLabel
+import com.example.walklogger.core.ui.message.UserMessageEffect
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -64,6 +66,7 @@ fun ActiveWalkRoute(
     onWalkEnded: (walkId: Long) -> Unit,
     onWalkDiscarded: () -> Unit,
     onNotFound: () -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: ActiveWalkViewModel =
         hiltViewModel<ActiveWalkViewModel, ActiveWalkViewModel.Factory> { it.create(walkId) },
@@ -79,6 +82,11 @@ fun ActiveWalkRoute(
             uiState.isNotFound -> currentOnNotFound()
         }
     }
+    UserMessageEffect(
+        message = uiState.userMessage,
+        snackbarHostState = snackbarHostState,
+        onConsume = viewModel::userMessageShown,
+    )
     ActiveWalkScreen(
         uiState = uiState,
         onNoteChange = viewModel::setNote,

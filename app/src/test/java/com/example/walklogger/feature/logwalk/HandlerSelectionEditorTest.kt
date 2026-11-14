@@ -1,9 +1,7 @@
 package com.example.walklogger.feature.logwalk
 
 import com.example.walklogger.R
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.testing.FakeHandlerRepository
-import com.example.walklogger.testing.shownMessages
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -14,11 +12,11 @@ import org.junit.Test
 class HandlerSelectionEditorTest {
 
     private val handlerRepository = FakeHandlerRepository()
-    private val userMessages = UserMessages()
+    private val shown = mutableListOf<Int>()
 
     private fun runEditorTest(body: suspend TestScope.(HandlerSelectionEditor) -> Unit) =
         runTest(UnconfinedTestDispatcher()) {
-            body(HandlerSelectionEditor(backgroundScope, handlerRepository, userMessages))
+            body(HandlerSelectionEditor(backgroundScope, handlerRepository, shown::add))
         }
 
     @Test
@@ -50,7 +48,6 @@ class HandlerSelectionEditorTest {
 
     @Test
     fun `a failed add says so and selects nothing`() = runEditorTest { editor ->
-        val shown = shownMessages(userMessages)
         handlerRepository.failures.failWrites = true
         editor.add("Kim")
         assertTrue(editor.state.value.selected.isEmpty())

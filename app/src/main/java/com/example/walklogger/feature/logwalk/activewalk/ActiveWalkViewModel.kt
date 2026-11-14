@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.logwalk.activewalk
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
@@ -16,7 +17,7 @@ import com.example.walklogger.core.model.withColour
 import com.example.walklogger.core.model.withPassed
 import com.example.walklogger.core.model.withQuantity
 import com.example.walklogger.core.model.withTexture
-import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.DiscardWalkUseCase
 import com.example.walklogger.feature.logwalk.MAX_NOTES_LENGTH
 import dagger.assisted.Assisted
@@ -50,7 +51,6 @@ class ActiveWalkViewModel @AssistedInject constructor(
     dogRepository: DogRepository,
     private val walkRepository: WalkRepository,
     private val discardWalkUseCase: DiscardWalkUseCase,
-    private val userMessages: UserMessages,
     private val clock: Clock,
 ) : ViewModel() {
 
@@ -68,6 +68,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
     /** Starts folded, so a walk reopened with an answer shows only its summary. */
     private val isStoolExpanded = MutableStateFlow(false)
     private val outcome = MutableStateFlow(Outcome())
+    private val userMessage = UserMessageState()
 
     private val ticks = flow {
         while (true) {
@@ -86,7 +87,6 @@ class ActiveWalkViewModel @AssistedInject constructor(
         viewModelScope.launch {
             if (walkRepository.observeWalk(walkId).first() == null) {
                 outcome.update { it.copy(isNotFound = true) }
-                userMessages.show(R.string.error_walk_not_found)
             }
         }
     }
@@ -123,11 +123,13 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 isDiscarding = outcome.isDiscarding,
                 isDiscarded = outcome.isDiscarded,
             )
-        }.filterNotNull().stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = ActiveWalkUiState(),
-        )
+        }.filterNotNull()
+            .combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = ActiveWalkUiState(),
+            )
 
     fun setNote(text: String) = note.update { text.take(MAX_NOTES_LENGTH) }
 
@@ -176,7 +178,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 .onSuccess { outcome.update { Outcome(isEnded = true) } }
                 .onFailure {
                     outcome.update { it.copy(isEnding = false) }
-                    userMessages.show(R.string.error_end_walk)
+                    userMessage.show(R.string.error_end_walk)
                 }
         }
     }
@@ -194,23 +196,25 @@ class ActiveWalkViewModel @AssistedInject constructor(
                     noteSaver = saveNotes()
                     stoolSaver = saveStool()
                     outcome.update { it.copy(isDiscarding = false) }
-                    userMessages.show(R.string.error_delete_walk)
+                    userMessage.show(R.string.error_delete_walk)
                 }
         }
     }
+
+    fun userMessageShown(@StringRes message: Int) = userMessage.shown(message)
 
     private fun saveNotes() = viewModelScope.launch {
         @OptIn(FlowPreview::class)
         note.filterNotNull().debounce(NOTE_SAVE_DELAY_MILLIS).collect {
             runCatchingCancellable { walkRepository.updateNotes(walkId, it) }
-                .onFailure { userMessages.show(R.string.error_save_note) }
+                .onFailure { userMessage.show(R.string.error_save_note) }
         }
     }
 
     private fun saveStool() = viewModelScope.launch {
         stool.filterNotNull().collect {
             runCatchingCancellable { walkRepository.updateStool(walkId, it.stool) }
-                .onFailure { userMessages.show(R.string.error_save_stool) }
+                .onFailure { userMessage.show(R.string.error_save_stool) }
         }
     }
 

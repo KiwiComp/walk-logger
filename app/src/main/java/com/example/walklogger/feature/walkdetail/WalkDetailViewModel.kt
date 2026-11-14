@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.walkdetail
 
+import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
@@ -9,7 +10,7 @@ import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Walk
-import com.example.walklogger.core.ui.message.UserMessages
+import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.DiscardWalkUseCase
 import dagger.assisted.Assisted
 import dagger.assisted.AssistedFactory
@@ -31,7 +32,6 @@ class WalkDetailViewModel @AssistedInject constructor(
     @Assisted private val walkId: Long,
     private val walkRepository: WalkRepository,
     dogRepository: DogRepository,
-    private val userMessages: UserMessages,
     private val clock: Clock,
     private val discardWalk: DiscardWalkUseCase,
 ) : ViewModel() {
@@ -42,12 +42,12 @@ class WalkDetailViewModel @AssistedInject constructor(
     }
 
     private val discard = MutableStateFlow(WalkDetailUiState())
+    private val userMessage = UserMessageState()
 
     init {
         viewModelScope.launch {
             if (walkRepository.observeWalk(walkId).first() == null) {
                 discard.update { it.copy(isNotFound = true) }
-                userMessages.show(R.string.error_walk_not_found)
             }
         }
     }
@@ -64,11 +64,12 @@ class WalkDetailViewModel @AssistedInject constructor(
             } else {
                 discard.detailsOf(walk, dog = dogs.find { it.id == walk.dogId })
             }
-        }.stateIn(
-            scope = viewModelScope,
-            started = SharingStarted.WhileSubscribed(5_000),
-            initialValue = discard.value,
-        )
+        }.combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
+            .stateIn(
+                scope = viewModelScope,
+                started = SharingStarted.WhileSubscribed(5_000),
+                initialValue = discard.value,
+            )
 
     fun discard() {
         if (!uiState.value.canDiscard) return
@@ -78,10 +79,12 @@ class WalkDetailViewModel @AssistedInject constructor(
                 .onSuccess { discard.update { it.copy(isDiscarding = false, isDiscarded = true) } }
                 .onFailure {
                     discard.update { it.copy(isDiscarding = false) }
-                    userMessages.show(R.string.error_delete_walk)
+                    userMessage.show(R.string.error_delete_walk)
                 }
         }
     }
+
+    fun userMessageShown(@StringRes message: Int) = userMessage.shown(message)
 
     private fun WalkDetailUiState.detailsOf(walk: Walk, dog: Dog?): WalkDetailUiState {
         val start = walk.startTime.toLocalDateTime(clock.zone)

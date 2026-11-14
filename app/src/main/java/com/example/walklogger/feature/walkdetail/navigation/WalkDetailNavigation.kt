@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.walkdetail.navigation
 
+import androidx.compose.material3.SnackbarHostState
 import androidx.navigation.NavController
 import androidx.navigation.NavGraphBuilder
 import androidx.navigation.compose.composable
@@ -19,6 +20,7 @@ fun NavGraphBuilder.walkDetailScreen(
     onEdit: (LocalDate, Long) -> Unit,
     onDiscarded: () -> Unit,
     onNotFound: () -> Unit,
+    snackbarHostState: SnackbarHostState,
 ) {
     composable<WalkDetailDestination> { entry ->
         WalkDetailRoute(
@@ -27,6 +29,7 @@ fun NavGraphBuilder.walkDetailScreen(
             onEdit = onEdit,
             onDiscarded = onDiscarded,
             onNotFound = onNotFound,
+            snackbarHostState = snackbarHostState,
         )
     }
 }

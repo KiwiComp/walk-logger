@@ -9,6 +9,7 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -28,6 +29,7 @@ import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.SegmentedToggle
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
+import com.example.walklogger.core.ui.message.UserMessageEffect
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
@@ -45,6 +47,7 @@ fun NewWalkRoute(
     onBack: () -> Unit,
     onWalkStarted: (walkId: Long) -> Unit,
     onLogPastWalk: (LocalDate) -> Unit,
+    snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: NewWalkViewModel =
         hiltViewModel<NewWalkViewModel, NewWalkViewModel.Factory> { it.create(date) },
@@ -57,6 +60,11 @@ fun NewWalkRoute(
     LocationPermissionRequest(
         shouldRequest = uiState.shouldRequestLocationPermission,
         onResult = { viewModel.onLocationPermissionAnswered() },
+    )
+    UserMessageEffect(
+        message = uiState.userMessage,
+        snackbarHostState = snackbarHostState,
+        onConsume = viewModel::userMessageShown,
     )
     NewWalkScreen(
         uiState = uiState,

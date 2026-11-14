@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.walkdetail
 
+import androidx.annotation.StringRes
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
@@ -32,6 +33,7 @@ data class WalkDetailUiState(
     val notes: String = "",
     val isDiscarding: Boolean = false,
     val isDiscarded: Boolean = false,
+    @param:StringRes val userMessage: Int? = null,
 ) {
     val durationMinutes: Int? =
         if (startTime != null &&

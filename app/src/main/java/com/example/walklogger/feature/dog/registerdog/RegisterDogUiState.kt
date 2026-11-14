@@ -1,5 +1,6 @@
 package com.example.walklogger.feature.dog.registerdog
 
+import androidx.annotation.StringRes
 import java.time.LocalDate
 
 data class RegisterDogUiState(
@@ -19,6 +20,7 @@ data class RegisterDogUiState(
     val isDeleted: Boolean = false,
     /** True while the dog being edited is out on a timed walk; it can't be deleted until the walk ends. */
     val hasActiveWalk: Boolean = false,
+    @param:StringRes val userMessage: Int? = null,
 ) {
     val weightKg: Double? = weight.trim().replace(',', '.').toDoubleOrNull()?.takeIf { it > 0 }
 

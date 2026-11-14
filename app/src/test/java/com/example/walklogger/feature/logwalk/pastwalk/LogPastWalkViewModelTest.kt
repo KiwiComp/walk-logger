@@ -14,7 +14,6 @@ import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.WeatherCondition
-import com.example.walklogger.core.ui.message.UserMessages
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.domain.SaveWalkUseCase
@@ -28,7 +27,6 @@ import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.MainDispatcherRule
-import com.example.walklogger.testing.shownMessages
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
@@ -56,7 +54,6 @@ class LogPastWalkViewModelTest {
     private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val walkRepository = FakeWalkRepository()
-    private val userMessages = UserMessages()
     private val locationRepository = FakeLocationRepository()
     private val weatherRepository = FakeWeatherRepository()
     private var walkId: Long? = null
@@ -69,7 +66,6 @@ class LogPastWalkViewModelTest {
             behaviourIssueRepository = behaviourIssueRepository,
             medicalConcernRepository = medicalConcernRepository,
             walkRepository = walkRepository,
-            userMessages = userMessages,
             clock = clock,
             fetchWalkWeather = FetchWalkWeatherUseCase(
                 locationRepository,
@@ -377,7 +373,6 @@ class LogPastWalkViewModelTest {
     fun `a failed save keeps the form open and says so`() = runTest {
         dogRepository.addDogs(Dog(id = 1, name = "Sixten"))
         handlerRepository.addHandlers("Kim")
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             fillInValidWalk()
             walkRepository.failures.failWrites = true
@@ -386,28 +381,35 @@ class LogPastWalkViewModelTest {
             assertFalse(state.isSaving)
             assertFalse(state.isSaved)
             assertTrue(state.canSave)
+            assertEquals(R.string.error_save_walk, viewModel.uiState.value.userMessage)
         }
-        assertEquals(listOf(R.string.error_save_walk), shown)
     }
 
     @Test
-    fun `editing a missing walk closes the screen and says so`() = runTest {
+    fun `editing a missing walk closes the screen`() = runTest {
         walkId = 9
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             assertTrue(expectMostRecentItem().isNotFound)
         }
-        assertEquals(listOf(R.string.error_walk_not_found), shown)
     }
 
     @Test
     fun `a failed handler add says so and selects nothing new`() = runTest {
-        val shown = shownMessages(userMessages)
         viewModel.uiState.test {
             handlerRepository.failures.failWrites = true
             viewModel.addHandler("Anna")
             assertTrue(expectMostRecentItem().selectedHandlers.isEmpty())
+            assertEquals(R.string.error_add_name, viewModel.uiState.value.userMessage)
         }
-        assertEquals(listOf(R.string.error_add_name), shown)
+    }
+
+    @Test
+    fun `a shown message is cleared`() = runTest {
+        viewModel.uiState.test {
+            handlerRepository.failures.failWrites = true
+            viewModel.addHandler("Anna")
+            viewModel.userMessageShown(R.string.error_add_name)
+            assertNull(expectMostRecentItem().userMessage)
+        }
     }
 }
