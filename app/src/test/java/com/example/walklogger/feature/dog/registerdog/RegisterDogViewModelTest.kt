@@ -6,6 +6,7 @@ import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.testing.FakeDogRepository
+import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.LocalDate
@@ -25,12 +26,14 @@ class RegisterDogViewModelTest {
 
     private val repository = FakeDogRepository()
     private val walkRepository = FakeWalkRepository()
+    private val errorReporter = FakeErrorReporter()
     private val viewModel by lazy { editViewModel(dogId = null) }
 
     private fun editViewModel(dogId: Long?) = RegisterDogViewModel(
         dogId = dogId,
         dogRepository = repository,
         walkRepository = walkRepository,
+        errorReporter = errorReporter,
     )
 
     private fun ongoingWalk(dogId: Long) = Walk(
@@ -172,6 +175,7 @@ class RegisterDogViewModelTest {
             assertTrue(state.canSave)
             assertEquals(R.string.error_save_dog, state.userMessage)
         }
+        assertEquals(listOf("Failed to save dog"), errorReporter.reported.map { it.second })
     }
 
     @Test
@@ -198,6 +202,7 @@ class RegisterDogViewModelTest {
             assertTrue(state.canDelete)
             assertEquals(R.string.error_delete_dog, state.userMessage)
         }
+        assertEquals(listOf("Failed to delete dog"), errorReporter.reported.map { it.second })
     }
 
     @Test

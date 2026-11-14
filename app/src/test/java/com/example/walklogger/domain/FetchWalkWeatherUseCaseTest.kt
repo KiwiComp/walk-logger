@@ -4,6 +4,7 @@ import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Place
 import com.example.walklogger.core.model.WalkLocation
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
+import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import java.time.Duration
@@ -19,11 +20,13 @@ class FetchWalkWeatherUseCaseTest {
     private val locationRepository = FakeLocationRepository()
     private val weatherRepository = FakeWeatherRepository()
     private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
+    private val errorReporter = FakeErrorReporter()
     private val useCase =
         FetchWalkWeatherUseCase(
             locationRepository,
             weatherRepository,
             activeWalkLocationRepository,
+            errorReporter,
         )
     private val uppsala = Place("Uppsala", null, Coordinates(59.86, 17.64))
 
@@ -100,9 +103,10 @@ class FetchWalkWeatherUseCaseTest {
     }
 
     @Test
-    fun `a failed request is reported as failed`() = runTest {
+    fun `an offline request fails without being reported`() = runTest {
         weatherRepository.fail = true
         val (start, end) = walkEndingAgo(Duration.ofHours(1))
         assertEquals(WeatherFetchResult.Failed, useCase(start, end))
+        assertTrue(errorReporter.reported.isEmpty())
     }
 }

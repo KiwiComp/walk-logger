@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
+import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.model.Dog
@@ -23,9 +24,10 @@ import kotlinx.coroutines.launch
 class DogViewModel @Inject constructor(
     private val dogRepository: DogRepository,
     private val clock: Clock,
+    errorReporter: ErrorReporter,
 ) : ViewModel() {
 
-    private val userMessage = UserMessageState()
+    private val userMessage = UserMessageState(errorReporter)
 
     val uiState: StateFlow<DogUiState> =
         combine(dogRepository.observeAllDogs(), dogRepository.observeActiveDog()) { dogs, active ->
@@ -46,7 +48,13 @@ class DogViewModel @Inject constructor(
     fun switchDog(id: Long) {
         viewModelScope.launch {
             runCatchingCancellable { dogRepository.setActiveDog(id) }
-                .onFailure { userMessage.show(R.string.error_select_dog) }
+                .onFailure {
+                    userMessage.showAndReportError(
+                        it,
+                        R.string.error_select_dog,
+                        "Failed to switch dog",
+                    )
+                }
         }
     }
 

@@ -1,6 +1,8 @@
 package com.example.walklogger.feature.logwalk
 
 import com.example.walklogger.R
+import com.example.walklogger.core.common.ErrorReporter
+import com.example.walklogger.core.common.reportUnlessOffline
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.LocationRepository
 import com.example.walklogger.core.model.Place
@@ -26,7 +28,8 @@ class WeatherFormEditor(
     private val fetchWalkWeather: FetchWalkWeatherUseCase,
     private val locationPermission: LocationPermissionUseCase,
     private val locationRepository: LocationRepository,
-    private val showMessage: (Int) -> Unit,
+    private val showError: (Throwable, Int, String) -> Unit,
+    private val errorReporter: ErrorReporter,
     private val walkId: Long? = null,
 ) : WeatherFormActions {
 
@@ -159,7 +162,8 @@ class WeatherFormEditor(
                         )
                     }
                 }
-                .onFailure {
+                .onFailure { error ->
+                    errorReporter.reportUnlessOffline(error, "Failed to search places")
                     input.update {
                         it.copy(
                             placeSearch = it.placeSearch?.copy(
@@ -178,7 +182,7 @@ class WeatherFormEditor(
         scope.launch {
             runCatchingCancellable { locationRepository.savePlace(place) }
                 .onSuccess { fetchWeather() }
-                .onFailure { showMessage(R.string.error_save_place) }
+                .onFailure { showError(it, R.string.error_save_place, "Failed to save place") }
         }
     }
 

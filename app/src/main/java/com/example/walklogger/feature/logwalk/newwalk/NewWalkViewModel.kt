@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
+import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
@@ -36,6 +37,7 @@ class NewWalkViewModel @AssistedInject constructor(
     private val walkRepository: WalkRepository,
     private val walkLocationCapturer: WalkLocationCapturer,
     private val locationPermission: LocationPermissionUseCase,
+    private val errorReporter: ErrorReporter,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -43,10 +45,10 @@ class NewWalkViewModel @AssistedInject constructor(
         fun create(date: LocalDate): NewWalkViewModel
     }
 
-    /** Declared before the editor, which is handed [UserMessageState.show]. */
-    private val userMessage = UserMessageState()
+    /** Declared before the editor, which is handed [UserMessageState.showAndReportError]. */
+    private val userMessage = UserMessageState(errorReporter)
     private val handlers =
-        HandlerSelectionEditor(viewModelScope, handlerRepository, userMessage::show)
+        HandlerSelectionEditor(viewModelScope, handlerRepository, userMessage::showAndReportError)
     private val equipment = MutableStateFlow(Equipment.COLLAR)
     private val start = MutableStateFlow(StartState())
 
@@ -107,6 +109,9 @@ class NewWalkViewModel @AssistedInject constructor(
         start.update { it.copy(shouldRequestLocationPermission = false) }
         viewModelScope.launch {
             runCatchingCancellable { locationPermission.markRequested() }
+                .onFailure {
+                    errorReporter.report(it, "Failed to mark location permission requested")
+                }
             storeWalk()
         }
     }
@@ -133,7 +138,11 @@ class NewWalkViewModel @AssistedInject constructor(
             }
             .onFailure {
                 start.update { StartState() }
-                userMessage.show(R.string.error_start_walk)
+                userMessage.showAndReportError(
+                    it,
+                    R.string.error_start_walk,
+                    "Failed to start walk",
+                )
             }
     }
 

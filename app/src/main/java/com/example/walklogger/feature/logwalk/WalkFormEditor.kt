@@ -1,6 +1,7 @@
 package com.example.walklogger.feature.logwalk
 
 import com.example.walklogger.R
+import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.LocationRepository
@@ -36,7 +37,7 @@ class WalkFormEditor private constructor(
     private val scope: CoroutineScope,
     private val behaviourIssueRepository: BehaviourIssueRepository,
     private val medicalConcernRepository: MedicalConcernRepository,
-    private val showMessage: (Int) -> Unit,
+    private val showError: (Throwable, Int, String) -> Unit,
     private val weather: WeatherFormEditor,
 ) : WalkFormActions,
     WeatherFormActions by weather {
@@ -46,7 +47,8 @@ class WalkFormEditor private constructor(
         scope: CoroutineScope,
         behaviourIssueRepository: BehaviourIssueRepository,
         medicalConcernRepository: MedicalConcernRepository,
-        showMessage: (Int) -> Unit,
+        showError: (Throwable, Int, String) -> Unit,
+        errorReporter: ErrorReporter,
         fetchWalkWeather: FetchWalkWeatherUseCase,
         locationPermission: LocationPermissionUseCase,
         locationRepository: LocationRepository,
@@ -55,13 +57,14 @@ class WalkFormEditor private constructor(
         scope,
         behaviourIssueRepository,
         medicalConcernRepository,
-        showMessage,
+        showError,
         WeatherFormEditor(
             scope,
             fetchWalkWeather,
             locationPermission,
             locationRepository,
-            showMessage,
+            showError,
+            errorReporter,
             walkId,
         ),
     )
@@ -183,7 +186,9 @@ class WalkFormEditor private constructor(
                         )
                     }
                 }
-                .onFailure { showMessage(R.string.error_add_name) }
+                .onFailure {
+                    showError(it, R.string.error_add_name, "Failed to add behaviour issue")
+                }
         }
     }
 
@@ -209,7 +214,9 @@ class WalkFormEditor private constructor(
                         )
                     }
                 }
-                .onFailure { showMessage(R.string.error_add_name) }
+                .onFailure {
+                    showError(it, R.string.error_add_name, "Failed to add medical concern")
+                }
         }
     }
 

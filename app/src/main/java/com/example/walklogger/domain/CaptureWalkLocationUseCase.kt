@@ -1,5 +1,6 @@
 package com.example.walklogger.domain
 
+import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.ActiveWalkLocationRepository
 import com.example.walklogger.core.data.LocationRepository
@@ -14,6 +15,7 @@ import kotlinx.coroutines.flow.first
 class CaptureWalkLocationUseCase @Inject constructor(
     private val locationRepository: LocationRepository,
     private val activeWalkLocationRepository: ActiveWalkLocationRepository,
+    private val errorReporter: ErrorReporter,
 ) {
     suspend operator fun invoke(walkId: Long) {
         if (!locationRepository.hasPermission()) return
@@ -25,6 +27,6 @@ class CaptureWalkLocationUseCase @Inject constructor(
             }
             val coordinates = locationRepository.currentLocation() ?: return@runCatchingCancellable
             activeWalkLocationRepository.save(WalkLocation(walkId, coordinates))
-        }
+        }.onFailure { errorReporter.report(it, "Failed to capture walk location") }
     }
 }

@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.testing.FakeDogRepository
+import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.Clock
 import java.time.LocalDate
@@ -22,8 +23,9 @@ class DogViewModelTest {
     private val today = LocalDate.of(2026, 9, 12)
     private val clock = Clock.fixed(today.atStartOfDay().toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
     private val repository = FakeDogRepository()
+    private val errorReporter = FakeErrorReporter()
 
-    private val viewModel by lazy { DogViewModel(repository, clock) }
+    private val viewModel by lazy { DogViewModel(repository, clock, errorReporter) }
 
     private val sixten =
         Dog(
@@ -110,6 +112,7 @@ class DogViewModelTest {
             assertEquals("Sixten", state.active?.name)
             assertEquals(R.string.error_select_dog, state.userMessage)
         }
+        assertEquals(listOf("Failed to switch dog"), errorReporter.reported.map { it.second })
     }
 
     @Test

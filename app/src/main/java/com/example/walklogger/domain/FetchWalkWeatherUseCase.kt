@@ -1,5 +1,7 @@
 package com.example.walklogger.domain
 
+import com.example.walklogger.core.common.ErrorReporter
+import com.example.walklogger.core.common.reportUnlessOffline
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.ActiveWalkLocationRepository
 import com.example.walklogger.core.data.LocationRepository
@@ -26,6 +28,7 @@ class FetchWalkWeatherUseCase @Inject constructor(
     private val locationRepository: LocationRepository,
     private val weatherRepository: WeatherRepository,
     private val activeWalkLocationRepository: ActiveWalkLocationRepository,
+    private val errorReporter: ErrorReporter,
 ) {
     /**
      * Values are taken from the hour that contains the middle of the walk. A position stored for
@@ -44,7 +47,8 @@ class FetchWalkWeatherUseCase @Inject constructor(
                 ?: locationRepository.savedPlace.first()?.coordinates
                 ?: return@runCatchingCancellable WeatherFetchResult.NoLocation
             WeatherFetchResult.Fetched(weatherRepository.weatherAt(coordinates, middle))
-        }.getOrDefault(WeatherFetchResult.Failed)
+        }.onFailure { errorReporter.reportUnlessOffline(it, "Failed to fetch weather") }
+            .getOrDefault(WeatherFetchResult.Failed)
     }
 
     private suspend fun activeWalkCoordinates(walkId: Long) =

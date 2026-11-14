@@ -8,6 +8,7 @@ import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.testing.FakeActiveWalkLocationRepository
+import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import java.time.Duration
@@ -24,6 +25,8 @@ import org.junit.Test
 class WeatherFormEditorTest {
 
     private val shown = mutableListOf<Int>()
+    private val logged = mutableListOf<String>()
+    private val errorReporter = FakeErrorReporter()
     private val locationRepository = FakeLocationRepository()
     private val weatherRepository = FakeWeatherRepository()
     private val now = Instant.parse("2026-11-09T12:00:00Z")
@@ -40,10 +43,15 @@ class WeatherFormEditorTest {
                         locationRepository,
                         weatherRepository,
                         FakeActiveWalkLocationRepository(),
+                        errorReporter,
                     ),
                     LocationPermissionUseCase(locationRepository),
                     locationRepository,
-                    shown::add,
+                    { _, message, log ->
+                        shown += message
+                        logged += log
+                    },
+                    errorReporter,
                 ),
             )
         }
@@ -159,6 +167,7 @@ class WeatherFormEditorTest {
         editor.openPlaceSearch()
         editor.searchPlaces("Upps")
         assertTrue(editor.state.value.placeSearch!!.isFailed)
+        assertTrue(errorReporter.reported.isEmpty())
         editor.closePlaceSearch()
         assertNull(editor.state.value.placeSearch)
     }
@@ -313,5 +322,6 @@ class WeatherFormEditorTest {
         locationRepository.failures.failWrites = true
         editor.selectPlace(Place("Uppsala", null, Coordinates(59.86, 17.64)))
         assertEquals(listOf(R.string.error_save_place), shown)
+        assertEquals(listOf("Failed to save place"), logged)
     }
 }

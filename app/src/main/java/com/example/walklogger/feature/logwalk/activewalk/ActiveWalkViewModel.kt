@@ -4,6 +4,7 @@ import androidx.annotation.StringRes
 import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
+import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
@@ -52,6 +53,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
     private val walkRepository: WalkRepository,
     private val discardWalkUseCase: DiscardWalkUseCase,
     private val clock: Clock,
+    errorReporter: ErrorReporter,
 ) : ViewModel() {
 
     @AssistedFactory
@@ -68,7 +70,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
     /** Starts folded, so a walk reopened with an answer shows only its summary. */
     private val isStoolExpanded = MutableStateFlow(false)
     private val outcome = MutableStateFlow(Outcome())
-    private val userMessage = UserMessageState()
+    private val userMessage = UserMessageState(errorReporter)
 
     private val ticks = flow {
         while (true) {
@@ -178,7 +180,11 @@ class ActiveWalkViewModel @AssistedInject constructor(
                 .onSuccess { outcome.update { Outcome(isEnded = true) } }
                 .onFailure {
                     outcome.update { it.copy(isEnding = false) }
-                    userMessage.show(R.string.error_end_walk)
+                    userMessage.showAndReportError(
+                        it,
+                        R.string.error_end_walk,
+                        "Failed to end walk",
+                    )
                 }
         }
     }
@@ -196,7 +202,11 @@ class ActiveWalkViewModel @AssistedInject constructor(
                     noteSaver = saveNotes()
                     stoolSaver = saveStool()
                     outcome.update { it.copy(isDiscarding = false) }
-                    userMessage.show(R.string.error_delete_walk)
+                    userMessage.showAndReportError(
+                        it,
+                        R.string.error_delete_walk,
+                        "Failed to discard walk",
+                    )
                 }
         }
     }
@@ -207,14 +217,26 @@ class ActiveWalkViewModel @AssistedInject constructor(
         @OptIn(FlowPreview::class)
         note.filterNotNull().debounce(NOTE_SAVE_DELAY_MILLIS).collect {
             runCatchingCancellable { walkRepository.updateNotes(walkId, it) }
-                .onFailure { userMessage.show(R.string.error_save_note) }
+                .onFailure {
+                    userMessage.showAndReportError(
+                        it,
+                        R.string.error_save_note,
+                        "Failed to save note",
+                    )
+                }
         }
     }
 
     private fun saveStool() = viewModelScope.launch {
         stool.filterNotNull().collect {
             runCatchingCancellable { walkRepository.updateStool(walkId, it.stool) }
-                .onFailure { userMessage.show(R.string.error_save_stool) }
+                .onFailure {
+                    userMessage.showAndReportError(
+                        it,
+                        R.string.error_save_stool,
+                        "Failed to save stool answer",
+                    )
+                }
         }
     }
 

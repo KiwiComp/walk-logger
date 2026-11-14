@@ -1,5 +1,6 @@
 package com.example.walklogger.domain
 
+import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.ActiveWalkLocationRepository
 import com.example.walklogger.core.data.WalkRepository
@@ -10,6 +11,7 @@ import javax.inject.Inject
 class SaveWalkUseCase @Inject constructor(
     private val walkRepository: WalkRepository,
     private val activeWalkLocationRepository: ActiveWalkLocationRepository,
+    private val errorReporter: ErrorReporter,
 ) {
     /**
      * A [walk] whose id is [UNSAVED] is logged as a new walk. Any other walk replaces the stored one,
@@ -22,6 +24,7 @@ class SaveWalkUseCase @Inject constructor(
             walkRepository.updateWalk(walk)
             // A position left behind is harmless: no other walk has this id.
             runCatchingCancellable { activeWalkLocationRepository.clearFor(walk.id) }
+                .onFailure { errorReporter.report(it, "Failed to clear walk location") }
         }
     }
 
