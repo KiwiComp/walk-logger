@@ -27,8 +27,13 @@ import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
 
+/** The note and stool answer of the walk in progress, the user's edits laid over what is stored. */
 data class ActiveWalkEdits(val note: String, val stool: Stool?, val isStoolExpanded: Boolean)
 
+/**
+ * Holds the note and stool answer of the walk in progress for its ViewModel, and stores each edit as
+ * it is made: the note after a pause in typing, stool picks at once. [stored] is the walk [walkId].
+ */
 class ActiveWalkEditor(
     private val scope: CoroutineScope,
     private val walkId: Long,
