@@ -51,8 +51,9 @@ fun walkSummary(walkCount: Int, averageRating: Double?, totalDuration: Duration)
     return count + duration + average
 }
 
+/** "45 min", or "1 h 5 min" from an hour up. */
 @Composable
-private fun formatDuration(duration: Duration): String =
+internal fun formatDuration(duration: Duration): String =
     duration.toComponents { hours, minutes, _, _ ->
         if (hours > 0) {
             stringResource(R.string.summary_duration_hours_minutes, hours, minutes)

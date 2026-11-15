@@ -27,7 +27,7 @@ internal object LogPreviewData {
         WalkUiState(
             id = 2,
             startTime = LocalTime.of(11, 30),
-            duration = 17.minutes,
+            duration = 177.minutes,
             equipment = Equipment.COLLAR,
             rating = 4,
             note = "Quick errand walk, distracted by the market.",
