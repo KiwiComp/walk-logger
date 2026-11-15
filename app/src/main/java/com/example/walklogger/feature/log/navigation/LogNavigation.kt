@@ -1,28 +1,23 @@
 package com.example.walklogger.feature.log.navigation
 
 import androidx.compose.material3.SnackbarHostState
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.example.walklogger.feature.log.LogRoute
 import java.time.LocalDate
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object LogDestination
+data object LogDestination : NavKey
 
-fun NavController.navigateToLog(navOptions: NavOptions? = null) =
-    navigate(LogDestination, navOptions)
-
-fun NavGraphBuilder.logScreen(
+fun EntryProviderScope<NavKey>.logScreen(
     onAddWalk: (LocalDate) -> Unit,
     onLogPastWalk: (LocalDate) -> Unit,
     onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    composable<LogDestination> {
+    entry<LogDestination> {
         LogRoute(
             onAddWalk = onAddWalk,
             onLogPastWalk = onLogPastWalk,

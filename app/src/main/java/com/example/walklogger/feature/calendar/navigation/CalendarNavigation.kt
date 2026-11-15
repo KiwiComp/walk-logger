@@ -1,28 +1,23 @@
 package com.example.walklogger.feature.calendar.navigation
 
 import androidx.compose.material3.SnackbarHostState
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.example.walklogger.feature.calendar.CalendarRoute
 import java.time.LocalDate
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object CalendarDestination
+data object CalendarDestination : NavKey
 
-fun NavController.navigateToCalendar(navOptions: NavOptions? = null) =
-    navigate(CalendarDestination, navOptions)
-
-fun NavGraphBuilder.calendarScreen(
+fun EntryProviderScope<NavKey>.calendarScreen(
     onAddWalk: (LocalDate) -> Unit,
     onLogPastWalk: (LocalDate) -> Unit,
     onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    composable<CalendarDestination> {
+    entry<CalendarDestination> {
         CalendarRoute(
             onAddWalk = onAddWalk,
             onLogPastWalk = onLogPastWalk,

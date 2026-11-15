@@ -64,7 +64,8 @@ See docs/ARCHITECTURE.md for the package tree and how to add a feature.
   Each feature owns its navigation (`feature/<name>/navigation`), registered in `navigation/WalkLoggerNavHost.kt`.
 * Screens are split into a stateful `*Route` (obtains the ViewModel, collects state) and a stateless
   `*Screen` (pure rendering, previewable and UI-testable without Hilt).
-* Navigation: Navigation Compose with type-safe `@Serializable` routes. Navigation calls live in the
+* Navigation: Navigation 3 with `@Serializable` `NavKey` routes; the app owns the back stacks in
+  `navigation/WalkLoggerNavigationState.kt`. Navigation calls live in the
   UI layer, never in ViewModels. Single activity; `MainActivity` stays thin.
 * Dependency injection with Hilt. Depend on interfaces (`WalkRepository`, …) so fakes can be
   swapped in for unit tests; prefer fakes over mocks.

@@ -1,10 +1,8 @@
 package com.example.walklogger.feature.logwalk.navigation
 
 import androidx.compose.material3.SnackbarHostState
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.example.walklogger.feature.logwalk.activewalk.ActiveWalkRoute
 import com.example.walklogger.feature.logwalk.finishwalk.FinishWalkRoute
 import com.example.walklogger.feature.logwalk.newwalk.NewWalkRoute
@@ -14,52 +12,64 @@ import kotlinx.serialization.Serializable
 
 /** [epochDay] is the day chosen on the log screen, see [java.time.LocalDate.toEpochDay]. */
 @Serializable
-data class NewWalkDestination(val epochDay: Long)
+data class NewWalkDestination(val epochDay: Long) : NavKey
 
 /**
  * [epochDay] prefills the form's date; the user can still change it.
  * With a [walkId] the form edits that walk instead of logging a new one.
  */
 @Serializable
-data class LogPastWalkDestination(val epochDay: Long, val walkId: Long? = null)
+data class LogPastWalkDestination(val epochDay: Long, val walkId: Long? = null) : NavKey
 
 /** The timer for the in-progress walk [walkId]. */
 @Serializable
-data class ActiveWalkDestination(val walkId: Long)
+data class ActiveWalkDestination(val walkId: Long) : NavKey
 
 /** The after-walk form for the just-finished walk [walkId]. */
 @Serializable
-data class FinishWalkDestination(val walkId: Long)
+data class FinishWalkDestination(val walkId: Long) : NavKey
 
-fun NavController.navigateToNewWalk(date: LocalDate) =
-    navigate(NewWalkDestination(epochDay = date.toEpochDay()))
+fun MutableList<NavKey>.navigateToNewWalk(date: LocalDate) {
+    add(NewWalkDestination(epochDay = date.toEpochDay()))
+}
 
 /** Replaces the new-walk form, so back from the timer never lands on it. */
-fun NavController.navigateToActiveWalk(walkId: Long) = navigate(ActiveWalkDestination(walkId)) {
-    popUpTo<NewWalkDestination> { inclusive = true }
-    launchSingleTop = true
+fun MutableList<NavKey>.navigateToActiveWalk(walkId: Long) {
+    popUpToInclusive<NewWalkDestination>()
+    val destination = ActiveWalkDestination(walkId)
+    if (lastOrNull() != destination) add(destination)
 }
 
 /** Replaces the timer screen; the walk is already finished so there is nothing to go back to. */
-fun NavController.navigateToFinishWalk(walkId: Long) = navigate(FinishWalkDestination(walkId)) {
-    popUpTo<ActiveWalkDestination> { inclusive = true }
+fun MutableList<NavKey>.navigateToFinishWalk(walkId: Long) {
+    popUpToInclusive<ActiveWalkDestination>()
+    add(FinishWalkDestination(walkId))
 }
 
-fun NavController.navigateToLogPastWalk(date: LocalDate) =
-    navigate(LogPastWalkDestination(epochDay = date.toEpochDay()))
+fun MutableList<NavKey>.navigateToLogPastWalk(date: LocalDate) {
+    add(LogPastWalkDestination(epochDay = date.toEpochDay()))
+}
 
-fun NavController.navigateToEditWalk(date: LocalDate, walkId: Long) =
-    navigate(LogPastWalkDestination(epochDay = date.toEpochDay(), walkId = walkId))
+fun MutableList<NavKey>.navigateToEditWalk(date: LocalDate, walkId: Long) {
+    add(LogPastWalkDestination(epochDay = date.toEpochDay(), walkId = walkId))
+}
 
-fun NavGraphBuilder.newWalkScreen(
+/** Nav2's `popUpTo<T> { inclusive = true }`: drops the topmost [T] and everything above it. */
+private inline fun <reified T : NavKey> MutableList<NavKey>.popUpToInclusive() {
+    val index = indexOfLast { it is T }
+    if (index == -1) return
+    while (size > index) removeAt(lastIndex)
+}
+
+fun EntryProviderScope<NavKey>.newWalkScreen(
     onBack: () -> Unit,
     onWalkStarted: (walkId: Long) -> Unit,
     onLogPastWalk: (LocalDate) -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    composable<NewWalkDestination> { entry ->
+    entry<NewWalkDestination> { key ->
         NewWalkRoute(
-            date = LocalDate.ofEpochDay(entry.toRoute<NewWalkDestination>().epochDay),
+            date = LocalDate.ofEpochDay(key.epochDay),
             onBack = onBack,
             onWalkStarted = onWalkStarted,
             onLogPastWalk = onLogPastWalk,
@@ -68,15 +78,15 @@ fun NavGraphBuilder.newWalkScreen(
     }
 }
 
-fun NavGraphBuilder.activeWalkScreen(
+fun EntryProviderScope<NavKey>.activeWalkScreen(
     onWalkEnded: (walkId: Long) -> Unit,
     onWalkDiscarded: () -> Unit,
     onNotFound: () -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    composable<ActiveWalkDestination> { entry ->
+    entry<ActiveWalkDestination> { key ->
         ActiveWalkRoute(
-            walkId = entry.toRoute<ActiveWalkDestination>().walkId,
+            walkId = key.walkId,
             onWalkEnded = onWalkEnded,
             onWalkDiscarded = onWalkDiscarded,
             onNotFound = onNotFound,
@@ -85,14 +95,14 @@ fun NavGraphBuilder.activeWalkScreen(
     }
 }
 
-fun NavGraphBuilder.finishWalkScreen(
+fun EntryProviderScope<NavKey>.finishWalkScreen(
     onSaved: () -> Unit,
     onNotFound: () -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    composable<FinishWalkDestination> { entry ->
+    entry<FinishWalkDestination> { key ->
         FinishWalkRoute(
-            walkId = entry.toRoute<FinishWalkDestination>().walkId,
+            walkId = key.walkId,
             onSaved = onSaved,
             onNotFound = onNotFound,
             snackbarHostState = snackbarHostState,
@@ -101,20 +111,19 @@ fun NavGraphBuilder.finishWalkScreen(
 }
 
 /** [onLogged] runs after a new walk is stored, [onUpdated] after an edited one. */
-fun NavGraphBuilder.logPastWalkScreen(
+fun EntryProviderScope<NavKey>.logPastWalkScreen(
     onClose: () -> Unit,
     onLogged: () -> Unit,
     onUpdated: () -> Unit,
     onNotFound: () -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    composable<LogPastWalkDestination> { entry ->
-        val destination = entry.toRoute<LogPastWalkDestination>()
+    entry<LogPastWalkDestination> { key ->
         LogPastWalkRoute(
-            date = LocalDate.ofEpochDay(destination.epochDay),
-            walkId = destination.walkId,
+            date = LocalDate.ofEpochDay(key.epochDay),
+            walkId = key.walkId,
             onClose = onClose,
-            onSaved = if (destination.walkId == null) onLogged else onUpdated,
+            onSaved = if (key.walkId == null) onLogged else onUpdated,
             onNotFound = onNotFound,
             snackbarHostState = snackbarHostState,
         )

@@ -1,17 +1,20 @@
 package com.example.walklogger.navigation
 
+import androidx.compose.animation.fadeIn
+import androidx.compose.animation.fadeOut
+import androidx.compose.animation.togetherWith
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
-import androidx.navigation.NavHostController
-import androidx.navigation.compose.NavHost
+import androidx.navigation3.runtime.NavKey
+import androidx.navigation3.runtime.entryProvider
+import androidx.navigation3.ui.NavDisplay
 import com.example.walklogger.R
 import com.example.walklogger.feature.calendar.navigation.calendarScreen
 import com.example.walklogger.feature.dog.navigation.dogScreen
 import com.example.walklogger.feature.dog.navigation.navigateToEditDog
 import com.example.walklogger.feature.dog.navigation.navigateToRegisterDog
 import com.example.walklogger.feature.dog.navigation.registerDogScreen
-import com.example.walklogger.feature.log.navigation.LogDestination
 import com.example.walklogger.feature.log.navigation.logScreen
 import com.example.walklogger.feature.logwalk.navigation.activeWalkScreen
 import com.example.walklogger.feature.logwalk.navigation.finishWalkScreen
@@ -32,88 +35,94 @@ import com.example.walklogger.feature.walkdetail.navigation.walkDetailScreen
  */
 @Composable
 fun WalkLoggerNavHost(
-    navController: NavHostController,
+    navigationState: WalkLoggerNavigationState,
     snackbarHostState: SnackbarHostState,
     onShowMessage: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    NavHost(
-        navController = navController,
-        startDestination = LogDestination,
-        modifier = modifier,
-    ) {
+    val entryProvider = entryProvider<NavKey> {
         logScreen(
-            onAddWalk = navController::navigateToNewWalk,
-            onLogPastWalk = navController::navigateToLogPastWalk,
-            onOpenWalk = navController::navigateToWalkDetail,
-            onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
+            onAddWalk = { navigationState.currentStack.navigateToNewWalk(it) },
+            onLogPastWalk = { navigationState.currentStack.navigateToLogPastWalk(it) },
+            onOpenWalk = { navigationState.currentStack.navigateToWalkDetail(it) },
+            onGoToDogs = { navigationState.selectTab(TopLevelDestination.DOG) },
             snackbarHostState = snackbarHostState,
         )
         calendarScreen(
-            onAddWalk = navController::navigateToNewWalk,
-            onLogPastWalk = navController::navigateToLogPastWalk,
-            onOpenWalk = navController::navigateToWalkDetail,
-            onGoToDogs = { navController.navigateToTopLevel(TopLevelDestination.DOG) },
+            onAddWalk = { navigationState.currentStack.navigateToNewWalk(it) },
+            onLogPastWalk = { navigationState.currentStack.navigateToLogPastWalk(it) },
+            onOpenWalk = { navigationState.currentStack.navigateToWalkDetail(it) },
+            onGoToDogs = { navigationState.selectTab(TopLevelDestination.DOG) },
             snackbarHostState = snackbarHostState,
         )
         patternsScreen()
         dogScreen(
-            onAddDog = navController::navigateToRegisterDog,
-            onEditDog = navController::navigateToEditDog,
+            onAddDog = { navigationState.currentStack.navigateToRegisterDog() },
+            onEditDog = { navigationState.currentStack.navigateToEditDog(it) },
             snackbarHostState = snackbarHostState,
         )
         registerDogScreen(
-            onDone = { navController.popBackStack() },
+            onDone = navigationState::goBack,
             onNotFound = {
-                navController.popToTopLevel()
+                navigationState.popToTopLevel()
                 onShowMessage(R.string.error_dog_not_found)
             },
             snackbarHostState = snackbarHostState,
         )
         newWalkScreen(
-            onBack = { navController.popBackStack() },
-            onWalkStarted = navController::navigateToActiveWalk,
-            onLogPastWalk = navController::navigateToLogPastWalk,
+            onBack = navigationState::goBack,
+            onWalkStarted = { navigationState.currentStack.navigateToActiveWalk(it) },
+            onLogPastWalk = { navigationState.currentStack.navigateToLogPastWalk(it) },
             snackbarHostState = snackbarHostState,
         )
         // Walk flows can start from the Log or Calendar tab; finishing one returns to whichever it was.
         activeWalkScreen(
-            onWalkEnded = navController::navigateToFinishWalk,
-            onWalkDiscarded = navController::popToTopLevel,
+            onWalkEnded = { navigationState.currentStack.navigateToFinishWalk(it) },
+            onWalkDiscarded = navigationState::popToTopLevel,
             onNotFound = {
-                navController.popToTopLevel()
+                navigationState.popToTopLevel()
                 onShowMessage(R.string.error_walk_not_found)
             },
             snackbarHostState = snackbarHostState,
         )
         finishWalkScreen(
-            onSaved = navController::popToTopLevel,
+            onSaved = navigationState::popToTopLevel,
             onNotFound = {
-                navController.popToTopLevel()
+                navigationState.popToTopLevel()
                 onShowMessage(R.string.error_walk_not_found)
             },
             snackbarHostState = snackbarHostState,
         )
         // Editing is pushed on top of the walk's detail screen, so every way out of the form lands back there.
         logPastWalkScreen(
-            onClose = { navController.popBackStack() },
-            onLogged = navController::popToTopLevel,
-            onUpdated = { navController.popBackStack() },
+            onClose = navigationState::goBack,
+            onLogged = navigationState::popToTopLevel,
+            onUpdated = navigationState::goBack,
             onNotFound = {
-                navController.popToTopLevel()
+                navigationState.popToTopLevel()
                 onShowMessage(R.string.error_walk_not_found)
             },
             snackbarHostState = snackbarHostState,
         )
         walkDetailScreen(
-            onBack = navController::popToTopLevel,
-            onEdit = navController::navigateToEditWalk,
-            onDiscarded = navController::popToTopLevel,
+            onBack = navigationState::popToTopLevel,
+            onEdit = { date, walkId ->
+                navigationState.currentStack.navigateToEditWalk(date, walkId)
+            },
+            onDiscarded = navigationState::popToTopLevel,
             onNotFound = {
-                navController.popToTopLevel()
+                navigationState.popToTopLevel()
                 onShowMessage(R.string.error_walk_not_found)
             },
             snackbarHostState = snackbarHostState,
         )
     }
+    NavDisplay(
+        entries = navigationState.toEntries(entryProvider),
+        onBack = navigationState::goBack,
+        modifier = modifier,
+        transitionSpec = { fadeIn() togetherWith fadeOut() },
+        popTransitionSpec = { fadeIn() togetherWith fadeOut() },
+        predictivePopTransitionSpec = { fadeIn() togetherWith fadeOut() },
+    )
 }

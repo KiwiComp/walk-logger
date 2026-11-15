@@ -21,8 +21,8 @@ it. Never weaken, ignore or skip a test or a style rule to make a check pass.
     - Find the changed files with `git diff --name-only main...HEAD` and `git diff --name-only HEAD`,
       plus untracked files from `git status --porcelain`.
     - Instrumented tests are needed when a file under `app/src/androidTest/` changed, or when a
-      changed main file is in `core/database`, `core/data`, `core/ui/component`, `navigation/`,
-      or a feature's `navigation/` or `component/` package.
+      changed main file is in `core/database`, `core/data`, `core/ui/component`, or a feature's
+      `component/` package.
     - Run `adb devices`. If no device or emulator is listed, do not run the task and say so
       explicitly. Never claim that instrumented tests pass when they were not run.
     - The instrumented tests find nodes by English text, so the device must use English as its
