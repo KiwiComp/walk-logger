@@ -109,6 +109,7 @@ class FinishWalkViewModel @AssistedInject constructor(
         val end = checkNotNull(times.endMillis)
         screen.update { it.copy(isSaving = true) }
         viewModelScope.launch {
+            form.awaitWeather()
             runCatchingCancellable {
                 saveWalk(form.applyTo(stored.copy(startTime = start, endTime = end)))
             }

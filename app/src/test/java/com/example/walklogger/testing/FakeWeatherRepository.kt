@@ -6,6 +6,7 @@ import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.WeatherCondition
 import java.io.IOException
 import java.time.Instant
+import kotlinx.coroutines.delay
 
 /**
  * [WeatherRepository] for unit tests: answers with [weather] and records each request in [requests];
@@ -27,12 +28,16 @@ class FakeWeatherRepository : WeatherRepository {
 
     var oldestAvailable: Instant = Instant.MIN
 
+    /** How long each request takes, in virtual time, to save while a fetch is still running. */
+    var delayMillis: Long = 0
+
     val requests = mutableListOf<Pair<Coordinates, Instant>>()
 
     override fun isAvailable(time: Instant): Boolean = time >= oldestAvailable
 
     override suspend fun weatherAt(coordinates: Coordinates, time: Instant): WalkWeather {
         requests += coordinates to time
+        delay(delayMillis)
         if (fail) throw IOException("simulated network failure")
         return weather
     }

@@ -124,7 +124,8 @@ class WalkFormEditor private constructor(
             rating = form.rating,
             optionalRatings = form.optionalRatings,
             stool = form.stool,
-            weather = form.weather.walkWeather,
+            // Read from the source: the combined state can lag a fetch that has just finished.
+            weather = weather.state.value.walkWeather,
             behaviourIssues = form.behaviourIssues.filter {
                 it.id in form.selectedBehaviourIssueIds
             },
@@ -137,6 +138,9 @@ class WalkFormEditor private constructor(
     /** See [WeatherFormEditor.onTimesChanged]. */
     fun onTimesChanged(startMillis: Long, endMillis: Long, autoFetch: Boolean) =
         weather.onTimesChanged(startMillis, endMillis, autoFetch)
+
+    /** See [WeatherFormEditor.awaitFetch]; call before [applyTo] when saving. */
+    suspend fun awaitWeather() = weather.awaitFetch()
 
     override fun setRating(rating: Int) = input.update { it.copy(rating = rating) }
 

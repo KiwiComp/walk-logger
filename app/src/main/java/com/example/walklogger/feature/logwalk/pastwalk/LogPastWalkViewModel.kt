@@ -151,6 +151,7 @@ class LogPastWalkViewModel @AssistedInject constructor(
         )
         screen.update { it.copy(isSaving = true) }
         viewModelScope.launch {
+            form.awaitWeather()
             runCatchingCancellable { saveWalk(form.applyTo(walk)) }
                 .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
