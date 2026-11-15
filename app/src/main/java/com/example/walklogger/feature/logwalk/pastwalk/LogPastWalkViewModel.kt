@@ -6,16 +6,11 @@ import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
 import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
-import com.example.walklogger.core.data.BehaviourIssueRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
-import com.example.walklogger.core.data.LocationRepository
-import com.example.walklogger.core.data.MedicalConcernRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.message.UserMessageState
-import com.example.walklogger.domain.FetchWalkWeatherUseCase
-import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.domain.SaveWalkUseCase
 import com.example.walklogger.feature.logwalk.HandlerSelectionEditor
 import com.example.walklogger.feature.logwalk.WalkFormActions
@@ -47,13 +42,9 @@ class LogPastWalkViewModel @AssistedInject constructor(
     @Assisted private val walkId: Long?,
     dogRepository: DogRepository,
     handlerRepository: HandlerRepository,
-    behaviourIssueRepository: BehaviourIssueRepository,
-    medicalConcernRepository: MedicalConcernRepository,
     private val walkRepository: WalkRepository,
     clock: Clock,
-    fetchWalkWeather: FetchWalkWeatherUseCase,
-    locationPermission: LocationPermissionUseCase,
-    locationRepository: LocationRepository,
+    formFactory: WalkFormEditor.Factory,
     private val saveWalk: SaveWalkUseCase,
     errorReporter: ErrorReporter,
 ) : ViewModel() {
@@ -66,15 +57,10 @@ class LogPastWalkViewModel @AssistedInject constructor(
     /** Declared before the editors, which are handed [UserMessageState.showAndReportError]. */
     private val userMessage = UserMessageState(errorReporter)
 
-    private val form = WalkFormEditor(
-        viewModelScope,
-        behaviourIssueRepository,
-        medicalConcernRepository,
-        userMessage::showAndReportError,
-        errorReporter,
-        fetchWalkWeather,
-        locationPermission,
-        locationRepository,
+    private val form = formFactory.create(
+        scope = viewModelScope,
+        showError = userMessage::showAndReportError,
+        walkId = null,
     )
 
     val formActions: WalkFormActions get() = form

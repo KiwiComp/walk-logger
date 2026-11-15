@@ -23,6 +23,7 @@ import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.MainDispatcherRule
+import com.example.walklogger.testing.walkFormEditorFactory
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
@@ -66,18 +67,21 @@ class FinishWalkViewModelTest {
         FinishWalkViewModel(
             walkId = 1,
             dogRepository = dogRepository,
-            behaviourIssueRepository = behaviourIssueRepository,
-            medicalConcernRepository = medicalConcernRepository,
             walkRepository = walkRepository,
             clock = clock,
-            fetchWalkWeather = FetchWalkWeatherUseCase(
-                locationRepository,
-                weatherRepository,
-                activeWalkLocationRepository,
-                errorReporter,
+            formFactory = walkFormEditorFactory(
+                behaviourIssueRepository = behaviourIssueRepository,
+                medicalConcernRepository = medicalConcernRepository,
+                errorReporter = errorReporter,
+                fetchWalkWeather = FetchWalkWeatherUseCase(
+                    locationRepository,
+                    weatherRepository,
+                    activeWalkLocationRepository,
+                    errorReporter,
+                ),
+                locationPermission = LocationPermissionUseCase(locationRepository),
+                locationRepository = locationRepository,
             ),
-            locationPermission = LocationPermissionUseCase(locationRepository),
-            locationRepository = locationRepository,
             saveWalk = SaveWalkUseCase(walkRepository, activeWalkLocationRepository, errorReporter),
             errorReporter = errorReporter,
         )
