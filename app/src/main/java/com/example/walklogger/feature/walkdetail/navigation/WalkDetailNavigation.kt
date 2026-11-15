@@ -1,30 +1,30 @@
 package com.example.walklogger.feature.walkdetail.navigation
 
 import androidx.compose.material3.SnackbarHostState
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.example.walklogger.feature.walkdetail.WalkDetailRoute
 import java.time.LocalDate
 import kotlinx.serialization.Serializable
 
 /** The read-only view of the logged walk [walkId]. */
 @Serializable
-data class WalkDetailDestination(val walkId: Long)
+data class WalkDetailDestination(val walkId: Long) : NavKey
 
-fun NavController.navigateToWalkDetail(walkId: Long) = navigate(WalkDetailDestination(walkId))
+fun MutableList<NavKey>.navigateToWalkDetail(walkId: Long) {
+    add(WalkDetailDestination(walkId))
+}
 
-fun NavGraphBuilder.walkDetailScreen(
+fun EntryProviderScope<NavKey>.walkDetailScreen(
     onBack: () -> Unit,
     onEdit: (LocalDate, Long) -> Unit,
     onDiscarded: () -> Unit,
     onNotFound: () -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    composable<WalkDetailDestination> { entry ->
+    entry<WalkDetailDestination> { key ->
         WalkDetailRoute(
-            walkId = entry.toRoute<WalkDetailDestination>().walkId,
+            walkId = key.walkId,
             onBack = onBack,
             onEdit = onEdit,
             onDiscarded = onDiscarded,

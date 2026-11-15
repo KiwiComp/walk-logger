@@ -9,7 +9,8 @@ com.example.walklogger
 ├── WalkLoggerApplication.kt   @HiltAndroidApp – root of the DI graph
 ├── MainActivity.kt            single activity, hosts WalkLoggerApp()
 │
-├── navigation/                app-level NavHost, bottom bar, top-level destinations;
+├── navigation/                app-level NavDisplay, per-tab back stacks (WalkLoggerNavigationState),
+│                              bottom bar, top-level destinations;
 │                              WalkLoggerAppViewModel reopens the timer when the app starts mid-walk
 │
 ├── feature/                   one package per tab/flow; layout inside a feature:
@@ -18,7 +19,8 @@ com.example.walklogger
 │   │                                         plus pieces only that screen uses
 │   │                            component/   pieces shared by more than one file in the feature
 │   │                            preview/     fixed content for @Previews only
-│   │                            navigation/  type-safe @Serializable route + NavGraphBuilder extension
+│   │                            navigation/  @Serializable NavKey route, EntryProviderScope extension
+│   │                                         and push functions on the back stack
 │   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from
 │   │                          component/ (WeekStrip, WalkTimeline, WalkCard)
 │   ├── logwalk/               the flow behind AddWalkButton, one sub-package per screen.
@@ -129,7 +131,7 @@ com.example.walklogger
 - **Depend on interfaces.** Every repository has a fake in `src/test` so ViewModels are
   unit-testable on the JVM.
 - **Route arguments reach the ViewModel by assisted injection.** `NewWalkViewModel` and
-  `LogPastWalkViewModel` take their `date` (and the walk screens their `walkId`) through an `@AssistedFactory` rather than `SavedStateHandle.toRoute()`, because
+  `LogPastWalkViewModel` take their `date` (and the walk screens their `walkId`) through an `@AssistedFactory` rather than `SavedStateHandle`, because
   `SavedStateHandle` needs Android's `Bundle` and would push ViewModel tests off the JVM.
 - **Pushed screens hide the bottom bar.** Anything that is not a `TopLevelDestination`
   (new walk, log past walk, walk detail, register dog) is a full-screen task with a leading back chevron
@@ -137,8 +139,14 @@ com.example.walklogger
   timed walk is stored the moment it starts, ended by "End walk" and already logged before the
   form opens, so there is nothing to cancel. When a flow finishes, `popToTopLevel()` returns to
   whichever tab (Log or Calendar) it was started from.
-- **Each feature owns its navigation.** Add a `@Serializable` route + `NavGraphBuilder.xxxScreen()`
-  in `feature/<name>/navigation`, then register it in `WalkLoggerNavHost`.
+- **Each feature owns its navigation.** Add a `@Serializable` route implementing `NavKey`, an
+  `EntryProviderScope<NavKey>.xxxScreen()` and `MutableList<NavKey>.navigateToXxx()` push functions
+  in `feature/<name>/navigation`, then register it in `WalkLoggerNavHost`. Features only see the
+  back stack as a list, so they never depend on the app-level `navigation/` package.
+- **The app owns the back stacks (Navigation 3).** `WalkLoggerNavigationState` keeps one back stack
+  per tab and shows the Log stack under the current tab, so back from another tab's root lands on
+  Log. Each stack is decorated with saveable state and a ViewModel store per entry, so a hidden tab
+  keeps its state.
 - **One file per composable piece.** A feature's building blocks (`WalkCard.kt`, `WeekStrip.kt`, …)
   each get their own file with their own `@Preview`. A piece used by more than one file lives in the
   feature's `component/`; a piece used by a single screen sits beside that screen. Preview fixtures

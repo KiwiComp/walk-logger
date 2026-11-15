@@ -1,18 +1,13 @@
 package com.example.walklogger.feature.patterns.navigation
 
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.example.walklogger.feature.patterns.PatternsRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object PatternsDestination
+data object PatternsDestination : NavKey
 
-fun NavController.navigateToPatterns(navOptions: NavOptions? = null) =
-    navigate(PatternsDestination, navOptions)
-
-fun NavGraphBuilder.patternsScreen() {
-    composable<PatternsDestination> { PatternsRoute() }
+fun EntryProviderScope<NavKey>.patternsScreen() {
+    entry<PatternsDestination> { PatternsRoute() }
 }

@@ -1,46 +1,44 @@
 package com.example.walklogger.feature.dog.navigation
 
 import androidx.compose.material3.SnackbarHostState
-import androidx.navigation.NavController
-import androidx.navigation.NavGraphBuilder
-import androidx.navigation.NavOptions
-import androidx.navigation.compose.composable
-import androidx.navigation.toRoute
+import androidx.navigation3.runtime.EntryProviderScope
+import androidx.navigation3.runtime.NavKey
 import com.example.walklogger.feature.dog.DogRoute
 import com.example.walklogger.feature.dog.registerdog.RegisterDogRoute
 import kotlinx.serialization.Serializable
 
 @Serializable
-data object DogDestination
+data object DogDestination : NavKey
 
 /** With a [dogId] the form edits that dog instead of registering a new one. */
 @Serializable
-data class RegisterDogDestination(val dogId: Long? = null)
+data class RegisterDogDestination(val dogId: Long? = null) : NavKey
 
-fun NavController.navigateToDog(navOptions: NavOptions? = null) =
-    navigate(DogDestination, navOptions)
+fun MutableList<NavKey>.navigateToRegisterDog() {
+    add(RegisterDogDestination())
+}
+fun MutableList<NavKey>.navigateToEditDog(dogId: Long) {
+    add(RegisterDogDestination(dogId = dogId))
+}
 
-fun NavController.navigateToRegisterDog() = navigate(RegisterDogDestination())
-fun NavController.navigateToEditDog(dogId: Long) = navigate(RegisterDogDestination(dogId = dogId))
-
-fun NavGraphBuilder.dogScreen(
+fun EntryProviderScope<NavKey>.dogScreen(
     onAddDog: () -> Unit,
     onEditDog: (dogId: Long) -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    composable<DogDestination> {
+    entry<DogDestination> {
         DogRoute(onAddDog = onAddDog, onEditDog = onEditDog, snackbarHostState = snackbarHostState)
     }
 }
 
-fun NavGraphBuilder.registerDogScreen(
+fun EntryProviderScope<NavKey>.registerDogScreen(
     onDone: () -> Unit,
     onNotFound: () -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
-    composable<RegisterDogDestination> { entry ->
+    entry<RegisterDogDestination> { key ->
         RegisterDogRoute(
-            dogId = entry.toRoute<RegisterDogDestination>().dogId,
+            dogId = key.dogId,
             onDone = onDone,
             onNotFound = onNotFound,
             snackbarHostState = snackbarHostState,
