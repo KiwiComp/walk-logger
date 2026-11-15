@@ -14,6 +14,8 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
@@ -59,6 +61,13 @@ internal fun WalkTimeline(
                         style = MaterialTheme.typography.bodySmall,
                         color = AppTheme.colors.contentMuted,
                     )
+                    if (walk.hasPassedStool == true) {
+                        val description = stringResource(R.string.walk_stool_passed_description)
+                        Text(
+                            text = stringResource(R.string.walk_stool_passed_emoji),
+                            modifier = Modifier.semantics { contentDescription = description },
+                        )
+                    }
                 }
                 Box(
                     modifier = Modifier

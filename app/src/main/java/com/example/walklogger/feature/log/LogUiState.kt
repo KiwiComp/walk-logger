@@ -40,4 +40,5 @@ data class WalkUiState(
     val equipment: Equipment?,
     val rating: Int?,
     val note: String,
+    val hasPassedStool: Boolean?,
 )

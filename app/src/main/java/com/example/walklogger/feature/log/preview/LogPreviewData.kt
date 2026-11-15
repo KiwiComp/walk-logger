@@ -19,6 +19,7 @@ internal object LogPreviewData {
         equipment = Equipment.HARNESS,
         rating = 6,
         note = "Long morning loop, calm the whole way.",
+        hasPassedStool = null,
     )
 
     val walks = listOf(
@@ -30,6 +31,7 @@ internal object LogPreviewData {
             equipment = Equipment.COLLAR,
             rating = 4,
             note = "Quick errand walk, distracted by the market.",
+            hasPassedStool = true,
         ),
     )
 

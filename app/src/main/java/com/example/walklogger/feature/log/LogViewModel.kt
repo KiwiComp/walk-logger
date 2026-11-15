@@ -77,4 +77,5 @@ private fun Walk.toUiState(zone: ZoneId) = WalkUiState(
     equipment = equipment,
     rating = rating,
     note = notes,
+    hasPassedStool = stool?.passed,
 )
