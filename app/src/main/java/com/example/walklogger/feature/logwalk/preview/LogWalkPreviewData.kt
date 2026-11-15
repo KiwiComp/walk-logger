@@ -100,7 +100,7 @@ internal object LogWalkPreviewData {
             endTime = LocalTime.of(7, 39),
         ),
         dogName = "Sixten",
-        handlers = listOf("Anna"),
+        handlers = listOf("Kim", "Jesper", "Camila", "Micke", "Malin"),
         form = WalkFormState(
             rating = 6,
             stool = Stool(

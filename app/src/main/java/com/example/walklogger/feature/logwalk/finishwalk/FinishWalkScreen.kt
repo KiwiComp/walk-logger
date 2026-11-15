@@ -2,7 +2,6 @@ package com.example.walklogger.feature.logwalk.finishwalk
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
@@ -141,33 +140,31 @@ fun FinishWalkScreen(
                     )
                 }
             }
+            Text(
+                text = uiState.walkedBy(),
+                style = MaterialTheme.typography.titleLarge,
+                color = AppTheme.colors.contentMuted,
+            )
             WalkFormContent(form = uiState.form, actions = formActions)
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
+            Column(
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+                horizontalAlignment = Alignment.CenterHorizontally,
             ) {
-                Text(
-                    text = uiState.walkedBy(),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppTheme.colors.contentMuted,
-                )
                 AppButton(
                     text = stringResource(R.string.log_past_walk_save),
                     onClick = onSave,
-                    width = AppButtonWidth.Wrap,
                     enabled = uiState.canSave || uiState.isSaving,
                     loading = uiState.isSaving,
                 )
-            }
-            uiState.saveBlocker?.let { blocker ->
-                Text(
-                    text = stringResource(blocker.messageRes),
-                    style = MaterialTheme.typography.bodyMedium,
-                    color = AppTheme.colors.contentMuted,
-                    textAlign = TextAlign.Center,
-                    modifier = Modifier.fillMaxWidth(),
-                )
+                uiState.saveBlocker?.let { blocker ->
+                    Text(
+                        text = stringResource(blocker.messageRes),
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AppTheme.colors.contentMuted,
+                        textAlign = TextAlign.Center,
+                        modifier = Modifier.fillMaxWidth(),
+                    )
+                }
             }
         }
     }
