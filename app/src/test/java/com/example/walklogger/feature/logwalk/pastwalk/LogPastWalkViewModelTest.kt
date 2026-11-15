@@ -10,7 +10,6 @@ import com.example.walklogger.core.model.OptionalRating
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
-import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkWeather
 import com.example.walklogger.core.model.WeatherCondition
@@ -28,6 +27,7 @@ import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.MainDispatcherRule
+import com.example.walklogger.testing.walkFormEditorFactory
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
@@ -65,18 +65,21 @@ class LogPastWalkViewModelTest {
             walkId = walkId,
             dogRepository = dogRepository,
             handlerRepository = handlerRepository,
-            behaviourIssueRepository = behaviourIssueRepository,
-            medicalConcernRepository = medicalConcernRepository,
             walkRepository = walkRepository,
             clock = clock,
-            fetchWalkWeather = FetchWalkWeatherUseCase(
-                locationRepository,
-                weatherRepository,
-                FakeActiveWalkLocationRepository(),
-                errorReporter,
+            formFactory = walkFormEditorFactory(
+                behaviourIssueRepository = behaviourIssueRepository,
+                medicalConcernRepository = medicalConcernRepository,
+                errorReporter = errorReporter,
+                fetchWalkWeather = FetchWalkWeatherUseCase(
+                    locationRepository,
+                    weatherRepository,
+                    FakeActiveWalkLocationRepository(),
+                    errorReporter,
+                ),
+                locationPermission = LocationPermissionUseCase(locationRepository),
+                locationRepository = locationRepository,
             ),
-            locationPermission = LocationPermissionUseCase(locationRepository),
-            locationRepository = locationRepository,
             saveWalk = SaveWalkUseCase(
                 walkRepository,
                 FakeActiveWalkLocationRepository(),

@@ -20,6 +20,9 @@ import com.example.walklogger.core.model.withQuantity
 import com.example.walklogger.core.model.withTexture
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
+import dagger.assisted.Assisted
+import dagger.assisted.AssistedFactory
+import dagger.assisted.AssistedInject
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
@@ -42,17 +45,26 @@ class WalkFormEditor private constructor(
 ) : WalkFormActions,
     WeatherFormActions by weather {
 
+    @AssistedFactory
+    interface Factory {
+        fun create(
+            scope: CoroutineScope,
+            showError: (Throwable, Int, String) -> Unit,
+            walkId: Long?,
+        ): WalkFormEditor
+    }
+
     /** [walkId] is the active walk being finished, whose stored start position the weather fetch uses. */
-    constructor(
-        scope: CoroutineScope,
+    @AssistedInject constructor(
+        @Assisted scope: CoroutineScope,
         behaviourIssueRepository: BehaviourIssueRepository,
         medicalConcernRepository: MedicalConcernRepository,
-        showError: (Throwable, Int, String) -> Unit,
+        @Assisted showError: (Throwable, Int, String) -> Unit,
         errorReporter: ErrorReporter,
         fetchWalkWeather: FetchWalkWeatherUseCase,
         locationPermission: LocationPermissionUseCase,
         locationRepository: LocationRepository,
-        walkId: Long? = null,
+        @Assisted walkId: Long? = null,
     ) : this(
         scope,
         behaviourIssueRepository,
