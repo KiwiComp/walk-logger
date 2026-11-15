@@ -29,6 +29,8 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneOffset
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.advanceTimeBy
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -135,6 +137,37 @@ class FinishWalkViewModelTest {
             weatherRepository.weather,
             walkRepository.observeWalks().first().single().weather,
         )
+    }
+
+    @Test
+    fun `saving while the weather loads waits for it and stores it`() = runTest {
+        weatherRepository.delayMillis = 3_000
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.formActions.setRating(5)
+            viewModel.save()
+            advanceUntilIdle()
+            assertTrue(expectMostRecentItem().isSaved)
+        }
+        assertEquals(
+            weatherRepository.weather,
+            walkRepository.observeWalks().first().single().weather,
+        )
+    }
+
+    @Test
+    fun `saving gives up waiting for the weather after the limit`() = runTest {
+        weatherRepository.delayMillis = 10_000
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.formActions.setRating(5)
+            viewModel.save()
+            advanceTimeBy(5_001)
+            assertTrue(expectMostRecentItem().isSaved)
+        }
+        assertNull(walkRepository.observeWalks().first().single().weather)
     }
 
     @Test

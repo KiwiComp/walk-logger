@@ -11,6 +11,7 @@ import com.example.walklogger.core.model.WeatherCondition
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.domain.WeatherFetchResult
+import kotlin.time.Duration.Companion.seconds
 import kotlinx.coroutines.CoroutineScope
 import kotlinx.coroutines.Job
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -18,6 +19,7 @@ import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.asStateFlow
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
+import kotlinx.coroutines.withTimeoutOrNull
 
 /**
  * Holds the weather section of the walk form: fetching for the walk's times, the handler's corrections and the
@@ -132,6 +134,14 @@ class WeatherFormEditor(
         }
     }
 
+    /**
+     * Waits for an ongoing fetch so saving keeps its result, for at most [FETCH_WAIT_TIME].
+     * The fetch is not cancelled at the limit, so it still lands if saving fails.
+     */
+    suspend fun awaitFetch() {
+        withTimeoutOrNull(FETCH_WAIT_TIME) { weatherJob?.join() }
+    }
+
     override fun onLocationPermissionResult(granted: Boolean) {
         input.update {
             it.copy(shouldRequestLocationPermission = false, hasLocationPermission = granted)
@@ -233,5 +243,8 @@ class WeatherFormEditor(
     private companion object {
         const val MAX_TEMPERATURE_LENGTH = 6
         const val TEMPERATURE_SYMBOLS = "-.,"
+
+        /** Long enough for most fetches, short enough that the handler never feels stuck on Save. */
+        val FETCH_WAIT_TIME = 5.seconds
     }
 }

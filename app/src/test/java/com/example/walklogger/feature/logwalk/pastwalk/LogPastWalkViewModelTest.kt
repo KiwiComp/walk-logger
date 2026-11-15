@@ -33,6 +33,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneOffset
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -316,6 +317,23 @@ class LogPastWalkViewModelTest {
             )
         }
         assertEquals(1, weatherRepository.requests.size)
+    }
+
+    @Test
+    fun `saving while the weather loads waits for it and stores it`() = runTest {
+        weatherRepository.delayMillis = 3_000
+        dogRepository.addDogs(Dog(id = 7, name = "Sixten"))
+        handlerRepository.addHandlers("Anna")
+        viewModel.uiState.test {
+            fillInValidWalk()
+            viewModel.save()
+            advanceUntilIdle()
+            assertTrue(expectMostRecentItem().isSaved)
+        }
+        assertEquals(
+            weatherRepository.weather,
+            walkRepository.observeWalks().first().single().weather,
+        )
     }
 
     @Test
