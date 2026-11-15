@@ -56,7 +56,7 @@ internal fun WalkTimeline(
                     Text(
                         text = stringResource(
                             R.string.walk_duration_minutes,
-                            walk.duration.toMinutes(),
+                            walk.duration.inWholeMinutes,
                         ),
                         style = MaterialTheme.typography.bodySmall,
                         color = AppTheme.colors.contentMuted,

@@ -15,6 +15,7 @@ import java.time.YearMonth
 import java.time.ZoneId
 import javax.inject.Inject
 import kotlin.math.roundToInt
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -99,4 +100,5 @@ private fun Walk.toUiState(zone: ZoneId) = CalendarWalkUiState(
     equipment = equipment,
     rating = rating,
     note = notes,
+    duration = (checkNotNull(endTime) { "walk $id has not finished" } - startTime).milliseconds,
 )

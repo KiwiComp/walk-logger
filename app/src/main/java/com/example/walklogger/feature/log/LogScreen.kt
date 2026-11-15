@@ -101,6 +101,7 @@ fun LogScreen(
                     walkSummary(
                         uiState.walks.size,
                         uiState.averageRating,
+                        uiState.totalDuration,
                     )
                 },
             )

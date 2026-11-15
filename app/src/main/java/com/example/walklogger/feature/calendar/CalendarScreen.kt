@@ -140,7 +140,11 @@ fun CalendarScreen(
             Spacer(Modifier.height(AppSpacing.xxl))
             DayHeading(
                 title = uiState.selectedDate.format(dayHeadingFormatter),
-                summary = walkSummary(uiState.walks.size, uiState.averageRating),
+                summary = walkSummary(
+                    uiState.walks.size,
+                    uiState.averageRating,
+                    uiState.totalDuration,
+                ),
             )
             if (uiState.walks.isNotEmpty()) {
                 CalendarWalkList(

@@ -4,6 +4,7 @@ import com.example.walklogger.core.model.Equipment
 import java.time.LocalDate
 import java.time.LocalTime
 import java.time.YearMonth
+import kotlin.time.Duration
 
 data class CalendarUiState(
     val month: YearMonth,
@@ -28,6 +29,10 @@ data class CalendarUiState(
     val averageRating: Double? =
         walks.mapNotNull { it.rating }.takeIf { it.isNotEmpty() }?.average()
 
+    val totalDuration: Duration = walks.fold(Duration.ZERO) { total, walk ->
+        total + walk.duration
+    }
+
     /** Walks can only be logged for a registered dog that is not deleted. */
     val canAddWalk: Boolean get() = activeDogName != null && !isActiveDogDeleted
 }
@@ -48,4 +53,5 @@ data class CalendarWalkUiState(
     val equipment: Equipment?,
     val rating: Int?,
     val note: String,
+    val duration: Duration,
 )

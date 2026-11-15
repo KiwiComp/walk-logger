@@ -1,9 +1,9 @@
 package com.example.walklogger.feature.log
 
 import com.example.walklogger.core.model.Equipment
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
+import kotlin.time.Duration
 
 data class LogUiState(
     val selectedDate: LocalDate,
@@ -22,6 +22,10 @@ data class LogUiState(
 
     /** Walks can only be logged for a registered dog that is not deleted. */
     val canAddWalk: Boolean get() = activeDogName != null && !isActiveDogDeleted
+
+    val totalDuration: Duration = walks.fold(Duration.ZERO) { total, walk ->
+        total + walk.duration
+    }
 }
 
 data class DayUiState(

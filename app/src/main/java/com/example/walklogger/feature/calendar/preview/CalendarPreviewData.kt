@@ -6,6 +6,7 @@ import com.example.walklogger.feature.calendar.CalendarUiState
 import com.example.walklogger.feature.calendar.CalendarWalkUiState
 import java.time.LocalTime
 import java.time.YearMonth
+import kotlin.time.Duration.Companion.minutes
 
 /** Fixed content for `@Preview`s only; never reaches the running app. */
 internal object CalendarPreviewData {
@@ -25,6 +26,7 @@ internal object CalendarPreviewData {
             equipment = Equipment.HARNESS,
             rating = 6,
             note = "Long morning loop, calm the whole way.",
+            duration = 38.minutes,
         ),
         CalendarWalkUiState(
             id = 2,
@@ -32,6 +34,7 @@ internal object CalendarPreviewData {
             equipment = Equipment.COLLAR,
             rating = 4,
             note = "",
+            duration = 17.minutes,
         ),
     )
 
