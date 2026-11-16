@@ -9,11 +9,11 @@ import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.Clock
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.ZoneOffset
+import kotlin.time.Duration.Companion.minutes
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertNull
@@ -105,7 +105,7 @@ class LogViewModelTest {
             val state = expectMostRecentItem()
             assertEquals(listOf(2L, 1L), state.walks.map { it.id })
             assertEquals(LocalTime.of(7, 5), state.walks[0].startTime)
-            assertEquals(Duration.ofMinutes(38), state.walks[0].duration)
+            assertEquals(38.minutes, state.walks[0].duration)
             assertEquals(5.0, state.averageRating!!, 0.0)
             assertEquals(
                 listOf(false, false, false, false, true, true, false),

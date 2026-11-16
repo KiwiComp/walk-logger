@@ -11,11 +11,11 @@ import com.example.walklogger.domain.ObserveWalkHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
 import java.time.DayOfWeek
-import java.time.Duration
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
 import javax.inject.Inject
+import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
@@ -73,8 +73,9 @@ class LogViewModel @Inject constructor(
 private fun Walk.toUiState(zone: ZoneId) = WalkUiState(
     id = id,
     startTime = startLocalTime(zone),
-    duration = Duration.ofMillis(checkNotNull(endTime) { "walk $id has not finished" } - startTime),
+    duration = (checkNotNull(endTime) { "walk $id has not finished" } - startTime).milliseconds,
     equipment = equipment,
     rating = rating,
     note = notes,
+    hasPassedStool = stool?.passed,
 )

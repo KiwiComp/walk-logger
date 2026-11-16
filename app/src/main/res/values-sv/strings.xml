@@ -52,7 +52,10 @@
         <item quantity="other">%1$d promenader</item>
     </plurals>
     <string name="summary_average">· snitt %1$.1f</string>
+    <string name="summary_duration">· %1$s</string>
+    <string name="summary_duration_hours_minutes">%1$d h %2$d min</string>
     <string name="walk_duration_minutes">%1$d min</string>
+    <string name="walk_stool_passed_description">Har bajsat</string>
     <string name="log_no_dog_message">Registrera en hund under fliken Hundar innan du loggar promenader.</string>
     <string name="log_no_dog_action">Hundar</string>
     <string name="log_deleted_dog_message">Det går inte att logga promenader för en borttagen hund. Byt hund på fliken Hundar.</string>

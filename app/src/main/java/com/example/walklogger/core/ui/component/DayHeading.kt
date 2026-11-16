@@ -17,6 +17,9 @@ import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+import kotlin.time.Duration
+import kotlin.time.Duration.Companion.hours
+import kotlin.time.Duration.Companion.minutes
 
 /** Day title with a muted summary hanging off its baseline. */
 @Composable
@@ -35,15 +38,29 @@ fun DayHeading(title: String, summary: String?, modifier: Modifier = Modifier) {
     }
 }
 
-/** "2 walks · avg 5.0"; the average is left out when there is none. */
+/** "2 walks · 1 h 5 min · avg 5.0"; the duration and average are left out when there is none. */
 @Composable
-fun walkSummary(walkCount: Int, averageRating: Double?): String {
+fun walkSummary(walkCount: Int, averageRating: Double?, totalDuration: Duration): String {
     val count = pluralStringResource(R.plurals.walk_count, walkCount, walkCount)
+    val duration = totalDuration.takeIf { it > Duration.ZERO }?.let {
+        " " + stringResource(R.string.summary_duration, formatDuration(it))
+    }.orEmpty()
     val average = averageRating?.let {
         " " + stringResource(R.string.summary_average, it)
     }.orEmpty()
-    return count + average
+    return count + duration + average
 }
+
+/** "45 min", or "1 h 5 min" from an hour up. */
+@Composable
+internal fun formatDuration(duration: Duration): String =
+    duration.toComponents { hours, minutes, _, _ ->
+        if (hours > 0) {
+            stringResource(R.string.summary_duration_hours_minutes, hours, minutes)
+        } else {
+            stringResource(R.string.walk_duration_minutes, minutes)
+        }
+    }
 
 @Preview(showBackground = true)
 @Composable
@@ -51,7 +68,11 @@ private fun DayHeadingPreview() {
     WalkLoggerTheme {
         DayHeading(
             title = "Saturday 12 Sep",
-            summary = walkSummary(walkCount = 2, averageRating = 5.0),
+            summary = walkSummary(
+                walkCount = 2,
+                averageRating = 5.0,
+                totalDuration = 1.hours + 5.minutes,
+            ),
         )
     }
 }

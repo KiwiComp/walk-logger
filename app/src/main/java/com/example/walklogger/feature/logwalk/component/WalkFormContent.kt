@@ -50,6 +50,7 @@ internal fun WalkFormContent(
         ) {
             RatingScale(rating = form.rating, onRatingChange = actions::setRating)
         }
+        WeatherSection(weather = form.weather, actions = actions)
         StoolSection(
             stool = form.stool,
             onPassedSelect = actions::selectStoolPassed,
@@ -68,7 +69,6 @@ internal fun WalkFormContent(
             onClear = actions::clearOptionalRatings,
             onRatingChange = actions::setOptionalRating,
         )
-        WeatherSection(weather = form.weather, actions = actions)
         BehaviourSection(
             issues = form.behaviourIssues,
             selectedIds = form.selectedBehaviourIssueIds,

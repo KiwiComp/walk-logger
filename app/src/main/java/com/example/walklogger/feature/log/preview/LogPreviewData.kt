@@ -4,9 +4,9 @@ import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.feature.log.DayUiState
 import com.example.walklogger.feature.log.LogUiState
 import com.example.walklogger.feature.log.WalkUiState
-import java.time.Duration
 import java.time.LocalDate
 import java.time.LocalTime
+import kotlin.time.Duration.Companion.minutes
 
 /** Fixed content for `@Preview`s only; never reaches the running app. */
 internal object LogPreviewData {
@@ -15,10 +15,11 @@ internal object LogPreviewData {
     val walk = WalkUiState(
         id = 1,
         startTime = LocalTime.of(7, 5),
-        duration = Duration.ofMinutes(38),
+        duration = 38.minutes,
         equipment = Equipment.HARNESS,
         rating = 6,
         note = "Long morning loop, calm the whole way.",
+        hasPassedStool = null,
     )
 
     val walks = listOf(
@@ -26,10 +27,11 @@ internal object LogPreviewData {
         WalkUiState(
             id = 2,
             startTime = LocalTime.of(11, 30),
-            duration = Duration.ofMinutes(17),
+            duration = 177.minutes,
             equipment = Equipment.COLLAR,
             rating = 4,
             note = "Quick errand walk, distracted by the market.",
+            hasPassedStool = true,
         ),
     )
 
