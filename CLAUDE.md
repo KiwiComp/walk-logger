@@ -78,3 +78,9 @@ See docs/ARCHITECTURE.md for the package tree and how to add a feature.
   introduce or touch rather than suppressing them.
 * No APIs that do not work for the project's minSDK: never use anything marked incompatible with the project's minSDK.
 * Verify before reporting: run the checks in `.claude/skills/verify/SKILL.md`.
+
+
+# README
+
+* Keep `README.md` up to date: when a change adds, removes or changes a user-facing feature,
+  the tech stack, build/test commands, CI, the AI workflow or a project skill, update the README in the same change.
