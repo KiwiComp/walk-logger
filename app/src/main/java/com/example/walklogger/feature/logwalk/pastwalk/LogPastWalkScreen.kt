@@ -26,12 +26,15 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.AppButton
 import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.HeaderIconButton
+import com.example.walklogger.core.ui.component.LocationPermissionRequest
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
+import com.example.walklogger.core.ui.component.rememberAllowLocation
 import com.example.walklogger.core.ui.message.UserMessageEffect
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
@@ -40,7 +43,6 @@ import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WeatherFormState
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
 import com.example.walklogger.feature.logwalk.component.FormSection
-import com.example.walklogger.feature.logwalk.component.LocationPermissionRequest
 import com.example.walklogger.feature.logwalk.component.SelectableChip
 import com.example.walklogger.feature.logwalk.component.WalkFormContent
 import com.example.walklogger.feature.logwalk.component.WhenSection
@@ -77,6 +79,14 @@ fun LogPastWalkRoute(
         shouldRequest = uiState.form.weather.shouldRequestLocationPermission,
         onResult = viewModel.formActions::onLocationPermissionResult,
     )
+    LifecycleResumeEffect(viewModel) {
+        viewModel.formActions.refreshLocationPermission()
+        onPauseOrDispose {}
+    }
+    val allowLocation = rememberAllowLocation(
+        wasRequested = uiState.form.weather.wasLocationRequested,
+        onRequest = viewModel.formActions::requestLocationPermission,
+    )
     UserMessageEffect(
         message = uiState.userMessage,
         snackbarHostState = snackbarHostState,
@@ -85,6 +95,7 @@ fun LogPastWalkRoute(
     LogPastWalkScreen(
         uiState = uiState,
         formActions = viewModel.formActions,
+        onAllowLocation = allowLocation,
         onClose = onClose,
         onDateChange = viewModel::setDate,
         onStartTimeChange = viewModel::setStartTime,
@@ -100,6 +111,7 @@ fun LogPastWalkRoute(
 fun LogPastWalkScreen(
     uiState: LogPastWalkUiState,
     formActions: WalkFormActions,
+    onAllowLocation: () -> Unit,
     onClose: () -> Unit,
     onDateChange: (LocalDate) -> Unit,
     onStartTimeChange: (LocalTime) -> Unit,
@@ -154,7 +166,11 @@ fun LogPastWalkScreen(
                     onAdd = { showAddHandler = true },
                 )
             }
-            WalkFormContent(form = uiState.form, actions = formActions)
+            WalkFormContent(
+                form = uiState.form,
+                actions = formActions,
+                onAllowLocation = onAllowLocation,
+            )
             Column(
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -193,6 +209,7 @@ private fun LogPastWalkScreenPreview(uiState: LogPastWalkUiState) {
         LogPastWalkScreen(
             uiState = uiState,
             formActions = LogWalkPreviewData.formActions,
+            onAllowLocation = {},
             onClose = {},
             onDateChange = {},
             onStartTimeChange = {},

@@ -28,6 +28,7 @@ private const val NOTES_MIN_LINES = 3
 internal fun WalkFormContent(
     form: WalkFormState,
     actions: WalkFormActions,
+    onAllowLocation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showAddIssue by rememberSaveable { mutableStateOf(false) }
@@ -50,7 +51,11 @@ internal fun WalkFormContent(
         ) {
             RatingScale(rating = form.rating, onRatingChange = actions::setRating)
         }
-        WeatherSection(weather = form.weather, actions = actions)
+        WeatherSection(
+            weather = form.weather,
+            actions = actions,
+            onAllowLocation = onAllowLocation,
+        )
         StoolSection(
             stool = form.stool,
             onPassedSelect = actions::selectStoolPassed,
@@ -124,6 +129,7 @@ private fun WalkFormContentPreview() {
         WalkFormContent(
             form = LogWalkPreviewData.finishWalk.form,
             actions = LogWalkPreviewData.formActions,
+            onAllowLocation = {},
             modifier = Modifier.padding(AppSpacing.xl),
         )
     }

@@ -22,7 +22,7 @@ com.example.walklogger
 │   │                            navigation/  @Serializable NavKey route, EntryProviderScope extension
 │   │                                         and push functions on the back stack
 │   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from
-│   │                          component/ (WeekStrip, WalkTimeline, WalkCard)
+│   │                          component/ (WeekStrip, WalkTimeline, WalkCard); the header's gear opens Settings
 │   ├── logwalk/               the flow behind AddWalkButton, one sub-package per screen.
 │   │                          WalkFormState + WalkFormEditor (implements WalkFormActions) hold the fields the after-walk
 │   │                          and past-walk forms share (rating to notes, incl. the issue/concern lists, prefill and
@@ -51,8 +51,10 @@ com.example.walklogger
 │   │                          FormStyle for the on-header variant the timer screen uses);
 │   │                          WeatherSection shows the fetched weather (WeatherSummary, also used by walk detail) with a
 │   │                          fetch button, a °C field and WeatherConditionPicker the handler can correct, the place row
-│   │                          (PlaceSearchDialog) when location is unavailable, and the Open-Meteo attribution; the form Routes
-│   │                          ask once through LocationPermissionRequest if Start walk never asked. WeatherFormEditor fetches the weather
+│   │                          (PlaceSearchDialog) without permission or when the device finds no position, a "Use my location"
+│   │                          button without permission, and the Open-Meteo attribution; the form Routes ask once through
+│   │                          LocationPermissionRequest if Start walk never asked, wire "Use my location" through
+│   │                          rememberAllowLocation and reread the permission on resume. WeatherFormEditor fetches the weather
 │   │                          when a new walk gets its times (again on new times until the handler edits it by hand);
 │   │                          an edited walk only fetches through the button;
 │   │                          the chosen day travels as a route argument into both form ViewModels
@@ -66,6 +68,9 @@ com.example.walklogger
 │   │                          (AppConfirmDialog confirms first) and back returns to the tab; component/ holds the read-only
 │   │                          pieces (DetailField, DetailPlaceholder, RatingSummary, OptionalRatingRow, NotedItem)
 │   ├── patterns/              placeholder, same shape as calendar
+│   ├── settings/              SettingsViewModel + SettingsScreen, pushed from Log's header: LocationSetting shows whether
+│   │                          location is allowed and lets the user allow it later (dialog or system settings, through
+│   │                          rememberAllowLocation), rereading the permission on resume
 │   └── dog/                   DogViewModel + DogScreen (profile header, dog list, add-dog CTA, deleted dogs) composed from
 │                              component/ (DogList); deleting a dog soft-deletes it (`isHidden`) so its walks stay, and it can
 │                              still be selected as active to read its history in Log and Calendar, but not to log walks
@@ -75,7 +80,8 @@ com.example.walklogger
 ├── domain/                    optional use cases (pure Kotlin, injectable); ObserveWalkHistoryUseCase gives Log and
 │                              Calendar the active dog's completed walks; FetchWalkWeatherUseCase fetches the weather for
 │                              the hour containing a walk's middle, from the active walk's start position, the device location
-│                              or else the saved place, and only for times WeatherRepository can still reach;
+│                              or else the saved place (also when the device lookup throws), and only for times
+│                              WeatherRepository can still reach;
 │                              CaptureWalkLocationUseCase stores the start position; LocationPermissionUseCase decides
 │                              whether to ask for location (once, wherever it is asked); SaveWalkUseCase logs a new walk
 │                              for the active dog or replaces a stored one, and DiscardWalkUseCase deletes one, both
@@ -99,7 +105,8 @@ com.example.walklogger
 │   │                          ActiveWalkLocationRepository (the active walk's start position) and WalkLocationCapturer
 │   │                          (implemented in service/)
 │   ├── network/               Retrofit APIs for Open-Meteo's forecast and geocoding, their @Serializable DTOs
-│   ├── location/              LocationProvider (fused location; accepts coarse or fine permission), read through LocationRepository
+│   ├── location/              LocationProvider (fused location; accepts coarse or fine permission, high accuracy with fine
+│   │                          so GPS can answer without Wi-Fi or cell positioning), read through LocationRepository
 │   ├── database/              Room database, DAOs, entities, type converters; walks join behaviour issues and medical
 │   │                          concerns through walk_behaviour_issues / walk_medical_concerns; the defaults are
 │   │                          seeded on create (SeedCallback) and on the migration that added each table;
@@ -116,7 +123,8 @@ com.example.walklogger
 │                              SectionLabel, SegmentedToggle, AppSwitch, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost,
 │                              AppConfirmDialog for discard and delete confirmations; addWalkClick decides what
-│                              AddWalkButton does on Log and Calendar)
+│                              AddWalkButton does on Log and Calendar; LocationPermissionRequest shows the system dialog and
+│                              rememberAllowLocation picks between it and the app's system settings once Android stops showing it)
 │                              + message/UserMessageState, the message a ViewModel combines into its UiState,
 │                              reporting the error behind it, and UserMessageEffect, which shows it in the app's snackbar
 ```
@@ -134,7 +142,7 @@ com.example.walklogger
   `LogPastWalkViewModel` take their `date` (and the walk screens their `walkId`) through an `@AssistedFactory` rather than `SavedStateHandle`, because
   `SavedStateHandle` needs Android's `Bundle` and would push ViewModel tests off the JVM.
 - **Pushed screens hide the bottom bar.** Anything that is not a `TopLevelDestination`
-  (new walk, log past walk, walk detail, register dog) is a full-screen task with a leading back chevron
+  (new walk, log past walk, walk detail, register dog, settings) is a full-screen task with a leading back chevron
   (or close cross for forms) in the header. The timer and after-walk screens have neither: a
   timed walk is stored the moment it starts, ended by "End walk" and already logged before the
   form opens, so there is nothing to cancel. When a flow finishes, `popToTopLevel()` returns to

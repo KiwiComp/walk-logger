@@ -20,6 +20,8 @@ data class WeatherFormState(
     val isCurrent: Boolean = false,
     /** False shows the place row, the fallback when the device location is unavailable. */
     val hasLocationPermission: Boolean = false,
+    /** Once asked, Android may no longer show the dialog, so "Use my location" leads to system settings instead. */
+    val wasLocationRequested: Boolean = false,
     /** Set when the Route should show the system permission dialog. */
     val shouldRequestLocationPermission: Boolean = false,
     val place: Place? = null,
@@ -35,14 +37,19 @@ data class WeatherFormState(
 
     /**
      * The fetch button only shows when fetching can bring something new. Too-old walks would fail again,
-     * and without a location the place row is the way forward.
+     * and without permission the place row is the way forward; with it, the device may find a position later.
      */
     val showsFetch: Boolean
         get() = hasTimes && when (status) {
             WeatherStatus.LOADING, WeatherStatus.FAILED -> true
-            WeatherStatus.TOO_OLD, WeatherStatus.NO_LOCATION -> false
+            WeatherStatus.TOO_OLD -> false
+            WeatherStatus.NO_LOCATION -> hasLocationPermission
             WeatherStatus.IDLE -> !isCurrent
         }
+
+    /** Also with permission when the device found no position, so a place can still be chosen. */
+    val showsPlace: Boolean
+        get() = !hasLocationPermission || status == WeatherStatus.NO_LOCATION
 
     /** Without fetched weather, entering it by hand is the only way, so the fields need no Edit tap. */
     val showsManualEntry: Boolean

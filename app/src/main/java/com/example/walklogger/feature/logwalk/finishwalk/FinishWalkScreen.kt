@@ -23,19 +23,21 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
+import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.AppButton
 import com.example.walklogger.core.ui.component.AppButtonStyle
 import com.example.walklogger.core.ui.component.AppButtonWidth
+import com.example.walklogger.core.ui.component.LocationPermissionRequest
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
+import com.example.walklogger.core.ui.component.rememberAllowLocation
 import com.example.walklogger.core.ui.message.UserMessageEffect
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.component.FormSection
-import com.example.walklogger.feature.logwalk.component.LocationPermissionRequest
 import com.example.walklogger.feature.logwalk.component.WalkFormContent
 import com.example.walklogger.feature.logwalk.component.WhenSection
 import com.example.walklogger.feature.logwalk.component.messageRes
@@ -70,6 +72,14 @@ fun FinishWalkRoute(
         shouldRequest = uiState.form.weather.shouldRequestLocationPermission,
         onResult = viewModel.formActions::onLocationPermissionResult,
     )
+    LifecycleResumeEffect(viewModel) {
+        viewModel.formActions.refreshLocationPermission()
+        onPauseOrDispose {}
+    }
+    val allowLocation = rememberAllowLocation(
+        wasRequested = uiState.form.weather.wasLocationRequested,
+        onRequest = viewModel.formActions::requestLocationPermission,
+    )
     UserMessageEffect(
         message = uiState.userMessage,
         snackbarHostState = snackbarHostState,
@@ -78,6 +88,7 @@ fun FinishWalkRoute(
     FinishWalkScreen(
         uiState = uiState,
         formActions = viewModel.formActions,
+        onAllowLocation = allowLocation,
         onToggleEditTimes = viewModel::toggleEditTimes,
         onDateChange = viewModel::setDate,
         onStartTimeChange = viewModel::setStartTime,
@@ -91,6 +102,7 @@ fun FinishWalkRoute(
 fun FinishWalkScreen(
     uiState: FinishWalkUiState,
     formActions: WalkFormActions,
+    onAllowLocation: () -> Unit,
     onToggleEditTimes: () -> Unit,
     onDateChange: (LocalDate) -> Unit,
     onStartTimeChange: (LocalTime) -> Unit,
@@ -145,7 +157,11 @@ fun FinishWalkScreen(
                 style = MaterialTheme.typography.titleLarge,
                 color = AppTheme.colors.contentMuted,
             )
-            WalkFormContent(form = uiState.form, actions = formActions)
+            WalkFormContent(
+                form = uiState.form,
+                actions = formActions,
+                onAllowLocation = onAllowLocation,
+            )
             Column(
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
                 horizontalAlignment = Alignment.CenterHorizontally,
@@ -199,6 +215,7 @@ private fun FinishWalkScreenPreview() {
         FinishWalkScreen(
             uiState = LogWalkPreviewData.finishWalk,
             formActions = LogWalkPreviewData.formActions,
+            onAllowLocation = {},
             onToggleEditTimes = {},
             onDateChange = {},
             onStartTimeChange = {},
@@ -215,6 +232,7 @@ private fun FinishWalkScreenEditingTimesPreview() {
         FinishWalkScreen(
             uiState = LogWalkPreviewData.finishWalk.copy(isEditingTimes = true),
             formActions = LogWalkPreviewData.formActions,
+            onAllowLocation = {},
             onToggleEditTimes = {},
             onDateChange = {},
             onStartTimeChange = {},

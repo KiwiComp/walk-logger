@@ -150,7 +150,9 @@ internal object LogWalkPreviewData {
         override fun setTemperature(text: String) = Unit
         override fun selectCondition(value: WeatherCondition) = Unit
         override fun fetchWeather() = Unit
+        override fun requestLocationPermission() = Unit
         override fun onLocationPermissionResult(granted: Boolean) = Unit
+        override fun refreshLocationPermission() = Unit
         override fun openPlaceSearch() = Unit
         override fun searchPlaces(query: String) = Unit
         override fun selectPlace(place: Place) = Unit

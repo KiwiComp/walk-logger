@@ -23,12 +23,18 @@ class FakeLocationRepository(
     /** While on, searches throw. */
     var failSearches: Boolean = false
 
+    /** While on, the device lookup throws, as when Play services disconnects. */
+    var failLocation: Boolean = false
+
     private val requested = MutableStateFlow(false)
     private val place = MutableStateFlow<Place?>(null)
 
     override fun hasPermission(): Boolean = isGranted
 
-    override suspend fun currentLocation(): Coordinates? = if (isGranted) location else null
+    override suspend fun currentLocation(): Coordinates? {
+        if (failLocation) throw IllegalStateException("simulated location failure")
+        return if (isGranted) location else null
+    }
 
     override val locationPermissionRequested: Flow<Boolean> = requested
 

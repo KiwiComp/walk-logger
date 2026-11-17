@@ -15,6 +15,7 @@ fun EntryProviderScope<NavKey>.logScreen(
     onLogPastWalk: (LocalDate) -> Unit,
     onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
+    onOpenSettings: () -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
     entry<LogDestination> {
@@ -23,6 +24,7 @@ fun EntryProviderScope<NavKey>.logScreen(
             onLogPastWalk = onLogPastWalk,
             onOpenWalk = onOpenWalk,
             onGoToDogs = onGoToDogs,
+            onOpenSettings = onOpenSettings,
             snackbarHostState = snackbarHostState,
         )
     }

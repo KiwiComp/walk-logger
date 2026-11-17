@@ -38,6 +38,7 @@ import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 internal fun WeatherSection(
     weather: WeatherFormState,
     actions: WeatherFormActions,
+    onAllowLocation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val walkWeather = weather.walkWeather
@@ -108,12 +109,20 @@ internal fun WeatherSection(
                     )
                 }
             }
-            if (!weather.hasLocationPermission) {
+            if (weather.showsPlace) {
                 AppPickerField(
                     value = weather.place?.name.orEmpty(),
                     label = stringResource(R.string.weather_place),
                     placeholder = stringResource(R.string.weather_place_search_title),
                     onPress = actions::openPlaceSearch,
+                )
+            }
+            if (!weather.hasLocationPermission) {
+                AppButton(
+                    text = stringResource(R.string.weather_use_my_location),
+                    onClick = onAllowLocation,
+                    style = AppButtonStyle.Secondary,
+                    width = AppButtonWidth.Wrap,
                 )
             }
             MutedText(stringResource(R.string.weather_attribution))
@@ -153,6 +162,7 @@ private fun WeatherSectionPreview() {
         WeatherSection(
             weather = LogWalkPreviewData.finishWalk.form.weather.copy(isExpanded = true),
             actions = LogWalkPreviewData.formActions,
+            onAllowLocation = {},
             modifier = Modifier.padding(AppSpacing.lg),
         )
     }
@@ -165,6 +175,7 @@ private fun WeatherSectionEditingPreview() {
         WeatherSection(
             weather = LogWalkPreviewData.finishWalk.form.weather.copy(isEditing = true),
             actions = LogWalkPreviewData.formActions,
+            onAllowLocation = {},
             modifier = Modifier.padding(AppSpacing.lg),
         )
     }
@@ -182,6 +193,7 @@ private fun WeatherSectionFailedPreview() {
                 status = WeatherStatus.FAILED,
             ),
             actions = LogWalkPreviewData.formActions,
+            onAllowLocation = {},
             modifier = Modifier.padding(AppSpacing.lg),
         )
     }
@@ -197,6 +209,7 @@ private fun WeatherSectionWithoutLocationPreview() {
                 status = WeatherStatus.NO_LOCATION,
             ),
             actions = LogWalkPreviewData.formActions,
+            onAllowLocation = {},
             modifier = Modifier.padding(AppSpacing.lg),
         )
     }

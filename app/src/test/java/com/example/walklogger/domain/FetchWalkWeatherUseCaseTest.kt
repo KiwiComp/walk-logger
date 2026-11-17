@@ -62,6 +62,21 @@ class FetchWalkWeatherUseCaseTest {
     }
 
     @Test
+    fun `falls back to the saved place when the device lookup fails`() = runTest {
+        locationRepository.savePlace(uppsala)
+        locationRepository.failLocation = true
+        val (start, end) = walkEndingAgo(Duration.ofHours(1))
+        assertTrue(useCase(start, end) is WeatherFetchResult.Fetched)
+        assertEquals(uppsala.coordinates, weatherRepository.requests.single().first)
+        assertEquals(
+            listOf("Failed to get device location"),
+            errorReporter.reported.map {
+                it.second
+            },
+        )
+    }
+
+    @Test
     fun `uses the position stored when the walk started, even without permission`() = runTest {
         activeWalkLocationRepository.save(WalkLocation(walkId = 4, uppsala.coordinates))
         locationRepository.isGranted = false
