@@ -4,12 +4,9 @@ import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
-import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
@@ -31,17 +28,14 @@ import com.example.walklogger.core.ui.component.RatingFace
 import com.example.walklogger.core.ui.theme.AppRadius
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
-import com.example.walklogger.core.ui.theme.StoolMediumBrown
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.log.WalkUiState
 import com.example.walklogger.feature.log.preview.LogPreviewData
 
-private val StoolDotSize = 10.dp
-
 /** Every card reserves this many note lines so the timeline stays even; longer notes are cut with an ellipsis. */
 private const val NOTE_LINES = 2
 
-/** One walk in the day's timeline: rating face, equipment, stool and note. Tapping it opens the walk. */
+/** One walk in the day's timeline: rating face, equipment and note. Tapping it opens the walk. */
 @Composable
 internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val shape = RoundedCornerShape(AppRadius.lg)
@@ -70,21 +64,6 @@ internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier
                 }
                 if (walk.equipment != null) {
                     EquipmentChip(equipment = walk.equipment)
-                }
-                if (walk.hasPassedStool == true) {
-                    if (walk.equipment != null) {
-                        Text(
-                            text = stringResource(R.string.separator_dot),
-                            style = MaterialTheme.typography.bodyLarge,
-                            color = AppTheme.colors.dashed,
-                        )
-                    }
-                    Box(Modifier.size(StoolDotSize).background(StoolMediumBrown, CircleShape))
-                    Text(
-                        text = stringResource(R.string.log_past_walk_stool),
-                        style = MaterialTheme.typography.bodyLarge,
-                        color = AppTheme.colors.contentSecondary,
-                    )
                 }
             }
             val hasNote = walk.note.isNotEmpty()

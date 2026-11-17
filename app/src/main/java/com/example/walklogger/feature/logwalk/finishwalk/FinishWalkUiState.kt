@@ -9,8 +9,12 @@ import com.example.walklogger.feature.logwalk.WalkTimesState
 data class FinishWalkUiState(
     val times: WalkTimesState,
     val dogName: String? = null,
-    /** Chosen before the walk; not editable here. */
+    /** Every stored handler, for the Change chips. */
     val handlers: List<String> = emptyList(),
+    /** Chosen before the walk; Change lets the handler correct it. */
+    val selectedHandlers: Set<String> = emptySet(),
+    /** True while the handler chips are shown. */
+    val isEditingHandlers: Boolean = false,
     val form: WalkFormState = WalkFormState(),
     /** True while the "Edit times" pickers are shown. */
     val isEditingTimes: Boolean = false,
@@ -20,11 +24,21 @@ data class FinishWalkUiState(
     val isNotFound: Boolean = false,
     val isSaving: Boolean = false,
     val isSaved: Boolean = false,
+    val isDiscarding: Boolean = false,
+    /** True once the walk has been deleted; the screen closes. */
+    val isDiscarded: Boolean = false,
     @param:StringRes val userMessage: Int? = null,
 ) {
     /** The first thing still stopping the walk from being saved, in form order. */
-    val saveBlocker: SaveBlocker? =
-        times.blocker ?: if (form.rating == null) SaveBlocker.RATING else null
+    val saveBlocker: SaveBlocker? = when {
+        !isLoading && selectedHandlers.isEmpty() -> SaveBlocker.HANDLER
+        times.blocker != null -> times.blocker
+        form.rating == null -> SaveBlocker.RATING
+        else -> null
+    }
 
-    val canSave: Boolean = saveBlocker == null && !isLoading && !isSaving && !isSaved
+    val canSave: Boolean =
+        saveBlocker == null && !isLoading && !isSaving && !isSaved && !isDiscarding
+
+    val canDiscard: Boolean = !isLoading && !isSaving && !isDiscarding && !isDiscarded
 }

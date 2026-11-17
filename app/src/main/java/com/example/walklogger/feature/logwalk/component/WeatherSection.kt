@@ -1,19 +1,18 @@
 package com.example.walklogger.feature.logwalk.component
 
-import androidx.compose.foundation.border
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.input.KeyboardType
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.model.TemperatureBand
 import com.example.walklogger.core.ui.component.AppButton
@@ -21,6 +20,7 @@ import com.example.walklogger.core.ui.component.AppButtonStyle
 import com.example.walklogger.core.ui.component.AppButtonWidth
 import com.example.walklogger.core.ui.component.AppPickerField
 import com.example.walklogger.core.ui.component.AppTextField
+import com.example.walklogger.core.ui.component.EditDonePillButton
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -30,9 +30,7 @@ import com.example.walklogger.feature.logwalk.WeatherStatus
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 
 /**
- * Collapsible "Weather" section: the fetched weather with a fetch button, then the temperature and
- * condition the handler can correct, the fallback place when location is unavailable, and the
- * attribution Open-Meteo's CC BY 4.0 licence requires.
+ * Collapsible "Weather" section around [WeatherContent], with Edit/Done for the manual fields and Clear.
  */
 @Composable
 internal fun WeatherSection(
@@ -41,14 +39,11 @@ internal fun WeatherSection(
     onAllowLocation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    val walkWeather = weather.walkWeather
     FormSection(
         label = stringResource(R.string.log_past_walk_weather),
         expanded = weather.isExpanded,
         onToggle = actions::toggleWeather,
-        actionLabel = if (walkWeather !=
-            null
-        ) {
+        actionLabel = if (weather.walkWeather != null) {
             stringResource(R.string.form_section_clear)
         } else {
             null
@@ -62,14 +57,31 @@ internal fun WeatherSection(
         onLeadingAction = actions::toggleWeatherEditing,
         modifier = modifier,
     ) {
-        Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
-            val statusMessage = weather.status.messageRes
-            if (walkWeather != null || statusMessage != null || weather.showsFetch) {
+        WeatherContent(weather = weather, actions = actions, onAllowLocation = onAllowLocation)
+    }
+}
+
+/**
+ * The fetched weather with a fetch button, then the temperature and condition the handler can correct,
+ * the fallback place when location is unavailable, and the attribution Open-Meteo's CC BY 4.0 licence
+ * requires. Pass [onEdit] to put an Edit/Done button beside the fetched weather that opens and closes the
+ * manual fields.
+ */
+@Composable
+internal fun WeatherContent(
+    weather: WeatherFormState,
+    actions: WeatherFormActions,
+    onAllowLocation: () -> Unit,
+    modifier: Modifier = Modifier,
+    onEdit: (() -> Unit)? = null,
+) {
+    val walkWeather = weather.walkWeather
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
+        val statusMessage = weather.status.messageRes
+        if (walkWeather != null || statusMessage != null || weather.showsFetch) {
+            Row(verticalAlignment = Alignment.Top) {
                 Column(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .border(1.dp, AppTheme.colors.outline, MaterialTheme.shapes.extraSmall)
-                        .padding(AppSpacing.md),
+                    modifier = Modifier.weight(1f),
                     verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
                 ) {
                     walkWeather?.let { WeatherSummary(weather = it) }
@@ -84,49 +96,57 @@ internal fun WeatherSection(
                         )
                     }
                 }
-            }
-            if (weather.showsManualEntry) {
-                AppTextField(
-                    value = weather.temperatureInput,
-                    onValueChange = actions::setTemperature,
-                    label = stringResource(R.string.weather_temperature),
-                    suffix = stringResource(R.string.weather_temperature_unit),
-                    supportingText = weather.temperatureCelsius?.let {
-                        stringResource(TemperatureBand.of(it).labelRes)
-                    },
-                    keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                )
-                Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
-                    Text(
-                        text = stringResource(R.string.weather_condition),
-                        style = MaterialTheme.typography.bodyMedium,
-                        color = AppTheme.colors.contentMuted,
-                    )
-                    WeatherConditionPicker(
-                        selected = weather.condition,
-                        isDay = weather.fetchedWeather?.isDay ?: true,
-                        onSelect = actions::selectCondition,
+                if (onEdit != null && weather.fetchedWeather != null) {
+                    EditDonePillButton(
+                        isEditing = weather.isEditing,
+                        editLabel = stringResource(R.string.weather_edit),
+                        doneLabel = stringResource(R.string.weather_done),
+                        onClick = onEdit,
                     )
                 }
             }
-            if (weather.showsPlace) {
-                AppPickerField(
-                    value = weather.place?.name.orEmpty(),
-                    label = stringResource(R.string.weather_place),
-                    placeholder = stringResource(R.string.weather_place_search_title),
-                    onPress = actions::openPlaceSearch,
-                )
-            }
-            if (!weather.hasLocationPermission) {
-                AppButton(
-                    text = stringResource(R.string.weather_use_my_location),
-                    onClick = onAllowLocation,
-                    style = AppButtonStyle.Secondary,
-                    width = AppButtonWidth.Wrap,
-                )
-            }
-            MutedText(stringResource(R.string.weather_attribution))
         }
+        if (weather.showsManualEntry) {
+            AppTextField(
+                value = weather.temperatureInput,
+                onValueChange = actions::setTemperature,
+                label = stringResource(R.string.weather_temperature),
+                suffix = stringResource(R.string.weather_temperature_unit),
+                supportingText = weather.temperatureCelsius?.let {
+                    stringResource(TemperatureBand.of(it).labelRes)
+                },
+                keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
+            )
+            Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
+                Text(
+                    text = stringResource(R.string.weather_condition),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = AppTheme.colors.contentMuted,
+                )
+                WeatherConditionPicker(
+                    selected = weather.condition,
+                    isDay = weather.fetchedWeather?.isDay ?: true,
+                    onSelect = actions::selectCondition,
+                )
+            }
+        }
+        if (weather.showsPlace) {
+            AppPickerField(
+                value = weather.place?.name.orEmpty(),
+                label = stringResource(R.string.weather_place),
+                placeholder = stringResource(R.string.weather_place_search_title),
+                onPress = actions::openPlaceSearch,
+            )
+        }
+        if (!weather.hasLocationPermission) {
+            AppButton(
+                text = stringResource(R.string.weather_use_my_location),
+                onClick = onAllowLocation,
+                style = AppButtonStyle.Secondary,
+                width = AppButtonWidth.Wrap,
+            )
+        }
+        MutedText(stringResource(R.string.weather_attribution))
     }
     weather.placeSearch?.let { search ->
         PlaceSearchDialog(
@@ -211,6 +231,20 @@ private fun WeatherSectionWithoutLocationPreview() {
             actions = LogWalkPreviewData.formActions,
             onAllowLocation = {},
             modifier = Modifier.padding(AppSpacing.lg),
+        )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WeatherContentPreview() {
+    WalkLoggerTheme {
+        WeatherContent(
+            weather = LogWalkPreviewData.finishWalk.form.weather.copy(isExpanded = true),
+            actions = LogWalkPreviewData.formActions,
+            onAllowLocation = {},
+            modifier = Modifier.padding(AppSpacing.lg),
+            onEdit = {},
         )
     }
 }

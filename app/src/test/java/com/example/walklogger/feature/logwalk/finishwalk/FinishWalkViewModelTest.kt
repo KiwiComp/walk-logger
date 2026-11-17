@@ -10,6 +10,7 @@ import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkLocation
+import com.example.walklogger.domain.DiscardWalkUseCase
 import com.example.walklogger.domain.FetchWalkWeatherUseCase
 import com.example.walklogger.domain.LocationPermissionUseCase
 import com.example.walklogger.domain.SaveWalkUseCase
@@ -18,6 +19,7 @@ import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeBehaviourIssueRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeErrorReporter
+import com.example.walklogger.testing.FakeHandlerRepository
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWalkRepository
@@ -52,6 +54,7 @@ class FinishWalkViewModelTest {
     private val behaviourIssueRepository = FakeBehaviourIssueRepository()
     private val medicalConcernRepository = FakeMedicalConcernRepository()
     private val walkRepository = FakeWalkRepository()
+    private val handlerRepository = FakeHandlerRepository().apply { addHandlers("Anna", "Jonas") }
     private val errorReporter = FakeErrorReporter()
     private val locationRepository = FakeLocationRepository()
     private val weatherRepository = FakeWeatherRepository()
@@ -69,6 +72,7 @@ class FinishWalkViewModelTest {
         FinishWalkViewModel(
             walkId = 1,
             dogRepository = dogRepository,
+            handlerRepository = handlerRepository,
             walkRepository = walkRepository,
             clock = clock,
             formFactory = walkFormEditorFactory(
@@ -85,6 +89,11 @@ class FinishWalkViewModelTest {
                 locationRepository = locationRepository,
             ),
             saveWalk = SaveWalkUseCase(walkRepository, activeWalkLocationRepository, errorReporter),
+            discardWalk = DiscardWalkUseCase(
+                walkRepository,
+                activeWalkLocationRepository,
+                errorReporter,
+            ),
             errorReporter = errorReporter,
         )
     }
@@ -101,7 +110,7 @@ class FinishWalkViewModelTest {
             assertEquals(LocalTime.of(7, 5), state.times.startTime)
             assertEquals(LocalTime.of(7, 39), state.times.endTime)
             assertEquals(34, state.times.durationMinutes)
-            assertEquals(listOf("Anna"), state.handlers)
+            assertEquals(setOf("Anna"), state.selectedHandlers)
             assertEquals(Equipment.HARNESS, state.form.equipment)
             assertEquals("Barked", state.form.notes)
             assertEquals(SaveBlocker.RATING, state.saveBlocker)
@@ -242,6 +251,42 @@ class FinishWalkViewModelTest {
             assertEquals(Stool(passed = true, texture = StoolTexture.FIRM), stored.stool)
             assertEquals(listOf(BehaviourIssue(2, "Barking")), stored.behaviourIssues)
             assertEquals("Off-lead in the field", stored.notes)
+        }
+    }
+
+    @Test
+    fun `a changed handler selection is saved`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.toggleHandler("Anna")
+            viewModel.toggleHandler("Jonas")
+            viewModel.formActions.setRating(5)
+            viewModel.save()
+
+            assertTrue(expectMostRecentItem().isSaved)
+            assertEquals(listOf("Jonas"), walkRepository.observeWalk(1).first()!!.handlers)
+        }
+    }
+
+    @Test
+    fun `no handler blocks saving`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.formActions.setRating(5)
+            viewModel.toggleHandler("Anna")
+            val state = expectMostRecentItem()
+            assertEquals(SaveBlocker.HANDLER, state.saveBlocker)
+            assertFalse(state.canSave)
+        }
+    }
+
+    @Test
+    fun `discarding deletes the walk and closes the screen`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            viewModel.discard()
+            assertTrue(expectMostRecentItem().isDiscarded)
+            assertNull(walkRepository.observeWalk(1).first())
         }
     }
 

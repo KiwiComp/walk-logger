@@ -95,6 +95,7 @@ fun WalkLoggerNavHost(
         )
         finishWalkScreen(
             onSaved = navigationState::popToTopLevel,
+            onDiscarded = navigationState::popToTopLevel,
             onNotFound = {
                 navigationState.popToTopLevel()
                 onShowMessage(R.string.error_walk_not_found)

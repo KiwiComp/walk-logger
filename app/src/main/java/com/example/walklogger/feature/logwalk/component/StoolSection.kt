@@ -19,8 +19,8 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /**
  * "Stool" form section. It is never folded away: [stool] stays null until the handler actively picks
- * Yes or No, and Clear returns it to null. The description rows only show after Yes; Done folds them into
- * a summary line and turns into Edit, which opens them again.
+ * Yes or No, and Clear returns it to null. The description rows only show after Yes; the chevron folds them
+ * into a summary line and opens them again.
  */
 @Composable
 internal fun StoolSection(
@@ -40,14 +40,12 @@ internal fun StoolSection(
         label = stringResource(R.string.log_past_walk_stool),
         actionLabel = if (stool != null) stringResource(R.string.form_section_clear) else null,
         onAction = onClear,
-        leadingActionLabel = if (passed) {
-            stringResource(
-                if (expanded) R.string.stool_done else R.string.stool_edit,
-            )
+        onToggle = if (passed) {
+            if (expanded) onFold else onExpand
         } else {
             null
         },
-        onLeadingAction = if (expanded) onFold else onExpand,
+        chevronUp = expanded,
         modifier = modifier,
     ) {
         Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {

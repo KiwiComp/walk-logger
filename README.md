@@ -7,7 +7,8 @@ weather at the time. Walks can be timed live or logged afterwards, and are brows
 
 - **Log**: week strip and a timeline of the active dog's walks.
 - **Live walk**: start a timed walk (elapsed time, quick note, stool) and finish it with rating,
-  equipment, weather, behaviour, medical concerns and notes.
+  equipment, stool, mood and focus ratings, behaviour, health concerns and notes. The handler, times and
+  weather can be corrected there, or the walk discarded.
 - **Past walk**: log a walk afterwards with its date and times, on any day.
 - **Weather**: fetched automatically from [Open-Meteo](https://open-meteo.com/) for the walk's time and
   place, and editable by hand.

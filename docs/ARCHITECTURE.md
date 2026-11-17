@@ -31,25 +31,27 @@ com.example.walklogger
 │   │                          WeatherFormActions, which WalkFormActions extends and WalkFormEditor passes on), with
 │   │                          WeatherFormat for the shown numbers; WalkTimesState + WalkTimesEditor hold the date and
 │   │                          times both forms share (duration, the time save blockers, passing the times on to the weather),
-│   │                          and HandlerSelectionEditor the handler chips the new-walk and past-walk screens share;
+│   │                          and HandlerSelectionEditor the handler chips the new-walk, after-walk and past-walk screens share;
 │   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk; the first
 │   │                          Start walk asks for precise location, then starts the walk whatever the answer);
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
 │   │                          stored start, quick note, ActiveStoolSection: a switch for "passed stool" whose description rows
 │   │                          fold into a summary on Done (which turns into Edit), stored on every tap; end walk; system back is swallowed);
-│   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen (rating, stool, optional ratings, equipment, weather, behaviour,
-│   │                          medical, notes for the just-finished walk, with an "Edit times" toggle);
+│   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen for the just-finished walk: FinishWalkSummaryCard (dog and
+│   │                          handlers with Change for the handler chips, times and weather each with an Edit/Done toggle) above the shared
+│   │                          form; the close cross confirms, then discards the walk through DiscardWalkUseCase;
 │   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating, stool, optional ratings,
 │   │                          equipment, weather, behaviour, medical, notes); the same screen edits a logged walk when the route
 │   │                          carries a walkId, pushed on top of that walk's detail screen so saving or closing returns there;
 │   │                          component/ holds the form pieces the screens share (WalkFormContent renders the shared
-│   │                          sections from equipment to notes, FormSection, SelectableChip,
+│   │                          sections from rating to notes, FormSection (a card unless card = false, as on walk detail), SelectableChip,
 │   │                          BehaviourSection, MedicalSection, AddNameDialog and its AddHandlerDialog /
-│   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, StoolSection (Yes/No; Done folds the
-│   │                          description into StoolSummary, Edit opens it) with StoolDescriptors, StoolColourPicker and
-│   │                          StoolSwatch, OptionalRatingsSection, WhenSection, Labels,
+│   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale (rating faces), StoolSection (Yes/No; the
+│   │                          chevron folds the description into StoolSummary and opens it) with StoolDescriptors, StoolColourPicker and
+│   │                          StoolSwatch, StepSlider (stool amount and texture, and OptionalRatingSlider in OptionalRatingsSection), WhenSection, Labels,
 │   │                          FormStyle for the on-header variant the timer screen uses);
-│   │                          WeatherSection shows the fetched weather (WeatherSummary, also used by walk detail) with a
+│   │                          WeatherSection (the past-walk card) wraps WeatherContent, which the after-walk summary card uses directly; it shows
+│   │                          the fetched weather (WeatherSummary, also used by walk detail) with a
 │   │                          fetch button, a °C field and WeatherConditionPicker the handler can correct, the place row
 │   │                          (PlaceSearchDialog) without permission or when the device finds no position, a "Use my location"
 │   │                          button without permission, and the Open-Meteo attribution; the form Routes ask once through
@@ -120,10 +122,11 @@ com.example.walklogger
 │   │                          lives per build type (logcat in src/debug, no-op in src/release)
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
-│                              SectionLabel, SegmentedToggle, AppSwitch, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
+│                              SectionLabel, SegmentedToggle, PillButton / EditDonePillButton, RatingFace, AppSwitch, DashedButton,
+│                              AddWalkButton, AddWalkFab, DayHeading, EquipmentChip,
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost,
 │                              AppConfirmDialog for discard and delete confirmations; addWalkClick decides what
-│                              AddWalkButton does on Log and Calendar; LocationPermissionRequest shows the system dialog and
+│                              AddWalkFab (Log) and AddWalkButton (Calendar) do; LocationPermissionRequest shows the system dialog and
 │                              rememberAllowLocation picks between it and the app's system settings once Android stops showing it)
 │                              + message/UserMessageState, the message a ViewModel combines into its UiState,
 │                              reporting the error behind it, and UserMessageEffect, which shows it in the app's snackbar
@@ -143,9 +146,9 @@ com.example.walklogger
   `SavedStateHandle` needs Android's `Bundle` and would push ViewModel tests off the JVM.
 - **Pushed screens hide the bottom bar.** Anything that is not a `TopLevelDestination`
   (new walk, log past walk, walk detail, register dog, settings) is a full-screen task with a leading back chevron
-  (or close cross for forms) in the header. The timer and after-walk screens have neither: a
-  timed walk is stored the moment it starts, ended by "End walk" and already logged before the
-  form opens, so there is nothing to cancel. When a flow finishes, `popToTopLevel()` returns to
+  (or close cross for forms) in the header. The timer has neither: a timed walk is stored the moment
+  it starts and ended by "End walk". The after-walk form opens on that already stored walk, so its
+  close cross discards the walk after a confirmation instead of just leaving. When a flow finishes, `popToTopLevel()` returns to
   whichever tab (Log or Calendar) it was started from.
 - **Each feature owns its navigation.** Add a `@Serializable` route implementing `NavKey`, an
   `EntryProviderScope<NavKey>.xxxScreen()` and `MutableList<NavKey>.navigateToXxx()` push functions

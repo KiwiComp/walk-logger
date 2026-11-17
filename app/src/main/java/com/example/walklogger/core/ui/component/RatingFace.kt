@@ -12,9 +12,10 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
+import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
-private val DefaultSize = 26.dp
+private val DefaultSize = AppSize.chipHeight
 
 /** Coloured face for a 1..7 walk rating, from very angry to very happy. */
 @Composable

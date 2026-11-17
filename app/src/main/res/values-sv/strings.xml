@@ -60,6 +60,7 @@
     <string name="summary_average">· snitt %1$.1f</string>
     <string name="summary_duration">· %1$s</string>
     <string name="summary_duration_hours_minutes">%1$d h %2$d min</string>
+    <string name="walk_stool_passed_description">Har bajsat</string>
     <string name="walk_duration_minutes">%1$d min</string>
     <string name="log_no_dog_message">Registrera en hund under fliken Hundar innan du loggar promenader.</string>
     <string name="log_no_dog_action">Hundar</string>
@@ -106,11 +107,23 @@
     <string name="active_walk_discard_confirm_message">Timern stoppas och inget loggas, inte ens anteckningen. Det går inte att ångra.</string>
     <string name="active_walk_discard_confirm">Släng</string>
 
-    <string name="finish_walk_title">Hur gick det?</string>
-    <string name="finish_walk_edit_times">Ändra tider</string>
-    <string name="finish_walk_times_summary">%1$s → %2$s · %3$s · loggad automatiskt</string>
+    <string name="finish_walk_title">Logga promenad</string>
+    <string name="finish_walk_edit_times">Redigera</string>
+    <string name="finish_walk_done_times">Klar</string>
     <string name="finish_walk_walked_by">Gick med %1$s</string>
-    <string name="finish_walk_dog_walked_by">%1$s gick med %2$s</string>
+    <string name="finish_walk_auto_logged">Autologgad</string>
+    <string name="finish_walk_change_handler">Ändra</string>
+    <string name="finish_walk_times">%1$s · %2$s – %3$s</string>
+    <string name="walk_form_rating">Hur var promenaden?</string>
+    <string name="rating_rough">Jobbig</string>
+    <string name="rating_great">Toppen</string>
+    <string name="walk_form_mood_focus">Humör &amp; fokus</string>
+    <string name="optional_ratings_rated">Valfritt · %1$d av %2$d betygsatta</string>
+    <string name="optional_rating_not_rated">Inte betygsatt</string>
+    <string name="optional_rating_value">%1$d / %2$d</string>
+    <string name="optional_rating_clear">Rensa %1$s</string>
+    <string name="optional_ratings_least">1 = minst</string>
+    <string name="optional_ratings_most">7 = mest</string>
 
     <string name="log_past_walk_title">Logga en tidigare promenad</string>
     <string name="edit_walk_title">Redigera promenad</string>
@@ -207,7 +220,7 @@
     <string name="stool_edit">Redigera</string>
     <string name="stool_no_details">Inga detaljer</string>
     <string name="log_past_walk_behaviour">Beteende</string>
-    <string name="behaviour_other_issue">+ Annat problem</string>
+    <string name="behaviour_other_issue">Annat…</string>
     <string name="behaviour_add_issue_title">Vad hände mer?</string>
     <string name="behaviour_add_issue_name">Problem</string>
     <string name="issue_pulling">Drar i kopplet</string>
@@ -221,7 +234,7 @@
     <string name="issue_not_recalling">Kommer inte på inkallning</string>
     <string name="issue_chasing">Jagar</string>
     <string name="log_past_walk_medical">Hälsa</string>
-    <string name="medical_other_concern">+ Annat besvär</string>
+    <string name="medical_other_concern">Annat…</string>
     <string name="medical_add_concern_title">Vad mer märkte du?</string>
     <string name="medical_add_concern_name">Besvär</string>
     <string name="concern_diarrhoea">Diarré</string>
@@ -233,7 +246,7 @@
     <string name="concern_irregular_gait">Avvikande gång</string>
     <string name="concern_excessive_drooling">Dreglar mycket</string>
     <string name="log_past_walk_notes">Anteckningar</string>
-    <string name="log_past_walk_notes_placeholder">Annan information du vill spara.</string>
+    <string name="log_past_walk_notes_placeholder">Något mer värt att komma ihåg?</string>
     <string name="log_past_walk_save">Spara promenad</string>
     <string name="log_past_walk_needs_handler">Välj vem som gick innan promenaden kan sparas.</string>
     <string name="log_past_walk_needs_times">Ange start- och sluttid innan promenaden kan sparas.</string>

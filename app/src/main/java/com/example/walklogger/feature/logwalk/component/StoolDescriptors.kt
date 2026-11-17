@@ -15,8 +15,6 @@ import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
-import com.example.walklogger.core.ui.component.SegmentedToggle
-import com.example.walklogger.core.ui.component.SegmentedToggleSize
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -33,21 +31,21 @@ internal fun StoolDescriptors(
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
         DescriptorRow(label = stringResource(R.string.stool_quantity), style = style) {
-            SegmentedToggle(
+            StepSlider(
                 options = StoolQuantity.entries,
                 selected = stool?.quantity,
                 onSelect = onQuantitySelect,
                 label = { stringResource(it.labelRes) },
-                size = SegmentedToggleSize.Compact,
+                style = style,
             )
         }
         DescriptorRow(label = stringResource(R.string.stool_texture), style = style) {
-            SegmentedToggle(
+            StepSlider(
                 options = StoolTexture.entries,
                 selected = stool?.texture,
                 onSelect = onTextureSelect,
                 label = { stringResource(it.labelRes) },
-                size = SegmentedToggleSize.Compact,
+                style = style,
             )
         }
         DescriptorRow(label = stringResource(R.string.stool_colour), style = style) {

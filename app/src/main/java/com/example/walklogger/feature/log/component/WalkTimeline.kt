@@ -19,8 +19,12 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.contentDescription
+import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
+import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.formatDuration
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
@@ -60,6 +64,13 @@ internal fun WalkTimeline(
                         style = MaterialTheme.typography.bodyMedium,
                         color = AppTheme.colors.contentMuted,
                     )
+                    if (walk.hasPassedStool == true) {
+                        val description = stringResource(R.string.walk_stool_passed_description)
+                        Text(
+                            text = stringResource(R.string.walk_stool_passed_emoji),
+                            modifier = Modifier.semantics { contentDescription = description },
+                        )
+                    }
                 }
                 TimelineConnector(isLast = index == walks.lastIndex)
                 WalkCard(

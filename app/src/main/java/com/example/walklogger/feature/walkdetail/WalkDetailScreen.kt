@@ -197,6 +197,7 @@ private fun DetailSection(
     FormSection(
         label = label,
         hint = hint,
+        card = false,
         modifier = modifier.padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xl),
         content = content,
     )
@@ -237,6 +238,7 @@ private fun WhoDetails(uiState: WalkDetailUiState) {
     Row(modifier = Modifier.padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xl)) {
         FormSection(
             label = stringResource(R.string.log_past_walk_handler),
+            card = false,
             modifier = Modifier.weight(1f),
         ) {
             Text(
@@ -247,6 +249,7 @@ private fun WhoDetails(uiState: WalkDetailUiState) {
         }
         FormSection(
             label = stringResource(R.string.walk_detail_dog),
+            card = false,
             modifier = Modifier.weight(1f),
         ) {
             Text(
@@ -268,6 +271,7 @@ private fun WhoDetails(uiState: WalkDetailUiState) {
         }
         FormSection(
             label = stringResource(R.string.new_walk_equipment),
+            card = false,
             modifier = Modifier.weight(1f),
         ) {
             Text(

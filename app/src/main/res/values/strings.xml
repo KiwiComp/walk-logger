@@ -62,6 +62,8 @@
     <string name="summary_average">· avg %1$.1f</string>
     <string name="summary_duration">· %1$s</string>
     <string name="summary_duration_hours_minutes">%1$d h %2$d min</string>
+    <string name="walk_stool_passed_emoji" translatable="false">💩</string>
+    <string name="walk_stool_passed_description">Pooped</string>
     <string name="walk_duration_minutes">%1$d min</string>
     <string name="log_no_dog_message">Register a dog on the Dogs tab before logging walks.</string>
     <string name="log_no_dog_action">Dogs</string>
@@ -69,7 +71,6 @@
     <string name="add_walk_for_day">+ Add a walk for %1$s</string>
     <string name="log_week_label">Week %1$d · %2$s</string>
     <string name="add_walk">Add walk</string>
-    <string name="separator_dot" translatable="false">·</string>
     <string name="rating_face_description">Rating %1$d of 7</string>
 
     <string name="equipment_collar">Collar</string>
@@ -109,11 +110,23 @@
     <string name="active_walk_discard_confirm_message">The timer stops and nothing is logged, not even the note. This can\'t be undone.</string>
     <string name="active_walk_discard_confirm">Discard</string>
 
-    <string name="finish_walk_title">How was it?</string>
-    <string name="finish_walk_edit_times">Edit times</string>
-    <string name="finish_walk_times_summary">%1$s → %2$s · %3$s · logged automatically</string>
+    <string name="finish_walk_title">Log walk</string>
+    <string name="finish_walk_edit_times">Edit</string>
+    <string name="finish_walk_done_times">Done</string>
     <string name="finish_walk_walked_by">Walked by %1$s</string>
-    <string name="finish_walk_dog_walked_by">%1$s walked by %2$s</string>
+    <string name="finish_walk_auto_logged">Auto-logged</string>
+    <string name="finish_walk_change_handler">Change</string>
+    <string name="finish_walk_times">%1$s · %2$s – %3$s</string>
+    <string name="walk_form_rating">How was the walk?</string>
+    <string name="rating_rough">Rough</string>
+    <string name="rating_great">Great</string>
+    <string name="walk_form_mood_focus">Mood &amp; focus</string>
+    <string name="optional_ratings_rated">Optional · %1$d of %2$d rated</string>
+    <string name="optional_rating_not_rated">Not rated</string>
+    <string name="optional_rating_value">%1$d / %2$d</string>
+    <string name="optional_rating_clear">Clear %1$s</string>
+    <string name="optional_ratings_least">1 = least</string>
+    <string name="optional_ratings_most">7 = most</string>
 
     <string name="log_past_walk_title">Log a past walk</string>
     <string name="edit_walk_title">Edit walk</string>
@@ -210,7 +223,7 @@
     <string name="stool_edit">Edit</string>
     <string name="stool_no_details">No details</string>
     <string name="log_past_walk_behaviour">Behaviour</string>
-    <string name="behaviour_other_issue">+ Other issue</string>
+    <string name="behaviour_other_issue">Other…</string>
     <string name="behaviour_add_issue_title">What else happened?</string>
     <string name="behaviour_add_issue_name">Issue</string>
     <string name="issue_pulling">Pulling</string>
@@ -223,8 +236,8 @@
     <string name="issue_not_listening">Not listening</string>
     <string name="issue_not_recalling">Not recalling</string>
     <string name="issue_chasing">Chasing</string>
-    <string name="log_past_walk_medical">Medical</string>
-    <string name="medical_other_concern">+ Other concern</string>
+    <string name="log_past_walk_medical">Health concerns</string>
+    <string name="medical_other_concern">Other…</string>
     <string name="medical_add_concern_title">What else did you notice?</string>
     <string name="medical_add_concern_name">Concern</string>
     <string name="concern_diarrhoea">Diarrhoea</string>
@@ -236,7 +249,7 @@
     <string name="concern_irregular_gait">Irregular gait</string>
     <string name="concern_excessive_drooling">Excessive drooling</string>
     <string name="log_past_walk_notes">Notes</string>
-    <string name="log_past_walk_notes_placeholder">Other information you want to store.</string>
+    <string name="log_past_walk_notes_placeholder">Anything else worth remembering?</string>
     <string name="log_past_walk_save">Save walk</string>
     <string name="log_past_walk_needs_handler">Choose who walked before this walk can be saved.</string>
     <string name="log_past_walk_needs_times">Enter start and end times before this walk can be saved.</string>
