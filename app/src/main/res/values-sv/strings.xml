@@ -13,11 +13,10 @@
     <string name="settings_location_description">Används för att hämta vädret för dina promenader. Utan den hämtas vädret för platsen du väljer.</string>
     <string name="settings_location_allow">Tillåt plats</string>
 
+    <string name="calendar_title">Kalender</string>
     <string name="calendar_previous_month">Föregående månad</string>
     <string name="calendar_next_month">Nästa månad</string>
     <string name="calendar_today">Idag</string>
-    <string name="calendar_legend_rating">betyg</string>
-    <string name="calendar_legend_range">1 → 7</string>
     <string name="calendar_no_description">(Ingen beskrivning)</string>
     <string name="patterns_coming_soon">Mönster kommer snart</string>
     <string name="dog_title">Din hund</string>
@@ -65,7 +64,6 @@
     <string name="log_no_dog_message">Registrera en hund under fliken Hundar innan du loggar promenader.</string>
     <string name="log_no_dog_action">Hundar</string>
     <string name="log_deleted_dog_message">Det går inte att logga promenader för en borttagen hund. Byt hund på fliken Hundar.</string>
-    <string name="add_walk_for_day">+ Lägg till en promenad för %1$s</string>
     <string name="log_week_label">Vecka %1$d · %2$s</string>
     <string name="add_walk">Lägg till promenad</string>
     <string name="rating_face_description">Betyg %1$d av 7</string>

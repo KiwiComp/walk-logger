@@ -1,47 +1,51 @@
 package com.example.walklogger.feature.calendar
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
+import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
-import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
-import androidx.compose.ui.res.pluralStringResource
+import androidx.compose.ui.layout.onSizeChanged
+import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
-import com.example.walklogger.core.ui.component.AddWalkButton
-import com.example.walklogger.core.ui.component.DayHeading
+import com.example.walklogger.core.ui.component.AddWalkFab
+import com.example.walklogger.core.ui.component.DayWalks
 import com.example.walklogger.core.ui.component.DogBadge
-import com.example.walklogger.core.ui.component.HeaderIconButton
-import com.example.walklogger.core.ui.component.HeaderTextButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.component.addWalkClick
+import com.example.walklogger.core.ui.component.dayTitle
 import com.example.walklogger.core.ui.component.walkSummary
+import com.example.walklogger.core.ui.theme.AppRadius
+import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
-import com.example.walklogger.feature.calendar.component.CalendarWalkList
 import com.example.walklogger.feature.calendar.component.MonthGrid
-import com.example.walklogger.feature.calendar.component.RatingLegend
+import com.example.walklogger.feature.calendar.component.MonthNavigator
 import com.example.walklogger.feature.calendar.preview.CalendarPreviewData
 import java.time.LocalDate
-import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
 
 @Composable
 fun CalendarRoute(
@@ -50,6 +54,7 @@ fun CalendarRoute(
     onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
     snackbarHostState: SnackbarHostState,
+    snackbarHeight: () -> Dp,
     modifier: Modifier = Modifier,
     viewModel: CalendarViewModel = hiltViewModel(),
 ) {
@@ -72,6 +77,7 @@ fun CalendarRoute(
         onDaySelect = viewModel::selectDay,
         onAddWalk = onAddWalkClick,
         onWalkClick = onOpenWalk,
+        snackbarHeight = snackbarHeight(),
         modifier = modifier,
     )
 }
@@ -86,77 +92,77 @@ fun CalendarScreen(
     onAddWalk: () -> Unit,
     onWalkClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
+    snackbarHeight: Dp = 0.dp,
 ) {
-    val locale = LocalConfiguration.current.locales[0]
-    val monthFormatter = remember(locale) { DateTimeFormatter.ofPattern("MMM yyyy", locale) }
-    val dayHeadingFormatter = remember(locale) { DateTimeFormatter.ofPattern("d MMMM", locale) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
-            title = uiState.month.format(monthFormatter).replaceFirstChar { it.titlecase(locale) },
-            subtitle = pluralStringResource(
-                R.plurals.walk_count,
-                uiState.monthWalkCount,
-                uiState.monthWalkCount,
-            ),
-            navigationIcon = {
-                HeaderIconButton(
-                    icon = Icons.AutoMirrored.Filled.KeyboardArrowLeft,
-                    contentDescription = stringResource(R.string.calendar_previous_month),
-                    onClick = onPreviousMonth,
-                )
-            },
+            title = stringResource(R.string.calendar_title),
             actions = {
                 DogBadge(name = uiState.activeDogName, isDeleted = uiState.isActiveDogDeleted)
-                HeaderIconButton(
-                    icon = Icons.AutoMirrored.Filled.KeyboardArrowRight,
-                    contentDescription = stringResource(R.string.calendar_next_month),
-                    onClick = onNextMonth,
-                    enabled = uiState.canShowNextMonth,
-                )
             },
-        ) {
-            Spacer(Modifier.height(AppSpacing.lg))
-            Row(
-                modifier = Modifier.fillMaxWidth(),
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                RatingLegend()
-                Spacer(Modifier.weight(1f))
-                HeaderTextButton(
-                    text = stringResource(R.string.calendar_today),
-                    onClick = onShowCurrentMonth,
-                    visible = !uiState.isCurrentMonth,
-                )
+        )
+        BoxWithConstraints(modifier = Modifier.fillMaxSize()) {
+            val viewportHeight = maxHeight
+            val density = LocalDensity.current
+            var monthHeight by remember { mutableStateOf(0.dp) }
+            Column(modifier = Modifier.fillMaxSize().verticalScroll(rememberScrollState())) {
+                Column(
+                    modifier = Modifier.onSizeChanged {
+                        monthHeight = with(density) { it.height.toDp() }
+                    },
+                ) {
+                    MonthNavigator(
+                        month = uiState.month,
+                        walkCount = uiState.monthWalkCount,
+                        isCurrentMonth = uiState.isCurrentMonth,
+                        canShowNextMonth = uiState.canShowNextMonth,
+                        onPreviousMonth = onPreviousMonth,
+                        onNextMonth = onNextMonth,
+                        onShowCurrentMonth = onShowCurrentMonth,
+                        modifier = Modifier.padding(horizontal = AppSpacing.sm),
+                    )
+                    MonthGrid(
+                        days = uiState.days,
+                        onDaySelect = onDaySelect,
+                        modifier = Modifier.padding(AppSpacing.lg),
+                    )
+                }
+                // Fills what the month leaves of the viewport, so the white reaches the bottom on a short day
+                // without adding scroll room when the day's walks fit.
+                Column(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = (viewportHeight - monthHeight).coerceAtLeast(0.dp))
+                        .background(
+                            AppTheme.colors.card,
+                            RoundedCornerShape(topStart = AppRadius.xl, topEnd = AppRadius.xl),
+                        )
+                        .padding(horizontal = AppSpacing.lg)
+                        .padding(top = AppSpacing.xxl),
+                ) {
+                    DayWalks(
+                        title = dayTitle(uiState.selectedDate, isToday = uiState.isTodaySelected),
+                        summary = if (uiState.walks.isEmpty()) {
+                            null
+                        } else {
+                            walkSummary(
+                                uiState.walks.size,
+                                averageRating = null,
+                                uiState.totalDuration,
+                            )
+                        },
+                        walks = uiState.walks,
+                        onWalkClick = onWalkClick,
+                    )
+                    Spacer(Modifier.height(AppSize.buttonHeight + AppSpacing.xxxl))
+                }
             }
-        }
-
-        Column(
-            modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
-        ) {
-            MonthGrid(days = uiState.days, onDaySelect = onDaySelect)
-            Spacer(Modifier.height(AppSpacing.xxl))
-            DayHeading(
-                title = uiState.selectedDate.format(dayHeadingFormatter),
-                summary = walkSummary(
-                    uiState.walks.size,
-                    uiState.averageRating,
-                    uiState.totalDuration,
-                ),
-            )
-            if (uiState.walks.isNotEmpty()) {
-                CalendarWalkList(
-                    walks = uiState.walks,
-                    onWalkClick = onWalkClick,
-                    modifier = Modifier.padding(top = AppSpacing.sm),
-                )
-            }
-            AddWalkButton(
-                dayLabel = uiState.selectedDate.dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
+            AddWalkFab(
                 onClick = onAddWalk,
-                modifier = Modifier.padding(top = AppSpacing.lg),
+                snackbarHeight = snackbarHeight,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(AppSpacing.lg),
             )
         }
     }

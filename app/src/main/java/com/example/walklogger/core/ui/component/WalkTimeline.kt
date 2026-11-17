@@ -1,4 +1,4 @@
-package com.example.walklogger.feature.log.component
+package com.example.walklogger.core.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
@@ -6,6 +6,7 @@ import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.IntrinsicSize
 import androidx.compose.foundation.layout.Row
+import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
@@ -25,13 +26,13 @@ import androidx.compose.ui.semantics.semantics
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
-import com.example.walklogger.core.ui.component.formatDuration
+import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
-import com.example.walklogger.feature.log.WalkUiState
-import com.example.walklogger.feature.log.preview.LogPreviewData
+import java.time.LocalTime
 import java.time.format.DateTimeFormatter
+import kotlin.time.Duration.Companion.minutes
 
 private val TimeColumnWidth = 72.dp
 private val ConnectorWidth = 32.dp
@@ -42,8 +43,8 @@ private val StartTimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern(
 
 /** The day's walks, each with its start time and a dot on a rail leading to a [WalkCard]. */
 @Composable
-internal fun WalkTimeline(
-    walks: List<WalkUiState>,
+fun WalkTimeline(
+    walks: List<TimelineWalk>,
     onWalkClick: (Long) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -110,14 +111,59 @@ private fun TimelineConnector(isLast: Boolean) {
     }
 }
 
+/** The day's [title] with its [summary], then its walks; shared by the Log and Calendar sheets. */
+@Composable
+fun DayWalks(
+    title: String,
+    summary: String?,
+    walks: List<TimelineWalk>,
+    onWalkClick: (Long) -> Unit,
+    modifier: Modifier = Modifier,
+) {
+    Column(modifier = modifier) {
+        DayHeading(title = title, summary = summary)
+        Spacer(Modifier.height(AppSpacing.xxl))
+        WalkTimeline(walks = walks, onWalkClick = onWalkClick)
+    }
+}
+
+private val PreviewWalks = listOf(
+    TimelineWalk(
+        id = 1,
+        startTime = LocalTime.of(7, 5),
+        duration = 38.minutes,
+        equipment = Equipment.HARNESS,
+        rating = 6,
+        note = "Long morning loop, calm the whole way.",
+        hasPassedStool = null,
+    ),
+    TimelineWalk(
+        id = 2,
+        startTime = LocalTime.of(11, 30),
+        duration = 177.minutes,
+        equipment = Equipment.COLLAR,
+        rating = 4,
+        note = "Quick errand walk, distracted by the market.",
+        hasPassedStool = true,
+    ),
+)
+
 @Preview(showBackground = true)
 @Composable
 private fun WalkTimelinePreview() {
     WalkLoggerTheme {
         WalkTimeline(
-            walks = LogPreviewData.walks,
+            walks = PreviewWalks,
             onWalkClick = {},
             modifier = Modifier.padding(AppSpacing.lg),
         )
+    }
+}
+
+@Preview(showBackground = true)
+@Composable
+private fun WalkCardPreview() {
+    WalkLoggerTheme {
+        WalkCard(walk = PreviewWalks[1], onClick = {}, modifier = Modifier.padding(AppSpacing.lg))
     }
 }

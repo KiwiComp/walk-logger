@@ -15,11 +15,10 @@
     <string name="settings_location_description">Used to fetch the weather for your walks. Without it, the weather is fetched for the place you choose.</string>
     <string name="settings_location_allow">Allow location</string>
 
+    <string name="calendar_title">Calendar</string>
     <string name="calendar_previous_month">Previous month</string>
     <string name="calendar_next_month">Next month</string>
     <string name="calendar_today">Today</string>
-    <string name="calendar_legend_rating">rating</string>
-    <string name="calendar_legend_range">1 → 7</string>
     <string name="calendar_no_description">(No description)</string>
     <string name="patterns_coming_soon">Patterns coming soon</string>
     <string name="dog_title">Your dog</string>
@@ -68,7 +67,6 @@
     <string name="log_no_dog_message">Register a dog on the Dogs tab before logging walks.</string>
     <string name="log_no_dog_action">Dogs</string>
     <string name="log_deleted_dog_message">Walks can\'t be logged for a deleted dog. Switch dog on the Dogs tab.</string>
-    <string name="add_walk_for_day">+ Add a walk for %1$s</string>
     <string name="log_week_label">Week %1$d · %2$s</string>
     <string name="add_walk">Add walk</string>
     <string name="rating_face_description">Rating %1$d of 7</string>

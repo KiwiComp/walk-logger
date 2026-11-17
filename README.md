@@ -12,7 +12,7 @@ weather at the time. Walks can be timed live or logged afterwards, and are brows
 - **Past walk**: log a walk afterwards with its date and times, on any day.
 - **Weather**: fetched automatically from [Open-Meteo](https://open-meteo.com/) for the walk's time and
   place, and editable by hand.
-- **Calendar**: month grid tinted by rating, with the walks of the selected day.
+- **Calendar**: month grid with a rating face per day, with the walks of the selected day.
 - **Walk detail**: read-only view of a logged walk, with edit and discard.
 - **Dogs**: register several dogs, pick the active one; deleted dogs keep their history.
 - English and Swedish.

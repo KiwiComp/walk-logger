@@ -1,9 +1,9 @@
 package com.example.walklogger.feature.log.preview
 
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.ui.component.TimelineWalk
 import com.example.walklogger.feature.log.DayUiState
 import com.example.walklogger.feature.log.LogUiState
-import com.example.walklogger.feature.log.WalkUiState
 import java.time.LocalDate
 import java.time.LocalTime
 import kotlin.time.Duration.Companion.minutes
@@ -12,7 +12,7 @@ import kotlin.time.Duration.Companion.minutes
 internal object LogPreviewData {
     private val saturday = LocalDate.of(2026, 9, 12)
 
-    val walk = WalkUiState(
+    val walk = TimelineWalk(
         id = 1,
         startTime = LocalTime.of(7, 5),
         duration = 38.minutes,
@@ -24,7 +24,7 @@ internal object LogPreviewData {
 
     val walks = listOf(
         walk,
-        WalkUiState(
+        TimelineWalk(
             id = 2,
             startTime = LocalTime.of(11, 30),
             duration = 177.minutes,
@@ -37,6 +37,7 @@ internal object LogPreviewData {
 
     val uiState = LogUiState(
         selectedDate = saturday,
+        weekNumber = 37,
         week = (0L until 7L).map { offset ->
             val day = saturday.minusDays(5).plusDays(offset)
             DayUiState(

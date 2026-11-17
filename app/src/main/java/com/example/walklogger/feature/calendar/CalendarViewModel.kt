@@ -7,6 +7,7 @@ import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.groupByStartDate
 import com.example.walklogger.core.model.startLocalTime
+import com.example.walklogger.core.ui.component.TimelineWalk
 import com.example.walklogger.domain.ObserveWalkHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
@@ -82,6 +83,7 @@ class CalendarViewModel @Inject constructor(
                         it.rating
                     }.takeIf { it.isNotEmpty() }?.average()?.roundToInt(),
                     isSelected = day == date,
+                    isToday = day == today,
                     isEnabled = !day.isAfter(today),
                 )
             },
@@ -94,11 +96,12 @@ class CalendarViewModel @Inject constructor(
     }
 }
 
-private fun Walk.toUiState(zone: ZoneId) = CalendarWalkUiState(
+private fun Walk.toUiState(zone: ZoneId) = TimelineWalk(
     id = id,
     startTime = startLocalTime(zone),
     equipment = equipment,
     rating = rating,
     note = notes,
     duration = (checkNotNull(endTime) { "walk $id has not finished" } - startTime).milliseconds,
+    hasPassedStool = stool?.passed,
 )

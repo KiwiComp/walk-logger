@@ -22,8 +22,8 @@ com.example.walklogger
 │   │                            navigation/  @Serializable NavKey route, EntryProviderScope extension
 │   │                                         and push functions on the back stack
 │   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from
-│   │                          component/ (WeekStrip, WalkTimeline, WalkCard); the header's gear opens Settings
-│   ├── logwalk/               the flow behind AddWalkButton, one sub-package per screen.
+│   │                          component/WeekStrip and the shared DayWalks; the header's gear opens Settings
+│   ├── logwalk/               the flow behind AddWalkFab, one sub-package per screen.
 │   │                          WalkFormState + WalkFormEditor (implements WalkFormActions) hold the fields the after-walk
 │   │                          and past-walk forms share (rating to notes, incl. the issue/concern lists, prefill and
 │   │                          applyTo(walk)); each form ViewModel keeps one private and exposes only `formActions`;
@@ -61,9 +61,9 @@ com.example.walklogger
 │   │                          an edited walk only fetches through the button;
 │   │                          the chosen day travels as a route argument into both form ViewModels
 │   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
-│   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
-│   │                          MonthGrid with cells tinted by rating and selection ringed in the selection colour, CalendarWalkList);
-│   │                          a walk row opens the walk's detail screen, the dashed button logs a walk on that day
+│   │                          rounded rating); CalendarScreen composed from component/ (MonthNavigator with a Today button off the
+│   │                          current month, MonthGrid with a rating face per rated day) and the shared DayWalks sheet;
+│   │                          a walk card opens the walk's detail screen, AddWalkFab logs a walk on the selected day
 │   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk as cards (WalkHeroCard
 │   │                          with date, times, dog, handlers, equipment and the rating face; weather; stool; mood & focus bars; behaviour
 │   │                          and health concerns; notes, dashed when empty), opened from a walk row on Log or Calendar;
@@ -123,10 +123,10 @@ com.example.walklogger
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
 │                              SectionLabel, SegmentedToggle, PillButton (Filled, Outlined, Inverse) / EditDonePillButton, RatingFace, AppSwitch, DashedButton,
-│                              AddWalkButton, AddWalkFab, DayHeading, EquipmentChip,
+│                              AddWalkFab, DayHeading (and dayTitle), DayWalks, WalkTimeline, WalkCard and their TimelineWalk model, EquipmentChip,
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost,
 │                              AppConfirmDialog for discard and delete confirmations; addWalkClick decides what
-│                              AddWalkFab (Log) and AddWalkButton (Calendar) do; LocationPermissionRequest shows the system dialog and
+│                              AddWalkFab does on Log and Calendar; LocationPermissionRequest shows the system dialog and
 │                              rememberAllowLocation picks between it and the app's system settings once Android stops showing it)
 │                              + message/UserMessageState, the message a ViewModel combines into its UiState,
 │                              reporting the error behind it, and UserMessageEffect, which shows it in the app's snackbar

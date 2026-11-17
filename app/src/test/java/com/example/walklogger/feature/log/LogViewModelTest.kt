@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.ui.component.TimelineWalk
 import com.example.walklogger.domain.ObserveWalkHistoryUseCase
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
@@ -78,10 +79,19 @@ class LogViewModelTest {
                 },
             )
             assertEquals(today, state.week.single { it.isToday }.date)
-            assertEquals(emptyList<WalkUiState>(), state.walks)
+            assertEquals(emptyList<TimelineWalk>(), state.walks)
             assertNull(state.averageRating)
             assertNull(state.activeDogName)
             assertEquals(true, state.canStartLiveWalk)
+        }
+    }
+
+    @Test
+    fun `the week number stays the ISO week of the strip when Sunday is selected`() = runTest {
+        viewModel.uiState.test {
+            assertEquals(37, expectMostRecentItem().weekNumber)
+            viewModel.selectDay(LocalDate.of(2026, 9, 13))
+            assertEquals(37, awaitItem().weekNumber)
         }
     }
 
@@ -122,7 +132,7 @@ class LogViewModelTest {
         repository.addWalks(walk(id = 1, start = today.atTime(8, 0), finished = false))
         viewModel.uiState.test {
             val state = expectMostRecentItem()
-            assertEquals(emptyList<WalkUiState>(), state.walks)
+            assertEquals(emptyList<TimelineWalk>(), state.walks)
             assertEquals(false, state.week.single { it.date == today }.hasWalks)
         }
     }
@@ -133,7 +143,7 @@ class LogViewModelTest {
         val friday = today.minusDays(1)
         repository.addWalks(walk(id = 1, start = friday.atTime(9, 0)))
         viewModel.uiState.test {
-            assertEquals(emptyList<WalkUiState>(), awaitItem().walks)
+            assertEquals(emptyList<TimelineWalk>(), awaitItem().walks)
             viewModel.selectDay(friday)
             val state = expectMostRecentItem()
             assertEquals(friday, state.selectedDate)
@@ -158,7 +168,7 @@ class LogViewModelTest {
             assertEquals(false, mira.week.single { it.date == today.minusDays(1) }.hasWalks)
             dogRepository.setActiveDog(2)
             val sixten = expectMostRecentItem()
-            assertEquals(emptyList<WalkUiState>(), sixten.walks)
+            assertEquals(emptyList<TimelineWalk>(), sixten.walks)
             assertEquals(true, sixten.week.single { it.date == today.minusDays(1) }.hasWalks)
         }
     }
@@ -168,7 +178,7 @@ class LogViewModelTest {
         repository.addWalks(walk(id = 1, start = today.atTime(8, 0)))
         viewModel.uiState.test {
             val state = expectMostRecentItem()
-            assertEquals(emptyList<WalkUiState>(), state.walks)
+            assertEquals(emptyList<TimelineWalk>(), state.walks)
             assertEquals(false, state.week.single { it.date == today }.hasWalks)
         }
     }

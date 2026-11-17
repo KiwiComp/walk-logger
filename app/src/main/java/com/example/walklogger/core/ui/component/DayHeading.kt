@@ -8,6 +8,7 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
@@ -15,6 +16,8 @@ import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+import java.time.LocalDate
+import java.time.format.DateTimeFormatter
 import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
@@ -37,6 +40,21 @@ fun DayHeading(title: String, summary: String?, modifier: Modifier = Modifier) {
                 modifier = Modifier.alignByBaseline(),
             )
         }
+    }
+}
+
+/** "Today, 17 Nov" for today, otherwise "Tuesday 3 Nov". */
+@Composable
+fun dayTitle(date: LocalDate, isToday: Boolean): String {
+    val locale = LocalConfiguration.current.locales[0]
+    return if (isToday) {
+        stringResource(
+            R.string.day_today_description,
+            date.format(DateTimeFormatter.ofPattern("d MMM", locale)),
+        )
+    } else {
+        date.format(DateTimeFormatter.ofPattern("EEEE d MMM", locale))
+            .replaceFirstChar { it.titlecase(locale) }
     }
 }
 

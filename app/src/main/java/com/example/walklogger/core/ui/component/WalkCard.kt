@@ -1,4 +1,4 @@
-package com.example.walklogger.feature.log.component
+package com.example.walklogger.core.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -20,24 +20,18 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.font.FontStyle
 import androidx.compose.ui.text.style.TextOverflow
-import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
-import com.example.walklogger.core.ui.component.EquipmentChip
-import com.example.walklogger.core.ui.component.RatingFace
 import com.example.walklogger.core.ui.theme.AppRadius
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
-import com.example.walklogger.core.ui.theme.WalkLoggerTheme
-import com.example.walklogger.feature.log.WalkUiState
-import com.example.walklogger.feature.log.preview.LogPreviewData
 
 /** Every card reserves this many note lines so the timeline stays even; longer notes are cut with an ellipsis. */
 private const val NOTE_LINES = 2
 
 /** One walk in the day's timeline: rating face, equipment and note. Tapping it opens the walk. */
 @Composable
-internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier = Modifier) {
+fun WalkCard(walk: TimelineWalk, onClick: () -> Unit, modifier: Modifier = Modifier) {
     val shape = RoundedCornerShape(AppRadius.lg)
     Row(
         modifier = modifier
@@ -87,14 +81,5 @@ internal fun WalkCard(walk: WalkUiState, onClick: () -> Unit, modifier: Modifier
             tint = AppTheme.colors.dashed,
             modifier = Modifier.padding(start = AppSpacing.sm),
         )
-    }
-}
-
-@Preview(showBackground = true)
-@Composable
-private fun WalkCardPreview() {
-    WalkLoggerTheme {
-        WalkCard(walk = LogPreviewData.walks[1], onClick = {
-        }, modifier = Modifier.padding(AppSpacing.lg))
     }
 }

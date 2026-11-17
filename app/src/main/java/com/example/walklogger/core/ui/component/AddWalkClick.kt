@@ -10,7 +10,7 @@ import java.time.LocalDate
 import kotlinx.coroutines.launch
 
 /**
- * What tapping [AddWalkButton] on the Log and Calendar tabs does for [date]: without a dog that can log walks a
+ * What tapping [AddWalkFab] on the Log and Calendar tabs does for [date]: without a dog that can log walks a
  * snackbar offers the dogs tab; otherwise today opens the timer and other days log a past walk.
  */
 @Composable

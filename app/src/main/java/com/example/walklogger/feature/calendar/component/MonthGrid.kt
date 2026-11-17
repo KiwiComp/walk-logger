@@ -8,20 +8,21 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.RowScope
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.aspectRatio
 import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.selection.selectable
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.pluralStringResource
-import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.semantics.contentDescription
 import androidx.compose.ui.semantics.semantics
@@ -29,7 +30,8 @@ import androidx.compose.ui.semantics.stateDescription
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
-import com.example.walklogger.core.ui.component.SectionLabel
+import com.example.walklogger.core.ui.component.RatingFace
+import com.example.walklogger.core.ui.theme.AppRadius
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -41,12 +43,10 @@ import java.time.format.DateTimeFormatter
 import java.time.format.TextStyle
 
 private const val DAYS_PER_WEEK = 7
-private val SelectedBorderWidth = 2.dp
+private val CellHeight = 60.dp
+private val FaceSize = 22.dp
 
-/** Ratings from here up sit on the dark blues, where [AppTheme.colors.content] would no longer be readable. */
-private const val FIRST_DARK_RATING = 5
-
-/** Monday-first month grid; each cell is tinted by its day's rating and shows the walk count. */
+/** Monday-first month grid; each day is a rounded card with its number and, when rated, its rating face. */
 @Composable
 internal fun MonthGrid(
     days: List<CalendarDayUiState>,
@@ -56,14 +56,16 @@ internal fun MonthGrid(
     val locale = LocalConfiguration.current.locales[0]
     Column(
         modifier = modifier.fillMaxWidth(),
-        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) {
-        Row(modifier = Modifier.fillMaxWidth().padding(bottom = AppSpacing.xs)) {
+        Row(modifier = Modifier.fillMaxWidth()) {
             DayOfWeek.entries.forEach { dayOfWeek ->
                 Box(Modifier.weight(1f), contentAlignment = Alignment.Center) {
-                    SectionLabel(
-                        text = dayOfWeek.getDisplayName(TextStyle.NARROW, locale),
-                        color = AppTheme.colors.contentMuted,
+                    Text(
+                        text = dayOfWeek.getDisplayName(TextStyle.SHORT, locale)
+                            .replaceFirstChar { it.titlecase(locale) },
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = AppTheme.colors.contentSecondary,
                     )
                 }
             }
@@ -76,9 +78,7 @@ internal fun MonthGrid(
                 horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
             ) {
                 week.forEach { day ->
-                    if (day ==
-                        null
-                    ) {
+                    if (day == null) {
                         Spacer(Modifier.weight(1f))
                     } else {
                         DayCell(day, onClick = { onDaySelect(day.date) })
@@ -92,11 +92,22 @@ internal fun MonthGrid(
 
 @Composable
 private fun RowScope.DayCell(day: CalendarDayUiState, onClick: () -> Unit) {
-    val background = day.rating?.let { AppTheme.colors.ratingTints[it - 1] } ?: AppTheme.colors.chip
-    val foreground = when {
-        !day.isEnabled -> AppTheme.colors.contentMuted
-        day.rating != null && day.rating >= FIRST_DARK_RATING -> AppTheme.colors.onHeader
-        else -> AppTheme.colors.content
+    val colors = AppTheme.colors
+    val background = when {
+        day.isSelected -> colors.selection
+        !day.isEnabled -> Color.Transparent
+        else -> colors.card
+    }
+    val border = when {
+        day.isSelected -> Color.Transparent
+        !day.isEnabled -> colors.outline
+        day.isToday -> colors.action
+        else -> Color.Transparent
+    }
+    val numberColor = when {
+        day.isSelected -> colors.onSelection
+        !day.isEnabled -> colors.placeholder
+        else -> colors.content
     }
     val locale = LocalConfiguration.current.locales[0]
     val description =
@@ -104,15 +115,14 @@ private fun RowScope.DayCell(day: CalendarDayUiState, onClick: () -> Unit) {
             day.date.format(DateTimeFormatter.ofPattern("EEEE d MMMM", locale))
         }
     val walksState = pluralStringResource(R.plurals.walk_count, day.walkCount, day.walkCount)
+    val shape = RoundedCornerShape(AppRadius.lg)
     Column(
         modifier = Modifier
             .weight(1f)
-            .aspectRatio(1f)
+            .height(CellHeight)
+            .clip(shape)
             .background(background)
-            .border(
-                SelectedBorderWidth,
-                if (day.isSelected) AppTheme.colors.selection else Color.Transparent,
-            )
+            .border(1.dp, border, shape)
             .selectable(
                 selected = day.isSelected,
                 enabled = day.isEnabled,
@@ -122,22 +132,17 @@ private fun RowScope.DayCell(day: CalendarDayUiState, onClick: () -> Unit) {
             .semantics {
                 contentDescription = description
                 stateDescription = walksState
-            },
+            }
+            .padding(vertical = AppSpacing.sm),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.Center,
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
     ) {
         Text(
             text = day.date.dayOfMonth.toString(),
             style = MaterialTheme.typography.titleMedium,
-            color = foreground,
+            color = numberColor,
         )
-        if (day.walkCount > 0) {
-            Text(
-                text = day.walkCount.toString(),
-                style = MaterialTheme.typography.bodySmall,
-                color = foreground,
-            )
-        }
+        day.rating?.let { RatingFace(rating = it, size = FaceSize) }
     }
 }
 

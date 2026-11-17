@@ -62,6 +62,7 @@ fun WalkLoggerNavHost(
             onOpenWalk = { navigationState.currentStack.navigateToWalkDetail(it) },
             onGoToDogs = { navigationState.selectTab(TopLevelDestination.DOG) },
             snackbarHostState = snackbarHostState,
+            snackbarHeight = snackbarHeight,
         )
         patternsScreen()
         dogScreen(
