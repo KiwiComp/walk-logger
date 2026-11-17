@@ -45,23 +45,20 @@ class DogViewModelTest {
     }
 
     @Test
-    fun `first dog is active and its profile is shown`() = runTest {
+    fun `first dog is active and each dog shows its details`() = runTest {
         repository.addDogs(sixten, mira)
         viewModel.uiState.test {
             val state = expectMostRecentItem()
             assertEquals(
-                DogProfileUiState(
-                    id = 1,
-                    name = "Sixten",
-                    breed = "Border collie",
-                    ageYears = 3,
-                    weightKg = 18.0,
-                ),
-                state.active,
-            )
-            assertEquals(
                 listOf(
-                    DogListItemUiState(id = 1, name = "Sixten", isActive = true),
+                    DogListItemUiState(
+                        id = 1,
+                        name = "Sixten",
+                        isActive = true,
+                        breed = "Border collie",
+                        ageYears = 3,
+                        weightKg = 18.0,
+                    ),
                     DogListItemUiState(id = 2, name = "Mira", isActive = false),
                 ),
                 state.dogs,
@@ -75,41 +72,32 @@ class DogViewModelTest {
         viewModel.uiState.test {
             val state = expectMostRecentItem()
             assertEquals(
-                DogProfileUiState(
-                    id = 2,
-                    name = "Mira",
-                    breed = "",
-                    ageYears = null,
-                    weightKg = null,
-                ),
-                state.active,
+                listOf(DogListItemUiState(id = 2, name = "Mira", isActive = true)),
+                state.dogs,
             )
         }
     }
 
     @Test
-    fun `switching dog changes the profile`() = runTest {
+    fun `switching dog changes the active dog`() = runTest {
         repository.addDogs(sixten, mira)
         viewModel.uiState.test {
-            assertEquals(
-                "Sixten",
-                expectMostRecentItem().active?.name,
-            )
+            assertEquals("Sixten", expectMostRecentItem().activeName())
             viewModel.switchDog(2)
             val state = expectMostRecentItem()
-            assertEquals("Mira", state.active?.name)
+            assertEquals("Mira", state.activeName())
             assertEquals(listOf(false, true), state.dogs.map { it.isActive })
         }
     }
 
     @Test
-    fun `a failed switch keeps the profile and says so`() = runTest {
+    fun `a failed switch keeps the active dog and says so`() = runTest {
         repository.addDogs(sixten, mira)
         viewModel.uiState.test {
             repository.failures.failWrites = true
             viewModel.switchDog(2)
             val state = expectMostRecentItem()
-            assertEquals("Sixten", state.active?.name)
+            assertEquals("Sixten", state.activeName())
             assertEquals(R.string.error_select_dog, state.userMessage)
         }
         assertEquals(listOf("Failed to switch dog"), errorReporter.reported.map { it.second })
@@ -132,7 +120,16 @@ class DogViewModelTest {
         viewModel.uiState.test {
             val before = expectMostRecentItem()
             assertEquals(
-                listOf(DogListItemUiState(id = 1, name = "Sixten", isActive = true)),
+                listOf(
+                    DogListItemUiState(
+                        id = 1,
+                        name = "Sixten",
+                        isActive = true,
+                        breed = "Border collie",
+                        ageYears = 3,
+                        weightKg = 18.0,
+                    ),
+                ),
                 before.dogs,
             )
             assertEquals(
@@ -141,8 +138,6 @@ class DogViewModelTest {
             )
             viewModel.switchDog(2)
             val after = expectMostRecentItem()
-            assertEquals("Mira", after.active?.name)
-            assertEquals(true, after.active?.isDeleted)
             assertEquals(
                 listOf(DogListItemUiState(id = 2, name = "Mira", isActive = true)),
                 after.deletedDogs,
@@ -165,4 +160,6 @@ class DogViewModelTest {
             )
         }
     }
+
+    private fun DogUiState.activeName() = (dogs + deletedDogs).single { it.isActive }.name
 }

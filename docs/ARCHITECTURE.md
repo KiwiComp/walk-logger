@@ -73,11 +73,12 @@ com.example.walklogger
 │   ├── settings/              SettingsViewModel + SettingsScreen, pushed from Log's header: LocationSetting shows whether
 │   │                          location is allowed and lets the user allow it later (dialog or system settings, through
 │   │                          rememberAllowLocation), rereading the permission on resume
-│   └── dog/                   DogViewModel + DogScreen (profile header, dog list, add-dog CTA, deleted dogs) composed from
+│   └── dog/                   DogViewModel + DogScreen (dog cards with details, Active or Switch, Add dog, deleted dogs dashed) composed from
 │                              component/ (DogList); deleting a dog soft-deletes it (`isHidden`) so its walks stay, and it can
 │                              still be selected as active to read its history in Log and Calendar, but not to log walks
 │                              or edit them;
-│                              registerdog/ RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight)
+│                              registerdog/ RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight in a card;
+│                              Add dog / Save changes in a bottom bar, Delete dog under the card when editing)
 │
 ├── domain/                    optional use cases (pure Kotlin, injectable); ObserveWalkHistoryUseCase gives Log and
 │                              Calendar the active dog's completed walks; FetchWalkWeatherUseCase fetches the weather for
@@ -121,7 +122,7 @@ com.example.walklogger
 │   │                          di/ holds the injectable coroutine dispatchers and Clock; the ErrorReporter binding
 │   │                          lives per build type (logcat in src/debug, no-op in src/release)
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
-│                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
+│                              + shared composables (WalkLoggerHeader, HeaderIconButton, DogBadge,
 │                              SectionLabel, SegmentedToggle, PillButton (Filled, Outlined, Inverse) / EditDonePillButton, RatingFace, AppSwitch, DashedButton,
 │                              AddWalkFab, DayHeading (and dayTitle), DayWalks, WalkTimeline, WalkCard and their TimelineWalk model, EquipmentChip,
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost,

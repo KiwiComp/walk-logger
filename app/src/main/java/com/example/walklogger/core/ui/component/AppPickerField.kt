@@ -21,6 +21,7 @@ fun AppPickerField(
     onPress: () -> Unit,
     modifier: Modifier = Modifier,
     placeholder: String? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
 ) {
     val interactionSource = remember { MutableInteractionSource() }
     val currentOnPress by rememberUpdatedState(onPress)
@@ -34,6 +35,7 @@ fun AppPickerField(
         onValueChange = {},
         label = label,
         placeholder = placeholder,
+        trailingIcon = trailingIcon,
         readOnly = true,
         interactionSource = interactionSource,
         modifier = modifier,

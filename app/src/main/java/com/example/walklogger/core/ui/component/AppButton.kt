@@ -9,6 +9,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.Button
 import androidx.compose.material3.ButtonDefaults
 import androidx.compose.material3.CircularProgressIndicator
@@ -68,20 +69,20 @@ fun AppButton(
     Button(
         onClick = { if (!loading) onClick() },
         enabled = enabled,
-        shape = MaterialTheme.shapes.extraSmall,
+        shape = CircleShape,
         colors = when (style) {
             AppButtonStyle.Primary -> ButtonDefaults.buttonColors(
                 containerColor = AppTheme.colors.action,
-                contentColor = AppTheme.colors.onHeader,
-                disabledContainerColor = AppTheme.colors.chip,
-                disabledContentColor = AppTheme.colors.contentMuted,
+                contentColor = AppTheme.colors.onAction,
+                disabledContainerColor = AppTheme.colors.disabled,
+                disabledContentColor = AppTheme.colors.onDisabled,
             )
 
             AppButtonStyle.Secondary -> ButtonDefaults.buttonColors(
                 containerColor = AppTheme.colors.card,
                 contentColor = AppTheme.colors.content,
-                disabledContainerColor = AppTheme.colors.chip,
-                disabledContentColor = AppTheme.colors.contentMuted,
+                disabledContainerColor = AppTheme.colors.disabled,
+                disabledContentColor = AppTheme.colors.onDisabled,
             )
 
             AppButtonStyle.Tertiary -> ButtonDefaults.buttonColors(
@@ -94,7 +95,7 @@ fun AppButton(
         border = when (style) {
             AppButtonStyle.Primary -> null
 
-            AppButtonStyle.Secondary -> BorderStroke(1.dp, AppTheme.colors.outline)
+            AppButtonStyle.Secondary -> BorderStroke(1.dp, AppTheme.colors.outlineStrong)
 
             AppButtonStyle.Tertiary -> BorderStroke(
                 1.dp,
@@ -109,7 +110,7 @@ fun AppButton(
         Box(contentAlignment = Alignment.Center) {
             Text(
                 text = text,
-                style = MaterialTheme.typography.titleSmall,
+                style = MaterialTheme.typography.titleMedium,
                 modifier = Modifier.alpha(if (loading) 0f else 1f),
             )
             if (loading) {

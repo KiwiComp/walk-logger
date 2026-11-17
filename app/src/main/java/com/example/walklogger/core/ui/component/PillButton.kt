@@ -73,7 +73,7 @@ fun PillButton(
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
             .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
         verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs, Alignment.CenterHorizontally),
     ) {
         icon?.let {
             Icon(

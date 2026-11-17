@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -16,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.R
@@ -30,7 +32,8 @@ import java.time.format.FormatStyle
 /**
  * [AppPickerField] that opens a [DatePickerDialog]. [onDateChange] receives null when the
  * dialog is confirmed with no day selected. [formatter] is applied with the current locale;
- * days after [maxDate] are disabled in the picker.
+ * days after [maxDate] are disabled in the picker. [showIcon] puts a calendar icon at the end; turn it
+ * off where the field is too narrow to fit both the date and the icon.
  */
 @Composable
 fun AppDateField(
@@ -41,6 +44,7 @@ fun AppDateField(
     placeholder: String? = null,
     formatter: DateTimeFormatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.LONG),
     maxDate: LocalDate? = null,
+    showIcon: Boolean = true,
 ) {
     val locale = LocalConfiguration.current.locales[0]
     val localizedFormatter = remember(formatter, locale) { formatter.withLocale(locale) }
@@ -50,6 +54,16 @@ fun AppDateField(
         label = label,
         onPress = { showPicker = true },
         placeholder = placeholder,
+        trailingIcon = if (showIcon) {
+            {
+                Icon(
+                    painter = painterResource(R.drawable.ic_tab_calendar),
+                    contentDescription = null,
+                )
+            }
+        } else {
+            null
+        },
         modifier = modifier,
     )
     if (showPicker) {

@@ -34,7 +34,6 @@ class DogViewModel @Inject constructor(
             val (deleted, remaining) = dogs.partition { it.isDeleted }
             DogUiState(
                 isLoading = false,
-                active = active?.toProfile(),
                 dogs = if (active == null) emptyList() else remaining.map { it.toListItem(active) },
                 deletedDogs = deleted.map { it.toListItem(active) },
             )
@@ -60,19 +59,16 @@ class DogViewModel @Inject constructor(
 
     fun userMessageShown(@StringRes message: Int) = userMessage.shown(message)
 
-    private fun Dog.toProfile() = DogProfileUiState(
-        id = id,
-        name = name,
-        breed = breed,
-        ageYears = birthDate?.let { Period.between(it, LocalDate.now(clock)).years },
-        weightKg = weightKg,
-        isDeleted = isDeleted,
-    )
-
     private fun Dog.toListItem(active: Dog?) = DogListItemUiState(
         id = id,
         name = name,
-        isActive =
-            id == active?.id,
+        isActive = id == active?.id,
+        breed = breed,
+        ageYears = ageYears(),
+        weightKg = weightKg,
     )
+
+    private fun Dog.ageYears(): Int? = birthDate?.let {
+        Period.between(it, LocalDate.now(clock)).years
+    }
 }

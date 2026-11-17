@@ -61,6 +61,7 @@ internal fun WhenSection(
                 label = stringResource(R.string.log_past_walk_date),
                 formatter = DateFormatter,
                 maxDate = maxDate,
+                showIcon = false,
                 modifier = Modifier.weight(DATE_WEIGHT),
             )
             TimeField(
