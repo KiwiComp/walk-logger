@@ -98,7 +98,7 @@ fun AppButton(
 
             AppButtonStyle.Tertiary -> BorderStroke(
                 1.dp,
-                if (enabled) AppTheme.colors.outlineOnHeader else AppTheme.colors.onHeaderMuted,
+                if (enabled) AppTheme.colors.outlineStrong else AppTheme.colors.onHeaderMuted,
             )
         },
         contentPadding = PaddingValues(horizontal = AppSpacing.xxl, vertical = AppSpacing.md),

@@ -6,6 +6,7 @@ import androidx.compose.animation.togetherWith
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.unit.Dp
 import androidx.navigation3.runtime.NavKey
 import androidx.navigation3.runtime.entryProvider
 import androidx.navigation3.ui.NavDisplay
@@ -33,12 +34,14 @@ import com.example.walklogger.feature.walkdetail.navigation.walkDetailScreen
 
 /**
  * App-level graph. Features contribute their destinations via extension functions.
+ * [snackbarHeight] is how much the snackbar showing right now covers, so floating actions can move above it.
  * [onShowMessage] is for messages that outlive the screen that caused them, such as a missing record closing it.
  */
 @Composable
 fun WalkLoggerNavHost(
     navigationState: WalkLoggerNavigationState,
     snackbarHostState: SnackbarHostState,
+    snackbarHeight: () -> Dp,
     onShowMessage: (Int) -> Unit,
     modifier: Modifier = Modifier,
 ) {
@@ -50,6 +53,7 @@ fun WalkLoggerNavHost(
             onGoToDogs = { navigationState.selectTab(TopLevelDestination.DOG) },
             onOpenSettings = { navigationState.currentStack.navigateToSettings() },
             snackbarHostState = snackbarHostState,
+            snackbarHeight = snackbarHeight,
         )
         settingsScreen(onBack = navigationState::goBack)
         calendarScreen(

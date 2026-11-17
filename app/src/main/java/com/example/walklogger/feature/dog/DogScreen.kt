@@ -141,7 +141,7 @@ private fun ProfileContent(
             Text(
                 text = subtitle,
                 style = MaterialTheme.typography.bodyMedium,
-                color = AppTheme.colors.onHeaderMuted,
+                color = AppTheme.colors.contentMuted,
             )
         }
     }

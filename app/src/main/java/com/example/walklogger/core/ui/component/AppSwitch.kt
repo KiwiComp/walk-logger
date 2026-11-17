@@ -54,7 +54,7 @@ private fun AppSwitchStyle.colors(): SwitchColors = when (this) {
         checkedBorderColor = AppTheme.colors.action,
         uncheckedThumbColor = AppTheme.colors.onHeaderMuted,
         uncheckedTrackColor = AppTheme.colors.headerRaised,
-        uncheckedBorderColor = AppTheme.colors.outlineOnHeader,
+        uncheckedBorderColor = AppTheme.colors.outlineStrong,
     )
 }
 

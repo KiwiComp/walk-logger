@@ -94,18 +94,11 @@ class WeekStripTest {
     fun showsEveryDayOfTheWeek() {
         setStrip(week())
 
-        (0L until 7L).map { monday.plusDays(it) }.filterNot { it == today }.forEach { date ->
-            day(date).assertIsNotSelected()
+        (0L until 7L).map { monday.plusDays(it) }.forEach { date ->
+            if (date != today) day(date).assertIsNotSelected()
             composeRule.onNode(hasText(date.dayOfMonth.toString())).assertExists()
         }
         todayNode().assertIsSelected()
-    }
-
-    @Test
-    fun todayShowsNoLabelOrNumber() {
-        setStrip(week())
-
-        composeRule.onNode(hasText(today.dayOfMonth.toString())).assertDoesNotExist()
     }
 
     @Test
@@ -162,6 +155,6 @@ class WeekStripTest {
         composeRule.onNodeWithContentDescription(
             "måndag 7 september",
         ).assert(hasStateDescription("Inga promenader"))
-        composeRule.onNode(hasText("MÅN")).assertExists()
+        composeRule.onNode(hasText("Mån")).assertExists()
     }
 }

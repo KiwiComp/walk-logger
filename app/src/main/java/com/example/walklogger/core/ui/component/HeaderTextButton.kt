@@ -1,6 +1,5 @@
 package com.example.walklogger.core.ui.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.border
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.padding
@@ -31,11 +30,11 @@ fun HeaderTextButton(
     val shape = MaterialTheme.shapes.extraSmall
     SectionLabel(
         text = text,
-        color = AppTheme.colors.onHeader,
+        color = AppTheme.colors.content,
         modifier = modifier
             .alpha(if (visible) 1f else 0f)
             .clip(shape)
-            .border(1.dp, AppTheme.colors.outlineOnHeader, shape)
+            .border(1.dp, AppTheme.colors.outlineStrong, shape)
             .clickable(enabled = visible, role = Role.Button, onClick = onClick)
             .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
     )
@@ -45,7 +44,6 @@ fun HeaderTextButton(
 @Composable
 private fun HeaderTextButtonPreview() {
     WalkLoggerTheme {
-        HeaderTextButton(text = "Today", onClick = {
-        }, modifier = Modifier.background(AppTheme.colors.header))
+        HeaderTextButton(text = "Today", onClick = {})
     }
 }

@@ -30,7 +30,7 @@ internal fun RatingLegend(modifier: Modifier = Modifier) {
         Text(
             text = stringResource(R.string.calendar_legend_rating),
             style = MaterialTheme.typography.bodySmall,
-            color = AppTheme.colors.onHeaderMuted,
+            color = AppTheme.colors.contentMuted,
         )
         Spacer(Modifier.width(AppSpacing.sm))
         Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
@@ -42,7 +42,7 @@ internal fun RatingLegend(modifier: Modifier = Modifier) {
         Text(
             text = stringResource(R.string.calendar_legend_range),
             style = MaterialTheme.typography.bodySmall,
-            color = AppTheme.colors.onHeaderMuted,
+            color = AppTheme.colors.contentMuted,
         )
     }
 }
@@ -51,6 +51,6 @@ internal fun RatingLegend(modifier: Modifier = Modifier) {
 @Composable
 private fun RatingLegendPreview() {
     WalkLoggerTheme {
-        RatingLegend(modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg))
+        RatingLegend(modifier = Modifier.padding(AppSpacing.lg))
     }
 }

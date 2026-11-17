@@ -2,17 +2,15 @@ package com.example.walklogger.core.ui.component
 
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
-import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.fillMaxWidth
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
-import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
@@ -21,18 +19,22 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
-/** Day title with a muted summary hanging off its baseline. */
+/** Day title with a muted summary at the end, sharing its baseline. */
 @Composable
 fun DayHeading(title: String, summary: String?, modifier: Modifier = Modifier) {
-    Row(modifier = modifier, verticalAlignment = Alignment.Bottom) {
-        Text(text = title, style = MaterialTheme.typography.headlineMedium)
+    Row(modifier = modifier.fillMaxWidth()) {
+        Text(
+            text = title,
+            style = MaterialTheme.typography.headlineMedium,
+            modifier = Modifier.alignByBaseline(),
+        )
         if (summary != null) {
-            Spacer(Modifier.width(AppSpacing.md))
+            Spacer(Modifier.weight(1f).widthIn(min = AppSpacing.md))
             Text(
                 text = summary,
-                style = MaterialTheme.typography.bodySmall,
+                style = MaterialTheme.typography.bodyMedium,
                 color = AppTheme.colors.contentMuted,
-                modifier = Modifier.padding(bottom = 3.dp),
+                modifier = Modifier.alignByBaseline(),
             )
         }
     }

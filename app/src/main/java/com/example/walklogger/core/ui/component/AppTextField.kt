@@ -71,7 +71,7 @@ fun AppTextField(
             text = AppTheme.colors.onHeader,
             muted = AppTheme.colors.onHeaderMuted,
             container = AppTheme.colors.headerRaised,
-            outline = AppTheme.colors.outlineOnHeader,
+            outline = AppTheme.colors.outlineStrong,
             focusedOutline = AppTheme.colors.onHeader,
         )
     }

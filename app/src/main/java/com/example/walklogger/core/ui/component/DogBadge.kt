@@ -2,6 +2,7 @@ package com.example.walklogger.core.ui.component
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -17,10 +18,10 @@ fun DogBadge(name: String?, modifier: Modifier = Modifier, isDeleted: Boolean = 
     if (name == null) return
     Text(
         text = if (isDeleted) stringResource(R.string.dog_name_deleted, name) else name,
-        style = MaterialTheme.typography.bodyMedium,
-        color = AppTheme.colors.onHeader,
+        style = MaterialTheme.typography.titleSmall,
+        color = AppTheme.colors.onActionLight,
         modifier = modifier
-            .background(AppTheme.colors.headerRaised)
-            .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
+            .background(AppTheme.colors.actionLight, CircleShape)
+            .padding(horizontal = AppSpacing.lg, vertical = AppSpacing.md),
     )
 }

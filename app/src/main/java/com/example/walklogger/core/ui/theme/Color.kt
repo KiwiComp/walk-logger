@@ -3,77 +3,121 @@ package com.example.walklogger.core.ui.theme
 import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
-// Palette taken from the design mockups. Private so screens go through the semantic roles in
-// [AppColors]; a dark theme or new palette then only changes this file.
-private val Navy = Color(0xFF1F2D3D)
-private val NavyLight = Color(0xFF34435A)
-private val Steel = Color(0xFF5E7A9C)
-private val SteelLight = Color(0xFF8FA7C2)
+// Palette from the 2026-11 redesign (warm neutrals + forest green). Private so screens go through
+// the semantic roles in [AppColors]; a dark theme or new palette then only changes this file.
+private val Ink = Color(0xFF17212B) // primary text, dark hero card, selected day
+private val InkRaised = Color(0xFF26323F) // tile on the dark hero card
+private val InkSecondary = Color(0xFF3E4752) // body text, sub-labels
+private val InkMuted = Color(0xFF5B6470) // captions, meta text (passes 4.5:1 on Canvas)
+private val InkPlaceholder = Color(0xFF6B7480) // placeholders, "(No description)", future days
+private val OnInk = Color(0xFFFFFFFF)
+private val OnInkMuted = Color(0xFFB9C2CC)
 
-private val Canvas = Color(0xFFF2F2F0)
-private val CardSurface = Color(0xFFF8F8F6)
-private val ChipSurface = Color(0xFFE8EAED)
-private val Outline = Color(0xFFD5D8DC)
-private val OutlineOnNavy = Color(0x66FFFFFF)
+private val Canvas = Color(0xFFF4F3EF) // screen background
+private val Surface = Color(0xFFFFFFFF) // cards, inputs, bottom bars
+private val SurfaceSubtle = Color(0xFFF9F8F5) // walk cards inside a white sheet, text areas
+private val Track = Color(0xFFECEAE4) // segmented-control track, "Edit" pill
+private val Outline = Color(0xFFE6E3DC) // card borders, dividers
+private val OutlineStrong = Color(0xFFD6D3CA) // input / chip / button borders
+private val Rail = Color(0xFFE2DFD8) // timeline line, empty slider track
+private val Dashed = Color(0xFFA9A59B) // dashed "Other…" chips, chevrons
 
-private val Ink = Color(0xFF1F2D3D)
-private val InkMuted = Color(0xFF7A8189)
-private val OnNavy = Color(0xFFFFFFFF)
-private val OnNavyMuted = Color(0xFFB9C2CE)
+private val Green = Color(0xFF2E6A4F) // primary action, selected chip, today ring
+private val GreenSoft = Color(0xFFE3EEE8) // selected-but-soft backgrounds, active nav pill
+private val GreenOnSoft = Color(0xFF1F4D38) // text/icons on GreenSoft
+private val GreenFocus = Color(0xFFCFE3D8) // input focus ring
 
-private val Accent = Color(0xFFD9A441)
+private val WarnSoft = Color(0xFFFBEBD3) // selected health concern
+private val WarnOnSoft = Color(0xFF6B3F06)
+private val WarnOutline = Color(0xFFD9963A)
+private val Danger = Color(0xFFB3261E) // "Delete walk" / "Delete dog"
+
+private val DisabledSurface = Color(0xFFEEECE7)
+private val DisabledContent = Color(0xFF9A9EA4)
 
 /** Colour roles the UI reads through [AppTheme.colors]; never reference palette hues directly. */
 @Immutable
 class AppColors(
     val background: Color,
     val card: Color,
+    val cardSubtle: Color,
     val chip: Color,
     val outline: Color,
+    val outlineStrong: Color,
+    val rail: Color,
+    val dashed: Color,
     val content: Color,
+    val contentSecondary: Color,
     val contentMuted: Color,
+    val placeholder: Color,
     val action: Color,
+    val onAction: Color,
     val actionLight: Color,
+    val onActionLight: Color,
+    val focusRing: Color,
+    /** Dark hero card on "Logged walk" (was the navy top bar). */
     val header: Color,
     val headerRaised: Color,
     val onHeader: Color,
     val onHeaderMuted: Color,
-    val outlineOnHeader: Color,
-    /** The one warm colour, reserved for marking a selection on top of the blues (calendar day). */
+    /** Selected day in week strip and calendar. Today is marked with [action] as a ring. */
     val selection: Color,
-    /** One shade per rating 1..7, lightest first. Index with `rating - 1`. */
+    val onSelection: Color,
+    val warningLight: Color,
+    val onWarningLight: Color,
+    val warningOutline: Color,
+    val danger: Color,
+    val disabled: Color,
+    val onDisabled: Color,
+    /** One colour per rating 1..7, red (worst) to green (best). Index with `rating - 1`. */
     val ratingTints: List<Color>,
+    /** Eyes and mouth on the rating faces. */
+    val ratingFaceInk: Color,
 )
 
 internal val LightAppColors = AppColors(
     background = Canvas,
-    card = CardSurface,
-    chip = ChipSurface,
+    card = Surface,
+    cardSubtle = SurfaceSubtle,
+    chip = Track,
     outline = Outline,
+    outlineStrong = OutlineStrong,
+    rail = Rail,
+    dashed = Dashed,
     content = Ink,
+    contentSecondary = InkSecondary,
     contentMuted = InkMuted,
-    action = Steel,
-    actionLight = SteelLight,
-    header = Navy,
-    headerRaised = NavyLight,
-    onHeader = OnNavy,
-    onHeaderMuted = OnNavyMuted,
-    outlineOnHeader = OutlineOnNavy,
-    selection = Accent,
-    // The top four are the palette blues.
+    placeholder = InkPlaceholder,
+    action = Green,
+    onAction = OnInk,
+    actionLight = GreenSoft,
+    onActionLight = GreenOnSoft,
+    focusRing = GreenFocus,
+    header = Ink,
+    headerRaised = InkRaised,
+    onHeader = OnInk,
+    onHeaderMuted = OnInkMuted,
+    selection = Ink,
+    onSelection = OnInk,
+    warningLight = WarnSoft,
+    onWarningLight = WarnOnSoft,
+    warningOutline = WarnOutline,
+    danger = Danger,
+    disabled = DisabledSurface,
+    onDisabled = DisabledContent,
     ratingTints = listOf(
-        Color(0xFFDCE4EE),
-        Color(0xFFC4D2E2),
-        Color(0xFFA9BDD3),
-        SteelLight,
-        Steel,
-        NavyLight,
-        Navy,
+        Color(0xFFE0533D), // 1 very angry
+        Color(0xFFEC7F3F), // 2 angry
+        Color(0xFFF2A93E), // 3 sad
+        Color(0xFFF0CB45), // 4 neutral
+        Color(0xFFC5D352), // 5 slight smile
+        Color(0xFF8CC85A), // 6 happy
+        Color(0xFF4CAF68), // 7 very happy
     ),
+    ratingFaceInk = Color(0xFF3B2A12),
 )
 
-// Stool swatches: the closest everyday match to what a handler sees, not part of the UI palette,
-// so they stay the same in every theme.
+// Stool swatches: unchanged. The redesign uses the same hues.
 // The streaked and specked swatches are drawables (res/drawable/stool_swatch_*) over StoolMediumBrown.
 val StoolLightBrown = Color(0xFFC8A27A)
 val StoolMediumBrown = Color(0xFF8B5A2B)
