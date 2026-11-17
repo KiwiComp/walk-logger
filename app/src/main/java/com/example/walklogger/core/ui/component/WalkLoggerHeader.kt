@@ -18,15 +18,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
-import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /**
- * The dark header every tab shares. [navigationIcon], [title] (with an optional muted [subtitle]
- * beneath it) and [actions] sit on the first row; [content] is an optional slot below it for
+ * The header every tab shares. [navigationIcon], [title] and [actions] sit on the first row,
+ * an optional [subtitle] below it; [content] is an optional slot below it for
  * tab-specific chrome such as the week strip.
  */
 @Composable
@@ -38,14 +37,14 @@ fun WalkLoggerHeader(
     actions: @Composable RowScope.() -> Unit = {},
     content: @Composable ColumnScope.() -> Unit = {},
 ) {
-    CompositionLocalProvider(LocalContentColor provides AppTheme.colors.onHeader) {
+    CompositionLocalProvider(LocalContentColor provides AppTheme.colors.content) {
         Column(
             modifier = modifier
                 .fillMaxWidth()
-                .background(AppTheme.colors.header)
+                .background(AppTheme.colors.background)
                 .statusBarsPadding()
                 .padding(horizontal = AppSpacing.xl)
-                .padding(top = AppSpacing.md, bottom = AppSpacing.xl),
+                .padding(top = AppSpacing.lg, bottom = AppSpacing.lg),
         ) {
             Row(
                 modifier = Modifier.fillMaxWidth(),
@@ -53,17 +52,20 @@ fun WalkLoggerHeader(
                 horizontalArrangement = Arrangement.spacedBy(AppSpacing.lg),
             ) {
                 navigationIcon?.invoke()
-                Column(modifier = Modifier.weight(1f)) {
-                    Text(text = title, style = MaterialTheme.typography.headlineLarge)
-                    if (subtitle != null) {
-                        Text(
-                            text = subtitle,
-                            style = MaterialTheme.typography.bodySmall,
-                            color = AppTheme.colors.onHeaderMuted,
-                        )
-                    }
-                }
+                Text(
+                    text = title,
+                    style = MaterialTheme.typography.headlineLarge,
+                    modifier = Modifier.weight(1f),
+                )
                 actions()
+            }
+            if (subtitle != null) {
+                Text(
+                    text = subtitle,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = AppTheme.colors.contentSecondary,
+                    modifier = Modifier.padding(top = AppSpacing.md),
+                )
             }
             content()
         }

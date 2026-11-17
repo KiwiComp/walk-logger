@@ -101,6 +101,7 @@ internal object LogWalkPreviewData {
         ),
         dogName = "Sixten",
         handlers = listOf("Kim", "Jesper", "Camila", "Micke", "Malin"),
+        selectedHandlers = setOf("Kim"),
         form = WalkFormState(
             rating = 6,
             stool = Stool(

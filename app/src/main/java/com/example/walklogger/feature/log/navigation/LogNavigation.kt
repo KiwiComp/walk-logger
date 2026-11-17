@@ -1,6 +1,7 @@
 package com.example.walklogger.feature.log.navigation
 
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.unit.Dp
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.example.walklogger.feature.log.LogRoute
@@ -17,6 +18,7 @@ fun EntryProviderScope<NavKey>.logScreen(
     onGoToDogs: () -> Unit,
     onOpenSettings: () -> Unit,
     snackbarHostState: SnackbarHostState,
+    snackbarHeight: () -> Dp,
 ) {
     entry<LogDestination> {
         LogRoute(
@@ -26,6 +28,7 @@ fun EntryProviderScope<NavKey>.logScreen(
             onGoToDogs = onGoToDogs,
             onOpenSettings = onOpenSettings,
             snackbarHostState = snackbarHostState,
+            snackbarHeight = snackbarHeight,
         )
     }
 }

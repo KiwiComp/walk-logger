@@ -4,6 +4,7 @@ import app.cash.turbine.test
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.ui.component.TimelineWalk
 import com.example.walklogger.domain.ObserveWalkHistoryUseCase
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
@@ -78,7 +79,7 @@ class CalendarViewModelTest {
                 state.days.filter { it.isEnabled }.map { it.date },
             )
             assertEquals(0, state.monthWalkCount)
-            assertEquals(emptyList<CalendarWalkUiState>(), state.walks)
+            assertEquals(emptyList<TimelineWalk>(), state.walks)
             assertTrue(state.isCurrentMonth)
             assertFalse(state.canShowNextMonth)
             assertTrue(state.canStartLiveWalk)
@@ -129,7 +130,6 @@ class CalendarViewModelTest {
             val state = expectMostRecentItem()
             assertEquals(listOf(2L, 1L), state.walks.map { it.id })
             assertEquals(LocalTime.of(7, 5), state.walks[0].startTime)
-            assertEquals(5.0, state.averageRating!!, 0.0)
         }
     }
 
@@ -139,7 +139,7 @@ class CalendarViewModelTest {
         val friday = today.minusDays(1)
         repository.addWalks(walk(id = 1, start = friday.atTime(9, 0)))
         viewModel.uiState.test {
-            assertEquals(emptyList<CalendarWalkUiState>(), awaitItem().walks)
+            assertEquals(emptyList<TimelineWalk>(), awaitItem().walks)
             viewModel.selectDay(friday)
             val state = expectMostRecentItem()
             assertEquals(friday, state.selectedDate)
@@ -222,7 +222,7 @@ class CalendarViewModelTest {
         repository.addWalks(walk(id = 1, start = today.atTime(8, 0)))
         viewModel.uiState.test {
             val state = expectMostRecentItem()
-            assertEquals(emptyList<CalendarWalkUiState>(), state.walks)
+            assertEquals(emptyList<TimelineWalk>(), state.walks)
             assertEquals(0, state.monthWalkCount)
         }
     }

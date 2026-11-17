@@ -23,20 +23,22 @@ import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 
 private const val NOTES_MIN_LINES = 3
 
-/** The sections the after-walk and past-walk forms share, from equipment to notes. */
+/** The sections the after-walk and past-walk forms share, from rating to notes; each screen places the weather itself. */
 @Composable
 internal fun WalkFormContent(
     form: WalkFormState,
     actions: WalkFormActions,
-    onAllowLocation: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     var showAddIssue by rememberSaveable { mutableStateOf(false) }
     var showAddConcern by rememberSaveable { mutableStateOf(false) }
     Column(
         modifier = modifier,
-        verticalArrangement = Arrangement.spacedBy(AppSpacing.xl),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
     ) {
+        FormSection(label = stringResource(R.string.walk_form_rating)) {
+            RatingScale(rating = form.rating, onRatingChange = actions::setRating)
+        }
         FormSection(label = stringResource(R.string.new_walk_equipment)) {
             SegmentedToggle(
                 options = Equipment.entries,
@@ -45,17 +47,6 @@ internal fun WalkFormContent(
                 label = { stringResource(it.labelRes) },
             )
         }
-        FormSection(
-            label = stringResource(R.string.log_past_walk_rating),
-            hint = stringResource(R.string.log_past_walk_rating_scale),
-        ) {
-            RatingScale(rating = form.rating, onRatingChange = actions::setRating)
-        }
-        WeatherSection(
-            weather = form.weather,
-            actions = actions,
-            onAllowLocation = onAllowLocation,
-        )
         StoolSection(
             stool = form.stool,
             onPassedSelect = actions::selectStoolPassed,
@@ -129,7 +120,6 @@ private fun WalkFormContentPreview() {
         WalkFormContent(
             form = LogWalkPreviewData.finishWalk.form,
             actions = LogWalkPreviewData.formActions,
-            onAllowLocation = {},
             modifier = Modifier.padding(AppSpacing.xl),
         )
     }

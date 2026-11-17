@@ -9,7 +9,9 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowLeft
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
@@ -17,9 +19,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -32,6 +35,7 @@ import com.example.walklogger.core.ui.component.SegmentedToggle
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.message.UserMessageEffect
 import com.example.walklogger.core.ui.theme.AppSpacing
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
 import com.example.walklogger.feature.logwalk.component.FormSection
@@ -105,9 +109,11 @@ fun NewWalkScreen(
         Column(
             modifier = Modifier
                 .fillMaxWidth()
+                .weight(1f)
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
-            verticalArrangement = Arrangement.spacedBy(AppSpacing.xl),
+                .padding(horizontal = AppSpacing.lg)
+                .padding(top = AppSpacing.md, bottom = AppSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
         ) {
             FormSection(label = stringResource(R.string.new_walk_who_is_walking)) {
                 SelectableChip(
@@ -127,11 +133,31 @@ fun NewWalkScreen(
                     label = { stringResource(it.labelRes) },
                 )
             }
-            AfterWalkNote()
+        }
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .padding(horizontal = AppSpacing.lg)
+                .padding(bottom = AppSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
+            horizontalAlignment = Alignment.CenterHorizontally,
+        ) {
             StartWalkButton(
-                summary = uiState.summary(),
+                subtitle = stringResource(
+                    if (uiState.canStart) {
+                        R.string.new_walk_timer_starts
+                    } else {
+                        R.string.new_walk_choose_handler
+                    },
+                ),
                 enabled = uiState.canStart,
                 onClick = onStartWalk,
+            )
+            Text(
+                text = stringResource(R.string.new_walk_after_note),
+                style = MaterialTheme.typography.bodyMedium,
+                color = AppTheme.colors.contentMuted,
+                textAlign = TextAlign.Center,
             )
             LogPastWalkButton(onClick = onLogPastWalk)
         }
@@ -145,16 +171,6 @@ fun NewWalkScreen(
             onDismiss = { showAddHandler = false },
         )
     }
-}
-
-/** Selected handlers and equipment, or why the walk can't start yet. */
-@Composable
-private fun NewWalkUiState.summary(): String {
-    if (selectedHandlers.isEmpty()) return stringResource(R.string.new_walk_choose_handler)
-    val locale = LocalConfiguration.current.locales[0]
-    val equipmentLabel = stringResource(equipment.labelRes).lowercase(locale)
-    val handlers = handlers.filter { it in selectedHandlers }
-    return stringResource(R.string.new_walk_summary, handlers.joinToString(), equipmentLabel)
 }
 
 @Preview(showBackground = true, heightDp = 900)

@@ -2,21 +2,23 @@ package com.example.walklogger.feature.logwalk.activewalk
 
 import androidx.activity.compose.BackHandler
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.navigationBarsPadding
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.statusBarsPadding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
-import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Close
+import androidx.compose.material3.HorizontalDivider
+import androidx.compose.material3.LocalContentColor
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
@@ -29,8 +31,9 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
@@ -40,16 +43,15 @@ import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.ui.component.AppButton
-import com.example.walklogger.core.ui.component.AppButtonStyle
 import com.example.walklogger.core.ui.component.AppConfirmDialog
 import com.example.walklogger.core.ui.component.AppTextField
-import com.example.walklogger.core.ui.component.AppTextFieldStyle
-import com.example.walklogger.core.ui.component.HeaderIconButton
-import com.example.walklogger.core.ui.component.SectionLabel
+import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.message.UserMessageEffect
+import com.example.walklogger.core.ui.theme.AppRadius
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
+import com.example.walklogger.feature.logwalk.component.FormSection
 import com.example.walklogger.feature.logwalk.component.labelRes
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 import java.time.Duration
@@ -57,6 +59,8 @@ import java.time.format.DateTimeFormatter
 
 private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 private const val NOTE_MIN_LINES = 2
+private val LiveDotSize = 8.dp
+private val StopIconSize = 12.dp
 
 /** The ways off this screen are ending or discarding the walk; system back asks to discard. */
 @Suppress("ktlint:compose:parameter-naming")
@@ -118,66 +122,27 @@ fun ActiveWalkScreen(
 ) {
     var showDiscardConfirm by rememberSaveable { mutableStateOf(false) }
     BackHandler { showDiscardConfirm = uiState.canDiscard }
-    Column(
-        modifier = modifier
-            .fillMaxSize()
-            .background(AppTheme.colors.header)
-            .statusBarsPadding()
-            .navigationBarsPadding()
-            .imePadding()
-            .padding(horizontal = AppSpacing.xxxl)
-            .padding(top = AppSpacing.xxl, bottom = AppSpacing.xxl),
-    ) {
+    Column(modifier = modifier.fillMaxSize().imePadding()) {
+        WalkLoggerHeader(title = stringResource(R.string.active_walk_title))
         Column(
             modifier = Modifier
+                .fillMaxWidth()
                 .weight(1f)
-                .verticalScroll(rememberScrollState()),
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = AppSpacing.lg)
+                .padding(top = AppSpacing.md, bottom = AppSpacing.lg),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
         ) {
-            Row(
-                modifier = Modifier.fillMaxWidth().padding(top = 2.dp),
-                horizontalArrangement = Arrangement.SpaceBetween,
-                verticalAlignment = Alignment.CenterVertically,
-            ) {
-                SectionLabel(
-                    text =
-                        uiState.dogName?.let { stringResource(R.string.active_walk_out_with, it) }
-                            ?: stringResource(R.string.active_walk_title),
-                    color = AppTheme.colors.onHeaderMuted,
-                )
-                HeaderIconButton(
-                    icon = Icons.Filled.Close,
-                    contentDescription = stringResource(R.string.active_walk_discard),
-                    onClick = { showDiscardConfirm = true },
-                    enabled = uiState.canDiscard,
+            TimerCard(uiState)
+            FormSection(label = stringResource(R.string.active_walk_quick_note)) {
+                AppTextField(
+                    value = uiState.note,
+                    onValueChange = onNoteChange,
+                    placeholder = stringResource(R.string.active_walk_quick_note_placeholder),
+                    singleLine = false,
+                    minLines = NOTE_MIN_LINES,
                 )
             }
-            Spacer(Modifier.height(AppSpacing.md))
-            Text(
-                text = uiState.elapsed.toClockText(),
-                style = MaterialTheme.typography.displayLarge,
-                color = AppTheme.colors.onHeader,
-            )
-            Spacer(Modifier.height(AppSpacing.sm))
-            Text(
-                text = uiState.startedSummary(),
-                style = MaterialTheme.typography.bodyLarge,
-                color = AppTheme.colors.onHeaderMuted,
-            )
-            Spacer(Modifier.height(AppSpacing.xxxl))
-            SectionLabel(
-                text = stringResource(R.string.active_walk_quick_note),
-                color = AppTheme.colors.onHeaderMuted,
-            )
-            Spacer(Modifier.height(AppSpacing.sm))
-            AppTextField(
-                value = uiState.note,
-                onValueChange = onNoteChange,
-                style = AppTextFieldStyle.Inverse,
-                placeholder = stringResource(R.string.active_walk_quick_note_placeholder),
-                singleLine = false,
-                minLines = NOTE_MIN_LINES,
-            )
-            Spacer(Modifier.height(AppSpacing.xxxl))
             ActiveStoolSection(
                 stool = uiState.stool,
                 expanded = uiState.isStoolExpanded,
@@ -189,14 +154,39 @@ fun ActiveWalkScreen(
                 onExpand = onStoolExpand,
             )
         }
-        Spacer(Modifier.height(AppSpacing.xl))
-        AppButton(
-            text = stringResource(R.string.active_walk_end),
-            onClick = onEndWalk,
-            style = AppButtonStyle.Secondary,
-            enabled = uiState.canEnd || uiState.isEnding,
-            loading = uiState.isEnding,
-        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .background(AppTheme.colors.card)
+                .navigationBarsPadding(),
+        ) {
+            HorizontalDivider(color = AppTheme.colors.outline)
+            Column(
+                modifier = Modifier.padding(AppSpacing.lg),
+                verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+                horizontalAlignment = Alignment.CenterHorizontally,
+            ) {
+                AppButton(
+                    text = stringResource(R.string.active_walk_end),
+                    onClick = onEndWalk,
+                    enabled = uiState.canEnd || uiState.isEnding,
+                    loading = uiState.isEnding,
+                    leadingIcon = {
+                        Box(
+                            Modifier
+                                .size(StopIconSize)
+                                .background(
+                                    LocalContentColor.current,
+                                    RoundedCornerShape(AppRadius.xs),
+                                ),
+                        )
+                    },
+                )
+                if (uiState.canDiscard) {
+                    DiscardButton(onClick = { showDiscardConfirm = true })
+                }
+            }
+        }
     }
     if (showDiscardConfirm) {
         AppConfirmDialog(
@@ -212,15 +202,63 @@ fun ActiveWalkScreen(
     }
 }
 
-/** "Started 07:05 · Anna · harness", or nothing until the walk has loaded. */
+/** Dark card with who is out, the running time and how the walk started. */
+@Composable
+private fun TimerCard(uiState: ActiveWalkUiState) {
+    val colors = AppTheme.colors
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .background(colors.header, RoundedCornerShape(AppRadius.xl))
+            .padding(AppSpacing.xl),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+    ) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+        ) {
+            Box(Modifier.size(LiveDotSize).background(colors.actionLight, CircleShape))
+            Text(
+                text = uiState.dogName?.let { stringResource(R.string.active_walk_out_with, it) }
+                    ?: stringResource(R.string.active_walk_title),
+                style = MaterialTheme.typography.titleSmall,
+                color = colors.onHeaderMuted,
+            )
+        }
+        Text(
+            text = uiState.elapsed.toClockText(),
+            style = MaterialTheme.typography.displayLarge,
+            color = colors.onHeader,
+        )
+        Text(
+            text = uiState.startedSummary(),
+            style = MaterialTheme.typography.bodyMedium,
+            color = colors.onHeaderMuted,
+        )
+    }
+}
+
+@Composable
+private fun DiscardButton(onClick: () -> Unit) {
+    Text(
+        text = stringResource(R.string.active_walk_discard),
+        style = MaterialTheme.typography.titleSmall,
+        color = AppTheme.colors.danger,
+        modifier = Modifier
+            .clip(CircleShape)
+            .clickable(role = Role.Button, onClick = onClick)
+            .padding(horizontal = AppSpacing.lg, vertical = AppSpacing.sm),
+    )
+}
+
+/** "Started 07:05 · Anna · Harness", or nothing until the walk has loaded. */
 @Composable
 private fun ActiveWalkUiState.startedSummary(): String {
     val start = startTime ?: return ""
-    val locale = LocalConfiguration.current.locales[0]
     val parts = buildList {
         add(stringResource(R.string.active_walk_started_at, start.format(TimeFormatter)))
         addAll(handlers)
-        equipment?.let { add(stringResource(it.labelRes).lowercase(locale)) }
+        equipment?.let { add(stringResource(it.labelRes)) }
     }
     return parts.joinToString(" · ")
 }

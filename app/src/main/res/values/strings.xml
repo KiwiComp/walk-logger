@@ -10,29 +10,27 @@
     <string name="patterns_title">Patterns</string>
     <string name="settings_title">Settings</string>
     <string name="settings_location">Location</string>
-    <string name="settings_location_allowed">Location is allowed</string>
-    <string name="settings_location_not_allowed">Location is not allowed</string>
+    <string name="settings_location_allowed">Allowed</string>
+    <string name="settings_location_not_allowed">Not allowed</string>
     <string name="settings_location_description">Used to fetch the weather for your walks. Without it, the weather is fetched for the place you choose.</string>
     <string name="settings_location_allow">Allow location</string>
 
+    <string name="calendar_title">Calendar</string>
     <string name="calendar_previous_month">Previous month</string>
     <string name="calendar_next_month">Next month</string>
     <string name="calendar_today">Today</string>
-    <string name="calendar_legend_rating">rating</string>
-    <string name="calendar_legend_range">1 → 7</string>
     <string name="calendar_no_description">(No description)</string>
     <string name="patterns_coming_soon">Patterns coming soon</string>
-    <string name="dog_title">Your dog</string>
+    <string name="dog_title">Dogs</string>
     <string name="dog_none_registered">No dog registered yet. Add one to start logging walks.</string>
-    <string name="dog_add_first">+ Add your dog</string>
-    <string name="dog_add_another">+ Add another dog</string>
-    <string name="dog_section_dogs">Dogs</string>
+    <string name="dog_section_dogs">Your dogs</string>
     <string name="dog_section_deleted">Deleted dogs</string>
     <string name="dog_name_deleted">%1$s (deleted)</string>
     <string name="dog_active">Active</string>
     <string name="dog_switch">Switch</string>
     <string name="dog_switch_to">Switch to %1$s</string>
-    <string name="dog_edit">Edit</string>
+    <string name="dog_add">Add dog</string>
+    <string name="dog_no_details">No details yet</string>
     <plurals name="dog_age_years">
         <item quantity="one">%1$d year</item>
         <item quantity="other">%1$d years</item>
@@ -47,10 +45,17 @@
     <string name="register_dog_weight">Weight</string>
     <string name="register_dog_weight_unit">kg</string>
     <string name="register_dog_weight_error">Enter a number</string>
-    <string name="register_dog_save">Save dog</string>
+    <string name="register_dog_save">Add dog</string>
+    <string name="register_dog_name_placeholder">What is your dog called?</string>
+    <string name="register_dog_breed_placeholder">e.g. Labrador</string>
+    <string name="register_dog_optional">Optional</string>
+    <string name="register_dog_weight_placeholder">0.0</string>
+    <string name="register_dog_optional_hint">Breed, birth date and weight are optional.</string>
+    <string name="register_dog_needs_name">Enter a name to add the dog</string>
+    <string name="edit_dog_save">Save changes</string>
 
     <string name="edit_dog_title">Edit dog</string>
-    <string name="edit_dog_delete">Delete</string>
+    <string name="edit_dog_delete">Delete dog</string>
     <string name="edit_dog_delete_confirm_title">Delete this dog?</string>
     <string name="edit_dog_delete_confirm_message">The dog can no longer log walks. Its history stays under Deleted dogs on the Dogs tab. This can\'t be undone.</string>
     <string name="edit_dog_delete_confirm">Delete</string>
@@ -62,13 +67,15 @@
     <string name="summary_average">· avg %1$.1f</string>
     <string name="summary_duration">· %1$s</string>
     <string name="summary_duration_hours_minutes">%1$d h %2$d min</string>
-    <string name="walk_duration_minutes">%1$d min</string>
     <string name="walk_stool_passed_emoji" translatable="false">💩</string>
     <string name="walk_stool_passed_description">Pooped</string>
+    <string name="walk_duration_minutes">%1$d min</string>
     <string name="log_no_dog_message">Register a dog on the Dogs tab before logging walks.</string>
     <string name="log_no_dog_action">Dogs</string>
     <string name="log_deleted_dog_message">Walks can\'t be logged for a deleted dog. Switch dog on the Dogs tab.</string>
-    <string name="add_walk_for_day">+ Add a walk for %1$s</string>
+    <string name="log_week_label">Week %1$d · %2$s</string>
+    <string name="add_walk">Add walk</string>
+    <string name="rating_face_description">Rating %1$d of 7</string>
 
     <string name="equipment_collar">Collar</string>
     <string name="equipment_harness">Harness</string>
@@ -82,24 +89,23 @@
     <string name="dialog_cancel">Cancel</string>
 
     <string name="new_walk_title">New walk</string>
-    <string name="new_walk_who_is_walking">Who is walking</string>
+    <string name="new_walk_who_is_walking">Who is walking?</string>
     <string name="new_walk_equipment">Equipment</string>
     <string name="new_walk_add_handler">+ Add</string>
-    <string name="new_walk_after_note">Rating, weather and notes come after the walk. Start time is set when you tap.</string>
-    <string name="new_walk_timer_starts_now">Timer starts now</string>
+    <string name="new_walk_after_note">You rate the walk and add notes when it ends.</string>
+    <string name="new_walk_timer_starts">Timer starts when you tap</string>
     <string name="new_walk_start">Start walk</string>
-    <string name="new_walk_summary">%1$s · %2$s</string>
     <string name="new_walk_choose_handler">Choose who is walking first.</string>
-    <string name="new_walk_already_happened">This walk already happened</string>
+    <string name="new_walk_already_happened">Log a past walk</string>
     <string name="new_walk_add_handler_title">Who else is walking?</string>
     <string name="new_walk_add_handler_name">Name</string>
 
     <string name="close">Close</string>
 
-    <string name="active_walk_title">Walking</string>
+    <string name="active_walk_title">Walk in progress</string>
     <string name="active_walk_out_with">Out with %1$s</string>
     <string name="active_walk_started_at">Started %1$s</string>
-    <string name="active_walk_quick_note">Quick note while you walk</string>
+    <string name="active_walk_quick_note">Quick note</string>
     <string name="active_walk_quick_note_placeholder">Barked at the bin lorry…</string>
     <string name="active_walk_end">End walk</string>
     <string name="active_walk_discard">Discard walk</string>
@@ -107,29 +113,38 @@
     <string name="active_walk_discard_confirm_message">The timer stops and nothing is logged, not even the note. This can\'t be undone.</string>
     <string name="active_walk_discard_confirm">Discard</string>
 
-    <string name="finish_walk_title">How was it?</string>
-    <string name="finish_walk_edit_times">Edit times</string>
-    <string name="finish_walk_times_summary">%1$s → %2$s · %3$s · logged automatically</string>
+    <string name="finish_walk_title">Log walk</string>
+    <string name="finish_walk_edit_times">Edit</string>
+    <string name="finish_walk_done_times">Done</string>
     <string name="finish_walk_walked_by">Walked by %1$s</string>
-    <string name="finish_walk_dog_walked_by">%1$s walked by %2$s</string>
+    <string name="finish_walk_auto_logged">Auto-logged</string>
+    <string name="finish_walk_change_handler">Change</string>
+    <string name="finish_walk_times">%1$s · %2$s – %3$s</string>
+    <string name="walk_form_rating">How was the walk?</string>
+    <string name="rating_rough">Rough</string>
+    <string name="rating_great">Great</string>
+    <string name="walk_form_mood_focus">Mood &amp; focus</string>
+    <string name="optional_ratings_rated">Optional · %1$d of %2$d rated</string>
+    <string name="optional_rating_not_rated">Not rated</string>
+    <string name="optional_rating_value">%1$d / %2$d</string>
+    <string name="optional_rating_clear">Clear %1$s</string>
+    <string name="optional_ratings_least">1 = least</string>
+    <string name="optional_ratings_most">7 = most</string>
 
     <string name="log_past_walk_title">Log a past walk</string>
     <string name="edit_walk_title">Edit walk</string>
     <string name="log_past_walk_when">When</string>
-    <string name="log_past_walk_date">Date</string>
     <string name="log_past_walk_start">Start</string>
     <string name="log_past_walk_end">End</string>
     <string name="log_past_walk_start_time">Start time</string>
     <string name="log_past_walk_end_time">End time</string>
+    <string name="when_change_date">Change</string>
+    <string name="when_time_unset" translatable="false">--:--</string>
     <plurals name="log_past_walk_duration_minutes">
         <item quantity="one">%1$d minute</item>
         <item quantity="other">%1$d minutes</item>
     </plurals>
     <string name="log_past_walk_handler">Handler</string>
-    <string name="log_past_walk_rating">Rating</string>
-    <string name="log_past_walk_rating_scale">1 worst · 7 best</string>
-    <string name="log_past_walk_optional_ratings">Optional ratings</string>
-    <string name="log_past_walk_optional_ratings_scale">1 least · 7 most</string>
     <string name="optional_rating_reactivity">Reactivity</string>
     <string name="optional_rating_energy_level">Energy level</string>
     <string name="optional_rating_responsiveness">Responsiveness</string>
@@ -208,7 +223,7 @@
     <string name="stool_edit">Edit</string>
     <string name="stool_no_details">No details</string>
     <string name="log_past_walk_behaviour">Behaviour</string>
-    <string name="behaviour_other_issue">+ Other issue</string>
+    <string name="behaviour_other_issue">Other…</string>
     <string name="behaviour_add_issue_title">What else happened?</string>
     <string name="behaviour_add_issue_name">Issue</string>
     <string name="issue_pulling">Pulling</string>
@@ -221,8 +236,8 @@
     <string name="issue_not_listening">Not listening</string>
     <string name="issue_not_recalling">Not recalling</string>
     <string name="issue_chasing">Chasing</string>
-    <string name="log_past_walk_medical">Medical</string>
-    <string name="medical_other_concern">+ Other concern</string>
+    <string name="log_past_walk_medical">Health concerns</string>
+    <string name="medical_other_concern">Other…</string>
     <string name="medical_add_concern_title">What else did you notice?</string>
     <string name="medical_add_concern_name">Concern</string>
     <string name="concern_diarrhoea">Diarrhoea</string>
@@ -234,7 +249,7 @@
     <string name="concern_irregular_gait">Irregular gait</string>
     <string name="concern_excessive_drooling">Excessive drooling</string>
     <string name="log_past_walk_notes">Notes</string>
-    <string name="log_past_walk_notes_placeholder">Other information you want to store.</string>
+    <string name="log_past_walk_notes_placeholder">Anything else worth remembering?</string>
     <string name="log_past_walk_save">Save walk</string>
     <string name="log_past_walk_needs_handler">Choose who walked before this walk can be saved.</string>
     <string name="log_past_walk_needs_times">Enter start and end times before this walk can be saved.</string>
@@ -242,21 +257,20 @@
     <string name="log_past_walk_needs_past_end">A past walk can\u2019t end in the future.</string>
     <string name="log_past_walk_needs_rating">A rating is needed before this walk can be saved.</string>
 
-    <string name="walk_detail_title">Logged walk</string>
+    <string name="walk_detail_title">Walk</string>
     <string name="walk_detail_edit">Edit</string>
     <string name="walk_detail_discard">Discard</string>
     <string name="walk_detail_discard_confirm_title">Discard this walk?</string>
     <string name="walk_detail_discard_confirm_message">The walk is removed from the log. This can\'t be undone.</string>
     <string name="walk_detail_discard_confirm">Discard</string>
-    <string name="walk_detail_length">Length</string>
-    <string name="walk_detail_dog">Dog</string>
+    <string name="walk_detail_walked_by">%1$s walked by %2$s</string>
+    <string name="walk_detail_delete">Delete walk</string>
+    <string name="walk_detail_not_rated">%1$s not rated</string>
+    <string name="list_and">%1$s and %2$s</string>
+    <string name="label_value">%1$s: %2$s</string>
     <string name="walk_detail_not_recorded">Not recorded</string>
     <string name="walk_detail_nothing_noted">Nothing noted</string>
     <string name="walk_detail_stool_none">No stool</string>
-    <plurals name="walk_detail_noted_count">
-        <item quantity="one">%1$d noted</item>
-        <item quantity="other">%1$d noted</item>
-    </plurals>
 
     <string name="error_save_walk">Couldn\'t save the walk</string>
     <string name="error_delete_walk">Couldn\'t delete the walk</string>

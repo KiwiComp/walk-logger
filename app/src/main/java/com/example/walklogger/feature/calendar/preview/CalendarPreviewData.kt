@@ -1,9 +1,9 @@
 package com.example.walklogger.feature.calendar.preview
 
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.ui.component.TimelineWalk
 import com.example.walklogger.feature.calendar.CalendarDayUiState
 import com.example.walklogger.feature.calendar.CalendarUiState
-import com.example.walklogger.feature.calendar.CalendarWalkUiState
 import java.time.LocalTime
 import java.time.YearMonth
 import kotlin.time.Duration.Companion.minutes
@@ -20,21 +20,23 @@ internal object CalendarPreviewData {
     )
 
     val walks = listOf(
-        CalendarWalkUiState(
+        TimelineWalk(
             id = 1,
             startTime = LocalTime.of(7, 5),
             equipment = Equipment.HARNESS,
             rating = 6,
             note = "Long morning loop, calm the whole way.",
             duration = 38.minutes,
+            hasPassedStool = true,
         ),
-        CalendarWalkUiState(
+        TimelineWalk(
             id = 2,
             startTime = LocalTime.of(11, 30),
             equipment = Equipment.COLLAR,
             rating = 4,
             note = "",
             duration = 17.minutes,
+            hasPassedStool = null,
         ),
     )
 
@@ -48,6 +50,7 @@ internal object CalendarPreviewData {
                 walkCount = walkCount,
                 rating = rating,
                 isSelected = dayOfMonth == today.dayOfMonth,
+                isToday = dayOfMonth == today.dayOfMonth,
                 isEnabled = dayOfMonth <= today.dayOfMonth,
             )
         },

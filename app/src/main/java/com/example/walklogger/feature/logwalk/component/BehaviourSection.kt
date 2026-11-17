@@ -45,6 +45,7 @@ internal fun BehaviourSection(
             addLabel = stringResource(R.string.behaviour_other_issue),
             onAdd = onAddIssue,
             size = SelectableChipSize.Compact,
+            showPlus = true,
         )
     }
 }

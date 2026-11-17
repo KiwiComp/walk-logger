@@ -4,6 +4,7 @@ import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.DatePicker
 import androidx.compose.material3.DatePickerDefaults
 import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.Icon
 import androidx.compose.material3.SelectableDates
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -16,6 +17,7 @@ import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
 import com.example.walklogger.R
@@ -50,38 +52,56 @@ fun AppDateField(
         label = label,
         onPress = { showPicker = true },
         placeholder = placeholder,
+        trailingIcon = {
+            Icon(painter = painterResource(R.drawable.ic_tab_calendar), contentDescription = null)
+        },
         modifier = modifier,
     )
     if (showPicker) {
-        val pickerState = rememberDatePickerState(
-            initialSelectedDateMillis = date?.atStartOfDay(
-                ZoneOffset.UTC,
-            )?.toInstant()?.toEpochMilli(),
-            selectableDates = remember(maxDate) {
-                maxDate?.let(::UpToDate)
-                    ?: DatePickerDefaults.AllDates
+        AppDatePickerDialog(
+            date = date,
+            maxDate = maxDate,
+            onConfirm = {
+                onDateChange(it)
+                showPicker = false
             },
+            onDismiss = { showPicker = false },
         )
-        DatePickerDialog(
-            onDismissRequest = { showPicker = false },
-            confirmButton = {
-                TextButton(
-                    onClick = {
-                        onDateChange(pickerState.selectedDateMillis?.toLocalDate())
-                        showPicker = false
-                    },
-                ) {
-                    Text(stringResource(R.string.dialog_ok))
-                }
-            },
-            dismissButton = {
-                TextButton(onClick = { showPicker = false }) {
-                    Text(stringResource(R.string.dialog_cancel))
-                }
-            },
-        ) {
-            DatePicker(state = pickerState)
-        }
+    }
+}
+
+/**
+ * Material date picker dialog in the app's wording; days after [maxDate] are disabled. [onConfirm] gets
+ * null when OK is pressed with no day selected.
+ */
+@Composable
+fun AppDatePickerDialog(
+    date: LocalDate?,
+    onConfirm: (LocalDate?) -> Unit,
+    onDismiss: () -> Unit,
+    maxDate: LocalDate? = null,
+) {
+    val pickerState = rememberDatePickerState(
+        initialSelectedDateMillis = date?.atStartOfDay(ZoneOffset.UTC)?.toInstant()?.toEpochMilli(),
+        selectableDates = remember(maxDate) {
+            maxDate?.let(::UpToDate)
+                ?: DatePickerDefaults.AllDates
+        },
+    )
+    DatePickerDialog(
+        onDismissRequest = onDismiss,
+        confirmButton = {
+            TextButton(onClick = { onConfirm(pickerState.selectedDateMillis?.toLocalDate()) }) {
+                Text(stringResource(R.string.dialog_ok))
+            }
+        },
+        dismissButton = {
+            TextButton(onClick = onDismiss) {
+                Text(stringResource(R.string.dialog_cancel))
+            }
+        },
+    ) {
+        DatePicker(state = pickerState)
     }
 }
 

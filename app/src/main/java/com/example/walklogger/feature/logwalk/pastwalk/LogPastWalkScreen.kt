@@ -45,6 +45,7 @@ import com.example.walklogger.feature.logwalk.component.AddHandlerDialog
 import com.example.walklogger.feature.logwalk.component.FormSection
 import com.example.walklogger.feature.logwalk.component.SelectableChip
 import com.example.walklogger.feature.logwalk.component.WalkFormContent
+import com.example.walklogger.feature.logwalk.component.WeatherSection
 import com.example.walklogger.feature.logwalk.component.WhenSection
 import com.example.walklogger.feature.logwalk.component.messageRes
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
@@ -141,8 +142,9 @@ fun LogPastWalkScreen(
                 .fillMaxWidth()
                 .imePadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
-            verticalArrangement = Arrangement.spacedBy(AppSpacing.xl),
+                .padding(horizontal = AppSpacing.lg)
+                .padding(bottom = AppSpacing.xxl),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
         ) {
             FormSection(label = stringResource(R.string.log_past_walk_when)) {
                 WhenSection(
@@ -166,12 +168,14 @@ fun LogPastWalkScreen(
                     onAdd = { showAddHandler = true },
                 )
             }
-            WalkFormContent(
-                form = uiState.form,
+            WeatherSection(
+                weather = uiState.form.weather,
                 actions = formActions,
                 onAllowLocation = onAllowLocation,
             )
+            WalkFormContent(form = uiState.form, actions = formActions)
             Column(
+                modifier = Modifier.padding(top = AppSpacing.md),
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {

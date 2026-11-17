@@ -1,11 +1,20 @@
 package com.example.walklogger.feature.logwalk.component
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.automirrored.filled.ArrowForward
 import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.TextButton
@@ -21,13 +30,19 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.saveable.rememberSaveable
 import androidx.compose.runtime.setValue
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
+import androidx.compose.ui.platform.LocalConfiguration
+import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.pluralStringResource
 import androidx.compose.ui.res.stringResource
+import androidx.compose.ui.semantics.Role
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
-import com.example.walklogger.core.ui.component.AppDateField
-import com.example.walklogger.core.ui.component.AppPickerField
+import com.example.walklogger.core.ui.component.AppDatePickerDialog
+import com.example.walklogger.core.ui.theme.AppRadius
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
@@ -35,12 +50,10 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.format.DateTimeFormatter
 
-private const val DATE_WEIGHT = 3f
-private const val TIME_WEIGHT = 2f
-private val DateFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("EEE d MMM")
 private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
+private val IconSize = 20.dp
 
-/** Date, start and end pickers side by side, with the resulting duration underneath. */
+/** The date with Change beside it, then start → end as two tappable tiles, and the duration underneath. */
 @Composable
 internal fun WhenSection(
     date: LocalDate,
@@ -53,29 +66,59 @@ internal fun WhenSection(
     onEndTimeChange: (LocalTime) -> Unit,
     modifier: Modifier = Modifier,
 ) {
-    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.sm)) {
-        Row(horizontalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
-            AppDateField(
-                date = date,
-                onDateChange = { if (it != null) onDateChange(it) },
-                label = stringResource(R.string.log_past_walk_date),
-                formatter = DateFormatter,
-                maxDate = maxDate,
-                modifier = Modifier.weight(DATE_WEIGHT),
+    val locale = LocalConfiguration.current.locales[0]
+    val dateFormatter = remember(locale) { DateTimeFormatter.ofPattern("EEE d MMM", locale) }
+    var showDatePicker by rememberSaveable { mutableStateOf(false) }
+    Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.sm),
+        ) {
+            Icon(
+                painter = painterResource(R.drawable.ic_tab_calendar),
+                contentDescription = null,
+                tint = AppTheme.colors.contentSecondary,
+                modifier = Modifier.size(IconSize),
             )
+            Text(
+                text = date.format(dateFormatter),
+                style = MaterialTheme.typography.titleSmall,
+                color = AppTheme.colors.content,
+                modifier = Modifier.weight(1f),
+            )
+            Text(
+                text = stringResource(R.string.when_change_date),
+                style = MaterialTheme.typography.titleSmall,
+                color = AppTheme.colors.action,
+                modifier = Modifier
+                    .clip(CircleShape)
+                    .clickable(role = Role.Button, onClick = { showDatePicker = true })
+                    .padding(horizontal = AppSpacing.sm, vertical = AppSpacing.xs),
+            )
+        }
+        Row(
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
+        ) {
             TimeField(
                 time = startTime,
                 label = stringResource(R.string.log_past_walk_start),
                 dialogTitle = stringResource(R.string.log_past_walk_start_time),
                 onTimeChange = onStartTimeChange,
-                modifier = Modifier.weight(TIME_WEIGHT),
+                modifier = Modifier.weight(1f),
+            )
+            Icon(
+                imageVector = Icons.AutoMirrored.Filled.ArrowForward,
+                contentDescription = null,
+                tint = AppTheme.colors.dashed,
+                modifier = Modifier.size(IconSize),
             )
             TimeField(
                 time = endTime,
                 label = stringResource(R.string.log_past_walk_end),
                 dialogTitle = stringResource(R.string.log_past_walk_end_time),
                 onTimeChange = onEndTimeChange,
-                modifier = Modifier.weight(TIME_WEIGHT),
+                modifier = Modifier.weight(1f),
             )
         }
         if (durationMinutes != null) {
@@ -90,9 +133,20 @@ internal fun WhenSection(
             )
         }
     }
+    if (showDatePicker) {
+        AppDatePickerDialog(
+            date = date,
+            maxDate = maxDate,
+            onConfirm = {
+                if (it != null) onDateChange(it)
+                showDatePicker = false
+            },
+            onDismiss = { showDatePicker = false },
+        )
+    }
 }
 
-/** Opens a dial picker; the keyboard toggle switches it to typed input. */
+/** A tile with [label] over the time; it opens a dial picker whose keyboard toggle switches to typed input. */
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 private fun TimeField(
@@ -103,12 +157,26 @@ private fun TimeField(
     modifier: Modifier = Modifier,
 ) {
     var showPicker by rememberSaveable { mutableStateOf(false) }
-    AppPickerField(
-        value = time?.format(TimeFormatter).orEmpty(),
-        label = label,
-        onPress = { showPicker = true },
-        modifier = modifier,
-    )
+    val shape = RoundedCornerShape(AppRadius.md)
+    Column(
+        modifier = modifier
+            .clip(shape)
+            .background(AppTheme.colors.card)
+            .border(1.dp, AppTheme.colors.outlineStrong, shape)
+            .clickable(role = Role.Button, onClick = { showPicker = true })
+            .padding(horizontal = AppSpacing.lg, vertical = AppSpacing.md),
+    ) {
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodySmall,
+            color = AppTheme.colors.contentMuted,
+        )
+        Text(
+            text = time?.format(TimeFormatter) ?: stringResource(R.string.when_time_unset),
+            style = MaterialTheme.typography.titleMedium,
+            color = if (time == null) AppTheme.colors.placeholder else AppTheme.colors.content,
+        )
+    }
     if (showPicker) {
         val pickerState = rememberTimePickerState(
             initialHour = time?.hour ?: LocalTime.NOON.hour,

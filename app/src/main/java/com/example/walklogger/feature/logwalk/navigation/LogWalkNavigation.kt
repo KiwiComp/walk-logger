@@ -97,6 +97,7 @@ fun EntryProviderScope<NavKey>.activeWalkScreen(
 
 fun EntryProviderScope<NavKey>.finishWalkScreen(
     onSaved: () -> Unit,
+    onDiscarded: () -> Unit,
     onNotFound: () -> Unit,
     snackbarHostState: SnackbarHostState,
 ) {
@@ -104,6 +105,7 @@ fun EntryProviderScope<NavKey>.finishWalkScreen(
         FinishWalkRoute(
             walkId = key.walkId,
             onSaved = onSaved,
+            onDiscarded = onDiscarded,
             onNotFound = onNotFound,
             snackbarHostState = snackbarHostState,
         )

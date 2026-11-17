@@ -1,12 +1,13 @@
 package com.example.walklogger.core.ui.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.relocation.BringIntoViewRequester
 import androidx.compose.foundation.relocation.bringIntoViewRequester
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.text.KeyboardActions
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material3.MaterialTheme
@@ -25,29 +26,26 @@ import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.layout.onSizeChanged
 import androidx.compose.ui.text.input.KeyboardCapitalization
 import androidx.compose.ui.tooling.preview.Preview
+import com.example.walklogger.core.ui.theme.AppRadius
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import kotlinx.coroutines.launch
 
-enum class AppTextFieldStyle {
-    /** Dark content on a light surface; every form field. */
-    Default,
-
-    /** Light text on the header surface; the quick note during a walk. */
-    Inverse,
-}
-
-/** Square, filled text field with an optional [label] above, as in the "Log a past walk" form. */
+/**
+ * Rounded, outlined text field with an optional bold [label] above it and a muted [labelHint]
+ * ("Optional") at the end of the label row.
+ */
 @Composable
 fun AppTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    style: AppTextFieldStyle = AppTextFieldStyle.Default,
     label: String? = null,
+    labelHint: String? = null,
     placeholder: String? = null,
     suffix: String? = null,
+    trailingIcon: @Composable (() -> Unit)? = null,
     supportingText: String? = null,
     isError: Boolean = false,
     readOnly: Boolean = false,
@@ -58,40 +56,41 @@ fun AppTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource? = null,
 ) {
-    val colors = when (style) {
-        AppTextFieldStyle.Default -> FieldColors(
-            text = AppTheme.colors.content,
-            muted = AppTheme.colors.contentMuted,
-            container = AppTheme.colors.chip,
-            outline = AppTheme.colors.outline,
-            focusedOutline = AppTheme.colors.action,
-        )
-
-        AppTextFieldStyle.Inverse -> FieldColors(
-            text = AppTheme.colors.onHeader,
-            muted = AppTheme.colors.onHeaderMuted,
-            container = AppTheme.colors.headerRaised,
-            outline = AppTheme.colors.outlineOnHeader,
-            focusedOutline = AppTheme.colors.onHeader,
-        )
-    }
+    val colors = FieldColors(
+        text = AppTheme.colors.content,
+        label = AppTheme.colors.contentSecondary,
+        muted = AppTheme.colors.placeholder,
+        container = AppTheme.colors.card,
+        outline = AppTheme.colors.outlineStrong,
+        focusedOutline = AppTheme.colors.action,
+    )
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val scope = rememberCoroutineScope()
     var isFocused by remember { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxWidth()) {
         if (label != null) {
-            Text(
-                text = label,
-                style = MaterialTheme.typography.bodyMedium,
-                color = colors.muted,
-                modifier = Modifier.padding(bottom = AppSpacing.xs),
-            )
+            Row(modifier = Modifier.fillMaxWidth().padding(bottom = AppSpacing.sm)) {
+                Text(
+                    text = label,
+                    style = MaterialTheme.typography.titleSmall,
+                    color = colors.label,
+                    modifier = Modifier.weight(1f),
+                )
+                labelHint?.let {
+                    Text(
+                        text = it,
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = colors.muted,
+                    )
+                }
+            }
         }
         OutlinedTextField(
             value = value,
             onValueChange = onValueChange,
             placeholder = placeholder?.let { { Text(it) } },
             suffix = suffix?.let { { Text(it) } },
+            trailingIcon = trailingIcon,
             supportingText = supportingText?.let { { Text(it) } },
             isError = isError,
             readOnly = readOnly,
@@ -100,7 +99,7 @@ fun AppTextField(
             keyboardOptions = keyboardOptions,
             keyboardActions = keyboardActions,
             interactionSource = interactionSource,
-            shape = MaterialTheme.shapes.extraSmall,
+            shape = RoundedCornerShape(AppRadius.md),
             textStyle = MaterialTheme.typography.bodyLarge,
             colors = OutlinedTextFieldDefaults.colors(
                 focusedTextColor = colors.text,
@@ -114,6 +113,8 @@ fun AppTextField(
                 unfocusedPlaceholderColor = colors.muted,
                 focusedSuffixColor = colors.muted,
                 unfocusedSuffixColor = colors.muted,
+                focusedTrailingIconColor = colors.label,
+                unfocusedTrailingIconColor = colors.label,
                 cursorColor = colors.focusedOutline,
             ),
             // Growing by a wrapped line keeps the new line above the keyboard.
@@ -130,6 +131,7 @@ fun AppTextField(
 
 private class FieldColors(
     val text: Color,
+    val label: Color,
     val muted: Color,
     val container: Color,
     val outline: Color,
@@ -158,22 +160,6 @@ private fun AppTextFieldPreview() {
                 isError = true,
                 supportingText = "Enter a number",
                 modifier = Modifier.padding(top = AppSpacing.lg),
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun AppTextFieldInversePreview() {
-    WalkLoggerTheme {
-        Column(modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg)) {
-            AppTextField(
-                value = "",
-                onValueChange = {},
-                style = AppTextFieldStyle.Inverse,
-                label = "Quick note while you walk",
-                placeholder = "Barked at the bin lorry…",
             )
         }
     }

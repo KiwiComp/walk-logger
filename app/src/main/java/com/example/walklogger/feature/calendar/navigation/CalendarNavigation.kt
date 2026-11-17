@@ -1,6 +1,7 @@
 package com.example.walklogger.feature.calendar.navigation
 
 import androidx.compose.material3.SnackbarHostState
+import androidx.compose.ui.unit.Dp
 import androidx.navigation3.runtime.EntryProviderScope
 import androidx.navigation3.runtime.NavKey
 import com.example.walklogger.feature.calendar.CalendarRoute
@@ -16,6 +17,7 @@ fun EntryProviderScope<NavKey>.calendarScreen(
     onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
     snackbarHostState: SnackbarHostState,
+    snackbarHeight: () -> Dp,
 ) {
     entry<CalendarDestination> {
         CalendarRoute(
@@ -24,6 +26,7 @@ fun EntryProviderScope<NavKey>.calendarScreen(
             onOpenWalk = onOpenWalk,
             onGoToDogs = onGoToDogs,
             snackbarHostState = snackbarHostState,
+            snackbarHeight = snackbarHeight,
         )
     }
 }

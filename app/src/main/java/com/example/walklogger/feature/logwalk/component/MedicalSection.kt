@@ -45,6 +45,7 @@ internal fun MedicalSection(
             addLabel = stringResource(R.string.medical_other_concern),
             onAdd = onAddConcern,
             size = SelectableChipSize.Compact,
+            showPlus = true,
         )
     }
 }

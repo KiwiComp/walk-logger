@@ -7,10 +7,13 @@ import com.example.walklogger.R
 import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
+import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.message.UserMessageState
+import com.example.walklogger.domain.DiscardWalkUseCase
 import com.example.walklogger.domain.SaveWalkUseCase
+import com.example.walklogger.feature.logwalk.HandlerSelectionEditor
 import com.example.walklogger.feature.logwalk.WalkFormActions
 import com.example.walklogger.feature.logwalk.WalkFormEditor
 import com.example.walklogger.feature.logwalk.WalkTimesEditor
@@ -35,10 +38,12 @@ import kotlinx.coroutines.launch
 class FinishWalkViewModel @AssistedInject constructor(
     @Assisted private val walkId: Long,
     dogRepository: DogRepository,
+    handlerRepository: HandlerRepository,
     private val walkRepository: WalkRepository,
     clock: Clock,
     formFactory: WalkFormEditor.Factory,
     private val saveWalk: SaveWalkUseCase,
+    private val discardWalk: DiscardWalkUseCase,
     errorReporter: ErrorReporter,
 ) : ViewModel() {
 
@@ -53,6 +58,9 @@ class FinishWalkViewModel @AssistedInject constructor(
     private val form = formFactory.create(viewModelScope, userMessage::showAndReportError, walkId)
 
     val formActions: WalkFormActions get() = form
+
+    private val handlers =
+        HandlerSelectionEditor(viewModelScope, handlerRepository, userMessage::showAndReportError)
 
     private val times = WalkTimesEditor(clock, LocalDate.now(clock)) { start, end ->
         form.onTimesChanged(start, end, autoFetch = true)
@@ -72,7 +80,8 @@ class FinishWalkViewModel @AssistedInject constructor(
             }
             walk = stored
             form.prefillFrom(stored)
-            screen.update { it.copy(handlers = stored.handlers, isLoading = false) }
+            handlers.prefill(stored.handlers)
+            screen.update { it.copy(isLoading = false) }
             times.prefillFrom(stored)
         }
     }
@@ -83,8 +92,15 @@ class FinishWalkViewModel @AssistedInject constructor(
             times.state,
             form.state,
             dogRepository.observeActiveDog(),
-        ) { screen, times, form, dog ->
-            screen.copy(times = times, form = form, dogName = dog?.name)
+            handlers.state,
+        ) { screen, times, form, dog, handlers ->
+            screen.copy(
+                times = times,
+                form = form,
+                dogName = dog?.name,
+                handlers = handlers.handlers,
+                selectedHandlers = handlers.selected,
+            )
         }.combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
             .stateIn(
                 scope = viewModelScope,
@@ -95,6 +111,13 @@ class FinishWalkViewModel @AssistedInject constructor(
     fun userMessageShown(@StringRes message: Int) = userMessage.shown(message)
 
     fun toggleEditTimes() = screen.update { it.copy(isEditingTimes = !it.isEditingTimes) }
+
+    fun toggleEditHandlers() = screen.update { it.copy(isEditingHandlers = !it.isEditingHandlers) }
+
+    fun toggleHandler(handler: String) = handlers.toggle(handler)
+
+    /** Stores the name (or finds the existing one) and selects it. */
+    fun addHandler(name: String) = handlers.add(name)
 
     fun setDate(date: LocalDate) = times.setDate(date)
 
@@ -111,7 +134,15 @@ class FinishWalkViewModel @AssistedInject constructor(
         viewModelScope.launch {
             form.awaitWeather()
             runCatchingCancellable {
-                saveWalk(form.applyTo(stored.copy(startTime = start, endTime = end)))
+                saveWalk(
+                    form.applyTo(
+                        stored.copy(
+                            startTime = start,
+                            endTime = end,
+                            handlers = handlers.state.value.selectedInOrder,
+                        ),
+                    ),
+                )
             }
                 .onSuccess { screen.update { it.copy(isSaving = false, isSaved = true) } }
                 .onFailure {
@@ -120,6 +151,24 @@ class FinishWalkViewModel @AssistedInject constructor(
                         it,
                         R.string.error_save_walk,
                         "Failed to save walk",
+                    )
+                }
+        }
+    }
+
+    /** Deletes the walk outright; nothing is logged. */
+    fun discard() {
+        if (!uiState.value.canDiscard) return
+        screen.update { it.copy(isDiscarding = true) }
+        viewModelScope.launch {
+            runCatchingCancellable { discardWalk(walkId) }
+                .onSuccess { screen.update { it.copy(isDiscarding = false, isDiscarded = true) } }
+                .onFailure {
+                    screen.update { it.copy(isDiscarding = false) }
+                    userMessage.showAndReportError(
+                        it,
+                        R.string.error_delete_walk,
+                        "Failed to discard walk",
                     )
                 }
         }

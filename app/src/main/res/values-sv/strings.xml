@@ -8,29 +8,27 @@
     <string name="patterns_title">Mönster</string>
     <string name="settings_title">Inställningar</string>
     <string name="settings_location">Plats</string>
-    <string name="settings_location_allowed">Platsen är tillåten</string>
-    <string name="settings_location_not_allowed">Platsen är inte tillåten</string>
+    <string name="settings_location_allowed">Tillåten</string>
+    <string name="settings_location_not_allowed">Inte tillåten</string>
     <string name="settings_location_description">Används för att hämta vädret för dina promenader. Utan den hämtas vädret för platsen du väljer.</string>
     <string name="settings_location_allow">Tillåt plats</string>
 
+    <string name="calendar_title">Kalender</string>
     <string name="calendar_previous_month">Föregående månad</string>
     <string name="calendar_next_month">Nästa månad</string>
     <string name="calendar_today">Idag</string>
-    <string name="calendar_legend_rating">betyg</string>
-    <string name="calendar_legend_range">1 → 7</string>
     <string name="calendar_no_description">(Ingen beskrivning)</string>
     <string name="patterns_coming_soon">Mönster kommer snart</string>
-    <string name="dog_title">Din hund</string>
+    <string name="dog_title">Hundar</string>
     <string name="dog_none_registered">Ingen hund registrerad än. Lägg till en för att börja logga promenader.</string>
-    <string name="dog_add_first">+ Lägg till din hund</string>
-    <string name="dog_add_another">+ Lägg till en hund till</string>
-    <string name="dog_section_dogs">Hundar</string>
+    <string name="dog_section_dogs">Dina hundar</string>
     <string name="dog_section_deleted">Borttagna hundar</string>
     <string name="dog_name_deleted">%1$s (borttagen)</string>
     <string name="dog_active">Aktiv</string>
     <string name="dog_switch">Byt</string>
     <string name="dog_switch_to">Byt till %1$s</string>
-    <string name="dog_edit">Redigera</string>
+    <string name="dog_add">Lägg till hund</string>
+    <string name="dog_no_details">Inga uppgifter än</string>
     <plurals name="dog_age_years">
         <item quantity="one">%1$d år</item>
         <item quantity="other">%1$d år</item>
@@ -45,10 +43,17 @@
     <string name="register_dog_weight">Vikt</string>
     <string name="register_dog_weight_unit">kg</string>
     <string name="register_dog_weight_error">Ange ett tal</string>
-    <string name="register_dog_save">Spara hund</string>
+    <string name="register_dog_save">Lägg till hund</string>
+    <string name="register_dog_name_placeholder">Vad heter din hund?</string>
+    <string name="register_dog_breed_placeholder">t.ex. labrador</string>
+    <string name="register_dog_optional">Valfritt</string>
+    <string name="register_dog_weight_placeholder">0,0</string>
+    <string name="register_dog_optional_hint">Ras, födelsedatum och vikt är valfria.</string>
+    <string name="register_dog_needs_name">Ange ett namn för att lägga till hunden</string>
+    <string name="edit_dog_save">Spara ändringar</string>
 
     <string name="edit_dog_title">Redigera hund</string>
-    <string name="edit_dog_delete">Ta bort</string>
+    <string name="edit_dog_delete">Ta bort hunden</string>
     <string name="edit_dog_delete_confirm_title">Ta bort hunden?</string>
     <string name="edit_dog_delete_confirm_message">Hunden kan inte längre logga promenader. Dess historik finns kvar under Borttagna hundar på fliken Hundar. Det kan inte ångras.</string>
     <string name="edit_dog_delete_confirm">Ta bort</string>
@@ -60,12 +65,14 @@
     <string name="summary_average">· snitt %1$.1f</string>
     <string name="summary_duration">· %1$s</string>
     <string name="summary_duration_hours_minutes">%1$d h %2$d min</string>
-    <string name="walk_duration_minutes">%1$d min</string>
     <string name="walk_stool_passed_description">Har bajsat</string>
+    <string name="walk_duration_minutes">%1$d min</string>
     <string name="log_no_dog_message">Registrera en hund under fliken Hundar innan du loggar promenader.</string>
     <string name="log_no_dog_action">Hundar</string>
     <string name="log_deleted_dog_message">Det går inte att logga promenader för en borttagen hund. Byt hund på fliken Hundar.</string>
-    <string name="add_walk_for_day">+ Lägg till en promenad för %1$s</string>
+    <string name="log_week_label">Vecka %1$d · %2$s</string>
+    <string name="add_walk">Lägg till promenad</string>
+    <string name="rating_face_description">Betyg %1$d av 7</string>
 
     <string name="equipment_collar">Halsband</string>
     <string name="equipment_harness">Sele</string>
@@ -79,15 +86,14 @@
     <string name="dialog_cancel">Avbryt</string>
 
     <string name="new_walk_title">Ny promenad</string>
-    <string name="new_walk_who_is_walking">Vem går</string>
+    <string name="new_walk_who_is_walking">Vem går?</string>
     <string name="new_walk_equipment">Utrustning</string>
     <string name="new_walk_add_handler">+ Lägg till</string>
-    <string name="new_walk_after_note">Betyg, väder och anteckningar fylls i efter promenaden. Starttiden sätts när du trycker.</string>
-    <string name="new_walk_timer_starts_now">Timern startar nu</string>
+    <string name="new_walk_after_note">Du betygsätter promenaden och skriver anteckningar när den är slut.</string>
+    <string name="new_walk_timer_starts">Timern startar när du trycker</string>
     <string name="new_walk_start">Starta promenad</string>
-    <string name="new_walk_summary">%1$s · %2$s</string>
     <string name="new_walk_choose_handler">Välj först vem som går.</string>
-    <string name="new_walk_already_happened">Promenaden har redan skett</string>
+    <string name="new_walk_already_happened">Logga en tidigare promenad</string>
     <string name="new_walk_add_handler_title">Vem mer går?</string>
     <string name="new_walk_add_handler_name">Namn</string>
 
@@ -96,7 +102,7 @@
     <string name="active_walk_title">Promenad pågår</string>
     <string name="active_walk_out_with">Ute med %1$s</string>
     <string name="active_walk_started_at">Startade %1$s</string>
-    <string name="active_walk_quick_note">Snabbanteckning under promenaden</string>
+    <string name="active_walk_quick_note">Snabbanteckning</string>
     <string name="active_walk_quick_note_placeholder">Skällde på sopbilen…</string>
     <string name="active_walk_end">Avsluta promenad</string>
     <string name="active_walk_discard">Släng promenaden</string>
@@ -104,29 +110,37 @@
     <string name="active_walk_discard_confirm_message">Timern stoppas och inget loggas, inte ens anteckningen. Det går inte att ångra.</string>
     <string name="active_walk_discard_confirm">Släng</string>
 
-    <string name="finish_walk_title">Hur gick det?</string>
-    <string name="finish_walk_edit_times">Ändra tider</string>
-    <string name="finish_walk_times_summary">%1$s → %2$s · %3$s · loggad automatiskt</string>
+    <string name="finish_walk_title">Logga promenad</string>
+    <string name="finish_walk_edit_times">Redigera</string>
+    <string name="finish_walk_done_times">Klar</string>
     <string name="finish_walk_walked_by">Gick med %1$s</string>
-    <string name="finish_walk_dog_walked_by">%1$s gick med %2$s</string>
+    <string name="finish_walk_auto_logged">Autologgad</string>
+    <string name="finish_walk_change_handler">Ändra</string>
+    <string name="finish_walk_times">%1$s · %2$s – %3$s</string>
+    <string name="walk_form_rating">Hur var promenaden?</string>
+    <string name="rating_rough">Jobbig</string>
+    <string name="rating_great">Toppen</string>
+    <string name="walk_form_mood_focus">Humör &amp; fokus</string>
+    <string name="optional_ratings_rated">Valfritt · %1$d av %2$d betygsatta</string>
+    <string name="optional_rating_not_rated">Inte betygsatt</string>
+    <string name="optional_rating_value">%1$d / %2$d</string>
+    <string name="optional_rating_clear">Rensa %1$s</string>
+    <string name="optional_ratings_least">1 = minst</string>
+    <string name="optional_ratings_most">7 = mest</string>
 
     <string name="log_past_walk_title">Logga en tidigare promenad</string>
     <string name="edit_walk_title">Redigera promenad</string>
     <string name="log_past_walk_when">När</string>
-    <string name="log_past_walk_date">Datum</string>
     <string name="log_past_walk_start">Start</string>
     <string name="log_past_walk_end">Slut</string>
     <string name="log_past_walk_start_time">Starttid</string>
     <string name="log_past_walk_end_time">Sluttid</string>
+    <string name="when_change_date">Ändra</string>
     <plurals name="log_past_walk_duration_minutes">
         <item quantity="one">%1$d minut</item>
         <item quantity="other">%1$d minuter</item>
     </plurals>
     <string name="log_past_walk_handler">Vem gick</string>
-    <string name="log_past_walk_rating">Betyg</string>
-    <string name="log_past_walk_rating_scale">1 sämst · 7 bäst</string>
-    <string name="log_past_walk_optional_ratings">Valfria betyg</string>
-    <string name="log_past_walk_optional_ratings_scale">1 minst · 7 mest</string>
     <string name="optional_rating_reactivity">Reaktivitet</string>
     <string name="optional_rating_energy_level">Energinivå</string>
     <string name="optional_rating_responsiveness">Följsamhet</string>
@@ -205,7 +219,7 @@
     <string name="stool_edit">Redigera</string>
     <string name="stool_no_details">Inga detaljer</string>
     <string name="log_past_walk_behaviour">Beteende</string>
-    <string name="behaviour_other_issue">+ Annat problem</string>
+    <string name="behaviour_other_issue">Annat…</string>
     <string name="behaviour_add_issue_title">Vad hände mer?</string>
     <string name="behaviour_add_issue_name">Problem</string>
     <string name="issue_pulling">Drar i kopplet</string>
@@ -219,7 +233,7 @@
     <string name="issue_not_recalling">Kommer inte på inkallning</string>
     <string name="issue_chasing">Jagar</string>
     <string name="log_past_walk_medical">Hälsa</string>
-    <string name="medical_other_concern">+ Annat besvär</string>
+    <string name="medical_other_concern">Annat…</string>
     <string name="medical_add_concern_title">Vad mer märkte du?</string>
     <string name="medical_add_concern_name">Besvär</string>
     <string name="concern_diarrhoea">Diarré</string>
@@ -231,7 +245,7 @@
     <string name="concern_irregular_gait">Avvikande gång</string>
     <string name="concern_excessive_drooling">Dreglar mycket</string>
     <string name="log_past_walk_notes">Anteckningar</string>
-    <string name="log_past_walk_notes_placeholder">Annan information du vill spara.</string>
+    <string name="log_past_walk_notes_placeholder">Något mer värt att komma ihåg?</string>
     <string name="log_past_walk_save">Spara promenad</string>
     <string name="log_past_walk_needs_handler">Välj vem som gick innan promenaden kan sparas.</string>
     <string name="log_past_walk_needs_times">Ange start- och sluttid innan promenaden kan sparas.</string>
@@ -239,21 +253,20 @@
     <string name="log_past_walk_needs_past_end">En tidigare promenad kan inte sluta i framtiden.</string>
     <string name="log_past_walk_needs_rating">Ett betyg behövs innan promenaden kan sparas.</string>
 
-    <string name="walk_detail_title">Loggad promenad</string>
+    <string name="walk_detail_title">Promenad</string>
     <string name="walk_detail_edit">Redigera</string>
     <string name="walk_detail_discard">Släng</string>
     <string name="walk_detail_discard_confirm_title">Släng den här promenaden?</string>
     <string name="walk_detail_discard_confirm_message">Promenaden tas bort från loggen. Det går inte att ångra.</string>
     <string name="walk_detail_discard_confirm">Släng</string>
-    <string name="walk_detail_length">Längd</string>
-    <string name="walk_detail_dog">Hund</string>
+    <string name="walk_detail_walked_by">%1$s gick med %2$s</string>
+    <string name="walk_detail_delete">Ta bort promenaden</string>
+    <string name="walk_detail_not_rated">%1$s inte betygsatta</string>
+    <string name="list_and">%1$s och %2$s</string>
+    <string name="label_value">%1$s: %2$s</string>
     <string name="walk_detail_not_recorded">Inte angivet</string>
     <string name="walk_detail_nothing_noted">Inget noterat</string>
     <string name="walk_detail_stool_none">Ingen avföring</string>
-    <plurals name="walk_detail_noted_count">
-        <item quantity="one">%1$d noterad</item>
-        <item quantity="other">%1$d noterade</item>
-    </plurals>
 
     <string name="error_save_walk">Kunde inte spara promenaden</string>
     <string name="error_delete_walk">Kunde inte ta bort promenaden</string>

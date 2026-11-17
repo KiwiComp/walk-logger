@@ -26,5 +26,5 @@ enum class TopLevelDestination(
         icon = R.drawable.ic_tab_patterns,
         key = PatternsDestination,
     ),
-    DOG(label = R.string.tab_dogs, icon = R.drawable.ic_tab_dog, key = DogDestination),
+    DOG(label = R.string.tab_dogs, icon = R.drawable.ic_common_dog, key = DogDestination),
 }

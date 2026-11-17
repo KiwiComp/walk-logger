@@ -7,6 +7,7 @@ import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.groupByStartDate
 import com.example.walklogger.core.model.startLocalTime
+import com.example.walklogger.core.ui.component.TimelineWalk
 import com.example.walklogger.domain.ObserveWalkHistoryUseCase
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
@@ -14,6 +15,7 @@ import java.time.DayOfWeek
 import java.time.LocalDate
 import java.time.ZoneId
 import java.time.temporal.TemporalAdjusters
+import java.time.temporal.WeekFields
 import javax.inject.Inject
 import kotlin.time.Duration.Companion.milliseconds
 import kotlinx.coroutines.flow.MutableStateFlow
@@ -53,6 +55,7 @@ class LogViewModel @Inject constructor(
         val monday = date.with(TemporalAdjusters.previousOrSame(DayOfWeek.MONDAY))
         return LogUiState(
             selectedDate = date,
+            weekNumber = date.get(WeekFields.ISO.weekOfWeekBasedYear()),
             week = (0L until 7L).map { monday.plusDays(it) }.map { day ->
                 DayUiState(
                     date = day,
@@ -70,7 +73,7 @@ class LogViewModel @Inject constructor(
     }
 }
 
-private fun Walk.toUiState(zone: ZoneId) = WalkUiState(
+private fun Walk.toUiState(zone: ZoneId) = TimelineWalk(
     id = id,
     startTime = startLocalTime(zone),
     duration = (checkNotNull(endTime) { "walk $id has not finished" } - startTime).milliseconds,

@@ -2,21 +2,24 @@ package com.example.walklogger.feature.logwalk.finishwalk
 
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
-import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.imePadding
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Close
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.res.stringResource
@@ -27,8 +30,8 @@ import androidx.lifecycle.compose.LifecycleResumeEffect
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.AppButton
-import com.example.walklogger.core.ui.component.AppButtonStyle
-import com.example.walklogger.core.ui.component.AppButtonWidth
+import com.example.walklogger.core.ui.component.AppConfirmDialog
+import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.LocationPermissionRequest
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.component.rememberAllowLocation
@@ -37,22 +40,19 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.WalkFormActions
-import com.example.walklogger.feature.logwalk.component.FormSection
 import com.example.walklogger.feature.logwalk.component.WalkFormContent
-import com.example.walklogger.feature.logwalk.component.WhenSection
 import com.example.walklogger.feature.logwalk.component.messageRes
+import com.example.walklogger.feature.logwalk.finishwalk.component.FinishWalkSummaryCard
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 import java.time.LocalDate
 import java.time.LocalTime
-import java.time.format.DateTimeFormatter
-
-private val TimeFormatter: DateTimeFormatter = DateTimeFormatter.ofPattern("HH:mm")
 
 @Suppress("ktlint:compose:parameter-naming")
 @Composable
 fun FinishWalkRoute(
     walkId: Long,
     onSaved: () -> Unit,
+    onDiscarded: () -> Unit,
     onNotFound: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
@@ -62,9 +62,11 @@ fun FinishWalkRoute(
     val uiState by viewModel.uiState.collectAsStateWithLifecycle()
     val currentOnSaved by rememberUpdatedState(onSaved)
     val currentOnNotFound by rememberUpdatedState(onNotFound)
-    LaunchedEffect(uiState.isSaved, uiState.isNotFound) {
+    val currentOnDiscarded by rememberUpdatedState(onDiscarded)
+    LaunchedEffect(uiState.isSaved, uiState.isNotFound, uiState.isDiscarded) {
         when {
             uiState.isSaved -> currentOnSaved()
+            uiState.isDiscarded -> currentOnDiscarded()
             uiState.isNotFound -> currentOnNotFound()
         }
     }
@@ -90,6 +92,10 @@ fun FinishWalkRoute(
         formActions = viewModel.formActions,
         onAllowLocation = allowLocation,
         onToggleEditTimes = viewModel::toggleEditTimes,
+        onToggleEditHandlers = viewModel::toggleEditHandlers,
+        onHandlerToggle = viewModel::toggleHandler,
+        onAddHandler = viewModel::addHandler,
+        onDiscard = viewModel::discard,
         onDateChange = viewModel::setDate,
         onStartTimeChange = viewModel::setStartTime,
         onEndTimeChange = viewModel::setEndTime,
@@ -104,65 +110,67 @@ fun FinishWalkScreen(
     formActions: WalkFormActions,
     onAllowLocation: () -> Unit,
     onToggleEditTimes: () -> Unit,
+    onToggleEditHandlers: () -> Unit,
+    onHandlerToggle: (String) -> Unit,
+    onAddHandler: (String) -> Unit,
     onDateChange: (LocalDate) -> Unit,
     onStartTimeChange: (LocalTime) -> Unit,
     onEndTimeChange: (LocalTime) -> Unit,
     onSave: () -> Unit,
+    onDiscard: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
+    var showDiscardConfirm by rememberSaveable { mutableStateOf(false) }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(R.string.finish_walk_title),
-            actions = {
-                AppButton(
-                    text = stringResource(R.string.finish_walk_edit_times),
-                    onClick = onToggleEditTimes,
-                    style = AppButtonStyle.Tertiary,
-                    width = AppButtonWidth.Wrap,
-                    enabled = !uiState.isLoading,
+            navigationIcon = {
+                HeaderIconButton(
+                    icon = Icons.Filled.Close,
+                    contentDescription = stringResource(R.string.walk_detail_discard),
+                    onClick = { showDiscardConfirm = true },
+                    enabled = uiState.canDiscard,
                 )
             },
-        ) {
-            Spacer(Modifier.height(AppSpacing.xs))
-            Text(
-                text = uiState.timesSummary(),
-                style = MaterialTheme.typography.bodyMedium,
-                color = AppTheme.colors.onHeaderMuted,
-            )
-        }
+            actions = {
+                Text(
+                    text = stringResource(R.string.finish_walk_auto_logged),
+                    style = MaterialTheme.typography.bodySmall,
+                    color = AppTheme.colors.contentMuted,
+                )
+            },
+        )
         Column(
             modifier = Modifier
                 .fillMaxWidth()
                 .imePadding()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
-            verticalArrangement = Arrangement.spacedBy(AppSpacing.xl),
+                .padding(horizontal = AppSpacing.lg)
+                .padding(bottom = AppSpacing.xxl),
+            verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
         ) {
-            if (uiState.isEditingTimes) {
-                FormSection(label = stringResource(R.string.log_past_walk_when)) {
-                    WhenSection(
-                        date = uiState.times.date,
-                        maxDate = uiState.times.maxDate,
-                        startTime = uiState.times.startTime,
-                        endTime = uiState.times.endTime,
-                        durationMinutes = uiState.times.durationMinutes,
-                        onDateChange = onDateChange,
-                        onStartTimeChange = onStartTimeChange,
-                        onEndTimeChange = onEndTimeChange,
-                    )
-                }
-            }
-            Text(
-                text = uiState.walkedBy(),
-                style = MaterialTheme.typography.titleLarge,
-                color = AppTheme.colors.contentMuted,
-            )
-            WalkFormContent(
-                form = uiState.form,
-                actions = formActions,
+            FinishWalkSummaryCard(
+                dogName = uiState.dogName,
+                handlers = uiState.handlers,
+                selectedHandlers = uiState.selectedHandlers,
+                isEditingHandlers = uiState.isEditingHandlers,
+                onToggleEditHandlers = onToggleEditHandlers,
+                onHandlerToggle = onHandlerToggle,
+                onAddHandler = onAddHandler,
+                times = uiState.times,
+                isEditingTimes = uiState.isEditingTimes,
+                onToggleEditTimes = onToggleEditTimes,
+                onDateChange = onDateChange,
+                onStartTimeChange = onStartTimeChange,
+                onEndTimeChange = onEndTimeChange,
+                weather = uiState.form.weather,
+                weatherActions = formActions,
                 onAllowLocation = onAllowLocation,
+                enabled = !uiState.isLoading,
             )
+            WalkFormContent(form = uiState.form, actions = formActions)
             Column(
+                modifier = Modifier.padding(top = AppSpacing.md),
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
                 horizontalAlignment = Alignment.CenterHorizontally,
             ) {
@@ -184,28 +192,18 @@ fun FinishWalkScreen(
             }
         }
     }
-}
-
-/** "Sixten walked by Anna", or just "Walked by Anna" until the dog is known. */
-@Composable
-private fun FinishWalkUiState.walkedBy(): String {
-    val handlers = handlers.joinToString()
-    val dog = dogName ?: return stringResource(R.string.finish_walk_walked_by, handlers)
-    return stringResource(R.string.finish_walk_dog_walked_by, dog, handlers)
-}
-
-/** "07:05 → 07:39 · 34 min · logged automatically", or nothing until the walk has loaded. */
-@Composable
-private fun FinishWalkUiState.timesSummary(): String {
-    val start = times.startTime ?: return ""
-    val end = times.endTime ?: return ""
-    val minutes = times.durationMinutes ?: return ""
-    return stringResource(
-        R.string.finish_walk_times_summary,
-        start.format(TimeFormatter),
-        end.format(TimeFormatter),
-        stringResource(R.string.walk_duration_minutes, minutes),
-    )
+    if (showDiscardConfirm) {
+        AppConfirmDialog(
+            title = stringResource(R.string.walk_detail_discard_confirm_title),
+            message = stringResource(R.string.walk_detail_discard_confirm_message),
+            confirmLabel = stringResource(R.string.walk_detail_discard_confirm),
+            onConfirm = {
+                showDiscardConfirm = false
+                onDiscard()
+            },
+            onDismiss = { showDiscardConfirm = false },
+        )
+    }
 }
 
 @Preview(showBackground = true, heightDp = 1100)
@@ -217,10 +215,14 @@ private fun FinishWalkScreenPreview() {
             formActions = LogWalkPreviewData.formActions,
             onAllowLocation = {},
             onToggleEditTimes = {},
+            onToggleEditHandlers = {},
+            onHandlerToggle = {},
+            onAddHandler = {},
             onDateChange = {},
             onStartTimeChange = {},
             onEndTimeChange = {},
             onSave = {},
+            onDiscard = {},
         )
     }
 }
@@ -234,10 +236,14 @@ private fun FinishWalkScreenEditingTimesPreview() {
             formActions = LogWalkPreviewData.formActions,
             onAllowLocation = {},
             onToggleEditTimes = {},
+            onToggleEditHandlers = {},
+            onHandlerToggle = {},
+            onAddHandler = {},
             onDateChange = {},
             onStartTimeChange = {},
             onEndTimeChange = {},
             onSave = {},
+            onDiscard = {},
         )
     }
 }

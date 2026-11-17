@@ -22,8 +22,8 @@ com.example.walklogger
 │   │                            navigation/  @Serializable NavKey route, EntryProviderScope extension
 │   │                                         and push functions on the back stack
 │   ├── log/                   LogViewModel + LogUiState; LogRoute/LogScreen composed from
-│   │                          component/ (WeekStrip, WalkTimeline, WalkCard); the header's gear opens Settings
-│   ├── logwalk/               the flow behind AddWalkButton, one sub-package per screen.
+│   │                          component/WeekStrip and the shared DayWalks; the header's gear opens Settings
+│   ├── logwalk/               the flow behind AddWalkFab, one sub-package per screen.
 │   │                          WalkFormState + WalkFormEditor (implements WalkFormActions) hold the fields the after-walk
 │   │                          and past-walk forms share (rating to notes, incl. the issue/concern lists, prefill and
 │   │                          applyTo(walk)); each form ViewModel keeps one private and exposes only `formActions`;
@@ -31,25 +31,29 @@ com.example.walklogger
 │   │                          WeatherFormActions, which WalkFormActions extends and WalkFormEditor passes on), with
 │   │                          WeatherFormat for the shown numbers; WalkTimesState + WalkTimesEditor hold the date and
 │   │                          times both forms share (duration, the time save blockers, passing the times on to the weather),
-│   │                          and HandlerSelectionEditor the handler chips the new-walk and past-walk screens share;
-│   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk; the first
+│   │                          and HandlerSelectionEditor the handler chips the new-walk, after-walk and past-walk screens share;
+│   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handler and equipment cards; StartWalkButton and Log a past
+│   │                          walk at the bottom; the first
 │   │                          Start walk asks for precise location, then starts the walk whatever the answer);
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
-│   │                          stored start, quick note, ActiveStoolSection: a switch for "passed stool" whose description rows
-│   │                          fold into a summary on Done (which turns into Edit), stored on every tap; end walk; system back is swallowed);
-│   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen (rating, stool, optional ratings, equipment, weather, behaviour,
-│   │                          medical, notes for the just-finished walk, with an "Edit times" toggle);
+│   │                          stored start in a dark card, quick note card, ActiveStoolSection: a card with a switch for "passed stool"
+│   │                          whose description rows Done folds into a summary (Edit opens them), stored on every tap; End walk and Discard walk
+│   │                          in a bottom bar; system back asks to discard);
+│   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen for the just-finished walk: FinishWalkSummaryCard (dog and
+│   │                          handlers with Change for the handler chips, times and weather each with an Edit/Done toggle) above the shared
+│   │                          form; the close cross confirms, then discards the walk through DiscardWalkUseCase;
 │   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating, stool, optional ratings,
 │   │                          equipment, weather, behaviour, medical, notes); the same screen edits a logged walk when the route
 │   │                          carries a walkId, pushed on top of that walk's detail screen so saving or closing returns there;
 │   │                          component/ holds the form pieces the screens share (WalkFormContent renders the shared
-│   │                          sections from equipment to notes, FormSection, SelectableChip,
+│   │                          sections from rating to notes, FormSection (a card unless card = false, as on walk detail), SelectableChip,
 │   │                          BehaviourSection, MedicalSection, AddNameDialog and its AddHandlerDialog /
-│   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale, StoolSection (Yes/No; Done folds the
-│   │                          description into StoolSummary, Edit opens it) with StoolDescriptors, StoolColourPicker and
-│   │                          StoolSwatch, OptionalRatingsSection, WhenSection, Labels,
-│   │                          FormStyle for the on-header variant the timer screen uses);
-│   │                          WeatherSection shows the fetched weather (WeatherSummary, also used by walk detail) with a
+│   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale (rating faces), StoolSection (Yes/No; the
+│   │                          chevron folds the description into StoolSummary and opens it) with StoolDescriptors, StoolColourPicker and
+│   │                          StoolSwatch, StepSlider (stool amount and texture, and OptionalRatingSlider in OptionalRatingsSection), WhenSection,
+│   │                          Labels);
+│   │                          WeatherSection (the past-walk card) wraps WeatherContent, which the after-walk summary card uses directly; it shows
+│   │                          the fetched weather (WeatherSummary, also used by walk detail) with a
 │   │                          fetch button, a °C field and WeatherConditionPicker the handler can correct, the place row
 │   │                          (PlaceSearchDialog) without permission or when the device finds no position, a "Use my location"
 │   │                          button without permission, and the Open-Meteo attribution; the form Routes ask once through
@@ -59,23 +63,24 @@ com.example.walklogger
 │   │                          an edited walk only fetches through the button;
 │   │                          the chosen day travels as a route argument into both form ViewModels
 │   ├── calendar/              CalendarViewModel + CalendarUiState (month, selected day, per-day walk count and
-│   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
-│   │                          MonthGrid with cells tinted by rating and selection ringed in the selection colour, CalendarWalkList);
-│   │                          a walk row opens the walk's detail screen, the dashed button logs a walk on that day
-│   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk (when, handler, dog,
-│   │                          equipment, rating, stool, optional ratings, weather, behaviour, medical, notes; empty sections say so),
-│   │                          opened from a walk row on Log or Calendar; Edit pushes LogPastWalkScreen, Discard deletes the walk
-│   │                          (AppConfirmDialog confirms first) and back returns to the tab; component/ holds the read-only
-│   │                          pieces (DetailField, DetailPlaceholder, RatingSummary, OptionalRatingRow, NotedItem)
+│   │                          rounded rating); CalendarScreen composed from component/ (MonthNavigator with a Today button off the
+│   │                          current month, MonthGrid with a rating face per rated day) and the shared DayWalks sheet;
+│   │                          a walk card opens the walk's detail screen, AddWalkFab logs a walk on the selected day
+│   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk as cards (WalkHeroCard
+│   │                          with date, times, dog, handlers, equipment and the rating face; weather; stool; mood & focus bars; behaviour
+│   │                          and health concerns; notes, dashed when empty), opened from a walk row on Log or Calendar;
+│   │                          Edit pushes LogPastWalkScreen, Delete walk deletes it (AppConfirmDialog confirms first) and back returns to
+│   │                          the tab; component/ holds WalkHeroCard and DetailPlaceholder
 │   ├── patterns/              placeholder, same shape as calendar
-│   ├── settings/              SettingsViewModel + SettingsScreen, pushed from Log's header: LocationSetting shows whether
-│   │                          location is allowed and lets the user allow it later (dialog or system settings, through
+│   ├── settings/              SettingsViewModel + SettingsScreen, pushed from Log's header: LocationSetting is a card whose
+│   │                          StatusTag shows whether location is allowed, and lets the user allow it later (dialog or system settings, through
 │   │                          rememberAllowLocation), rereading the permission on resume
-│   └── dog/                   DogViewModel + DogScreen (profile header, dog list, add-dog CTA, deleted dogs) composed from
+│   └── dog/                   DogViewModel + DogScreen (dog cards with details, Active or Switch, Add dog, deleted dogs dashed) composed from
 │                              component/ (DogList); deleting a dog soft-deletes it (`isHidden`) so its walks stay, and it can
 │                              still be selected as active to read its history in Log and Calendar, but not to log walks
 │                              or edit them;
-│                              registerdog/ RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight)
+│                              registerdog/ RegisterDogViewModel + RegisterDogScreen (name, breed, birth date, weight in a card;
+│                              Add dog / Save changes in a bottom bar, Delete dog under the card when editing)
 │
 ├── domain/                    optional use cases (pure Kotlin, injectable); ObserveWalkHistoryUseCase gives Log and
 │                              Calendar the active dog's completed walks; FetchWalkWeatherUseCase fetches the weather for
@@ -119,11 +124,12 @@ com.example.walklogger
 │   │                          di/ holds the injectable coroutine dispatchers and Clock; the ErrorReporter binding
 │   │                          lives per build type (logcat in src/debug, no-op in src/release)
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
-│                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
-│                              SectionLabel, SegmentedToggle, AppSwitch, DashedButton, AddWalkButton, DayHeading, EquipmentChip,
+│                              + shared composables (WalkLoggerHeader, HeaderIconButton, DogBadge,
+│                              SectionLabel, SegmentedToggle, PillButton (Filled, Outlined, Inverse) / EditDonePillButton, StatusTag, RatingFace, AppSwitch, DashedButton,
+│                              AddWalkFab, DayHeading (and dayTitle), DayWalks, WalkTimeline, WalkCard and their TimelineWalk model, EquipmentChip,
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost,
 │                              AppConfirmDialog for discard and delete confirmations; addWalkClick decides what
-│                              AddWalkButton does on Log and Calendar; LocationPermissionRequest shows the system dialog and
+│                              AddWalkFab does on Log and Calendar; LocationPermissionRequest shows the system dialog and
 │                              rememberAllowLocation picks between it and the app's system settings once Android stops showing it)
 │                              + message/UserMessageState, the message a ViewModel combines into its UiState,
 │                              reporting the error behind it, and UserMessageEffect, which shows it in the app's snackbar
@@ -143,9 +149,9 @@ com.example.walklogger
   `SavedStateHandle` needs Android's `Bundle` and would push ViewModel tests off the JVM.
 - **Pushed screens hide the bottom bar.** Anything that is not a `TopLevelDestination`
   (new walk, log past walk, walk detail, register dog, settings) is a full-screen task with a leading back chevron
-  (or close cross for forms) in the header. The timer and after-walk screens have neither: a
-  timed walk is stored the moment it starts, ended by "End walk" and already logged before the
-  form opens, so there is nothing to cancel. When a flow finishes, `popToTopLevel()` returns to
+  (or close cross for forms) in the header. The timer has neither: a timed walk is stored the moment
+  it starts and ended by "End walk". The after-walk form opens on that already stored walk, so its
+  close cross discards the walk after a confirmation instead of just leaving. When a flow finishes, `popToTopLevel()` returns to
   whichever tab (Log or Calendar) it was started from.
 - **Each feature owns its navigation.** Add a `@Serializable` route implementing `NavKey`, an
   `EntryProviderScope<NavKey>.xxxScreen()` and `MutableList<NavKey>.navigateToXxx()` push functions
@@ -176,7 +182,8 @@ com.example.walklogger
   Debug builds log to logcat; release builds report nothing, as errors can carry personal or location data.
 - **Colours come from roles.** Read `AppTheme.colors` (`header`, `content`, `outline`, …), never a hue;
   the palette is private to `core/ui/theme`, so a dark theme or new palette only changes that package.
-  Stool swatches are the exception: they depict real colours and stay fixed.
+  Two exceptions stay fixed whatever the theme: stool swatches, which depict real colours, and the
+  rating faces (`res/drawable/rating_*.xml`, drawn by `RatingFace`), which keep the colours drawn into them.
 
 ## Adding a feature
 

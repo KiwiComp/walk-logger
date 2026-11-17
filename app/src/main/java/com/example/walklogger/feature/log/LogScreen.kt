@@ -1,5 +1,7 @@
 package com.example.walklogger.feature.log
 
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Spacer
 import androidx.compose.foundation.layout.fillMaxSize
@@ -7,35 +9,41 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material.icons.Icons
-import androidx.compose.material.icons.filled.Settings
+import androidx.compose.material.icons.outlined.Settings
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.tooling.preview.Preview
+import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.unit.dp
 import androidx.hilt.lifecycle.viewmodel.compose.hiltViewModel
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
 import com.example.walklogger.R
-import com.example.walklogger.core.ui.component.AddWalkButton
-import com.example.walklogger.core.ui.component.DayHeading
+import com.example.walklogger.core.ui.component.AddWalkFab
+import com.example.walklogger.core.ui.component.DayWalks
 import com.example.walklogger.core.ui.component.DogBadge
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.component.addWalkClick
+import com.example.walklogger.core.ui.component.dayTitle
 import com.example.walklogger.core.ui.component.walkSummary
+import com.example.walklogger.core.ui.theme.AppRadius
+import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
-import com.example.walklogger.feature.log.component.WalkTimeline
 import com.example.walklogger.feature.log.component.WeekStrip
 import com.example.walklogger.feature.log.preview.LogPreviewData
 import java.time.LocalDate
 import java.time.format.DateTimeFormatter
-import java.time.format.TextStyle
 
 @Composable
 fun LogRoute(
@@ -45,6 +53,7 @@ fun LogRoute(
     onGoToDogs: () -> Unit,
     onOpenSettings: () -> Unit,
     snackbarHostState: SnackbarHostState,
+    snackbarHeight: () -> Dp,
     modifier: Modifier = Modifier,
     viewModel: LogViewModel = hiltViewModel(),
 ) {
@@ -65,6 +74,7 @@ fun LogRoute(
         onAddWalk = onAddWalkClick,
         onWalkClick = onOpenWalk,
         onOpenSettings = onOpenSettings,
+        snackbarHeight = snackbarHeight(),
         modifier = modifier,
     )
 }
@@ -77,53 +87,65 @@ fun LogScreen(
     onWalkClick: (Long) -> Unit,
     onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
+    snackbarHeight: Dp = 0.dp,
 ) {
     val locale = LocalConfiguration.current.locales[0]
-    val dayHeadingFormatter = remember(locale) { DateTimeFormatter.ofPattern("EEEE d MMM", locale) }
+    val monthFormatter = remember(locale) { DateTimeFormatter.ofPattern("MMM yyyy", locale) }
+    val isTodaySelected = uiState.week.any { it.isSelected && it.isToday }
     Column(modifier = modifier.fillMaxSize()) {
         WalkLoggerHeader(
             title = stringResource(R.string.log_title),
+            subtitle = stringResource(
+                R.string.log_week_label,
+                uiState.weekNumber,
+                uiState.selectedDate.format(monthFormatter),
+            ),
             actions = {
                 DogBadge(name = uiState.activeDogName, isDeleted = uiState.isActiveDogDeleted)
                 HeaderIconButton(
-                    icon = Icons.Filled.Settings,
+                    icon = Icons.Outlined.Settings,
                     contentDescription = stringResource(R.string.settings_title),
                     onClick = onOpenSettings,
                 )
             },
         ) {
-            Spacer(Modifier.height(AppSpacing.xl))
+            Spacer(Modifier.height(AppSpacing.md))
             WeekStrip(days = uiState.week, onDaySelect = onDaySelect)
         }
 
-        Column(
+        Box(
             modifier = Modifier
-                .fillMaxWidth()
-                .verticalScroll(rememberScrollState())
-                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
+                .fillMaxSize()
+                .background(
+                    AppTheme.colors.card,
+                    RoundedCornerShape(topStart = AppRadius.xl, topEnd = AppRadius.xl),
+                ),
         ) {
-            DayHeading(
-                title = uiState.selectedDate.format(dayHeadingFormatter).replaceFirstChar {
-                    it.titlecase(locale)
-                },
-                summary = if (uiState.walks.isEmpty()) {
-                    null
-                } else {
-                    walkSummary(
-                        uiState.walks.size,
-                        uiState.averageRating,
-                        uiState.totalDuration,
-                    )
-                },
-            )
-            Spacer(Modifier.height(AppSpacing.lg))
-            if (uiState.walks.isNotEmpty()) {
-                WalkTimeline(walks = uiState.walks, onWalkClick = onWalkClick)
+            Column(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .verticalScroll(rememberScrollState())
+                    .padding(horizontal = AppSpacing.lg)
+                    .padding(top = AppSpacing.xxl),
+            ) {
+                DayWalks(
+                    title = dayTitle(uiState.selectedDate, isToday = isTodaySelected),
+                    summary = if (uiState.walks.isEmpty()) {
+                        null
+                    } else {
+                        walkSummary(uiState.walks.size, averageRating = null, uiState.totalDuration)
+                    },
+                    walks = uiState.walks,
+                    onWalkClick = onWalkClick,
+                )
+                Spacer(Modifier.height(AppSize.buttonHeight + AppSpacing.xxxl))
             }
-            AddWalkButton(
-                dayLabel = uiState.selectedDate.dayOfWeek.getDisplayName(TextStyle.SHORT, locale),
+            AddWalkFab(
                 onClick = onAddWalk,
-                modifier = Modifier.padding(top = AppSpacing.lg),
+                snackbarHeight = snackbarHeight,
+                modifier = Modifier
+                    .align(Alignment.BottomEnd)
+                    .padding(AppSpacing.lg),
             )
         }
     }

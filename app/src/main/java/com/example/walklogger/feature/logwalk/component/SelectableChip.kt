@@ -7,9 +7,16 @@ import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.FlowRow
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.selection.toggleable
+import androidx.compose.foundation.shape.CircleShape
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
+import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -21,6 +28,7 @@ import androidx.compose.ui.graphics.PathEffect
 import androidx.compose.ui.graphics.drawOutline
 import androidx.compose.ui.graphics.drawscope.Stroke
 import androidx.compose.ui.semantics.Role
+import androidx.compose.ui.text.TextStyle
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.ui.theme.AppSize
@@ -28,6 +36,8 @@ import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
+
+private val IconSize = 16.dp
 
 /** Label size of a [SelectableChip]; the chips themselves keep the same height. */
 internal enum class SelectableChipSize {
@@ -39,8 +49,9 @@ internal enum class SelectableChipSize {
 }
 
 /**
- * [items], any number of which can be selected, laid out as wrapping chips and ending with a dashed
- * [addLabel] chip. Selection is decided per item by [isSelected], so callers can key it on a name or an id.
+ * [items], any number of which can be selected, laid out as wrapping pills and ending with a dashed
+ * [addLabel] pill. Selection is decided per item by [isSelected], so callers can key it on a name or an id.
+ * [showPlus] marks unselected pills with a "+", for lists where selecting means adding something to the walk.
  */
 @Composable
 internal fun <T> SelectableChip(
@@ -52,6 +63,7 @@ internal fun <T> SelectableChip(
     onAdd: () -> Unit,
     modifier: Modifier = Modifier,
     size: SelectableChipSize = SelectableChipSize.Regular,
+    showPlus: Boolean = false,
 ) {
     FlowRow(
         modifier = modifier,
@@ -59,57 +71,74 @@ internal fun <T> SelectableChip(
         verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
     ) {
         items.forEach { item ->
-            Chip(text = label(item), isSelected = isSelected(item), onToggle = {
-                onToggle(item)
-            }, size = size)
+            val selected = isSelected(item)
+            PillChip(
+                text = label(item),
+                isSelected = selected,
+                textStyle = size.textStyle(),
+                showPlus = showPlus && !selected,
+                modifier = Modifier.toggleable(
+                    value = selected,
+                    role = Role.Checkbox,
+                    onValueChange = { onToggle(item) },
+                ),
+            )
         }
         AddChip(text = addLabel, onClick = onAdd, chipSize = size)
     }
 }
 
+/** Rounded pill, ticked while selected; the caller supplies the selection behaviour through [modifier]. */
 @Composable
-private fun Chip(
+private fun PillChip(
     text: String,
     isSelected: Boolean,
-    onToggle: () -> Unit,
-    size: SelectableChipSize,
+    textStyle: TextStyle,
+    modifier: Modifier = Modifier,
+    showPlus: Boolean = false,
 ) {
-    val shape = MaterialTheme.shapes.extraSmall
-    Box(
+    val colors = AppTheme.colors
+    Row(
         modifier = Modifier
             .height(AppSize.chipHeight)
-            .clip(shape)
-            .background(if (isSelected) AppTheme.colors.action else AppTheme.colors.card)
-            .border(
-                1.dp,
-                if (isSelected) AppTheme.colors.action else AppTheme.colors.outline,
-                shape,
-            )
-            .toggleable(value = isSelected, role = Role.Checkbox, onValueChange = { onToggle() })
+            .clip(CircleShape)
+            .background(if (isSelected) colors.action else colors.card)
+            .border(1.dp, if (isSelected) colors.action else colors.outlineStrong, CircleShape)
+            .then(modifier)
             .padding(horizontal = AppSpacing.lg),
-        contentAlignment = Alignment.Center,
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
     ) {
-        Text(
-            text = text,
-            style = size.textStyle(),
-            color = if (isSelected) AppTheme.colors.onHeader else AppTheme.colors.content,
-        )
+        val content = if (isSelected) colors.onAction else colors.content
+        val icon = when {
+            isSelected -> Icons.Filled.Check
+            showPlus -> Icons.Filled.Add
+            else -> null
+        }
+        icon?.let {
+            Icon(
+                imageVector = it,
+                contentDescription = null,
+                tint = content,
+                modifier = Modifier.size(IconSize),
+            )
+        }
+        Text(text = text, style = textStyle, color = content)
     }
 }
 
 @Composable
 private fun AddChip(text: String, onClick: () -> Unit, chipSize: SelectableChipSize) {
     val dash = PathEffect.dashPathEffect(floatArrayOf(12f, 8f))
-    val outlineColor = AppTheme.colors.outline
-    val shape = MaterialTheme.shapes.extraSmall
+    val outlineColor = AppTheme.colors.dashed
     Box(
         modifier = Modifier
             .height(AppSize.chipHeight)
-            .clip(shape)
+            .clip(CircleShape)
             .drawBehind {
                 drawOutline(
                     color = outlineColor,
-                    outline = shape.createOutline(size, layoutDirection, this),
+                    outline = CircleShape.createOutline(size, layoutDirection, this),
                     style = Stroke(width = 3f, pathEffect = dash),
                 )
             }
@@ -120,7 +149,7 @@ private fun AddChip(text: String, onClick: () -> Unit, chipSize: SelectableChipS
         Text(
             text = text,
             style = chipSize.textStyle(),
-            color = AppTheme.colors.content,
+            color = AppTheme.colors.contentSecondary,
         )
     }
 }
@@ -128,7 +157,7 @@ private fun AddChip(text: String, onClick: () -> Unit, chipSize: SelectableChipS
 @Composable
 private fun SelectableChipSize.textStyle() = when (this) {
     SelectableChipSize.Regular -> MaterialTheme.typography.titleSmall
-    SelectableChipSize.Compact -> MaterialTheme.typography.bodySmall
+    SelectableChipSize.Compact -> MaterialTheme.typography.bodyMedium
 }
 
 @Preview(showBackground = true)
@@ -149,8 +178,9 @@ private fun SelectableChipPreview() {
                 isSelected = { it.id in setOf(1L, 4L) },
                 label = { it.label() },
                 onToggle = {},
-                addLabel = "+ Other issue",
+                addLabel = "Other…",
                 onAdd = {},
+                showPlus = true,
                 modifier = Modifier.padding(top = AppSpacing.lg),
                 size = SelectableChipSize.Compact,
             )

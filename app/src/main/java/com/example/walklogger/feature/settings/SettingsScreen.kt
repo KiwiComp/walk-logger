@@ -73,7 +73,8 @@ fun SettingsScreen(
             modifier = Modifier
                 .fillMaxWidth()
                 .verticalScroll(rememberScrollState())
-                .padding(horizontal = AppSpacing.xl, vertical = AppSpacing.xxl),
+                .padding(horizontal = AppSpacing.lg)
+                .padding(top = AppSpacing.md, bottom = AppSpacing.xxl),
         ) {
             LocationSetting(
                 hasLocationPermission = uiState.hasLocationPermission,
