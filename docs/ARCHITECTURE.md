@@ -64,11 +64,11 @@ com.example.walklogger
 │   │                          rounded rating); CalendarScreen composed from component/ (RatingLegend in the header,
 │   │                          MonthGrid with cells tinted by rating and selection ringed in the selection colour, CalendarWalkList);
 │   │                          a walk row opens the walk's detail screen, the dashed button logs a walk on that day
-│   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk (when, handler, dog,
-│   │                          equipment, rating, stool, optional ratings, weather, behaviour, medical, notes; empty sections say so),
-│   │                          opened from a walk row on Log or Calendar; Edit pushes LogPastWalkScreen, Discard deletes the walk
-│   │                          (AppConfirmDialog confirms first) and back returns to the tab; component/ holds the read-only
-│   │                          pieces (DetailField, DetailPlaceholder, RatingSummary, OptionalRatingRow, NotedItem)
+│   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk as cards (WalkHeroCard
+│   │                          with date, times, dog, handlers, equipment and the rating face; weather; stool; mood & focus bars; behaviour
+│   │                          and health concerns; notes, dashed when empty), opened from a walk row on Log or Calendar;
+│   │                          Edit pushes LogPastWalkScreen, Delete walk deletes it (AppConfirmDialog confirms first) and back returns to
+│   │                          the tab; component/ holds WalkHeroCard and DetailPlaceholder
 │   ├── patterns/              placeholder, same shape as calendar
 │   ├── settings/              SettingsViewModel + SettingsScreen, pushed from Log's header: LocationSetting shows whether
 │   │                          location is allowed and lets the user allow it later (dialog or system settings, through
@@ -122,7 +122,7 @@ com.example.walklogger
 │   │                          lives per build type (logcat in src/debug, no-op in src/release)
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, HeaderTextButton, DogBadge,
-│                              SectionLabel, SegmentedToggle, PillButton / EditDonePillButton, RatingFace, AppSwitch, DashedButton,
+│                              SectionLabel, SegmentedToggle, PillButton (Filled, Outlined, Inverse) / EditDonePillButton, RatingFace, AppSwitch, DashedButton,
 │                              AddWalkButton, AddWalkFab, DayHeading, EquipmentChip,
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost,
 │                              AppConfirmDialog for discard and delete confirmations; addWalkClick decides what

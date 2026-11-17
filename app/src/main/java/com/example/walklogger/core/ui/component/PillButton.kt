@@ -35,6 +35,9 @@ enum class PillButtonStyle {
 
     /** Bordered, for an action that sits beside a filled one ("Change"). */
     Outlined,
+
+    /** Dark, for the main action in a header ("Edit" on walk detail). */
+    Inverse,
 }
 
 /** Small rounded action at the end of a row, with an optional leading [icon]. */
@@ -47,6 +50,13 @@ fun PillButton(
     style: PillButtonStyle = PillButtonStyle.Filled,
     enabled: Boolean = true,
 ) {
+    val content = if (style ==
+        PillButtonStyle.Inverse
+    ) {
+        AppTheme.colors.onSelection
+    } else {
+        AppTheme.colors.content
+    }
     Row(
         modifier = modifier
             .clip(CircleShape)
@@ -56,6 +66,8 @@ fun PillButton(
 
                     PillButtonStyle.Outlined ->
                         Modifier.border(1.dp, AppTheme.colors.outlineStrong, CircleShape)
+
+                    PillButtonStyle.Inverse -> Modifier.background(AppTheme.colors.selection)
                 },
             )
             .clickable(enabled = enabled, role = Role.Button, onClick = onClick)
@@ -67,14 +79,14 @@ fun PillButton(
             Icon(
                 imageVector = it,
                 contentDescription = null,
-                tint = AppTheme.colors.content,
+                tint = content,
                 modifier = Modifier.size(IconSize),
             )
         }
         Text(
             text = text,
             style = MaterialTheme.typography.titleSmall,
-            color = AppTheme.colors.content,
+            color = content,
         )
     }
 }
@@ -107,6 +119,7 @@ private fun PillButtonPreview() {
             verticalArrangement = Arrangement.spacedBy(AppSpacing.sm),
         ) {
             PillButton(text = "Change", onClick = {}, style = PillButtonStyle.Outlined)
+            PillButton(text = "Edit", onClick = {}, style = PillButtonStyle.Inverse)
             listOf(false, true).forEach {
                 EditDonePillButton(
                     isEditing = it,

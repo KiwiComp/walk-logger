@@ -138,10 +138,6 @@
         <item quantity="other">%1$d minuter</item>
     </plurals>
     <string name="log_past_walk_handler">Vem gick</string>
-    <string name="log_past_walk_rating">Betyg</string>
-    <string name="log_past_walk_rating_scale">1 sämst · 7 bäst</string>
-    <string name="log_past_walk_optional_ratings">Valfria betyg</string>
-    <string name="log_past_walk_optional_ratings_scale">1 minst · 7 mest</string>
     <string name="optional_rating_reactivity">Reaktivitet</string>
     <string name="optional_rating_energy_level">Energinivå</string>
     <string name="optional_rating_responsiveness">Följsamhet</string>
@@ -254,21 +250,20 @@
     <string name="log_past_walk_needs_past_end">En tidigare promenad kan inte sluta i framtiden.</string>
     <string name="log_past_walk_needs_rating">Ett betyg behövs innan promenaden kan sparas.</string>
 
-    <string name="walk_detail_title">Loggad promenad</string>
+    <string name="walk_detail_title">Promenad</string>
     <string name="walk_detail_edit">Redigera</string>
     <string name="walk_detail_discard">Släng</string>
     <string name="walk_detail_discard_confirm_title">Släng den här promenaden?</string>
     <string name="walk_detail_discard_confirm_message">Promenaden tas bort från loggen. Det går inte att ångra.</string>
     <string name="walk_detail_discard_confirm">Släng</string>
-    <string name="walk_detail_length">Längd</string>
-    <string name="walk_detail_dog">Hund</string>
+    <string name="walk_detail_walked_by">%1$s gick med %2$s</string>
+    <string name="walk_detail_delete">Ta bort promenaden</string>
+    <string name="walk_detail_not_rated">%1$s inte betygsatta</string>
+    <string name="list_and">%1$s och %2$s</string>
+    <string name="label_value">%1$s: %2$s</string>
     <string name="walk_detail_not_recorded">Inte angivet</string>
     <string name="walk_detail_nothing_noted">Inget noterat</string>
     <string name="walk_detail_stool_none">Ingen avföring</string>
-    <plurals name="walk_detail_noted_count">
-        <item quantity="one">%1$d noterad</item>
-        <item quantity="other">%1$d noterade</item>
-    </plurals>
 
     <string name="error_save_walk">Kunde inte spara promenaden</string>
     <string name="error_delete_walk">Kunde inte ta bort promenaden</string>
