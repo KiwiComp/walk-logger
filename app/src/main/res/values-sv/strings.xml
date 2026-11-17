@@ -131,11 +131,11 @@
     <string name="log_past_walk_title">Logga en tidigare promenad</string>
     <string name="edit_walk_title">Redigera promenad</string>
     <string name="log_past_walk_when">När</string>
-    <string name="log_past_walk_date">Datum</string>
     <string name="log_past_walk_start">Start</string>
     <string name="log_past_walk_end">Slut</string>
     <string name="log_past_walk_start_time">Starttid</string>
     <string name="log_past_walk_end_time">Sluttid</string>
+    <string name="when_change_date">Ändra</string>
     <plurals name="log_past_walk_duration_minutes">
         <item quantity="one">%1$d minut</item>
         <item quantity="other">%1$d minuter</item>
