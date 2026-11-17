@@ -162,6 +162,56 @@ class WeatherFormEditorTest {
         }
 
     @Test
+    fun `with permission but no position both the fetch button and the place row show`() =
+        runEditorTest { editor ->
+            locationRepository.location = null
+            editor.onTimesChanged(start, end, autoFetch = true)
+            with(editor.state.value) {
+                assertEquals(WeatherStatus.NO_LOCATION, status)
+                assertTrue(hasLocationPermission)
+                assertTrue(showsFetch)
+                assertTrue(showsPlace)
+            }
+        }
+
+    @Test
+    fun `location granted in system settings fetches the weather that lacked a location`() =
+        runEditorTest { editor ->
+            locationRepository.isGranted = false
+            locationRepository.markLocationPermissionRequested()
+            editor.onTimesChanged(start, end, autoFetch = true)
+            assertEquals(WeatherStatus.NO_LOCATION, editor.state.value.status)
+
+            locationRepository.isGranted = true
+            editor.refreshLocationPermission()
+            with(editor.state.value) {
+                assertTrue(hasLocationPermission)
+                assertFalse(showsPlace)
+                assertEquals(fetched, fetchedWeather)
+            }
+            assertEquals(locationRepository.location, weatherRepository.requests.single().first)
+        }
+
+    @Test
+    fun `use my location after an earlier answer asks again and fetches on a grant`() =
+        runEditorTest { editor ->
+            locationRepository.isGranted = false
+            locationRepository.markLocationPermissionRequested()
+            editor.onTimesChanged(start, end, autoFetch = false)
+            assertTrue(editor.state.value.wasLocationRequested)
+
+            editor.requestLocationPermission()
+            assertTrue(editor.state.value.shouldRequestLocationPermission)
+
+            locationRepository.isGranted = true
+            editor.onLocationPermissionResult(granted = true)
+            with(editor.state.value) {
+                assertFalse(shouldRequestLocationPermission)
+                assertEquals(fetched, fetchedWeather)
+            }
+        }
+
+    @Test
     fun `a failed place search says so`() = runEditorTest { editor ->
         locationRepository.failSearches = true
         editor.openPlaceSearch()

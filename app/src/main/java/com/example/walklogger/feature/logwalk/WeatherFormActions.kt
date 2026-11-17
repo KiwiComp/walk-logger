@@ -10,7 +10,11 @@ interface WeatherFormActions {
     /** Picking the selected condition again removes it. */
     fun selectCondition(value: WeatherCondition)
     fun fetchWeather()
+    fun requestLocationPermission()
     fun onLocationPermissionResult(granted: Boolean)
+
+    /** The permission can change in system settings while the app is in the background. */
+    fun refreshLocationPermission()
     fun openPlaceSearch()
     fun searchPlaces(query: String)
 

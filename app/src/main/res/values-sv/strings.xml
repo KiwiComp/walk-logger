@@ -6,6 +6,12 @@
 
     <string name="log_title">Promenadlogg</string>
     <string name="patterns_title">Mönster</string>
+    <string name="settings_title">Inställningar</string>
+    <string name="settings_location">Plats</string>
+    <string name="settings_location_allowed">Platsen är tillåten</string>
+    <string name="settings_location_not_allowed">Platsen är inte tillåten</string>
+    <string name="settings_location_description">Används för att hämta vädret för dina promenader. Utan den hämtas vädret för platsen du väljer.</string>
+    <string name="settings_location_allow">Tillåt plats</string>
 
     <string name="calendar_previous_month">Föregående månad</string>
     <string name="calendar_next_month">Nästa månad</string>
@@ -161,6 +167,7 @@
     <string name="weather_fetch_failed">Kunde inte hämta vädret</string>
     <string name="weather_no_location">Välj en ort för att hämta vädret</string>
     <string name="weather_place">Ort</string>
+    <string name="weather_use_my_location">Använd min plats</string>
     <string name="weather_place_search_title">Välj ort</string>
     <string name="weather_place_search_hint">Sök ort</string>
     <string name="weather_place_search_action">Sök</string>

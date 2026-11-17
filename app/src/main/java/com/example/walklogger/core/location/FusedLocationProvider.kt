@@ -22,20 +22,29 @@ class FusedLocationProvider @Inject constructor(@ApplicationContext private val 
     override fun hasPermission(): Boolean = isGranted(Manifest.permission.ACCESS_FINE_LOCATION) ||
         isGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
 
+    /**
+     * With precise location the request may turn on GPS, so a position is found without Wi-Fi or
+     * cell positioning; approximate location cannot use GPS and stays on the balanced priority.
+     */
     override suspend fun currentLocation(): Coordinates? {
-        if (ContextCompat.checkSelfPermission(context, Manifest.permission.ACCESS_FINE_LOCATION) !=
-            PackageManager.PERMISSION_GRANTED &&
-            ContextCompat.checkSelfPermission(
-                context,
-                Manifest.permission.ACCESS_COARSE_LOCATION,
-            ) !=
-            PackageManager.PERMISSION_GRANTED
-        ) {
-            return null
+        // Checked inline, not through isGranted, so lint's MissingPermission check sees it.
+        val hasFine = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_FINE_LOCATION,
+        ) == PackageManager.PERMISSION_GRANTED
+        val hasCoarse = ContextCompat.checkSelfPermission(
+            context,
+            Manifest.permission.ACCESS_COARSE_LOCATION,
+        ) == PackageManager.PERMISSION_GRANTED
+        if (!hasFine && !hasCoarse) return null
+        val priority = if (hasFine) {
+            Priority.PRIORITY_HIGH_ACCURACY
+        } else {
+            Priority.PRIORITY_BALANCED_POWER_ACCURACY
         }
         val cancellation = CancellationTokenSource()
         val request = CurrentLocationRequest.Builder()
-            .setPriority(Priority.PRIORITY_BALANCED_POWER_ACCURACY)
+            .setPriority(priority)
             .setMaxUpdateAgeMillis(MAX_LOCATION_AGE_MILLIS)
             .setDurationMillis(MAX_WAIT_MILLIS)
             .build()

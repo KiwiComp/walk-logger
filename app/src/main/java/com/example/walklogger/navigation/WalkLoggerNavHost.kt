@@ -26,6 +26,8 @@ import com.example.walklogger.feature.logwalk.navigation.navigateToLogPastWalk
 import com.example.walklogger.feature.logwalk.navigation.navigateToNewWalk
 import com.example.walklogger.feature.logwalk.navigation.newWalkScreen
 import com.example.walklogger.feature.patterns.navigation.patternsScreen
+import com.example.walklogger.feature.settings.navigation.navigateToSettings
+import com.example.walklogger.feature.settings.navigation.settingsScreen
 import com.example.walklogger.feature.walkdetail.navigation.navigateToWalkDetail
 import com.example.walklogger.feature.walkdetail.navigation.walkDetailScreen
 
@@ -46,8 +48,10 @@ fun WalkLoggerNavHost(
             onLogPastWalk = { navigationState.currentStack.navigateToLogPastWalk(it) },
             onOpenWalk = { navigationState.currentStack.navigateToWalkDetail(it) },
             onGoToDogs = { navigationState.selectTab(TopLevelDestination.DOG) },
+            onOpenSettings = { navigationState.currentStack.navigateToSettings() },
             snackbarHostState = snackbarHostState,
         )
+        settingsScreen(onBack = navigationState::goBack)
         calendarScreen(
             onAddWalk = { navigationState.currentStack.navigateToNewWalk(it) },
             onLogPastWalk = { navigationState.currentStack.navigateToLogPastWalk(it) },

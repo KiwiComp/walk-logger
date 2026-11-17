@@ -56,6 +56,12 @@ class FetchWalkWeatherUseCase @Inject constructor(
             it.walkId == walkId
         }?.coordinates
 
-    private suspend fun deviceCoordinates() =
-        if (locationRepository.hasPermission()) locationRepository.currentLocation() else null
+    /** A failing lookup (such as Play services disconnecting) still leaves the saved place to fall back on. */
+    private suspend fun deviceCoordinates() = if (locationRepository.hasPermission()) {
+        runCatchingCancellable { locationRepository.currentLocation() }
+            .onFailure { errorReporter.report(it, "Failed to get device location") }
+            .getOrNull()
+    } else {
+        null
+    }
 }

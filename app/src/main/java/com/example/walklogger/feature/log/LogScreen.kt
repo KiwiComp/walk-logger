@@ -8,6 +8,8 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
+import androidx.compose.material.icons.Icons
+import androidx.compose.material.icons.filled.Settings
 import androidx.compose.material3.SnackbarHostState
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
@@ -22,6 +24,7 @@ import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.AddWalkButton
 import com.example.walklogger.core.ui.component.DayHeading
 import com.example.walklogger.core.ui.component.DogBadge
+import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
 import com.example.walklogger.core.ui.component.addWalkClick
 import com.example.walklogger.core.ui.component.walkSummary
@@ -40,6 +43,7 @@ fun LogRoute(
     onLogPastWalk: (LocalDate) -> Unit,
     onOpenWalk: (Long) -> Unit,
     onGoToDogs: () -> Unit,
+    onOpenSettings: () -> Unit,
     snackbarHostState: SnackbarHostState,
     modifier: Modifier = Modifier,
     viewModel: LogViewModel = hiltViewModel(),
@@ -60,6 +64,7 @@ fun LogRoute(
         onDaySelect = viewModel::selectDay,
         onAddWalk = onAddWalkClick,
         onWalkClick = onOpenWalk,
+        onOpenSettings = onOpenSettings,
         modifier = modifier,
     )
 }
@@ -70,6 +75,7 @@ fun LogScreen(
     onDaySelect: (LocalDate) -> Unit,
     onAddWalk: () -> Unit,
     onWalkClick: (Long) -> Unit,
+    onOpenSettings: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val locale = LocalConfiguration.current.locales[0]
@@ -79,6 +85,11 @@ fun LogScreen(
             title = stringResource(R.string.log_title),
             actions = {
                 DogBadge(name = uiState.activeDogName, isDeleted = uiState.isActiveDogDeleted)
+                HeaderIconButton(
+                    icon = Icons.Filled.Settings,
+                    contentDescription = stringResource(R.string.settings_title),
+                    onClick = onOpenSettings,
+                )
             },
         ) {
             Spacer(Modifier.height(AppSpacing.xl))
@@ -127,6 +138,7 @@ private fun LogScreenPreview() {
             onDaySelect = {},
             onAddWalk = {},
             onWalkClick = {},
+            onOpenSettings = {},
         )
     }
 }
@@ -140,6 +152,7 @@ private fun LogScreenEmptyPreview() {
             onDaySelect = {},
             onAddWalk = {},
             onWalkClick = {},
+            onOpenSettings = {},
         )
     }
 }

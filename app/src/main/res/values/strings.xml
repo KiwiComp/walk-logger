@@ -8,6 +8,12 @@
 
     <string name="log_title">Walk log</string>
     <string name="patterns_title">Patterns</string>
+    <string name="settings_title">Settings</string>
+    <string name="settings_location">Location</string>
+    <string name="settings_location_allowed">Location is allowed</string>
+    <string name="settings_location_not_allowed">Location is not allowed</string>
+    <string name="settings_location_description">Used to fetch the weather for your walks. Without it, the weather is fetched for the place you choose.</string>
+    <string name="settings_location_allow">Allow location</string>
 
     <string name="calendar_previous_month">Previous month</string>
     <string name="calendar_next_month">Next month</string>
@@ -164,6 +170,7 @@
     <string name="weather_fetch_failed">Couldn\'t fetch the weather</string>
     <string name="weather_no_location">Choose a place to fetch the weather</string>
     <string name="weather_place">Place</string>
+    <string name="weather_use_my_location">Use my location</string>
     <string name="weather_place_search_title">Choose place</string>
     <string name="weather_place_search_hint">Search for a town</string>
     <string name="weather_place_search_action">Search</string>

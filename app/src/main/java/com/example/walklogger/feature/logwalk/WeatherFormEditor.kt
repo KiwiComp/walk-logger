@@ -60,6 +60,11 @@ class WeatherFormEditor(
                 input.update { it.copy(place = place) }
             }
         }
+        scope.launch {
+            locationPermission.locationPermissionRequested.collect { requested ->
+                input.update { it.copy(wasLocationRequested = requested) }
+            }
+        }
     }
 
     /** Shows the stored [weather], opening the section when there is any. */
@@ -140,6 +145,19 @@ class WeatherFormEditor(
      */
     suspend fun awaitFetch() {
         withTimeoutOrNull(FETCH_WAIT_TIME) { weatherJob?.join() }
+    }
+
+    override fun requestLocationPermission() =
+        input.update { it.copy(shouldRequestLocationPermission = true) }
+
+    /** A walk whose fetch stopped for want of a location fetches again once it is granted. */
+    override fun refreshLocationPermission() {
+        val hadPermission = input.value.hasLocationPermission
+        val hasPermission = locationPermission.hasPermission()
+        input.update { it.copy(hasLocationPermission = hasPermission) }
+        if (!hadPermission && hasPermission && input.value.status == WeatherStatus.NO_LOCATION) {
+            fetchWeather()
+        }
     }
 
     override fun onLocationPermissionResult(granted: Boolean) {
