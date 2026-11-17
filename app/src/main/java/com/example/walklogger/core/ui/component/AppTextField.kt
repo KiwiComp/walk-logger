@@ -1,6 +1,5 @@
 package com.example.walklogger.core.ui.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
@@ -33,14 +32,6 @@ import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import kotlinx.coroutines.launch
 
-enum class AppTextFieldStyle {
-    /** Dark content on a light surface; every form field. */
-    Default,
-
-    /** Light text on the header surface; the quick note during a walk. */
-    Inverse,
-}
-
 /**
  * Rounded, outlined text field with an optional bold [label] above it and a muted [labelHint]
  * ("Optional") at the end of the label row.
@@ -50,7 +41,6 @@ fun AppTextField(
     value: String,
     onValueChange: (String) -> Unit,
     modifier: Modifier = Modifier,
-    style: AppTextFieldStyle = AppTextFieldStyle.Default,
     label: String? = null,
     labelHint: String? = null,
     placeholder: String? = null,
@@ -66,25 +56,14 @@ fun AppTextField(
     keyboardActions: KeyboardActions = KeyboardActions.Default,
     interactionSource: MutableInteractionSource? = null,
 ) {
-    val colors = when (style) {
-        AppTextFieldStyle.Default -> FieldColors(
-            text = AppTheme.colors.content,
-            label = AppTheme.colors.contentSecondary,
-            muted = AppTheme.colors.placeholder,
-            container = AppTheme.colors.card,
-            outline = AppTheme.colors.outlineStrong,
-            focusedOutline = AppTheme.colors.action,
-        )
-
-        AppTextFieldStyle.Inverse -> FieldColors(
-            text = AppTheme.colors.onHeader,
-            label = AppTheme.colors.onHeaderMuted,
-            muted = AppTheme.colors.onHeaderMuted,
-            container = AppTheme.colors.headerRaised,
-            outline = AppTheme.colors.outlineStrong,
-            focusedOutline = AppTheme.colors.onHeader,
-        )
-    }
+    val colors = FieldColors(
+        text = AppTheme.colors.content,
+        label = AppTheme.colors.contentSecondary,
+        muted = AppTheme.colors.placeholder,
+        container = AppTheme.colors.card,
+        outline = AppTheme.colors.outlineStrong,
+        focusedOutline = AppTheme.colors.action,
+    )
     val bringIntoViewRequester = remember { BringIntoViewRequester() }
     val scope = rememberCoroutineScope()
     var isFocused by remember { mutableStateOf(false) }
@@ -181,22 +160,6 @@ private fun AppTextFieldPreview() {
                 isError = true,
                 supportingText = "Enter a number",
                 modifier = Modifier.padding(top = AppSpacing.lg),
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun AppTextFieldInversePreview() {
-    WalkLoggerTheme {
-        Column(modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg)) {
-            AppTextField(
-                value = "",
-                onValueChange = {},
-                style = AppTextFieldStyle.Inverse,
-                label = "Quick note while you walk",
-                placeholder = "Barked at the bin lorry…",
             )
         }
     }

@@ -1,10 +1,11 @@
 package com.example.walklogger.core.ui.component
 
 import androidx.compose.foundation.BorderStroke
-import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
+import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
@@ -20,7 +21,6 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.core.ui.theme.AppSize
@@ -45,9 +45,6 @@ enum class AppButtonStyle {
 
     /** Light fill; an alternative to the primary action ("This walk already happened", "End walk"). */
     Secondary,
-
-    /** Border only, for navy surfaces; the least emphasised action ("Pause"). */
-    Tertiary,
 }
 
 /**
@@ -65,6 +62,7 @@ fun AppButton(
     width: AppButtonWidth = AppButtonWidth.Fill,
     enabled: Boolean = true,
     loading: Boolean = false,
+    leadingIcon: @Composable (() -> Unit)? = null,
 ) {
     Button(
         onClick = { if (!loading) onClick() },
@@ -84,23 +82,10 @@ fun AppButton(
                 disabledContainerColor = AppTheme.colors.disabled,
                 disabledContentColor = AppTheme.colors.onDisabled,
             )
-
-            AppButtonStyle.Tertiary -> ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = AppTheme.colors.onHeader,
-                disabledContainerColor = Color.Transparent,
-                disabledContentColor = AppTheme.colors.onHeaderMuted,
-            )
         },
         border = when (style) {
             AppButtonStyle.Primary -> null
-
             AppButtonStyle.Secondary -> BorderStroke(1.dp, AppTheme.colors.outlineStrong)
-
-            AppButtonStyle.Tertiary -> BorderStroke(
-                1.dp,
-                if (enabled) AppTheme.colors.outlineStrong else AppTheme.colors.onHeaderMuted,
-            )
         },
         contentPadding = PaddingValues(horizontal = AppSpacing.xxl, vertical = AppSpacing.md),
         modifier = modifier
@@ -108,11 +93,14 @@ fun AppButton(
             .heightIn(min = AppSize.buttonHeight),
     ) {
         Box(contentAlignment = Alignment.Center) {
-            Text(
-                text = text,
-                style = MaterialTheme.typography.titleMedium,
+            Row(
                 modifier = Modifier.alpha(if (loading) 0f else 1f),
-            )
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(AppSpacing.md),
+            ) {
+                leadingIcon?.invoke()
+                Text(text = text, style = MaterialTheme.typography.titleMedium)
+            }
             if (loading) {
                 CircularProgressIndicator(
                     color = LocalContentColor.current,
@@ -150,23 +138,6 @@ private fun AppButtonPreview() {
                 text = "This walk already happened",
                 onClick = {},
                 style = AppButtonStyle.Secondary,
-                enabled = false,
-                modifier = Modifier.padding(top = AppSpacing.lg),
-            )
-        }
-    }
-}
-
-@Preview
-@Composable
-private fun AppButtonTertiaryPreview() {
-    WalkLoggerTheme {
-        Column(modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg)) {
-            AppButton(text = "Pause", onClick = {}, style = AppButtonStyle.Tertiary)
-            AppButton(
-                text = "Pause",
-                onClick = {},
-                style = AppButtonStyle.Tertiary,
                 enabled = false,
                 modifier = Modifier.padding(top = AppSpacing.lg),
             )

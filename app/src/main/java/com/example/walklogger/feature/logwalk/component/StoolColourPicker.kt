@@ -42,7 +42,6 @@ internal fun StoolColourPicker(
     selected: StoolColour?,
     onSelect: (StoolColour?) -> Unit,
     modifier: Modifier = Modifier,
-    style: FormStyle = FormStyle.Default,
 ) {
     FlowRow(
         modifier = modifier.fillMaxWidth().selectableGroup(),
@@ -61,7 +60,7 @@ internal fun StoolColourPicker(
                         if (isSelected) {
                             Modifier.border(
                                 RingWidth,
-                                style.action,
+                                AppTheme.colors.action,
                                 CircleShape,
                             )
                         } else {

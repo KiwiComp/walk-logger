@@ -16,20 +16,16 @@ import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.ui.theme.AppSpacing
+import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 
 /** The folded description rows as one line, "Normal · Firm · Medium brown"; tapping it opens them again. */
 @Composable
-internal fun StoolSummary(
-    stool: Stool?,
-    onClick: () -> Unit,
-    modifier: Modifier = Modifier,
-    style: FormStyle = FormStyle.Default,
-) {
+internal fun StoolSummary(stool: Stool?, onClick: () -> Unit, modifier: Modifier = Modifier) {
     Text(
         text = stool.summary(),
         style = MaterialTheme.typography.bodyMedium,
-        color = style.text,
+        color = AppTheme.colors.content,
         modifier = modifier
             .fillMaxWidth()
             .clickable(role = Role.Button, onClick = onClick)

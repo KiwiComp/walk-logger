@@ -89,24 +89,23 @@
     <string name="dialog_cancel">Cancel</string>
 
     <string name="new_walk_title">New walk</string>
-    <string name="new_walk_who_is_walking">Who is walking</string>
+    <string name="new_walk_who_is_walking">Who is walking?</string>
     <string name="new_walk_equipment">Equipment</string>
     <string name="new_walk_add_handler">+ Add</string>
-    <string name="new_walk_after_note">Rating, weather and notes come after the walk. Start time is set when you tap.</string>
-    <string name="new_walk_timer_starts_now">Timer starts now</string>
+    <string name="new_walk_after_note">You rate the walk and add notes when it ends.</string>
+    <string name="new_walk_timer_starts">Timer starts when you tap</string>
     <string name="new_walk_start">Start walk</string>
-    <string name="new_walk_summary">%1$s · %2$s</string>
     <string name="new_walk_choose_handler">Choose who is walking first.</string>
-    <string name="new_walk_already_happened">This walk already happened</string>
+    <string name="new_walk_already_happened">Log a past walk</string>
     <string name="new_walk_add_handler_title">Who else is walking?</string>
     <string name="new_walk_add_handler_name">Name</string>
 
     <string name="close">Close</string>
 
-    <string name="active_walk_title">Walking</string>
+    <string name="active_walk_title">Walk in progress</string>
     <string name="active_walk_out_with">Out with %1$s</string>
     <string name="active_walk_started_at">Started %1$s</string>
-    <string name="active_walk_quick_note">Quick note while you walk</string>
+    <string name="active_walk_quick_note">Quick note</string>
     <string name="active_walk_quick_note_placeholder">Barked at the bin lorry…</string>
     <string name="active_walk_end">End walk</string>
     <string name="active_walk_discard">Discard walk</string>

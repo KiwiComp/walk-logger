@@ -51,11 +51,10 @@ internal fun <T> StepSlider(
     onSelect: (T) -> Unit,
     label: @Composable (T) -> String,
     modifier: Modifier = Modifier,
-    style: FormStyle = FormStyle.Default,
 ) {
     val colors = AppTheme.colors
-    val railColor = if (style == FormStyle.Default) colors.rail else colors.headerRaised
-    val ringColor = if (style == FormStyle.Default) colors.card else colors.header
+    val railColor = colors.rail
+    val ringColor = colors.card
     val selectedIndex = options.indexOf(selected).takeIf { it >= 0 }
     val restingIndex = options.lastIndex / 2
     // The slider only reports a change, so a tap on the hidden resting stop would otherwise do nothing.
@@ -113,7 +112,7 @@ internal fun <T> StepSlider(
             },
             modifier = Modifier.heightIn(max = AppSize.chipHeight),
         )
-        StopLabels(labels = options.map { label(it) }, color = style.muted)
+        StopLabels(labels = options.map { label(it) }, color = colors.contentMuted)
     }
 }
 

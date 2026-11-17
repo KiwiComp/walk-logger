@@ -15,6 +15,7 @@ import androidx.compose.foundation.selection.toggleable
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Add
+import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,7 +37,7 @@ import com.example.walklogger.core.ui.theme.AppTheme
 import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.logwalk.preview.LogWalkPreviewData
 
-private val PlusSize = 16.dp
+private val IconSize = 16.dp
 
 /** Label size of a [SelectableChip]; the chips themselves keep the same height. */
 internal enum class SelectableChipSize {
@@ -87,7 +88,7 @@ internal fun <T> SelectableChip(
     }
 }
 
-/** Rounded pill; the caller supplies the selection behaviour through [modifier]. */
+/** Rounded pill, ticked while selected; the caller supplies the selection behaviour through [modifier]. */
 @Composable
 private fun PillChip(
     text: String,
@@ -109,12 +110,17 @@ private fun PillChip(
         horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
     ) {
         val content = if (isSelected) colors.onAction else colors.content
-        if (showPlus) {
+        val icon = when {
+            isSelected -> Icons.Filled.Check
+            showPlus -> Icons.Filled.Add
+            else -> null
+        }
+        icon?.let {
             Icon(
-                imageVector = Icons.Filled.Add,
+                imageVector = it,
                 contentDescription = null,
                 tint = content,
-                modifier = Modifier.size(PlusSize),
+                modifier = Modifier.size(IconSize),
             )
         }
         Text(text = text, style = textStyle, color = content)

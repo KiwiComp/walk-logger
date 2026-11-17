@@ -32,11 +32,13 @@ com.example.walklogger
 │   │                          WeatherFormat for the shown numbers; WalkTimesState + WalkTimesEditor hold the date and
 │   │                          times both forms share (duration, the time save blockers, passing the times on to the weather),
 │   │                          and HandlerSelectionEditor the handler chips the new-walk, after-walk and past-walk screens share;
-│   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handlers, equipment, start / log past walk; the first
+│   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handler and equipment cards; StartWalkButton and Log a past
+│   │                          walk at the bottom; the first
 │   │                          Start walk asks for precise location, then starts the walk whatever the answer);
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
-│   │                          stored start, quick note, ActiveStoolSection: a switch for "passed stool" whose description rows
-│   │                          fold into a summary on Done (which turns into Edit), stored on every tap; end walk; system back is swallowed);
+│   │                          stored start in a dark card, quick note card, ActiveStoolSection: a card with a switch for "passed stool"
+│   │                          whose description rows Done folds into a summary (Edit opens them), stored on every tap; End walk and Discard walk
+│   │                          in a bottom bar; system back asks to discard);
 │   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen for the just-finished walk: FinishWalkSummaryCard (dog and
 │   │                          handlers with Change for the handler chips, times and weather each with an Edit/Done toggle) above the shared
 │   │                          form; the close cross confirms, then discards the walk through DiscardWalkUseCase;
@@ -48,8 +50,8 @@ com.example.walklogger
 │   │                          BehaviourSection, MedicalSection, AddNameDialog and its AddHandlerDialog /
 │   │                          AddBehaviourIssueDialog / AddMedicalConcernDialog wrappers, RatingScale (rating faces), StoolSection (Yes/No; the
 │   │                          chevron folds the description into StoolSummary and opens it) with StoolDescriptors, StoolColourPicker and
-│   │                          StoolSwatch, StepSlider (stool amount and texture, and OptionalRatingSlider in OptionalRatingsSection), WhenSection, Labels,
-│   │                          FormStyle for the on-header variant the timer screen uses);
+│   │                          StoolSwatch, StepSlider (stool amount and texture, and OptionalRatingSlider in OptionalRatingsSection), WhenSection,
+│   │                          Labels);
 │   │                          WeatherSection (the past-walk card) wraps WeatherContent, which the after-walk summary card uses directly; it shows
 │   │                          the fetched weather (WeatherSummary, also used by walk detail) with a
 │   │                          fetch button, a °C field and WeatherConditionPicker the handler can correct, the place row
@@ -180,7 +182,8 @@ com.example.walklogger
   Debug builds log to logcat; release builds report nothing, as errors can carry personal or location data.
 - **Colours come from roles.** Read `AppTheme.colors` (`header`, `content`, `outline`, …), never a hue;
   the palette is private to `core/ui/theme`, so a dark theme or new palette only changes that package.
-  Stool swatches are the exception: they depict real colours and stay fixed.
+  Two exceptions stay fixed whatever the theme: stool swatches, which depict real colours, and the
+  rating faces (`res/drawable/rating_*.xml`, drawn by `RatingFace`), which keep the colours drawn into them.
 
 ## Adding a feature
 

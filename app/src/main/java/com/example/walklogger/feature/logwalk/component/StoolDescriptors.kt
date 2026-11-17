@@ -1,6 +1,5 @@
 package com.example.walklogger.feature.logwalk.component
 
-import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.padding
@@ -27,37 +26,38 @@ internal fun StoolDescriptors(
     onTextureSelect: (StoolTexture) -> Unit,
     onColourSelect: (StoolColour?) -> Unit,
     modifier: Modifier = Modifier,
-    style: FormStyle = FormStyle.Default,
 ) {
     Column(modifier = modifier, verticalArrangement = Arrangement.spacedBy(AppSpacing.md)) {
-        DescriptorRow(label = stringResource(R.string.stool_quantity), style = style) {
+        DescriptorRow(label = stringResource(R.string.stool_quantity)) {
             StepSlider(
                 options = StoolQuantity.entries,
                 selected = stool?.quantity,
                 onSelect = onQuantitySelect,
                 label = { stringResource(it.labelRes) },
-                style = style,
             )
         }
-        DescriptorRow(label = stringResource(R.string.stool_texture), style = style) {
+        DescriptorRow(label = stringResource(R.string.stool_texture)) {
             StepSlider(
                 options = StoolTexture.entries,
                 selected = stool?.texture,
                 onSelect = onTextureSelect,
                 label = { stringResource(it.labelRes) },
-                style = style,
             )
         }
-        DescriptorRow(label = stringResource(R.string.stool_colour), style = style) {
-            StoolColourPicker(selected = stool?.colour, onSelect = onColourSelect, style = style)
+        DescriptorRow(label = stringResource(R.string.stool_colour)) {
+            StoolColourPicker(selected = stool?.colour, onSelect = onColourSelect)
         }
     }
 }
 
 @Composable
-private fun DescriptorRow(label: String, style: FormStyle, content: @Composable () -> Unit) {
+private fun DescriptorRow(label: String, content: @Composable () -> Unit) {
     Column(verticalArrangement = Arrangement.spacedBy(AppSpacing.xs)) {
-        Text(text = label, style = MaterialTheme.typography.bodyMedium, color = style.muted)
+        Text(
+            text = label,
+            style = MaterialTheme.typography.bodyMedium,
+            color = AppTheme.colors.contentMuted,
+        )
         content()
     }
 }
@@ -76,25 +76,6 @@ private fun StoolDescriptorsPreview() {
             onTextureSelect = {},
             onColourSelect = {},
             modifier = Modifier.padding(AppSpacing.lg),
-        )
-    }
-}
-
-@Preview
-@Composable
-private fun StoolDescriptorsInversePreview() {
-    WalkLoggerTheme {
-        StoolDescriptors(
-            stool = Stool(
-                passed = true,
-                texture = StoolTexture.SOFT,
-                colour = StoolColour.WHITE_SPECKED,
-            ),
-            onQuantitySelect = {},
-            onTextureSelect = {},
-            onColourSelect = {},
-            style = FormStyle.Inverse,
-            modifier = Modifier.background(AppTheme.colors.header).padding(AppSpacing.lg),
         )
     }
 }

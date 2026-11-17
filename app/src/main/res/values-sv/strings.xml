@@ -86,15 +86,14 @@
     <string name="dialog_cancel">Avbryt</string>
 
     <string name="new_walk_title">Ny promenad</string>
-    <string name="new_walk_who_is_walking">Vem går</string>
+    <string name="new_walk_who_is_walking">Vem går?</string>
     <string name="new_walk_equipment">Utrustning</string>
     <string name="new_walk_add_handler">+ Lägg till</string>
-    <string name="new_walk_after_note">Betyg, väder och anteckningar fylls i efter promenaden. Starttiden sätts när du trycker.</string>
-    <string name="new_walk_timer_starts_now">Timern startar nu</string>
+    <string name="new_walk_after_note">Du betygsätter promenaden och skriver anteckningar när den är slut.</string>
+    <string name="new_walk_timer_starts">Timern startar när du trycker</string>
     <string name="new_walk_start">Starta promenad</string>
-    <string name="new_walk_summary">%1$s · %2$s</string>
     <string name="new_walk_choose_handler">Välj först vem som går.</string>
-    <string name="new_walk_already_happened">Promenaden har redan skett</string>
+    <string name="new_walk_already_happened">Logga en tidigare promenad</string>
     <string name="new_walk_add_handler_title">Vem mer går?</string>
     <string name="new_walk_add_handler_name">Namn</string>
 
@@ -103,7 +102,7 @@
     <string name="active_walk_title">Promenad pågår</string>
     <string name="active_walk_out_with">Ute med %1$s</string>
     <string name="active_walk_started_at">Startade %1$s</string>
-    <string name="active_walk_quick_note">Snabbanteckning under promenaden</string>
+    <string name="active_walk_quick_note">Snabbanteckning</string>
     <string name="active_walk_quick_note_placeholder">Skällde på sopbilen…</string>
     <string name="active_walk_end">Avsluta promenad</string>
     <string name="active_walk_discard">Släng promenaden</string>
