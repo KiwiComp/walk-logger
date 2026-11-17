@@ -10,8 +10,8 @@
     <string name="patterns_title">Patterns</string>
     <string name="settings_title">Settings</string>
     <string name="settings_location">Location</string>
-    <string name="settings_location_allowed">Location is allowed</string>
-    <string name="settings_location_not_allowed">Location is not allowed</string>
+    <string name="settings_location_allowed">Allowed</string>
+    <string name="settings_location_not_allowed">Not allowed</string>
     <string name="settings_location_description">Used to fetch the weather for your walks. Without it, the weather is fetched for the place you choose.</string>
     <string name="settings_location_allow">Allow location</string>
 

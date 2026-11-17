@@ -8,8 +8,8 @@
     <string name="patterns_title">Mönster</string>
     <string name="settings_title">Inställningar</string>
     <string name="settings_location">Plats</string>
-    <string name="settings_location_allowed">Platsen är tillåten</string>
-    <string name="settings_location_not_allowed">Platsen är inte tillåten</string>
+    <string name="settings_location_allowed">Tillåten</string>
+    <string name="settings_location_not_allowed">Inte tillåten</string>
     <string name="settings_location_description">Används för att hämta vädret för dina promenader. Utan den hämtas vädret för platsen du väljer.</string>
     <string name="settings_location_allow">Tillåt plats</string>
 

@@ -72,8 +72,8 @@ com.example.walklogger
 │   │                          Edit pushes LogPastWalkScreen, Delete walk deletes it (AppConfirmDialog confirms first) and back returns to
 │   │                          the tab; component/ holds WalkHeroCard and DetailPlaceholder
 │   ├── patterns/              placeholder, same shape as calendar
-│   ├── settings/              SettingsViewModel + SettingsScreen, pushed from Log's header: LocationSetting shows whether
-│   │                          location is allowed and lets the user allow it later (dialog or system settings, through
+│   ├── settings/              SettingsViewModel + SettingsScreen, pushed from Log's header: LocationSetting is a card whose
+│   │                          StatusTag shows whether location is allowed, and lets the user allow it later (dialog or system settings, through
 │   │                          rememberAllowLocation), rereading the permission on resume
 │   └── dog/                   DogViewModel + DogScreen (dog cards with details, Active or Switch, Add dog, deleted dogs dashed) composed from
 │                              component/ (DogList); deleting a dog soft-deletes it (`isHidden`) so its walks stay, and it can
@@ -125,7 +125,7 @@ com.example.walklogger
 │   │                          lives per build type (logcat in src/debug, no-op in src/release)
 │   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, DogBadge,
-│                              SectionLabel, SegmentedToggle, PillButton (Filled, Outlined, Inverse) / EditDonePillButton, RatingFace, AppSwitch, DashedButton,
+│                              SectionLabel, SegmentedToggle, PillButton (Filled, Outlined, Inverse) / EditDonePillButton, StatusTag, RatingFace, AppSwitch, DashedButton,
 │                              AddWalkFab, DayHeading (and dayTitle), DayWalks, WalkTimeline, WalkCard and their TimelineWalk model, EquipmentChip,
 │                              AppButton, AppTextField, AppPickerField, AppDateField, EmptyTabContent, AppSnackbarHost,
 │                              AppConfirmDialog for discard and delete confirmations; addWalkClick decides what

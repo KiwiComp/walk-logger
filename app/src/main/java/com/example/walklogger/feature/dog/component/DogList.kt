@@ -8,12 +8,9 @@ import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
-import androidx.compose.foundation.layout.size
-import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.automirrored.filled.KeyboardArrowRight
-import androidx.compose.material.icons.filled.Check
 import androidx.compose.material3.Icon
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
@@ -36,6 +33,8 @@ import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.PillButton
 import com.example.walklogger.core.ui.component.PillButtonStyle
+import com.example.walklogger.core.ui.component.StatusTag
+import com.example.walklogger.core.ui.component.StatusTagTone
 import com.example.walklogger.core.ui.theme.AppRadius
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
@@ -43,8 +42,6 @@ import com.example.walklogger.core.ui.theme.WalkLoggerTheme
 import com.example.walklogger.feature.dog.DogListItemUiState
 import com.example.walklogger.feature.dog.preview.DogPreviewData
 import java.text.NumberFormat
-
-private val ActiveIconSize = 18.dp
 
 /**
  * The dogs as cards, each with "Active" or a Switch button. Pass [onEditDog] to make the cards
@@ -121,7 +118,7 @@ private fun DogCard(dog: DogListItemUiState, onSwitch: () -> Unit, onEdit: (() -
             }
         }
         if (dog.isActive) {
-            ActiveTag()
+            StatusTag(text = stringResource(R.string.dog_active), tone = StatusTagTone.Positive)
         } else {
             val description = stringResource(R.string.dog_switch_to, dog.name)
             PillButton(
@@ -138,29 +135,6 @@ private fun DogCard(dog: DogListItemUiState, onSwitch: () -> Unit, onEdit: (() -
                 tint = AppTheme.colors.dashed,
             )
         }
-    }
-}
-
-@Composable
-private fun ActiveTag() {
-    Row(
-        modifier = Modifier
-            .background(AppTheme.colors.actionLight, CircleShape)
-            .padding(horizontal = AppSpacing.md, vertical = AppSpacing.sm),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(AppSpacing.xs),
-    ) {
-        Icon(
-            imageVector = Icons.Filled.Check,
-            contentDescription = null,
-            tint = AppTheme.colors.onActionLight,
-            modifier = Modifier.size(ActiveIconSize),
-        )
-        Text(
-            text = stringResource(R.string.dog_active),
-            style = MaterialTheme.typography.titleSmall,
-            color = AppTheme.colors.onActionLight,
-        )
     }
 }
 
