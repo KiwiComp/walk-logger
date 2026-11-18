@@ -15,6 +15,7 @@ weather at the time. Walks can be timed live or logged afterwards, and are brows
 - **Calendar**: month grid with a rating face per day, with the walks of the selected day.
 - **Walk detail**: read-only view of a logged walk, with edit and discard.
 - **Dogs**: register several dogs, pick the active one; deleted dogs keep their history.
+- Light and dark theme, following the system or chosen in Settings.
 - English and Swedish.
 
 ## Tech stack

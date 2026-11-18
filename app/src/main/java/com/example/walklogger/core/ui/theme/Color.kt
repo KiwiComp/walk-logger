@@ -4,7 +4,7 @@ import androidx.compose.runtime.Immutable
 import androidx.compose.ui.graphics.Color
 
 // Palette from the 2026-11 redesign (warm neutrals + forest green). Private so screens go through
-// the semantic roles in [AppColors]; a dark theme or new palette then only changes this file.
+// the semantic roles in [AppColors]; a new palette then only changes this file.
 private val Ink = Color(0xFF17212B) // primary text, dark hero card, selected day
 private val InkRaised = Color(0xFF26323F) // tile on the dark hero card
 private val InkSecondary = Color(0xFF3E4752) // body text, sub-labels
@@ -34,6 +34,38 @@ private val Danger = Color(0xFFB3261E) // "Delete walk" / "Delete dog"
 
 private val DisabledSurface = Color(0xFFEEECE7)
 private val DisabledContent = Color(0xFF9A9EA4)
+
+private val DarkCanvas = Color(0xFF12171D)
+private val DarkSurface = Color(0xFF1B222A)
+private val DarkSurfaceSubtle = Color(0xFF222A33)
+private val DarkTrack = Color(0xFF262E37)
+private val DarkOutline = Color(0xFF2C353F)
+private val DarkOutlineStrong = Color(0xFF3A444F)
+private val DarkRail = Color(0xFF333C46)
+private val DarkDashed = Color(0xFF6B7480)
+
+private val DarkInk = Color(0xFFECEFF2)
+private val DarkInkSecondary = Color(0xFFC3C9D0)
+private val DarkInkMuted = Color(0xFF9AA3AD)
+private val DarkInkPlaceholder = Color(0xFF858E99)
+
+private val DarkGreen = Color(0xFF6CC497) // lighter green, so it reads on dark
+private val DarkOnGreen = Color(0xFF0F2A1D) // dark text on the green button
+private val DarkGreenSoft = Color(0xFF1E3A2D)
+private val DarkGreenOnSoft = Color(0xFFA9DFC2)
+private val DarkGreenFocus = Color(0xFF2F5A44)
+
+private val DarkHero = Color(0xFF232D38)
+private val DarkHeroRaised = Color(0xFF2F3A47)
+private val DarkOnHeroMuted = Color(0xFFAEB8C3)
+
+private val DarkWarnSoft = Color(0xFF3D2C14)
+private val DarkWarnOnSoft = Color(0xFFF4C98A)
+private val DarkWarnOutline = Color(0xFFB57A2A)
+private val DarkDanger = Color(0xFFFF8A80)
+
+private val DarkDisabledSurface = Color(0xFF222930)
+private val DarkDisabledContent = Color(0xFF5C6570)
 
 /** Colour roles the UI reads through [AppTheme.colors]; never reference palette hues directly. */
 @Immutable
@@ -115,6 +147,42 @@ internal val LightAppColors = AppColors(
         Color(0xFF4CAF68), // 7 very happy
     ),
     ratingFaceInk = Color(0xFF3B2A12),
+)
+
+internal val DarkAppColors = AppColors(
+    background = DarkCanvas,
+    card = DarkSurface,
+    cardSubtle = DarkSurfaceSubtle,
+    chip = DarkTrack,
+    outline = DarkOutline,
+    outlineStrong = DarkOutlineStrong,
+    rail = DarkRail,
+    dashed = DarkDashed,
+    content = DarkInk,
+    contentSecondary = DarkInkSecondary,
+    contentMuted = DarkInkMuted,
+    placeholder = DarkInkPlaceholder,
+    action = DarkGreen,
+    onAction = DarkOnGreen,
+    actionLight = DarkGreenSoft,
+    onActionLight = DarkGreenOnSoft,
+    focusRing = DarkGreenFocus,
+    header = DarkHero,
+    headerRaised = DarkHeroRaised,
+    onHeader = OnInk,
+    onHeaderMuted = DarkOnHeroMuted,
+    // Light mode marks the selected day dark; dark mode flips it to light.
+    selection = DarkInk,
+    onSelection = DarkCanvas,
+    warningLight = DarkWarnSoft,
+    onWarningLight = DarkWarnOnSoft,
+    warningOutline = DarkWarnOutline,
+    danger = DarkDanger,
+    disabled = DarkDisabledSurface,
+    onDisabled = DarkDisabledContent,
+    // Same faces in both themes, so the rating reads the same.
+    ratingTints = LightAppColors.ratingTints,
+    ratingFaceInk = LightAppColors.ratingFaceInk,
 )
 
 // Stool swatches: unchanged. The redesign uses the same hues.

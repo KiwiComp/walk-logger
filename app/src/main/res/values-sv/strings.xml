@@ -12,6 +12,10 @@
     <string name="settings_location_not_allowed">Inte tillåten</string>
     <string name="settings_location_description">Används för att hämta vädret för dina promenader. Utan den hämtas vädret för platsen du väljer.</string>
     <string name="settings_location_allow">Tillåt plats</string>
+    <string name="settings_theme">Utseende</string>
+    <string name="settings_theme_light">Ljust</string>
+    <string name="settings_theme_dark">Mörkt</string>
+    <string name="settings_theme_system">System</string>
 
     <string name="calendar_title">Kalender</string>
     <string name="calendar_previous_month">Föregående månad</string>
@@ -279,6 +283,7 @@
     <string name="error_save_dog">Kunde inte spara hunden</string>
     <string name="error_delete_dog">Kunde inte ta bort hunden</string>
     <string name="error_select_dog">Kunde inte byta hund</string>
+    <string name="error_save_theme">Kunde inte spara utseendet</string>
     <string name="error_walk_not_found">Promenaden finns inte längre</string>
     <string name="error_dog_not_found">Hunden finns inte längre</string>
 </resources>
