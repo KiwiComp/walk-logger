@@ -18,6 +18,27 @@ weather at the time. Walks can be timed live or logged afterwards, and are brows
 - Light and dark theme, following the system or chosen in Settings.
 - English and Swedish.
 
+## Appearance
+
+### Light mode
+<img width="150" alt="Screenshot_20261117_182731" src="https://github.com/user-attachments/assets/04add677-f8b2-49a9-a6db-15fc52759f2e" />
+<img width="150" alt="Screenshot_20261117_182800" src="https://github.com/user-attachments/assets/8ebeea4e-a33d-407f-8baa-0a4f6bbcbf1f" />
+<img width="150" alt="Screenshot_20261117_182814" src="https://github.com/user-attachments/assets/126f4781-6219-475f-8330-02f63651c529" />
+<img width="150" alt="Screenshot_20261117_182824" src="https://github.com/user-attachments/assets/74f2ddf8-df53-4588-92bc-7abc84db6d51" />
+<img width="150" alt="Screenshot_20261117_182846" src="https://github.com/user-attachments/assets/c317558b-3847-41f3-92cf-38fd4c400ab6" />
+<img width="150" alt="Screenshot_20261117_182935" src="https://github.com/user-attachments/assets/e2fa3084-5174-4c3f-a35d-6712df29e6a2" />
+<img width="150" alt="Screenshot_20261117_183014" src="https://github.com/user-attachments/assets/6264d262-191f-4ddd-b875-61bdeaef376d" />
+<img width="150" alt="Screenshot_20261117_183325" src="https://github.com/user-attachments/assets/bc73498c-6714-4d9e-9a28-d20d303562e1" />
+<img width="150" alt="Screenshot_20261120_123833" src="https://github.com/user-attachments/assets/0e13ec07-a042-44d9-9d90-57c728eb9e91" />
+
+### Dark mode
+<img width="150" alt="Screenshot_20261120_124228" src="https://github.com/user-attachments/assets/4f397b31-4647-4acb-902d-5132f3516cba" />
+<img width="150" alt="Screenshot_20261120_124236" src="https://github.com/user-attachments/assets/f9a16a5c-6f0b-4a19-a1ca-51977e7d39a4" />
+<img width="150" alt="Screenshot_20261120_124120" src="https://github.com/user-attachments/assets/df993704-a37e-49be-ab54-74d5542d705a" />
+<img width="150" alt="Screenshot_20261120_124136" src="https://github.com/user-attachments/assets/ab71aef1-6e2d-4de4-adcd-fe0ee27a2214" />
+<img width="150" alt="Screenshot_20261120_124207" src="https://github.com/user-attachments/assets/3edfef73-8611-4ca8-94bc-771a842dcf71" />
+<img width="150" alt="Screenshot_20261120_124040" src="https://github.com/user-attachments/assets/53bd6ee2-361e-4ff6-bffd-98abe3d7a897" />
+
 ## Tech stack
 
 Kotlin, Jetpack Compose (Material 3), Navigation 3, Hilt, Room, DataStore, coroutines and Flow,
