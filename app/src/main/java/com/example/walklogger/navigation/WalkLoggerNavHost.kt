@@ -55,7 +55,10 @@ fun WalkLoggerNavHost(
             snackbarHostState = snackbarHostState,
             snackbarHeight = snackbarHeight,
         )
-        settingsScreen(onBack = navigationState::goBack)
+        settingsScreen(
+            onBack = navigationState::goBack,
+            snackbarHostState = snackbarHostState,
+        )
         calendarScreen(
             onAddWalk = { navigationState.currentStack.navigateToNewWalk(it) },
             onLogPastWalk = { navigationState.currentStack.navigateToLogPastWalk(it) },

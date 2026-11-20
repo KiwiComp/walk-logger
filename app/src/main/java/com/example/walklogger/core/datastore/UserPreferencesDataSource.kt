@@ -9,6 +9,7 @@ import androidx.datastore.preferences.core.longPreferencesKey
 import androidx.datastore.preferences.core.stringPreferencesKey
 import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Place
+import com.example.walklogger.core.model.ThemeMode
 import com.example.walklogger.core.model.WalkLocation
 import javax.inject.Inject
 import javax.inject.Singleton
@@ -87,6 +88,14 @@ class UserPreferencesDataSource @Inject constructor(private val dataStore: DataS
         }
     }
 
+    val themeMode: Flow<ThemeMode> = dataStore.data.map { prefs ->
+        ThemeMode.entries.find { it.name == prefs[THEME_MODE] } ?: ThemeMode.System
+    }
+
+    suspend fun setThemeMode(mode: ThemeMode) {
+        dataStore.edit { it[THEME_MODE] = mode.name }
+    }
+
     private companion object {
         val ACTIVE_DOG_ID = longPreferencesKey("active_dog_id")
         val WEATHER_PLACE_NAME = stringPreferencesKey("weather_place_name")
@@ -97,5 +106,6 @@ class UserPreferencesDataSource @Inject constructor(private val dataStore: DataS
         val ACTIVE_WALK_ID = longPreferencesKey("active_walk_id")
         val ACTIVE_WALK_LATITUDE = doublePreferencesKey("active_walk_latitude")
         val ACTIVE_WALK_LONGITUDE = doublePreferencesKey("active_walk_longitude")
+        val THEME_MODE = stringPreferencesKey("theme_mode")
     }
 }

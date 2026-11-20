@@ -14,6 +14,10 @@
     <string name="settings_location_not_allowed">Not allowed</string>
     <string name="settings_location_description">Used to fetch the weather for your walks. Without it, the weather is fetched for the place you choose.</string>
     <string name="settings_location_allow">Allow location</string>
+    <string name="settings_theme">Appearance</string>
+    <string name="settings_theme_light">Light</string>
+    <string name="settings_theme_dark">Dark</string>
+    <string name="settings_theme_system">System</string>
 
     <string name="calendar_title">Calendar</string>
     <string name="calendar_previous_month">Previous month</string>
@@ -283,6 +287,7 @@
     <string name="error_save_dog">Couldn\'t save the dog</string>
     <string name="error_delete_dog">Couldn\'t delete the dog</string>
     <string name="error_select_dog">Couldn\'t switch dog</string>
+    <string name="error_save_theme">Couldn\'t save the appearance</string>
     <string name="error_walk_not_found">The walk no longer exists</string>
     <string name="error_dog_not_found">The dog no longer exists</string>
 </resources>

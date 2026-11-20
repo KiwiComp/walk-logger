@@ -7,7 +7,9 @@ Kotlin `Flow` end to end. Packages are organised **by feature**, with shared cod
 ```
 com.example.walklogger
 ├── WalkLoggerApplication.kt   @HiltAndroidApp – root of the DI graph
-├── MainActivity.kt            single activity, hosts WalkLoggerApp()
+├── MainActivity.kt            single activity, hosts WalkLoggerApp() in WalkLoggerTheme; the first frame waits for
+│                              the saved ThemeMode so the wrong theme never shows
+├── MainActivityViewModel.kt   loads the saved ThemeMode eagerly, null until it has loaded
 │
 ├── navigation/                app-level NavDisplay, per-tab back stacks (WalkLoggerNavigationState),
 │                              bottom bar, top-level destinations;
@@ -74,7 +76,8 @@ com.example.walklogger
 │   ├── patterns/              placeholder, same shape as calendar
 │   ├── settings/              SettingsViewModel + SettingsScreen, pushed from Log's header: LocationSetting is a card whose
 │   │                          StatusTag shows whether location is allowed, and lets the user allow it later (dialog or system settings, through
-│   │                          rememberAllowLocation), rereading the permission on resume
+│   │                          rememberAllowLocation), rereading the permission on resume; ThemeSetting picks Light, Dark
+│   │                          or System with a SegmentedToggle, and a failed save shows a snackbar
 │   └── dog/                   DogViewModel + DogScreen (dog cards with details, Active or Switch, Add dog, deleted dogs dashed) composed from
 │                              component/ (DogList); deleting a dog soft-deletes it (`isHidden`) so its walks stay, and it can
 │                              still be selected as active to read its history in Log and Calendar, but not to log walks
@@ -99,7 +102,7 @@ com.example.walklogger
 │
 ├── core/
 │   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern, WalkWeather with its
-│   │                          WeatherCondition and the TemperatureBand derived from °C) – no Android deps;
+│   │                          WeatherCondition and the TemperatureBand derived from °C, ThemeMode) – no Android deps;
 │   │                          StoolEdits holds the stool answer rules the forms and the timer share; WalkDays gives a
 │   │                          walk's start day and time and groups walks by day, for Log and Calendar
 │   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository /
@@ -107,7 +110,8 @@ com.example.walklogger
 │   │                          WeatherRepository (Open-Meteo forecast, WMO codes mapped in WeatherMappers, and how far back
 │   │                          it reaches), LocationRepository (device location over core/location, whether location
 │   │                          has been asked for, and the saved place with its geocoding search as the fallback),
-│   │                          ActiveWalkLocationRepository (the active walk's start position) and WalkLocationCapturer
+│   │                          ActiveWalkLocationRepository (the active walk's start position), UserSettingsRepository
+│   │                          (app-wide choices from Settings: the theme mode) and WalkLocationCapturer
 │   │                          (implemented in service/)
 │   ├── network/               Retrofit APIs for Open-Meteo's forecast and geocoding, their @Serializable DTOs
 │   ├── location/              LocationProvider (fused location; accepts coarse or fine permission, high accuracy with fine
@@ -118,12 +122,13 @@ com.example.walklogger
 │   │                          seeded defaults carry a `key` that Labels.kt maps to a string resource (user-added
 │   │                          rows show their name), and `isHidden` soft-deletes without touching walk history
 │   ├── datastore/             Preferences DataStore (active dog id, the weather place, the active walk's start position,
-│   │                          whether location was asked for)
+│   │                          whether location was asked for, the theme mode)
 │   ├── common/                runCatchingCancellable; ErrorReporter (+ reportUnlessOffline) for caught errors;
 │   │                          Time.kt converts stored epoch millis to and from local date-times;
 │   │                          di/ holds the injectable coroutine dispatchers and Clock; the ErrorReporter binding
 │   │                          lives per build type (logcat in src/debug, no-op in src/release)
-│   └── ui/                    theme (AppColors roles via AppTheme.colors over a private palette, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
+│   └── ui/                    theme (light and dark AppColors roles via AppTheme.colors over private palettes, WalkLoggerTheme(darkTheme)
+│                              picking between them, fixed stool swatches, AppSpacing/AppRadius/AppSize tokens)
 │                              + shared composables (WalkLoggerHeader, HeaderIconButton, DogBadge,
 │                              SectionLabel, SegmentedToggle, PillButton (Filled, Outlined, Inverse) / EditDonePillButton, StatusTag, RatingFace, AppSwitch, DashedButton,
 │                              AddWalkFab, DayHeading (and dayTitle), DayWalks, WalkTimeline, WalkCard and their TimelineWalk model, EquipmentChip,
@@ -181,7 +186,8 @@ com.example.walklogger
   `ErrorReporter.report`; network failures use `reportUnlessOffline`, since being offline is expected.
   Debug builds log to logcat; release builds report nothing, as errors can carry personal or location data.
 - **Colours come from roles.** Read `AppTheme.colors` (`header`, `content`, `outline`, …), never a hue;
-  the palette is private to `core/ui/theme`, so a dark theme or new palette only changes that package.
+  the palettes are private to `core/ui/theme`, so a new palette only changes that package; light and dark
+  share the same roles.
   Two exceptions stay fixed whatever the theme: stool swatches, which depict real colours, and the
   rating faces (`res/drawable/rating_*.xml`, drawn by `RatingFace`), which keep the colours drawn into them.
 
