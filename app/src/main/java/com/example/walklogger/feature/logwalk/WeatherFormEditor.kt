@@ -73,7 +73,7 @@ class WeatherFormEditor(
         input.update {
             it.copy(
                 fetchedWeather = weather,
-                temperatureInput = weather?.temperatureCelsius?.let(::formatWeatherValue).orEmpty(),
+                temperatureInput = weather?.temperatureCelsius?.let(::formatWeatherInput).orEmpty(),
                 condition = weather?.condition,
                 isExpanded = weather != null,
                 isEditing = false,
@@ -104,9 +104,14 @@ class WeatherFormEditor(
 
     override fun setTemperature(text: String) = input.update {
         it.copy(
-            temperatureInput = text.filter { c ->
-                c.isDigit() || c in TEMPERATURE_SYMBOLS
-            }.take(MAX_TEMPERATURE_LENGTH),
+            temperatureInput = text.mapNotNull { c ->
+                when {
+                    c.isDigit() -> '0' + c.digitToInt()
+                    c == ARABIC_DECIMAL_SEPARATOR -> ','
+                    c in TEMPERATURE_SYMBOLS -> c
+                    else -> null
+                }
+            }.joinToString("").take(MAX_TEMPERATURE_LENGTH),
             isEditedManually = true,
         )
     }
@@ -243,7 +248,7 @@ class WeatherFormEditor(
         when (result) {
             is WeatherFetchResult.Fetched -> copy(
                 fetchedWeather = result.weather,
-                temperatureInput = result.weather.temperatureCelsius?.let(::formatWeatherValue)
+                temperatureInput = result.weather.temperatureCelsius?.let(::formatWeatherInput)
                     .orEmpty(),
                 condition = result.weather.condition,
                 isEditedManually = false,
@@ -260,7 +265,10 @@ class WeatherFormEditor(
 
     private companion object {
         const val MAX_TEMPERATURE_LENGTH = 6
-        const val TEMPERATURE_SYMBOLS = "-.,"
+        const val TEMPERATURE_SYMBOLS = "-−.,"
+
+        /** Arabic and Persian keyboards type it; [WeatherFormState.temperatureCelsius] only parses `,` and `.`. */
+        const val ARABIC_DECIMAL_SEPARATOR = '٫'
 
         /** Long enough for most fetches, short enough that the handler never feels stuck on Save. */
         val FETCH_WAIT_TIME = 5.seconds

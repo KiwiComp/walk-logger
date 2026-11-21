@@ -13,6 +13,7 @@ import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import java.time.Duration
 import java.time.Instant
+import java.util.Locale
 import kotlinx.coroutines.test.TestScope
 import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
@@ -250,6 +251,37 @@ class WeatherFormEditorTest {
             assertNull(editor.state.value.condition)
             assertTrue(editor.state.value.isEditedManually)
         }
+
+    @Test
+    fun `typed Arabic-Indic digits and decimal separator become a parsable temperature`() =
+        runEditorTest { editor ->
+            editor.setTemperature("-٢٫٥")
+            assertEquals("-2,5", editor.state.value.temperatureInput)
+            assertEquals(-2.5, editor.state.value.temperatureCelsius!!, 0.0)
+        }
+
+    /** ar-EG formats with Arabic-Indic digits, `٫` and a direction mark before the minus. */
+    @Test
+    fun `a fetched or stored sub-zero temperature is saved in a locale with its own number symbols`() =
+        withLocale("ar-EG") {
+            weatherRepository.weather = fetched.copy(temperatureCelsius = -2.5)
+            runEditorTest { editor ->
+                editor.onTimesChanged(start, end, autoFetch = true)
+                assertEquals(-2.5, editor.state.value.walkWeather?.temperatureCelsius!!, 0.0)
+                editor.prefillFrom(WalkWeather(temperatureCelsius = -3.5))
+                assertEquals(-3.5, editor.state.value.walkWeather?.temperatureCelsius!!, 0.0)
+            }
+        }
+
+    private fun withLocale(tag: String, body: () -> Unit) {
+        val defaultLocale = Locale.getDefault()
+        Locale.setDefault(Locale.forLanguageTag(tag))
+        try {
+            body()
+        } finally {
+            Locale.setDefault(defaultLocale)
+        }
+    }
 
     @Test
     fun `clear weather drops everything and keeps new times from refetching`() =

@@ -32,8 +32,9 @@ data class WeatherFormState(
     /** True while the weather is shown; opens by itself when there is weather or something to say about it. */
     val isExpanded: Boolean = false,
 ) {
-    /** Null when the field is empty or not a number; accepts a decimal comma. */
-    val temperatureCelsius: Double? get() = temperatureInput.replace(',', '.').toDoubleOrNull()
+    /** Null when the field is empty or not a number; accepts a decimal comma and a typed U+2212 minus sign. */
+    val temperatureCelsius: Double?
+        get() = temperatureInput.replace(',', '.').replace('−', '-').toDoubleOrNull()
 
     /**
      * The fetch button only shows when fetching can bring something new. Too-old walks would fail again,
