@@ -31,7 +31,8 @@ com.example.walklogger
 │   │                          applyTo(walk)); each form ViewModel keeps one private and exposes only `formActions`;
 │   │                          the weather section is its own WeatherFormState + WeatherFormEditor (implements
 │   │                          WeatherFormActions, which WalkFormActions extends and WalkFormEditor passes on), with
-│   │                          WeatherFormat for the shown numbers; WalkTimesState + WalkTimesEditor hold the date and
+│   │                          WeatherFormat for the shown numbers (device locale) and the °C field's input (ASCII digits
+│   │                          and minus, so it parses back in any locale); WalkTimesState + WalkTimesEditor hold the date and
 │   │                          times both forms share (duration, the time save blockers, passing the times on to the weather),
 │   │                          and HandlerSelectionEditor the handler chips the new-walk, after-walk and past-walk screens share;
 │   │                          newwalk/ NewWalkViewModel + NewWalkScreen (handler and equipment cards; StartWalkButton and Log a past
