@@ -6,7 +6,7 @@ import kotlinx.coroutines.flow.Flow
 
 /** Where the device is, whether the app has asked for location, and the saved place to fall back on without it. */
 interface LocationRepository {
-    /** True with either coarse or fine location, so a later precise-location grant still counts. */
+    /** True only with precise location; approximate location is too coarse for a route and counts as none. */
     fun hasPermission(): Boolean
 
     /** Null without permission or when the device cannot tell where it is. */

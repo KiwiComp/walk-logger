@@ -10,13 +10,19 @@ import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.rememberUpdatedState
+import androidx.compose.runtime.saveable.rememberSaveable
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.res.stringResource
+import com.example.walklogger.R
 
 /**
- * Shows the system dialog for location while [shouldRequest] is true and reports whether any location
- * was granted. Precise location is asked for now, as route tracking will need it; from Android 12 the
- * user may still pick approximate, which is enough for the weather.
+ * While [shouldRequest] is true, first explains that only precise location works, then shows the
+ * system dialog and reports whether precise location was granted. Coarse is asked for too, as
+ * Android 12 and later ignore a request for fine alone; the user may still pick approximate, which
+ * the app treats as no location.
  */
 @Composable
 fun LocationPermissionRequest(shouldRequest: Boolean, onResult: (granted: Boolean) -> Unit) {
@@ -24,17 +30,27 @@ fun LocationPermissionRequest(shouldRequest: Boolean, onResult: (granted: Boolea
         rememberLauncherForActivityResult(
             ActivityResultContracts.RequestMultiplePermissions(),
         ) { results ->
-            onResult(results.values.any { it })
+            onResult(results[Manifest.permission.ACCESS_FINE_LOCATION] == true)
         }
+    // Saved so a rotation while the system dialog is up neither shows the explanation again nor relaunches it.
+    var isExplained by rememberSaveable { mutableStateOf(false) }
     LaunchedEffect(shouldRequest) {
-        if (shouldRequest) {
-            launcher.launch(
-                arrayOf(
-                    Manifest.permission.ACCESS_FINE_LOCATION,
-                    Manifest.permission.ACCESS_COARSE_LOCATION,
-                ),
-            )
-        }
+        if (!shouldRequest) isExplained = false
+    }
+    if (shouldRequest && !isExplained) {
+        AppInfoDialog(
+            title = stringResource(R.string.location_precise_title),
+            message = stringResource(R.string.location_precise_message),
+            onConfirm = {
+                isExplained = true
+                launcher.launch(
+                    arrayOf(
+                        Manifest.permission.ACCESS_FINE_LOCATION,
+                        Manifest.permission.ACCESS_COARSE_LOCATION,
+                    ),
+                )
+            },
+        )
     }
 }
 

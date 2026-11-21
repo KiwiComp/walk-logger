@@ -195,6 +195,8 @@
     <string name="weather_attribution">Väderdata: Open-Meteo.com</string>
     <string name="walk_location_channel">Promenadplats</string>
     <string name="walk_location_notification">Hämtar plats för vädret…</string>
+    <string name="location_precise_title">Välj exakt plats</string>
+    <string name="location_precise_message">Funktionerna som använder din plats fungerar bara med exakt plats. Välj Exakt i nästa dialog.</string>
     <string name="log_past_walk_stool">Avföring</string>
     <string name="stool_passed_yes">Ja</string>
     <string name="stool_passed_no">Nej</string>

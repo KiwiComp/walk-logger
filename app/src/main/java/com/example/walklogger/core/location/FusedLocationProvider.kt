@@ -19,32 +19,24 @@ class FusedLocationProvider @Inject constructor(@ApplicationContext private val 
 
     private val client = LocationServices.getFusedLocationProviderClient(context)
 
-    override fun hasPermission(): Boolean = isGranted(Manifest.permission.ACCESS_FINE_LOCATION) ||
-        isGranted(Manifest.permission.ACCESS_COARSE_LOCATION)
+    override fun hasPermission(): Boolean = ContextCompat.checkSelfPermission(
+        context,
+        Manifest.permission.ACCESS_FINE_LOCATION,
+    ) == PackageManager.PERMISSION_GRANTED
 
-    /**
-     * With precise location the request may turn on GPS, so a position is found without Wi-Fi or
-     * cell positioning; approximate location cannot use GPS and stays on the balanced priority.
-     */
+    /** High accuracy may turn on GPS, so a position is found without Wi-Fi or cell positioning. */
     override suspend fun currentLocation(): Coordinates? {
-        // Checked inline, not through isGranted, so lint's MissingPermission check sees it.
-        val hasFine = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_FINE_LOCATION,
-        ) == PackageManager.PERMISSION_GRANTED
-        val hasCoarse = ContextCompat.checkSelfPermission(
-            context,
-            Manifest.permission.ACCESS_COARSE_LOCATION,
-        ) == PackageManager.PERMISSION_GRANTED
-        if (!hasFine && !hasCoarse) return null
-        val priority = if (hasFine) {
-            Priority.PRIORITY_HIGH_ACCURACY
-        } else {
-            Priority.PRIORITY_BALANCED_POWER_ACCURACY
+        // Checked inline, not through hasPermission, so lint's MissingPermission check sees it.
+        if (ContextCompat.checkSelfPermission(
+                context,
+                Manifest.permission.ACCESS_FINE_LOCATION,
+            ) != PackageManager.PERMISSION_GRANTED
+        ) {
+            return null
         }
         val cancellation = CancellationTokenSource()
         val request = CurrentLocationRequest.Builder()
-            .setPriority(priority)
+            .setPriority(Priority.PRIORITY_HIGH_ACCURACY)
             .setMaxUpdateAgeMillis(MAX_LOCATION_AGE_MILLIS)
             .setDurationMillis(MAX_WAIT_MILLIS)
             .build()
@@ -52,9 +44,6 @@ class FusedLocationProvider @Inject constructor(@ApplicationContext private val 
             ?: client.lastLocation.await()
         return location?.let { Coordinates(it.latitude, it.longitude) }
     }
-
-    private fun isGranted(permission: String) =
-        ContextCompat.checkSelfPermission(context, permission) == PackageManager.PERMISSION_GRANTED
 
     private companion object {
         /** Weather is per area and hour, so a position from the last half hour is good enough and returns at once. */
