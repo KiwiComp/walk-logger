@@ -105,20 +105,23 @@ com.example.walklogger
 │   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern, WalkWeather with its
 │   │                          WeatherCondition and the TemperatureBand derived from °C, ThemeMode) – no Android deps;
 │   │                          StoolEdits holds the stool answer rules the forms and the timer share; WalkDays gives a
-│   │                          walk's start day and time and groups walks by day, for Log and Calendar
+│   │                          walk's start day and time and groups walks by day, for Log and Calendar; RoutePoint is a
+│   │                          position recorded during an active walk, and `within` hides those outside the walk's times
 │   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository /
 │   │                          MedicalConcernRepository interfaces + Room-backed implementations, mappers;
 │   │                          WeatherRepository (Open-Meteo forecast, WMO codes mapped in WeatherMappers, and how far back
 │   │                          it reaches), LocationRepository (device location over core/location, whether location
 │   │                          has been asked for, and the saved place with its geocoding search as the fallback),
-│   │                          ActiveWalkLocationRepository (the active walk's start position), UserSettingsRepository
+│   │                          ActiveWalkLocationRepository (the active walk's start position), WalkRouteRepository
+│   │                          (the positions recorded during an active walk), UserSettingsRepository
 │   │                          (app-wide choices from Settings: the theme mode) and WalkLocationCapturer
 │   │                          (implemented in service/)
 │   ├── network/               Retrofit APIs for Open-Meteo's forecast and geocoding, their @Serializable DTOs
 │   ├── location/              LocationProvider (fused location; needs precise permission, approximate counts as none;
 │   │                          high accuracy so GPS can answer without Wi-Fi or cell positioning), read through LocationRepository
 │   ├── database/              Room database, DAOs, entities, type converters; walks join behaviour issues and medical
-│   │                          concerns through walk_behaviour_issues / walk_medical_concerns; the defaults are
+│   │                          concerns through walk_behaviour_issues / walk_medical_concerns; walk_route_points has
+│   │                          one row per recorded position and goes with its walk; the defaults are
 │   │                          seeded on create (SeedCallback) and on the migration that added each table;
 │   │                          seeded defaults carry a `key` that Labels.kt maps to a string resource (user-added
 │   │                          rows show their name), and `isHidden` soft-deletes without touching walk history
