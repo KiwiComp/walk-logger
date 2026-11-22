@@ -70,7 +70,8 @@ com.example.walklogger
 │   │                          current month, MonthGrid with a rating face per rated day) and the shared DayWalks sheet;
 │   │                          a walk card opens the walk's detail screen, AddWalkFab logs a walk on the selected day
 │   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk as cards (WalkHeroCard
-│   │                          with date, times, dog, handlers, equipment and the rating face; weather; stool; mood & focus bars; behaviour
+│   │                          with date, times, dog, handlers, equipment and the rating face; WalkRouteMap with the route
+│   │                          within the stored times; weather; stool; mood & focus bars; behaviour
 │   │                          and health concerns; notes, dashed when empty), opened from a walk row on Log or Calendar;
 │   │                          Edit pushes LogPastWalkScreen, Delete walk deletes it (AppConfirmDialog confirms first) and back returns to
 │   │                          the tab; component/ holds WalkHeroCard and DetailPlaceholder

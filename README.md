@@ -9,11 +9,14 @@ weather at the time. Walks can be timed live or logged afterwards, and are brows
 - **Live walk**: start a timed walk (elapsed time, quick note, stool) and finish it with rating,
   equipment, stool, mood and focus ratings, behaviour, health concerns and notes. The handler, times and
   weather can be corrected there, or the walk discarded.
+- **Route**: with precise location, a live walk records its route, also with the screen locked, and
+  shows it on a map when finishing the walk and in the walk detail. Points outside the walk's times are
+  hidden, not deleted. Needs a [Maps API key](#maps-api-key).
 - **Past walk**: log a walk afterwards with its date and times, on any day.
 - **Weather**: fetched automatically from [Open-Meteo](https://open-meteo.com/) for the walk's time and
-  place, and editable by hand.
+  place (the device's precise location, or else a chosen place), and editable by hand.
 - **Calendar**: month grid with a rating face per day, with the walks of the selected day.
-- **Walk detail**: read-only view of a logged walk, with edit and discard.
+- **Walk detail**: read-only view of a logged walk with its route map, with edit and discard.
 - **Dogs**: register several dogs, pick the active one; deleted dogs keep their history.
 - Light and dark theme, following the system or chosen in Settings.
 - English and Swedish.
