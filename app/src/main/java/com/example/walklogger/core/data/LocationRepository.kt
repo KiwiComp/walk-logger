@@ -12,6 +12,9 @@ interface LocationRepository {
     /** Null without permission or when the device cannot tell where it is. */
     suspend fun currentLocation(): Coordinates?
 
+    /** Positions for as long as it is collected; completes at once without permission. */
+    fun locationUpdates(): Flow<Coordinates>
+
     /** True once the app has asked for location, wherever it asked; it never asks again by itself. */
     val locationPermissionRequested: Flow<Boolean>
 

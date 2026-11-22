@@ -24,6 +24,8 @@ class DefaultLocationRepository @Inject constructor(
 
     override suspend fun currentLocation(): Coordinates? = locationProvider.currentLocation()
 
+    override fun locationUpdates(): Flow<Coordinates> = locationProvider.locationUpdates()
+
     override val locationPermissionRequested: Flow<Boolean> =
         preferences.locationPermissionRequested
 

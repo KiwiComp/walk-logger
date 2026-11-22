@@ -117,7 +117,7 @@ com.example.walklogger
 │   │                          (app-wide choices from Settings: the theme mode) and WalkLocationCapturer
 │   │                          (implemented in service/)
 │   ├── network/               Retrofit APIs for Open-Meteo's forecast and geocoding, their @Serializable DTOs
-│   ├── location/              LocationProvider (fused location; needs precise permission, approximate counts as none;
+│   ├── location/              LocationProvider (fused location, one position or a stream of them for the route; needs precise permission, approximate counts as none;
 │   │                          high accuracy so GPS can answer without Wi-Fi or cell positioning), read through LocationRepository
 │   ├── database/              Room database, DAOs, entities, type converters; walks join behaviour issues and medical
 │   │                          concerns through walk_behaviour_issues / walk_medical_concerns; walk_route_points has

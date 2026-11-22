@@ -5,7 +5,9 @@ import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Place
 import java.io.IOException
 import kotlinx.coroutines.flow.Flow
+import kotlinx.coroutines.flow.MutableSharedFlow
 import kotlinx.coroutines.flow.MutableStateFlow
+import kotlinx.coroutines.flow.emptyFlow
 
 /**
  * [LocationRepository] for unit tests; grant or deny with [isGranted], place the device with [location],
@@ -35,6 +37,11 @@ class FakeLocationRepository(
         if (failLocation) throw IllegalStateException("simulated location failure")
         return if (isGranted) location else null
     }
+
+    /** What [locationUpdates] emits while collected with permission. */
+    val updates = MutableSharedFlow<Coordinates>()
+
+    override fun locationUpdates(): Flow<Coordinates> = if (isGranted) updates else emptyFlow()
 
     override val locationPermissionRequested: Flow<Boolean> = requested
 
