@@ -12,7 +12,7 @@ import androidx.core.app.ServiceCompat
 import com.example.walklogger.R
 import com.example.walklogger.core.common.di.Dispatcher
 import com.example.walklogger.core.common.di.WalkLoggerDispatchers
-import com.example.walklogger.domain.CaptureWalkLocationUseCase
+import com.example.walklogger.domain.TrackWalkLocationUseCase
 import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
@@ -28,7 +28,7 @@ import kotlinx.coroutines.launch
 @AndroidEntryPoint
 class WalkLocationService : Service() {
 
-    @Inject lateinit var captureWalkLocation: CaptureWalkLocationUseCase
+    @Inject lateinit var trackWalkLocation: TrackWalkLocationUseCase
 
     @Inject
     @Dispatcher(WalkLoggerDispatchers.Default)
@@ -53,7 +53,7 @@ class WalkLocationService : Service() {
         }
         val walkId = intent?.getLongExtra(EXTRA_WALK_ID, NO_WALK) ?: NO_WALK
         scope.launch {
-            if (walkId != NO_WALK) captureWalkLocation(walkId)
+            if (walkId != NO_WALK) trackWalkLocation(walkId)
             stopSelf(startId)
         }
         return START_NOT_STICKY

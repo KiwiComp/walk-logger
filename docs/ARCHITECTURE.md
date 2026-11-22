@@ -91,14 +91,15 @@ com.example.walklogger
 │                              the hour containing a walk's middle, from the active walk's start position, the device location
 │                              or else the saved place (also when the device lookup throws), and only for times
 │                              WeatherRepository can still reach;
-│                              CaptureWalkLocationUseCase stores the start position; LocationPermissionUseCase decides
+│                              TrackWalkLocationUseCase stores the start position, then the route points until the walk
+│                              ends; LocationPermissionUseCase decides
 │                              whether to ask for location (once, wherever it is asked); SaveWalkUseCase logs a new walk
 │                              for the active dog or replaces a stored one, and DiscardWalkUseCase deletes one, both
 │                              clearing the start position stored for that walk; use cases depend only on
 │                              repositories, never on network, location or database classes
 │
 ├── service/                   app-layer Android services: WalkLocationService, a `location` foreground service that runs
-│                              CaptureWalkLocationUseCase so the start position is captured with a locked screen, started by
+│                              TrackWalkLocationUseCase so the start position and route are captured with a locked screen, started by
 │                              ServiceWalkLocationCapturer (bound to core/data's WalkLocationCapturer, like NiA's SyncManager)
 │
 ├── core/
