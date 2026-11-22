@@ -42,7 +42,7 @@ weather at the time. Walks can be timed live or logged afterwards, and are brows
 ## Tech stack
 
 Kotlin, Jetpack Compose (Material 3), Navigation 3, Hilt, Room, DataStore, coroutines and Flow,
-Retrofit/OkHttp, Play Services Location. minSdk 29.
+Retrofit/OkHttp, Play Services Location, Maps Compose. minSdk 29.
 
 Architecture follows Google's recommended app architecture (UI → optional domain → data),
 organised by feature. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -56,6 +56,25 @@ organised by feature. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 ./gradlew lintDebug               # Android lint
 ./gradlew connectedAndroidTest    # Room and Compose UI tests, needs a device in English
 ```
+
+### Maps API key
+
+The route map needs a Google Maps API key. Without one the app still builds and runs, and the map
+stays blank.
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/google/maps-apis), enable
+   **Maps SDK for Android** and create an API key.
+2. Restrict the key to **Android apps**, with the package name `com.example.walklogger` and the
+   SHA-1 of every certificate that signs a build you hand out (`./gradlew signingReport` lists the
+   debug one), and to the **Maps SDK for Android** API only.
+3. Add it to `local.properties`, which is not committed:
+
+   ```properties
+   MAPS_API_KEY=your-key
+   ```
+
+The key is built into the APK, so anyone with the APK can read it; the restrictions above are what
+stop it from being used elsewhere.
 
 ## CI
 
