@@ -8,6 +8,7 @@ import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.data.WalkTracker
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.StoolQuantity
 import com.example.walklogger.core.model.StoolTexture
@@ -45,6 +46,7 @@ class ActiveWalkViewModel @AssistedInject constructor(
     dogRepository: DogRepository,
     private val walkRepository: WalkRepository,
     private val discardWalkUseCase: DiscardWalkUseCase,
+    private val walkTracker: WalkTracker,
     private val clock: Clock,
     errorReporter: ErrorReporter,
 ) : ViewModel() {
@@ -76,8 +78,12 @@ class ActiveWalkViewModel @AssistedInject constructor(
 
     init {
         viewModelScope.launch {
-            if (walk.first() == null) {
-                outcome.update { it.copy(isNotFound = true) }
+            val stored = walk.first()
+            when {
+                stored == null -> outcome.update { it.copy(isNotFound = true) }
+
+                // Resumes the route after Android killed the app; the screen is visible, so the service may start.
+                stored.isActive -> walkTracker.track(walkId)
             }
         }
     }

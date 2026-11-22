@@ -17,13 +17,16 @@ import dagger.hilt.android.AndroidEntryPoint
 import javax.inject.Inject
 import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.CoroutineScope
+import kotlinx.coroutines.Job
 import kotlinx.coroutines.SupervisorJob
 import kotlinx.coroutines.cancel
 import kotlinx.coroutines.launch
 
 /**
- * Looks up the position of a just-started walk. A foreground service keeps "while in use" location
- * access when the screen is locked right after the start; it stops as soon as the position is stored.
+ * Records the start position and route of the active walk. A foreground service started while the app
+ * is visible keeps "while in use" location access with the screen locked; it stops when the walk ends.
+ * It is not sticky: Android refuses to restart a location service from the background, so after the
+ * process is killed tracking resumes when the active walk is shown again.
  */
 @AndroidEntryPoint
 class WalkLocationService : Service() {
@@ -35,6 +38,9 @@ class WalkLocationService : Service() {
     lateinit var defaultDispatcher: CoroutineDispatcher
 
     private val scope by lazy { CoroutineScope(SupervisorJob() + defaultDispatcher) }
+
+    private var tracking: Job? = null
+    private var trackedWalkId = NO_WALK
 
     override fun onBind(intent: Intent?): IBinder? = null
 
@@ -52,9 +58,21 @@ class WalkLocationService : Service() {
             return START_NOT_STICKY
         }
         val walkId = intent?.getLongExtra(EXTRA_WALK_ID, NO_WALK) ?: NO_WALK
-        scope.launch {
-            if (walkId != NO_WALK) trackWalkLocation(walkId)
-            stopSelf(startId)
+        val isTracking = tracking?.isActive == true
+        when {
+            walkId == NO_WALK -> if (!isTracking) stopSelf(startId)
+
+            walkId == trackedWalkId && isTracking -> Unit
+
+            else -> {
+                tracking?.cancel()
+                trackedWalkId = walkId
+                tracking = scope.launch {
+                    trackWalkLocation(walkId)
+                    // Not stopSelf(startId): a repeated start for the same walk has a later id and would keep it running.
+                    stopSelf()
+                }
+            }
         }
         return START_NOT_STICKY
     }

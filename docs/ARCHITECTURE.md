@@ -41,7 +41,7 @@ com.example.walklogger
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
 │   │                          stored start in a dark card, quick note card, ActiveStoolSection: a card with a switch for "passed stool"
 │   │                          whose description rows Done folds into a summary (Edit opens them), stored on every tap; End walk and Discard walk
-│   │                          in a bottom bar; system back asks to discard);
+│   │                          in a bottom bar; system back asks to discard; showing an active walk resumes its tracking);
 │   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen for the just-finished walk: FinishWalkSummaryCard (dog and
 │   │                          handlers with Change for the handler chips, times and weather each with an Edit/Done toggle) above the shared
 │   │                          form; the close cross confirms, then discards the walk through DiscardWalkUseCase;
@@ -100,7 +100,9 @@ com.example.walklogger
 │
 ├── service/                   app-layer Android services: WalkLocationService, a `location` foreground service that runs
 │                              TrackWalkLocationUseCase so the start position and route are captured with a locked screen, started by
-│                              ServiceWalkLocationCapturer (bound to core/data's WalkLocationCapturer, like NiA's SyncManager)
+│                              ServiceWalkTracker (bound to core/data's WalkTracker, like NiA's SyncManager); it lives
+│                              until the walk ends, ignores a repeated start for the same walk and is not sticky, so
+│                              ActiveWalkViewModel starts it again when the walk is shown after the process was killed
 │
 ├── core/
 │   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern, WalkWeather with its
@@ -115,7 +117,7 @@ com.example.walklogger
 │   │                          has been asked for, and the saved place with its geocoding search as the fallback),
 │   │                          ActiveWalkLocationRepository (the active walk's start position), WalkRouteRepository
 │   │                          (the positions recorded during an active walk), UserSettingsRepository
-│   │                          (app-wide choices from Settings: the theme mode) and WalkLocationCapturer
+│   │                          (app-wide choices from Settings: the theme mode) and WalkTracker
 │   │                          (implemented in service/)
 │   ├── network/               Retrofit APIs for Open-Meteo's forecast and geocoding, their @Serializable DTOs
 │   ├── location/              LocationProvider (fused location, one position or a stream of them for the route; needs precise permission, approximate counts as none;
