@@ -1,6 +1,7 @@
 package com.example.walklogger.feature.walkdetail.preview
 
 import com.example.walklogger.core.model.BehaviourIssue
+import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
@@ -21,6 +22,11 @@ internal object WalkDetailPreviewData {
         date = LocalDate.of(2026, 9, 15),
         startTime = LocalTime.of(7, 12),
         endTime = LocalTime.of(7, 46),
+        route = listOf(
+            Coordinates(59.3293, 18.0686),
+            Coordinates(59.3310, 18.0712),
+            Coordinates(59.3328, 18.0695),
+        ),
         dogName = "Sixten",
         handlers = listOf("Kim"),
         equipment = Equipment.COLLAR,

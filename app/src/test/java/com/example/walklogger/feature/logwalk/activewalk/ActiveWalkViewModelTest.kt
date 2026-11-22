@@ -16,6 +16,7 @@ import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeWalkRepository
+import com.example.walklogger.testing.FakeWalkTracker
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.Clock
 import java.time.Duration
@@ -48,6 +49,7 @@ class ActiveWalkViewModelTest {
     private val walkRepository = FakeWalkRepository()
     private val errorReporter = FakeErrorReporter()
     private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
+    private val walkTracker = FakeWalkTracker()
     private val walk = Walk(
         id = 1,
         dogId = 1,
@@ -67,6 +69,7 @@ class ActiveWalkViewModelTest {
                 activeWalkLocationRepository,
                 errorReporter,
             ),
+            walkTracker = walkTracker,
             clock = clock,
             errorReporter = errorReporter,
         )
@@ -85,6 +88,24 @@ class ActiveWalkViewModelTest {
             assertEquals(Duration.ofMinutes(34).plusSeconds(12), state.elapsed)
             assertEquals("Barked", state.note)
             assertTrue(state.canEnd)
+        }
+    }
+
+    @Test
+    fun `showing an active walk resumes its tracking`() = runTest {
+        walkRepository.addWalks(walk)
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            assertEquals(listOf(walk.id), walkTracker.trackedWalkIds)
+        }
+    }
+
+    @Test
+    fun `showing a finished walk does not track it`() = runTest {
+        walkRepository.addWalks(walk.copy(endTime = start.toEpochMilli() + 60_000))
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            assertTrue(walkTracker.trackedWalkIds.isEmpty())
         }
     }
 

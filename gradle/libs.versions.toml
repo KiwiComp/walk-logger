@@ -19,6 +19,8 @@ turbine = "1.2.1"
 retrofit = "3.0.0"
 okhttp = "5.5.1"
 playServicesLocation = "21.4.0"
+# 8.2.0 is the newest release built against Kotlin 2.3 and Compose BOM 2026.01, which this project's Kotlin 2.2 and BOM can use.
+mapsCompose = "8.2.0"
 spotless = "8.11.0"
 ktlint = "1.8.0"
 composeRules = "0.6.8"
@@ -71,6 +73,9 @@ okhttp = { group = "com.squareup.okhttp3", name = "okhttp", version.ref = "okhtt
 
 # Location
 play-services-location = { group = "com.google.android.gms", name = "play-services-location", version.ref = "playServicesLocation" }
+
+# Maps
+maps-compose = { group = "com.google.maps.android", name = "maps-compose", version.ref = "mapsCompose" }
 
 # Kotlinx
 kotlinx-serialization-json = { group = "org.jetbrains.kotlinx", name = "kotlinx-serialization-json", version.ref = "kotlinxSerialization" }

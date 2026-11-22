@@ -4,11 +4,14 @@ import com.example.walklogger.core.database.WalkWithBehaviourIssuesAndMedicalCon
 import com.example.walklogger.core.database.entity.BehaviourIssueEntity
 import com.example.walklogger.core.database.entity.DogEntity
 import com.example.walklogger.core.database.entity.MedicalConcernEntity
+import com.example.walklogger.core.database.entity.RoutePointEntity
 import com.example.walklogger.core.database.entity.WalkEntity
 import com.example.walklogger.core.model.BehaviourIssue
+import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
+import com.example.walklogger.core.model.RoutePoint
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.model.WalkWeather
@@ -101,4 +104,14 @@ internal fun DogEntity.toModel(): Dog = Dog(
     birthDate = birthDate?.let(LocalDate::ofEpochDay),
     weightKg = weightKg,
     isDeleted = isHidden,
+)
+
+internal fun RoutePointEntity.toModel(): RoutePoint =
+    RoutePoint(time = time, coordinates = Coordinates(latitude, longitude))
+
+internal fun RoutePoint.toEntity(walkId: Long): RoutePointEntity = RoutePointEntity(
+    walkId = walkId,
+    time = time,
+    latitude = coordinates.latitude,
+    longitude = coordinates.longitude,
 )

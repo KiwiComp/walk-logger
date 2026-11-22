@@ -9,8 +9,11 @@ import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.common.toLocalDateTime
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.data.WalkRouteRepository
 import com.example.walklogger.core.model.Dog
+import com.example.walklogger.core.model.RoutePoint
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.within
 import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.DiscardWalkUseCase
 import dagger.assisted.Assisted
@@ -32,6 +35,7 @@ import kotlinx.coroutines.launch
 class WalkDetailViewModel @AssistedInject constructor(
     @Assisted private val walkId: Long,
     private val walkRepository: WalkRepository,
+    walkRouteRepository: WalkRouteRepository,
     dogRepository: DogRepository,
     private val clock: Clock,
     private val discardWalk: DiscardWalkUseCase,
@@ -56,15 +60,16 @@ class WalkDetailViewModel @AssistedInject constructor(
 
     /** Once discarded the walk is gone from the repository; only the discard flags remain while the screen leaves. */
     val uiState: StateFlow<WalkDetailUiState> =
-        combine(walkRepository.observeWalk(walkId), dogRepository.observeAllDogs(), discard) {
-                walk,
-                dogs,
-                discard,
-            ->
+        combine(
+            walkRepository.observeWalk(walkId),
+            dogRepository.observeAllDogs(),
+            walkRouteRepository.observeRoute(walkId),
+            discard,
+        ) { walk, dogs, route, discard ->
             if (walk == null) {
                 discard
             } else {
-                discard.detailsOf(walk, dog = dogs.find { it.id == walk.dogId })
+                discard.detailsOf(walk, dog = dogs.find { it.id == walk.dogId }, route = route)
             }
         }.combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
             .stateIn(
@@ -92,7 +97,11 @@ class WalkDetailViewModel @AssistedInject constructor(
 
     fun userMessageShown(@StringRes message: Int) = userMessage.shown(message)
 
-    private fun WalkDetailUiState.detailsOf(walk: Walk, dog: Dog?): WalkDetailUiState {
+    private fun WalkDetailUiState.detailsOf(
+        walk: Walk,
+        dog: Dog?,
+        route: List<RoutePoint>,
+    ): WalkDetailUiState {
         val start = walk.startTime.toLocalDateTime(clock.zone)
         return copy(
             isLoading = false,
@@ -110,6 +119,7 @@ class WalkDetailViewModel @AssistedInject constructor(
             behaviourIssues = walk.behaviourIssues,
             medicalConcerns = walk.medicalConcerns,
             notes = walk.notes,
+            route = route.within(walk.startTime, walk.endTime).map { it.coordinates },
         )
     }
 }

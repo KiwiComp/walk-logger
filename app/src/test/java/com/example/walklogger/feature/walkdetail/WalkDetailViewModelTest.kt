@@ -3,10 +3,12 @@ package com.example.walklogger.feature.walkdetail
 import app.cash.turbine.test
 import com.example.walklogger.R
 import com.example.walklogger.core.model.BehaviourIssue
+import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
+import com.example.walklogger.core.model.RoutePoint
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolColour
 import com.example.walklogger.core.model.Walk
@@ -17,6 +19,7 @@ import com.example.walklogger.testing.FakeActiveWalkLocationRepository
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeWalkRepository
+import com.example.walklogger.testing.FakeWalkRouteRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.Clock
 import java.time.LocalDate
@@ -41,11 +44,13 @@ class WalkDetailViewModelTest {
     private val clock = Clock.fixed(date.atTime(20, 0).toInstant(zone), zone)
     private val dogRepository = FakeDogRepository()
     private val walkRepository = FakeWalkRepository()
+    private val walkRouteRepository = FakeWalkRouteRepository()
     private val errorReporter = FakeErrorReporter()
     private val viewModel by lazy {
         WalkDetailViewModel(
             walkId = 1,
             walkRepository = walkRepository,
+            walkRouteRepository = walkRouteRepository,
             dogRepository = dogRepository,
             clock = clock,
             discardWalk = DiscardWalkUseCase(
@@ -114,6 +119,25 @@ class WalkDetailViewModelTest {
             assertEquals(listOf(concern), state.medicalConcerns)
             assertEquals("Windy", state.notes)
             assertTrue(state.canDiscard)
+        }
+    }
+
+    @Test
+    fun `shows only the route within the walk's stored times`() = runTest {
+        seedWalk()
+        val inside = Coordinates(59.3300, 18.0600)
+        listOf(
+            LocalTime.of(7, 0) to Coordinates(59.3200, 18.0500),
+            LocalTime.of(7, 30) to inside,
+            LocalTime.of(7, 50) to Coordinates(59.3400, 18.0700),
+        ).forEach { (time, coordinates) ->
+            walkRouteRepository.addPoint(
+                1,
+                RoutePoint(date.atTime(time).toInstant(zone).toEpochMilli(), coordinates),
+            )
+        }
+        viewModel.uiState.test {
+            assertEquals(listOf(inside), expectMostRecentItem().route)
         }
     }
 

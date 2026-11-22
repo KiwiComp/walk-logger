@@ -10,6 +10,7 @@ import com.example.walklogger.core.data.DefaultLocationRepository
 import com.example.walklogger.core.data.DefaultMedicalConcernRepository
 import com.example.walklogger.core.data.DefaultUserSettingsRepository
 import com.example.walklogger.core.data.DefaultWalkRepository
+import com.example.walklogger.core.data.DefaultWalkRouteRepository
 import com.example.walklogger.core.data.DefaultWeatherRepository
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
@@ -17,6 +18,7 @@ import com.example.walklogger.core.data.LocationRepository
 import com.example.walklogger.core.data.MedicalConcernRepository
 import com.example.walklogger.core.data.UserSettingsRepository
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.data.WalkRouteRepository
 import com.example.walklogger.core.data.WeatherRepository
 import dagger.Binds
 import dagger.Module
@@ -55,6 +57,9 @@ abstract class DataModule {
     abstract fun bindsActiveWalkLocationRepository(
         impl: DefaultActiveWalkLocationRepository,
     ): ActiveWalkLocationRepository
+
+    @Binds
+    abstract fun bindsWalkRouteRepository(impl: DefaultWalkRouteRepository): WalkRouteRepository
 
     @Binds
     abstract fun bindsUserSettingsRepository(

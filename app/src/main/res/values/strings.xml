@@ -198,7 +198,10 @@
     <string name="weather_place_no_results">No places found</string>
     <string name="weather_attribution">Weather data: Open-Meteo.com</string>
     <string name="walk_location_channel">Walk location</string>
-    <string name="walk_location_notification">Getting location for the weather…</string>
+    <string name="walk_location_notification">Recording the walk route…</string>
+    <string name="walk_route_map">Map of the walk\'s route</string>
+    <string name="location_precise_title">Choose precise location</string>
+    <string name="location_precise_message">The features that use your location only work with precise location. In the next dialog, choose Precise.</string>
     <string name="log_past_walk_stool">Stool</string>
     <string name="stool_passed_yes">Yes</string>
     <string name="stool_passed_no">No</string>

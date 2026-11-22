@@ -8,8 +8,8 @@ import com.example.walklogger.core.common.ErrorReporter
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
-import com.example.walklogger.core.data.WalkLocationCapturer
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.data.WalkTracker
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.LocationPermissionUseCase
@@ -35,7 +35,7 @@ class NewWalkViewModel @AssistedInject constructor(
     private val dogRepository: DogRepository,
     handlerRepository: HandlerRepository,
     private val walkRepository: WalkRepository,
-    private val walkLocationCapturer: WalkLocationCapturer,
+    private val walkTracker: WalkTracker,
     private val locationPermission: LocationPermissionUseCase,
     private val errorReporter: ErrorReporter,
 ) : ViewModel() {
@@ -133,7 +133,7 @@ class NewWalkViewModel @AssistedInject constructor(
             )
         }
             .onSuccess { walkId ->
-                walkLocationCapturer.capture(walkId)
+                walkTracker.track(walkId)
                 start.update { StartState(walkId = walkId) }
             }
             .onFailure {

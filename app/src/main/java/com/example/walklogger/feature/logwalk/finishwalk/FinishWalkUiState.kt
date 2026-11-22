@@ -1,6 +1,7 @@
 package com.example.walklogger.feature.logwalk.finishwalk
 
 import androidx.annotation.StringRes
+import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.feature.logwalk.SaveBlocker
 import com.example.walklogger.feature.logwalk.WalkFormState
 import com.example.walklogger.feature.logwalk.WalkTimesState
@@ -16,6 +17,8 @@ data class FinishWalkUiState(
     /** True while the handler chips are shown. */
     val isEditingHandlers: Boolean = false,
     val form: WalkFormState = WalkFormState(),
+    /** The recorded route within the times as currently edited; empty for a walk without one. */
+    val route: List<Coordinates> = emptyList(),
     /** True while the "Edit times" pickers are shown. */
     val isEditingTimes: Boolean = false,
     /** True until the finished walk has been read; the form is not editable before that. */

@@ -2,6 +2,7 @@ package com.example.walklogger.feature.walkdetail
 
 import androidx.annotation.StringRes
 import com.example.walklogger.core.model.BehaviourIssue
+import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
 import com.example.walklogger.core.model.OptionalRating
@@ -31,6 +32,8 @@ data class WalkDetailUiState(
     val behaviourIssues: List<BehaviourIssue> = emptyList(),
     val medicalConcerns: List<MedicalConcern> = emptyList(),
     val notes: String = "",
+    /** The recorded route within the walk's stored times; empty for a walk without one. */
+    val route: List<Coordinates> = emptyList(),
     val isDiscarding: Boolean = false,
     val isDiscarded: Boolean = false,
     @param:StringRes val userMessage: Int? = null,

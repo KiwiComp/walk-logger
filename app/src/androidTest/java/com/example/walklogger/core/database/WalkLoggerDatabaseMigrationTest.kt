@@ -253,6 +253,28 @@ class WalkLoggerDatabaseMigrationTest {
         }
     }
 
+    @Test
+    fun migrate11To12_addsRoutePointsTableAndKeepsWalks() {
+        helper.createDatabase(DB_NAME, 11).use { db ->
+            db.execSQL("INSERT INTO walks (id, startTime) VALUES (1, 100)")
+        }
+
+        val db = helper.runMigrationsAndValidate(DB_NAME, 12, true)
+
+        db.execSQL(
+            "INSERT INTO walk_route_points (walkId, time, latitude, longitude) VALUES (1, 150, 59.3, 18.0)",
+        )
+        db.query("SELECT COUNT(*) FROM walks").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1, cursor.getInt(0))
+        }
+        db.query("SELECT walkId, time FROM walk_route_points").use { cursor ->
+            assertTrue(cursor.moveToFirst())
+            assertEquals(1L, cursor.getLong(0))
+            assertEquals(150L, cursor.getLong(1))
+        }
+    }
+
     private companion object {
         const val DB_NAME = "migration-test.db"
     }

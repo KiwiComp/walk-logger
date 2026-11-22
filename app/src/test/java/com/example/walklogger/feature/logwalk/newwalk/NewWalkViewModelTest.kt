@@ -9,8 +9,8 @@ import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeErrorReporter
 import com.example.walklogger.testing.FakeHandlerRepository
 import com.example.walklogger.testing.FakeLocationRepository
-import com.example.walklogger.testing.FakeWalkLocationCapturer
 import com.example.walklogger.testing.FakeWalkRepository
+import com.example.walklogger.testing.FakeWalkTracker
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.LocalDate
 import kotlinx.coroutines.flow.first
@@ -33,7 +33,7 @@ class NewWalkViewModelTest {
     private val handlerRepository = FakeHandlerRepository()
     private val walkRepository = FakeWalkRepository()
     private val errorReporter = FakeErrorReporter()
-    private val walkLocationCapturer = FakeWalkLocationCapturer()
+    private val walkTracker = FakeWalkTracker()
     private val locationRepository = FakeLocationRepository()
     private val viewModel by lazy {
         NewWalkViewModel(
@@ -41,7 +41,7 @@ class NewWalkViewModelTest {
             dogRepository = dogRepository,
             handlerRepository = handlerRepository,
             walkRepository = walkRepository,
-            walkLocationCapturer = walkLocationCapturer,
+            walkTracker = walkTracker,
             locationPermission = LocationPermissionUseCase(locationRepository),
             errorReporter = errorReporter,
         )
@@ -153,7 +153,7 @@ class NewWalkViewModelTest {
             assertEquals(listOf("Anna", "Jonas"), walk.handlers)
             assertEquals(Equipment.HARNESS, walk.equipment)
             assertFalse(state.canStart)
-            assertEquals(listOf(walk.id), walkLocationCapturer.capturedWalkIds)
+            assertEquals(listOf(walk.id), walkTracker.trackedWalkIds)
         }
     }
 
@@ -181,7 +181,7 @@ class NewWalkViewModelTest {
             assertEquals(R.string.error_start_walk, viewModel.uiState.value.userMessage)
             assertEquals(listOf("Failed to start walk"), errorReporter.reported.map { it.second })
         }
-        assertTrue(walkLocationCapturer.capturedWalkIds.isEmpty())
+        assertTrue(walkTracker.trackedWalkIds.isEmpty())
     }
 
     @Test
@@ -212,7 +212,7 @@ class NewWalkViewModelTest {
             assertFalse(state.shouldRequestLocationPermission)
             val walk = walkRepository.observeActiveWalk().first()!!
             assertEquals(walk.id, state.startedWalkId)
-            assertEquals(listOf(walk.id), walkLocationCapturer.capturedWalkIds)
+            assertEquals(listOf(walk.id), walkTracker.trackedWalkIds)
         }
         assertTrue(locationRepository.locationPermissionRequested.first())
     }

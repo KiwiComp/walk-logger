@@ -63,6 +63,7 @@ import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.PillButton
 import com.example.walklogger.core.ui.component.PillButtonStyle
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
+import com.example.walklogger.core.ui.component.WalkRouteMap
 import com.example.walklogger.core.ui.message.UserMessageEffect
 import com.example.walklogger.core.ui.theme.AppRadius
 import com.example.walklogger.core.ui.theme.AppSpacing
@@ -157,6 +158,7 @@ fun WalkDetailScreen(
                 verticalArrangement = Arrangement.spacedBy(AppSpacing.md),
             ) {
                 WalkHeroCard(uiState)
+                WalkRouteMap(route = uiState.route)
                 WeatherCard(uiState.weather)
                 StoolCard(uiState.stool)
                 MoodCard(uiState.optionalRatings)

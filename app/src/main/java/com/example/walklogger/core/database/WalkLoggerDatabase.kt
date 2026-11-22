@@ -12,6 +12,7 @@ import com.example.walklogger.core.database.entity.BehaviourIssueEntity
 import com.example.walklogger.core.database.entity.DogEntity
 import com.example.walklogger.core.database.entity.HandlerEntity
 import com.example.walklogger.core.database.entity.MedicalConcernEntity
+import com.example.walklogger.core.database.entity.RoutePointEntity
 import com.example.walklogger.core.database.entity.WalkBehaviourIssueEntity
 import com.example.walklogger.core.database.entity.WalkEntity
 import com.example.walklogger.core.database.entity.WalkMedicalConcernEntity
@@ -25,8 +26,9 @@ import com.example.walklogger.core.database.entity.WalkMedicalConcernEntity
         WalkBehaviourIssueEntity::class,
         MedicalConcernEntity::class,
         WalkMedicalConcernEntity::class,
+        RoutePointEntity::class,
     ],
-    version = 11,
+    version = 12,
     exportSchema = true,
     autoMigrations = [
         AutoMigration(from = 1, to = 2, spec = WalkLoggerDatabase.Migration1To2::class),
@@ -39,6 +41,7 @@ import com.example.walklogger.core.database.entity.WalkMedicalConcernEntity
         AutoMigration(from = 8, to = 9),
         AutoMigration(from = 9, to = 10),
         AutoMigration(from = 10, to = 11, spec = WalkLoggerDatabase.Migration10To11::class),
+        AutoMigration(from = 11, to = 12),
     ],
 )
 @TypeConverters(StringListConverter::class)
@@ -48,6 +51,7 @@ abstract class WalkLoggerDatabase : RoomDatabase() {
     abstract fun handlerDao(): HandlerDao
     abstract fun behaviourIssueDao(): BehaviourIssueDao
     abstract fun medicalConcernDao(): MedicalConcernDao
+    abstract fun routePointDao(): RoutePointDao
 
     @RenameColumn(
         tableName = "walks",

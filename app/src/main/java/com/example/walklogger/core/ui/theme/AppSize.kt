@@ -10,4 +10,7 @@ object AppSize {
 
     /** Height of inline choice controls (SelectableChip, SegmentedToggle). */
     val chipHeight: Dp = 44.dp
+
+    /** Height of the route map (WalkRouteMap) on Finish walk and Walk detail. */
+    val mapHeight: Dp = 200.dp
 }

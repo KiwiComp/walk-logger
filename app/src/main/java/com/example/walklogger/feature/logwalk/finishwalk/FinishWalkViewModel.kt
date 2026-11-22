@@ -9,7 +9,9 @@ import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
+import com.example.walklogger.core.data.WalkRouteRepository
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.within
 import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.DiscardWalkUseCase
 import com.example.walklogger.domain.SaveWalkUseCase
@@ -40,6 +42,7 @@ class FinishWalkViewModel @AssistedInject constructor(
     dogRepository: DogRepository,
     handlerRepository: HandlerRepository,
     private val walkRepository: WalkRepository,
+    walkRouteRepository: WalkRouteRepository,
     clock: Clock,
     formFactory: WalkFormEditor.Factory,
     private val saveWalk: SaveWalkUseCase,
@@ -67,6 +70,13 @@ class FinishWalkViewModel @AssistedInject constructor(
     }
 
     private val screen = MutableStateFlow(FinishWalkUiState(times = times.state.value))
+
+    /** Follows the edited times, so points hidden by a shorter walk show again when it is lengthened. */
+    private val route =
+        combine(walkRouteRepository.observeRoute(walkId), times.state) { points, _ ->
+            val start = times.startMillis ?: return@combine emptyList()
+            points.within(start, times.endMillis).map { it.coordinates }
+        }
 
     /** The stored walk, kept so saving preserves its id, dog and handlers. */
     private var walk: Walk? = null
@@ -101,7 +111,8 @@ class FinishWalkViewModel @AssistedInject constructor(
                 handlers = handlers.handlers,
                 selectedHandlers = handlers.selected,
             )
-        }.combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
+        }.combine(route) { state, route -> state.copy(route = route) }
+            .combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),

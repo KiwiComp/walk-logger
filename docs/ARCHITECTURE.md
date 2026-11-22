@@ -41,10 +41,10 @@ com.example.walklogger
 │   │                          activewalk/ ActiveWalkViewModel + ActiveWalkScreen (the timer: elapsed time from the
 │   │                          stored start in a dark card, quick note card, ActiveStoolSection: a card with a switch for "passed stool"
 │   │                          whose description rows Done folds into a summary (Edit opens them), stored on every tap; End walk and Discard walk
-│   │                          in a bottom bar; system back asks to discard);
+│   │                          in a bottom bar; system back asks to discard; showing an active walk resumes its tracking);
 │   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen for the just-finished walk: FinishWalkSummaryCard (dog and
-│   │                          handlers with Change for the handler chips, times and weather each with an Edit/Done toggle) above the shared
-│   │                          form; the close cross confirms, then discards the walk through DiscardWalkUseCase;
+│   │                          handlers with Change for the handler chips, times and weather each with an Edit/Done toggle), then
+│   │                          WalkRouteMap with the route within the times as edited, above the shared form; the close cross confirms, then discards the walk through DiscardWalkUseCase;
 │   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating, stool, optional ratings,
 │   │                          equipment, weather, behaviour, medical, notes); the same screen edits a logged walk when the route
 │   │                          carries a walkId, pushed on top of that walk's detail screen so saving or closing returns there;
@@ -70,7 +70,8 @@ com.example.walklogger
 │   │                          current month, MonthGrid with a rating face per rated day) and the shared DayWalks sheet;
 │   │                          a walk card opens the walk's detail screen, AddWalkFab logs a walk on the selected day
 │   ├── walkdetail/            WalkDetailViewModel + WalkDetailScreen: the read-only view of a logged walk as cards (WalkHeroCard
-│   │                          with date, times, dog, handlers, equipment and the rating face; weather; stool; mood & focus bars; behaviour
+│   │                          with date, times, dog, handlers, equipment and the rating face; WalkRouteMap with the route
+│   │                          within the stored times; weather; stool; mood & focus bars; behaviour
 │   │                          and health concerns; notes, dashed when empty), opened from a walk row on Log or Calendar;
 │   │                          Edit pushes LogPastWalkScreen, Delete walk deletes it (AppConfirmDialog confirms first) and back returns to
 │   │                          the tab; component/ holds WalkHeroCard and DetailPlaceholder
@@ -91,34 +92,40 @@ com.example.walklogger
 │                              the hour containing a walk's middle, from the active walk's start position, the device location
 │                              or else the saved place (also when the device lookup throws), and only for times
 │                              WeatherRepository can still reach;
-│                              CaptureWalkLocationUseCase stores the start position; LocationPermissionUseCase decides
+│                              TrackWalkLocationUseCase stores the start position, then the route points until the walk
+│                              ends; LocationPermissionUseCase decides
 │                              whether to ask for location (once, wherever it is asked); SaveWalkUseCase logs a new walk
 │                              for the active dog or replaces a stored one, and DiscardWalkUseCase deletes one, both
 │                              clearing the start position stored for that walk; use cases depend only on
 │                              repositories, never on network, location or database classes
 │
 ├── service/                   app-layer Android services: WalkLocationService, a `location` foreground service that runs
-│                              CaptureWalkLocationUseCase so the start position is captured with a locked screen, started by
-│                              ServiceWalkLocationCapturer (bound to core/data's WalkLocationCapturer, like NiA's SyncManager)
+│                              TrackWalkLocationUseCase so the start position and route are captured with a locked screen, started by
+│                              ServiceWalkTracker (bound to core/data's WalkTracker, like NiA's SyncManager); it lives
+│                              until the walk ends, ignores a repeated start for the same walk and is not sticky, so
+│                              ActiveWalkViewModel starts it again when the walk is shown after the process was killed
 │
 ├── core/
 │   ├── model/                 domain models (Walk, Dog, BehaviourIssue, MedicalConcern, WalkWeather with its
 │   │                          WeatherCondition and the TemperatureBand derived from °C, ThemeMode) – no Android deps;
 │   │                          StoolEdits holds the stool answer rules the forms and the timer share; WalkDays gives a
-│   │                          walk's start day and time and groups walks by day, for Log and Calendar
+│   │                          walk's start day and time and groups walks by day, for Log and Calendar; RoutePoint is a
+│   │                          position recorded during an active walk, and `within` hides those outside the walk's times
 │   ├── data/                  WalkRepository / DogRepository / HandlerRepository / BehaviourIssueRepository /
 │   │                          MedicalConcernRepository interfaces + Room-backed implementations, mappers;
 │   │                          WeatherRepository (Open-Meteo forecast, WMO codes mapped in WeatherMappers, and how far back
 │   │                          it reaches), LocationRepository (device location over core/location, whether location
 │   │                          has been asked for, and the saved place with its geocoding search as the fallback),
-│   │                          ActiveWalkLocationRepository (the active walk's start position), UserSettingsRepository
-│   │                          (app-wide choices from Settings: the theme mode) and WalkLocationCapturer
+│   │                          ActiveWalkLocationRepository (the active walk's start position), WalkRouteRepository
+│   │                          (the positions recorded during an active walk), UserSettingsRepository
+│   │                          (app-wide choices from Settings: the theme mode) and WalkTracker
 │   │                          (implemented in service/)
 │   ├── network/               Retrofit APIs for Open-Meteo's forecast and geocoding, their @Serializable DTOs
-│   ├── location/              LocationProvider (fused location; accepts coarse or fine permission, high accuracy with fine
-│   │                          so GPS can answer without Wi-Fi or cell positioning), read through LocationRepository
+│   ├── location/              LocationProvider (fused location, one position or a stream of them for the route; needs precise permission, approximate counts as none;
+│   │                          high accuracy so GPS can answer without Wi-Fi or cell positioning), read through LocationRepository
 │   ├── database/              Room database, DAOs, entities, type converters; walks join behaviour issues and medical
-│   │                          concerns through walk_behaviour_issues / walk_medical_concerns; the defaults are
+│   │                          concerns through walk_behaviour_issues / walk_medical_concerns; walk_route_points has
+│   │                          one row per recorded position and goes with its walk; the defaults are
 │   │                          seeded on create (SeedCallback) and on the migration that added each table;
 │   │                          seeded defaults carry a `key` that Labels.kt maps to a string resource (user-added
 │   │                          rows show their name), and `isHidden` soft-deletes without touching walk history

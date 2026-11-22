@@ -9,11 +9,14 @@ weather at the time. Walks can be timed live or logged afterwards, and are brows
 - **Live walk**: start a timed walk (elapsed time, quick note, stool) and finish it with rating,
   equipment, stool, mood and focus ratings, behaviour, health concerns and notes. The handler, times and
   weather can be corrected there, or the walk discarded.
+- **Route**: with precise location, a live walk records its route, also with the screen locked, and
+  shows it on a map when finishing the walk and in the walk detail. Points outside the walk's times are
+  hidden, not deleted. Needs a [Maps API key](#maps-api-key).
 - **Past walk**: log a walk afterwards with its date and times, on any day.
 - **Weather**: fetched automatically from [Open-Meteo](https://open-meteo.com/) for the walk's time and
-  place, and editable by hand.
+  place (the device's precise location, or else a chosen place), and editable by hand.
 - **Calendar**: month grid with a rating face per day, with the walks of the selected day.
-- **Walk detail**: read-only view of a logged walk, with edit and discard.
+- **Walk detail**: read-only view of a logged walk with its route map, with edit and discard.
 - **Dogs**: register several dogs, pick the active one; deleted dogs keep their history.
 - Light and dark theme, following the system or chosen in Settings.
 - English and Swedish.
@@ -42,7 +45,7 @@ weather at the time. Walks can be timed live or logged afterwards, and are brows
 ## Tech stack
 
 Kotlin, Jetpack Compose (Material 3), Navigation 3, Hilt, Room, DataStore, coroutines and Flow,
-Retrofit/OkHttp, Play Services Location. minSdk 29.
+Retrofit/OkHttp, Play Services Location, Maps Compose. minSdk 29.
 
 Architecture follows Google's recommended app architecture (UI → optional domain → data),
 organised by feature. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
@@ -56,6 +59,25 @@ organised by feature. See [docs/ARCHITECTURE.md](docs/ARCHITECTURE.md).
 ./gradlew lintDebug               # Android lint
 ./gradlew connectedAndroidTest    # Room and Compose UI tests, needs a device in English
 ```
+
+### Maps API key
+
+The route map needs a Google Maps API key. Without one the app still builds and runs, and the map
+stays blank.
+
+1. In the [Google Cloud Console](https://console.cloud.google.com/google/maps-apis), enable
+   **Maps SDK for Android** and create an API key.
+2. Restrict the key to **Android apps**, with the package name `com.example.walklogger` and the
+   SHA-1 of every certificate that signs a build you hand out (`./gradlew signingReport` lists the
+   debug one), and to the **Maps SDK for Android** API only.
+3. Add it to `local.properties`, which is not committed:
+
+   ```properties
+   MAPS_API_KEY=your-key
+   ```
+
+The key is built into the APK, so anyone with the APK can read it; the restrictions above are what
+stop it from being used elsewhere.
 
 ## CI
 
