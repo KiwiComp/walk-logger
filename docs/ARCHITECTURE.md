@@ -43,8 +43,8 @@ com.example.walklogger
 │   │                          whose description rows Done folds into a summary (Edit opens them), stored on every tap; End walk and Discard walk
 │   │                          in a bottom bar; system back asks to discard; showing an active walk resumes its tracking);
 │   │                          finishwalk/ FinishWalkViewModel + FinishWalkScreen for the just-finished walk: FinishWalkSummaryCard (dog and
-│   │                          handlers with Change for the handler chips, times and weather each with an Edit/Done toggle) above the shared
-│   │                          form; the close cross confirms, then discards the walk through DiscardWalkUseCase;
+│   │                          handlers with Change for the handler chips, times and weather each with an Edit/Done toggle), then
+│   │                          WalkRouteMap with the route within the times as edited, above the shared form; the close cross confirms, then discards the walk through DiscardWalkUseCase;
 │   │                          pastwalk/ LogPastWalkViewModel + LogPastWalkScreen (date/times, handlers, rating, stool, optional ratings,
 │   │                          equipment, weather, behaviour, medical, notes); the same screen edits a logged walk when the route
 │   │                          carries a walkId, pushed on top of that walk's detail screen so saving or closing returns there;

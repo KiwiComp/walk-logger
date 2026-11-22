@@ -6,6 +6,7 @@ import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.RoutePoint
 import com.example.walklogger.core.model.Stool
 import com.example.walklogger.core.model.StoolTexture
 import com.example.walklogger.core.model.Walk
@@ -23,6 +24,7 @@ import com.example.walklogger.testing.FakeHandlerRepository
 import com.example.walklogger.testing.FakeLocationRepository
 import com.example.walklogger.testing.FakeMedicalConcernRepository
 import com.example.walklogger.testing.FakeWalkRepository
+import com.example.walklogger.testing.FakeWalkRouteRepository
 import com.example.walklogger.testing.FakeWeatherRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import com.example.walklogger.testing.walkFormEditorFactory
@@ -59,6 +61,7 @@ class FinishWalkViewModelTest {
     private val locationRepository = FakeLocationRepository()
     private val weatherRepository = FakeWeatherRepository()
     private val activeWalkLocationRepository = FakeActiveWalkLocationRepository()
+    private val walkRouteRepository = FakeWalkRouteRepository()
     private val walk = Walk(
         id = 1,
         dogId = 1,
@@ -74,6 +77,7 @@ class FinishWalkViewModelTest {
             dogRepository = dogRepository,
             handlerRepository = handlerRepository,
             walkRepository = walkRepository,
+            walkRouteRepository = walkRouteRepository,
             clock = clock,
             formFactory = walkFormEditorFactory(
                 behaviourIssueRepository = behaviourIssueRepository,
@@ -117,6 +121,24 @@ class FinishWalkViewModelTest {
             assertNull(state.form.stool)
         }
     }
+
+    @Test
+    fun `shows the route within the edited times, and the hidden part again once lengthened`() =
+        runTest {
+            walkRepository.addWalks(walk)
+            val early = pointAt(LocalTime.of(7, 10), Coordinates(59.3300, 18.0600))
+            val late = pointAt(LocalTime.of(7, 35), Coordinates(59.3350, 18.0700))
+            walkRouteRepository.addPoint(walk.id, early)
+            walkRouteRepository.addPoint(walk.id, late)
+            viewModel.uiState.test {
+                val whole = listOf(early.coordinates, late.coordinates)
+                assertEquals(whole, expectMostRecentItem().route)
+                viewModel.setEndTime(LocalTime.of(7, 30))
+                assertEquals(listOf(early.coordinates), expectMostRecentItem().route)
+                viewModel.setEndTime(LocalTime.of(7, 39))
+                assertEquals(whole, expectMostRecentItem().route)
+            }
+        }
 
     @Test
     fun `fetches the weather for the walk when it opens, and again when its times change`() =
@@ -322,4 +344,7 @@ class FinishWalkViewModelTest {
             assertTrue(expectMostRecentItem().isNotFound)
         }
     }
+
+    private fun pointAt(time: LocalTime, coordinates: Coordinates) =
+        RoutePoint(date.atTime(time).toInstant(zone).toEpochMilli(), coordinates)
 }

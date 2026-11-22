@@ -34,6 +34,7 @@ import com.example.walklogger.core.ui.component.AppConfirmDialog
 import com.example.walklogger.core.ui.component.HeaderIconButton
 import com.example.walklogger.core.ui.component.LocationPermissionRequest
 import com.example.walklogger.core.ui.component.WalkLoggerHeader
+import com.example.walklogger.core.ui.component.WalkRouteMap
 import com.example.walklogger.core.ui.component.rememberAllowLocation
 import com.example.walklogger.core.ui.message.UserMessageEffect
 import com.example.walklogger.core.ui.theme.AppSpacing
@@ -168,6 +169,7 @@ fun FinishWalkScreen(
                 onAllowLocation = onAllowLocation,
                 enabled = !uiState.isLoading,
             )
+            WalkRouteMap(route = uiState.route)
             WalkFormContent(form = uiState.form, actions = formActions)
             Column(
                 modifier = Modifier.padding(top = AppSpacing.md),
