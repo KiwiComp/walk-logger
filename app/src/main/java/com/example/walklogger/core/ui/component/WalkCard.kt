@@ -23,6 +23,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.theme.AppRadius
+import com.example.walklogger.core.ui.theme.AppSize
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
 
@@ -54,6 +55,7 @@ fun WalkCard(walk: TimelineWalk, onClick: () -> Unit, modifier: Modifier = Modif
                     RatingFace(
                         rating = walk.rating,
                         modifier = Modifier.padding(end = AppSpacing.xs),
+                        size = AppSize.singleRatingHeight,
                     )
                 }
                 if (walk.equipment != null) {

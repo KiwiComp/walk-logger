@@ -16,7 +16,7 @@ fun AppSnackbarHost(hostState: SnackbarHostState, modifier: Modifier = Modifier)
             shape = MaterialTheme.shapes.extraSmall,
             containerColor = AppTheme.colors.header,
             contentColor = AppTheme.colors.onHeader,
-            actionColor = AppTheme.colors.actionLight,
+            actionColor = AppTheme.colors.onHeaderAction,
         )
     }
 }
