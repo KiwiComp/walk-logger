@@ -92,6 +92,8 @@ class AppColors(
     val headerRaised: Color,
     val onHeader: Color,
     val onHeaderMuted: Color,
+    /** Action text on [header], e.g. the snackbar button; [action] is too dark on it in light mode. */
+    val onHeaderAction: Color,
     /** Selected day in week strip and calendar. Today is marked with [action] as a ring. */
     val selection: Color,
     val onSelection: Color,
@@ -129,6 +131,7 @@ internal val LightAppColors = AppColors(
     headerRaised = InkRaised,
     onHeader = OnInk,
     onHeaderMuted = OnInkMuted,
+    onHeaderAction = DarkGreen,
     selection = Ink,
     onSelection = OnInk,
     warningLight = WarnSoft,
@@ -171,6 +174,7 @@ internal val DarkAppColors = AppColors(
     headerRaised = DarkHeroRaised,
     onHeader = OnInk,
     onHeaderMuted = DarkOnHeroMuted,
+    onHeaderAction = DarkGreen,
     // Light mode marks the selected day dark; dark mode flips it to light.
     selection = DarkInk,
     onSelection = DarkCanvas,

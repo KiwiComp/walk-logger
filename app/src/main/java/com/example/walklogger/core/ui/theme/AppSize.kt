@@ -11,6 +11,12 @@ object AppSize {
     /** Height of inline choice controls (SelectableChip, SegmentedToggle). */
     val chipHeight: Dp = 44.dp
 
+    /** Height of rating faces on the walk cards */
+    val singleRatingHeight: Dp = 28.dp
+
     /** Height of the route map (WalkRouteMap) on Finish walk and Walk detail. */
     val mapHeight: Dp = 200.dp
+
+    /** Keeps the header title on one line beside DogBadge and the settings icon on 360dp screens. */
+    val dogBadgeMaxWidth: Dp = 120.dp
 }

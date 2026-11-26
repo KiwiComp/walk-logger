@@ -230,7 +230,7 @@ private fun DogFormCard(
                 label = stringResource(R.string.register_dog_birth_date),
                 placeholder = stringResource(R.string.register_dog_birth_date_none),
                 formatter = DateTimeFormatter.ofLocalizedDate(FormatStyle.MEDIUM),
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(3f),
             )
             AppTextField(
                 value = uiState.weight,
@@ -243,7 +243,7 @@ private fun DogFormCard(
                     uiState.isWeightInvalid
                 },
                 keyboardOptions = KeyboardOptions(keyboardType = KeyboardType.Decimal),
-                modifier = Modifier.weight(1f),
+                modifier = Modifier.weight(2f),
             )
         }
         Text(
