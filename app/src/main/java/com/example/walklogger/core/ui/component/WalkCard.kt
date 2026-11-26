@@ -40,7 +40,7 @@ fun WalkCard(walk: TimelineWalk, onClick: () -> Unit, modifier: Modifier = Modif
             .background(AppTheme.colors.cardSubtle)
             .border(1.dp, AppTheme.colors.outline, shape)
             .clickable(onClick = onClick)
-            .padding(AppSpacing.lg),
+            .padding(AppSpacing.md),
         verticalAlignment = Alignment.CenterVertically,
     ) {
         Column(
