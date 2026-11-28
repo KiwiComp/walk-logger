@@ -6,6 +6,7 @@ import androidx.test.ext.junit.runners.AndroidJUnit4
 import com.example.walklogger.core.database.WalkLoggerDatabase
 import com.example.walklogger.core.database.entity.BehaviourIssueEntity
 import com.example.walklogger.core.database.entity.MedicalConcernEntity
+import com.example.walklogger.core.database.entity.RoutePointEntity
 import com.example.walklogger.core.model.BehaviourIssue
 import com.example.walklogger.core.model.Equipment
 import com.example.walklogger.core.model.MedicalConcern
@@ -196,6 +197,31 @@ class DefaultWalkRepositoryTest {
     }
 
     @Test
+    fun updateWalk_onAnotherDate_movesOnlyItsRouteByWholeDays() = runBlocking {
+        val id = repository.logWalk(pastWalk)
+        val otherId = repository.logWalk(pastWalk)
+        addRoutePoints(id, 1_200, 2_000)
+        addRoutePoints(otherId, 1_200)
+
+        repository.updateWalk(
+            pastWalk.copy(id = id, startTime = 1_000 + 2 * DAY, endTime = 2_500 + 2 * DAY),
+        )
+
+        assertEquals(listOf(1_200 + 2 * DAY, 2_000 + 2 * DAY), routeTimes(id))
+        assertEquals(listOf(1_200L), routeTimes(otherId))
+    }
+
+    @Test
+    fun updateWalk_withNewTimesOnTheSameDate_leavesItsRouteAlone() = runBlocking {
+        val id = repository.logWalk(pastWalk)
+        addRoutePoints(id, 1_200, 2_000)
+
+        repository.updateWalk(pastWalk.copy(id = id, startTime = 1_500, endTime = 3_000))
+
+        assertEquals(listOf(1_200L, 2_000L), routeTimes(id))
+    }
+
+    @Test
     fun deleteWalk_removesItAndItsIssueAndConcernRows() = runBlocking {
         val id = repository.logWalk(pastWalk)
 
@@ -210,5 +236,18 @@ class DefaultWalkRepositoryTest {
             assertTrue(cursor.moveToFirst())
             assertEquals(0, cursor.getInt(0))
         }
+    }
+
+    private suspend fun addRoutePoints(walkId: Long, vararg times: Long) = times.forEach {
+        database.routePointDao().insertPoint(
+            RoutePointEntity(walkId = walkId, time = it, latitude = 59.0, longitude = 18.0),
+        )
+    }
+
+    private suspend fun routeTimes(walkId: Long): List<Long> =
+        database.routePointDao().observeRoute(walkId).first().map { it.time }
+
+    private companion object {
+        const val DAY = 86_400_000L
     }
 }

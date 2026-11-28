@@ -1,7 +1,9 @@
 package com.example.walklogger.core.data
 
+import com.example.walklogger.core.common.dayShiftMillis
 import com.example.walklogger.core.common.di.Dispatcher
 import com.example.walklogger.core.common.di.WalkLoggerDispatchers
+import com.example.walklogger.core.common.toLocalDateTime
 import com.example.walklogger.core.database.WalkDao
 import com.example.walklogger.core.database.entity.WalkEntity
 import com.example.walklogger.core.model.Equipment
@@ -64,12 +66,16 @@ class DefaultWalkRepository @Inject constructor(
     override suspend fun updateWalk(walk: Walk) {
         require(!walk.isActive) { "a logged walk needs an end time" }
         withContext(ioDispatcher) {
+            val storedStart = walkDao.getStartTime(walk.id)
+            val newDate = walk.startTime.toLocalDateTime(clock.zone).toLocalDate()
             walkDao.updateWalk(
                 walk.toEntity(),
                 walk.behaviourIssues.map {
                     it.id
                 },
                 walk.medicalConcerns.map { it.id },
+                routeShiftMillis =
+                    storedStart?.let { dayShiftMillis(it, newDate, clock.zone) } ?: 0L,
             )
         }
     }

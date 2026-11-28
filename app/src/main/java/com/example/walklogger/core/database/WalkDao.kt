@@ -53,16 +53,27 @@ interface WalkDao {
     }
 
     @Update
-    suspend fun updateWalk(walk: WalkEntity)
+    suspend fun updateWalkRow(walk: WalkEntity)
 
-    /** Replaces the walk row and its ticked issues and concerns as one unit. */
+    @Query("SELECT startTime FROM walks WHERE id = :id")
+    suspend fun getStartTime(id: Long): Long?
+
+    @Query("UPDATE walk_route_points SET time = time + :shiftMillis WHERE walkId = :walkId")
+    suspend fun shiftRoute(walkId: Long, shiftMillis: Long)
+
+    /**
+     * Replaces the walk row and its ticked issues and concerns as one unit, moving its route points by
+     * [routeShiftMillis] in the same transaction so the walk and its route never end up on different days.
+     */
     @Transaction
     suspend fun updateWalk(
         walk: WalkEntity,
         behaviourIssueIds: List<Long>,
         medicalConcernIds: List<Long>,
+        routeShiftMillis: Long,
     ) {
-        updateWalk(walk)
+        updateWalkRow(walk)
+        if (routeShiftMillis != 0L) shiftRoute(walk.id, routeShiftMillis)
         deleteWalkBehaviourIssues(walk.id)
         insertWalkBehaviourIssues(
             behaviourIssueIds.map {

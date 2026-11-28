@@ -143,6 +143,22 @@ class FinishWalkViewModelTest {
         }
 
     @Test
+    fun `the route and distance follow a new date`() = runTest {
+        walkRepository.addWalks(walk)
+        val early = pointAt(LocalTime.of(7, 10), Coordinates(59.0, 18.0))
+        val late = pointAt(LocalTime.of(7, 20), Coordinates(59.01, 18.0))
+        walkRouteRepository.addPoint(walk.id, early)
+        walkRouteRepository.addPoint(walk.id, late)
+        viewModel.uiState.test {
+            expectMostRecentItem()
+            viewModel.setDate(date.minusDays(1))
+            val state = expectMostRecentItem()
+            assertEquals(listOf(early.coordinates, late.coordinates), state.route)
+            assertEquals(1_111.95, state.distanceMeters!!, 0.1)
+        }
+    }
+
+    @Test
     fun `the distance follows the edited times`() = runTest {
         walkRepository.addWalks(walk)
         walkRouteRepository.addPoint(walk.id, pointAt(LocalTime.of(7, 10), Coordinates(59.0, 18.0)))
