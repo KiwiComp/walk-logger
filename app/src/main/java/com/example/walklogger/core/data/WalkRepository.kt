@@ -23,7 +23,10 @@ interface WalkRepository {
      */
     suspend fun logWalk(walk: Walk): Long
 
-    /** Replaces the stored walk with [Walk.id]; like [logWalk], it must have an end time. */
+    /**
+     * Replaces the stored walk with [Walk.id]; like [logWalk], it must have an end time. A new date moves
+     * its recorded route by the same number of days, so the points stay within the walk's times.
+     */
     suspend fun updateWalk(walk: Walk)
 
     /** Replaces the notes of the walk with [walkId]; used while a walk is still in progress. */

@@ -5,6 +5,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
 import com.example.walklogger.core.common.ErrorReporter
+import com.example.walklogger.core.common.dayShiftMillis
 import com.example.walklogger.core.common.di.Dispatcher
 import com.example.walklogger.core.common.di.WalkLoggerDispatchers
 import com.example.walklogger.core.common.runCatchingCancellable
@@ -78,11 +79,18 @@ class FinishWalkViewModel @AssistedInject constructor(
 
     private val screen = MutableStateFlow(FinishWalkUiState(times = times.state.value))
 
-    /** Follows the edited times, so points hidden by a shorter walk show again when it is lengthened. */
+    /**
+     * Follows the edited times, so points hidden by a shorter walk show again when it is lengthened.
+     * A new date moves the points with it, as saving does.
+     */
     private val route =
-        combine(walkRouteRepository.observeRoute(walkId), times.state) { points, _ ->
+        combine(walkRouteRepository.observeRoute(walkId), times.state) { points, timesState ->
+            val stored = walk ?: return@combine emptyList()
             val start = times.startMillis ?: return@combine emptyList()
-            points.within(start, times.endMillis).map { it.coordinates }
+            val shift = dayShiftMillis(stored.startTime, timesState.date, clock.zone)
+            points.map { it.copy(time = it.time + shift) }
+                .within(start, times.endMillis)
+                .map { it.coordinates }
         }.map { it to it.distanceMeters() }.flowOn(defaultDispatcher)
 
     /** The stored walk, kept so saving preserves its id, dog and handlers. */
