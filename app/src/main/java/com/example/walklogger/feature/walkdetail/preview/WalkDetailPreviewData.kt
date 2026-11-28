@@ -27,6 +27,7 @@ internal object WalkDetailPreviewData {
             Coordinates(59.3310, 18.0712),
             Coordinates(59.3328, 18.0695),
         ),
+        distanceMeters = 420.0,
         dogName = "Sixten",
         handlers = listOf("Kim"),
         equipment = Equipment.COLLAR,

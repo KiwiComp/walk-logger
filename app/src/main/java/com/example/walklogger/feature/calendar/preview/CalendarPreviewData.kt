@@ -27,6 +27,7 @@ internal object CalendarPreviewData {
             rating = 6,
             note = "Long morning loop, calm the whole way.",
             duration = 38.minutes,
+            distanceMeters = 3_240.0,
             hasPassedStool = true,
         ),
         TimelineWalk(
@@ -36,6 +37,7 @@ internal object CalendarPreviewData {
             rating = 4,
             note = "",
             duration = 17.minutes,
+            distanceMeters = 1_150.0,
             hasPassedStool = null,
         ),
     )

@@ -28,6 +28,7 @@ import androidx.compose.ui.tooling.preview.Preview
 import androidx.compose.ui.unit.dp
 import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.RatingFace
+import com.example.walklogger.core.ui.component.durationWithDistance
 import com.example.walklogger.core.ui.theme.AppRadius
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
@@ -69,7 +70,7 @@ internal fun WalkHeroCard(uiState: WalkDetailUiState, modifier: Modifier = Modif
             )
             uiState.durationMinutes?.let {
                 Text(
-                    text = stringResource(R.string.walk_duration_minutes, it),
+                    text = durationWithDistance(it, uiState.distanceMeters),
                     style = MaterialTheme.typography.bodyMedium,
                     color = colors.onHeaderMuted,
                 )

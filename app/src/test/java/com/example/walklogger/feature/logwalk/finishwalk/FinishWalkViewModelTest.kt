@@ -33,6 +33,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneOffset
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.advanceTimeBy
 import kotlinx.coroutines.test.advanceUntilIdle
 import kotlinx.coroutines.test.runTest
@@ -79,6 +80,7 @@ class FinishWalkViewModelTest {
             walkRepository = walkRepository,
             walkRouteRepository = walkRouteRepository,
             clock = clock,
+            defaultDispatcher = UnconfinedTestDispatcher(),
             formFactory = walkFormEditorFactory(
                 behaviourIssueRepository = behaviourIssueRepository,
                 medicalConcernRepository = medicalConcernRepository,
@@ -139,6 +141,21 @@ class FinishWalkViewModelTest {
                 assertEquals(whole, expectMostRecentItem().route)
             }
         }
+
+    @Test
+    fun `the distance follows the edited times`() = runTest {
+        walkRepository.addWalks(walk)
+        walkRouteRepository.addPoint(walk.id, pointAt(LocalTime.of(7, 10), Coordinates(59.0, 18.0)))
+        walkRouteRepository.addPoint(
+            walk.id,
+            pointAt(LocalTime.of(7, 20), Coordinates(59.01, 18.0)),
+        )
+        viewModel.uiState.test {
+            assertEquals(1_111.95, expectMostRecentItem().distanceMeters!!, 0.1)
+            viewModel.setEndTime(LocalTime.of(7, 15))
+            assertNull(expectMostRecentItem().distanceMeters)
+        }
+    }
 
     @Test
     fun `fetches the weather for the walk when it opens, and again when its times change`() =

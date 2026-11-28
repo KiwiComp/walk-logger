@@ -19,6 +19,8 @@ data class FinishWalkUiState(
     val form: WalkFormState = WalkFormState(),
     /** The recorded route within the times as currently edited; empty for a walk without one. */
     val route: List<Coordinates> = emptyList(),
+    /** Length of [route]; null without one. */
+    val distanceMeters: Double? = null,
     /** True while the "Edit times" pickers are shown. */
     val isEditingTimes: Boolean = false,
     /** True until the finished walk has been read; the form is not editable before that. */

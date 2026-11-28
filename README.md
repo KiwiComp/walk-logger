@@ -12,6 +12,8 @@ weather at the time. Walks can be timed live or logged afterwards, and are brows
 - **Route**: with precise location, a live walk records its route, also with the screen locked, and
   shows it on a map when finishing the walk and in the walk detail. Points outside the walk's times are
   hidden, not deleted. Needs a [Maps API key](#maps-api-key).
+- **Distance**: the length of a recorded route in km, shown when finishing the walk, in the walk detail
+  and in the day timeline, with the day's total next to its total time on Log and Calendar.
 - **Past walk**: log a walk afterwards with its date and times, on any day.
 - **Weather**: fetched automatically from [Open-Meteo](https://open-meteo.com/) for the walk's time and
   place (the device's precise location, or else a chosen place), and editable by hand.

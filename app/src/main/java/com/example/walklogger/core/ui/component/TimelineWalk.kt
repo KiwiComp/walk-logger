@@ -9,6 +9,8 @@ data class TimelineWalk(
     val id: Long,
     val startTime: LocalTime,
     val duration: Duration,
+    /** Null for a walk without a recorded route. */
+    val distanceMeters: Double?,
     val equipment: Equipment?,
     val rating: Int?,
     val note: String,

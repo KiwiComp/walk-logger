@@ -159,6 +159,7 @@ fun FinishWalkScreen(
                 onHandlerToggle = onHandlerToggle,
                 onAddHandler = onAddHandler,
                 times = uiState.times,
+                distanceMeters = uiState.distanceMeters,
                 isEditingTimes = uiState.isEditingTimes,
                 onToggleEditTimes = onToggleEditTimes,
                 onDateChange = onDateChange,

@@ -65,6 +65,13 @@ fun WalkTimeline(
                         style = MaterialTheme.typography.bodyMedium,
                         color = AppTheme.colors.contentMuted,
                     )
+                    walk.distanceMeters?.let {
+                        Text(
+                            text = formatDistance(it),
+                            style = MaterialTheme.typography.bodyMedium,
+                            color = AppTheme.colors.contentMuted,
+                        )
+                    }
                     if (walk.hasPassedStool == true) {
                         val description = stringResource(R.string.walk_stool_passed_description)
                         Text(
@@ -132,6 +139,7 @@ private val PreviewWalks = listOf(
         id = 1,
         startTime = LocalTime.of(7, 5),
         duration = 38.minutes,
+        distanceMeters = 3_240.0,
         equipment = Equipment.HARNESS,
         rating = 6,
         note = "Long morning loop, calm the whole way.",
@@ -141,6 +149,7 @@ private val PreviewWalks = listOf(
         id = 2,
         startTime = LocalTime.of(11, 30),
         duration = 177.minutes,
+        distanceMeters = null,
         equipment = Equipment.COLLAR,
         rating = 4,
         note = "Quick errand walk, distracted by the market.",

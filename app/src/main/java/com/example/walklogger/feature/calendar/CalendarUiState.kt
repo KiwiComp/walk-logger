@@ -31,6 +31,10 @@ data class CalendarUiState(
         total + walk.duration
     }
 
+    /** Null when none of the day's walks has a recorded route. */
+    val totalDistanceMeters: Double? =
+        walks.mapNotNull { it.distanceMeters }.takeIf { it.isNotEmpty() }?.sum()
+
     /** Walks can only be logged for a registered dog that is not deleted. */
     val canAddWalk: Boolean get() = activeDogName != null && !isActiveDogDeleted
 }

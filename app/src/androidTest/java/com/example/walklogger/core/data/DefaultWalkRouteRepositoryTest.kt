@@ -54,6 +54,18 @@ class DefaultWalkRouteRepositoryTest {
     }
 
     @Test
+    fun observeRoutes_returnsOnlyTheAskedWalksPointsOldestFirst() = runBlocking {
+        repository.addPoint(WALK, second)
+        repository.addPoint(OTHER_WALK, first)
+        repository.addPoint(WALK, first)
+
+        assertEquals(
+            mapOf(WALK to listOf(first, second)),
+            repository.observeRoutes(listOf(WALK)).first(),
+        )
+    }
+
+    @Test
     fun deletingTheWalk_removesItsRoute() = runBlocking {
         repository.addPoint(WALK, first)
 

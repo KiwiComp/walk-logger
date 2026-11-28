@@ -133,7 +133,12 @@ fun LogScreen(
                     summary = if (uiState.walks.isEmpty()) {
                         null
                     } else {
-                        walkSummary(uiState.walks.size, averageRating = null, uiState.totalDuration)
+                        walkSummary(
+                            uiState.walks.size,
+                            averageRating = null,
+                            uiState.totalDuration,
+                            uiState.totalDistanceMeters,
+                        )
                     },
                     walks = uiState.walks,
                     onWalkClick = onWalkClick,

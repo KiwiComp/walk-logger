@@ -17,6 +17,12 @@ class FakeWalkRouteRepository : WalkRouteRepository {
     override fun observeRoute(walkId: Long): Flow<List<RoutePoint>> =
         points.map { byWalk -> byWalk[walkId].orEmpty().sortedBy { it.time } }
 
+    override fun observeRoutes(walkIds: List<Long>): Flow<Map<Long, List<RoutePoint>>> =
+        points.map { byWalk ->
+            byWalk.filter { (id, route) -> id in walkIds && route.isNotEmpty() }
+                .mapValues { (_, route) -> route.sortedBy { it.time } }
+        }
+
     override suspend fun addPoint(walkId: Long, point: RoutePoint) {
         failures.check()
         points.update { it + (walkId to it[walkId].orEmpty() + point) }
