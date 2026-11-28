@@ -27,6 +27,10 @@ data class LogUiState(
     val totalDuration: Duration = walks.fold(Duration.ZERO) { total, walk ->
         total + walk.duration
     }
+
+    /** Null when none of the day's walks has a recorded route. */
+    val totalDistanceMeters: Double? =
+        walks.mapNotNull { it.distanceMeters }.takeIf { it.isNotEmpty() }?.sum()
 }
 
 data class DayUiState(

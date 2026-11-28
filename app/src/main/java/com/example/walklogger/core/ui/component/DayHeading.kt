@@ -1,9 +1,8 @@
 package com.example.walklogger.core.ui.component
 
-import androidx.compose.foundation.layout.Row
-import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.fillMaxWidth
-import androidx.compose.foundation.layout.widthIn
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -22,22 +21,21 @@ import kotlin.time.Duration
 import kotlin.time.Duration.Companion.hours
 import kotlin.time.Duration.Companion.minutes
 
-/** Day title with a muted summary at the end, sharing its baseline. */
+private const val METERS_PER_KM = 1_000.0
+
+/** Day title with a muted summary below it, which has its own line as it grows too long to fit beside. */
 @Composable
 fun DayHeading(title: String, summary: String?, modifier: Modifier = Modifier) {
-    Row(modifier = modifier.fillMaxWidth()) {
-        Text(
-            text = title,
-            style = MaterialTheme.typography.headlineMedium,
-            modifier = Modifier.alignByBaseline(),
-        )
+    Column(
+        modifier = modifier.fillMaxWidth(),
+        verticalArrangement = Arrangement.spacedBy(AppSpacing.xs),
+    ) {
+        Text(text = title, style = MaterialTheme.typography.headlineMedium)
         if (summary != null) {
-            Spacer(Modifier.weight(1f).widthIn(min = AppSpacing.md))
             Text(
                 text = summary,
                 style = MaterialTheme.typography.bodyMedium,
                 color = AppTheme.colors.contentMuted,
-                modifier = Modifier.alignByBaseline(),
             )
         }
     }
@@ -58,17 +56,25 @@ fun dayTitle(date: LocalDate, isToday: Boolean): String {
     }
 }
 
-/** "2 walks · 1 h 5 min · avg 5.0"; the duration and average are left out when there is none. */
+/** "2 walks · 1 h 5 min · 3.2 km · avg 5.0"; the duration, distance and average are left out when there is none. */
 @Composable
-fun walkSummary(walkCount: Int, averageRating: Double?, totalDuration: Duration): String {
+fun walkSummary(
+    walkCount: Int,
+    averageRating: Double?,
+    totalDuration: Duration,
+    totalDistanceMeters: Double? = null,
+): String {
     val count = pluralStringResource(R.plurals.walk_count, walkCount, walkCount)
     val duration = totalDuration.takeIf { it > Duration.ZERO }?.let {
         " " + stringResource(R.string.summary_duration, formatDuration(it))
     }.orEmpty()
+    val distance = totalDistanceMeters?.let {
+        " " + stringResource(R.string.summary_distance, formatDistance(it))
+    }.orEmpty()
     val average = averageRating?.let {
         " " + stringResource(R.string.summary_average, it)
     }.orEmpty()
-    return count + duration + average
+    return count + duration + distance + average
 }
 
 /** "45 min", or "1 h 5 min" from an hour up. */
@@ -82,6 +88,20 @@ internal fun formatDuration(duration: Duration): String =
         }
     }
 
+/** "3.2 km", one decimal in the user's locale. */
+@Composable
+internal fun formatDistance(meters: Double): String =
+    stringResource(R.string.walk_distance_km, meters / METERS_PER_KM)
+
+/** "38 min · 3.2 km", or just "38 min" without a distance. */
+@Composable
+internal fun durationWithDistance(durationMinutes: Int, distanceMeters: Double?): String {
+    val duration = stringResource(R.string.walk_duration_minutes, durationMinutes)
+    return distanceMeters?.let {
+        stringResource(R.string.walk_duration_with_distance, duration, formatDistance(it))
+    } ?: duration
+}
+
 @Preview(showBackground = true)
 @Composable
 private fun DayHeadingPreview() {
@@ -92,6 +112,7 @@ private fun DayHeadingPreview() {
                 walkCount = 2,
                 averageRating = 5.0,
                 totalDuration = 1.hours + 5.minutes,
+                totalDistanceMeters = 3_240.0,
             ),
         )
     }

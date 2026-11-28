@@ -99,6 +99,7 @@ internal object LogWalkPreviewData {
             startTime = LocalTime.of(7, 5),
             endTime = LocalTime.of(7, 39),
         ),
+        distanceMeters = 2_340.0,
         dogName = "Sixten",
         handlers = listOf("Kim", "Jesper", "Camila", "Micke", "Malin"),
         selectedHandlers = setOf("Kim"),

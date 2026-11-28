@@ -149,6 +149,7 @@ fun CalendarScreen(
                                 uiState.walks.size,
                                 averageRating = null,
                                 uiState.totalDuration,
+                                uiState.totalDistanceMeters,
                             )
                         },
                         walks = uiState.walks,

@@ -31,6 +31,7 @@ import com.example.walklogger.R
 import com.example.walklogger.core.ui.component.EditDonePillButton
 import com.example.walklogger.core.ui.component.PillButton
 import com.example.walklogger.core.ui.component.PillButtonStyle
+import com.example.walklogger.core.ui.component.durationWithDistance
 import com.example.walklogger.core.ui.theme.AppRadius
 import com.example.walklogger.core.ui.theme.AppSpacing
 import com.example.walklogger.core.ui.theme.AppTheme
@@ -64,6 +65,7 @@ internal fun FinishWalkSummaryCard(
     onHandlerToggle: (String) -> Unit,
     onAddHandler: (String) -> Unit,
     times: WalkTimesState,
+    distanceMeters: Double?,
     isEditingTimes: Boolean,
     onToggleEditTimes: () -> Unit,
     onDateChange: (LocalDate) -> Unit,
@@ -134,7 +136,7 @@ internal fun FinishWalkSummaryCard(
                 )
                 times.durationMinutes?.let {
                     Text(
-                        text = stringResource(R.string.walk_duration_minutes, it),
+                        text = durationWithDistance(it, distanceMeters),
                         style = MaterialTheme.typography.bodyMedium,
                         color = AppTheme.colors.contentMuted,
                     )
@@ -220,6 +222,7 @@ private fun FinishWalkSummaryCardPreview() {
             onHandlerToggle = {},
             onAddHandler = {},
             times = state.times,
+            distanceMeters = state.distanceMeters,
             isEditingTimes = false,
             onToggleEditTimes = {},
             onDateChange = {},

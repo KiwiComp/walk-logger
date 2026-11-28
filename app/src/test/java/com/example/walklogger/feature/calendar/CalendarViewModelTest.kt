@@ -1,13 +1,17 @@
 package com.example.walklogger.feature.calendar
 
 import app.cash.turbine.test
+import com.example.walklogger.core.model.Coordinates
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.Equipment
+import com.example.walklogger.core.model.RoutePoint
 import com.example.walklogger.core.model.Walk
 import com.example.walklogger.core.ui.component.TimelineWalk
+import com.example.walklogger.domain.ObserveWalkDistancesUseCase
 import com.example.walklogger.domain.ObserveWalkHistoryUseCase
 import com.example.walklogger.testing.FakeDogRepository
 import com.example.walklogger.testing.FakeWalkRepository
+import com.example.walklogger.testing.FakeWalkRouteRepository
 import com.example.walklogger.testing.MainDispatcherRule
 import java.time.Clock
 import java.time.LocalDate
@@ -15,6 +19,7 @@ import java.time.LocalDateTime
 import java.time.LocalTime
 import java.time.YearMonth
 import java.time.ZoneOffset
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -32,11 +37,13 @@ class CalendarViewModelTest {
     private val clock = Clock.fixed(today.atTime(15, 0).toInstant(ZoneOffset.UTC), ZoneOffset.UTC)
     private val repository = FakeWalkRepository()
     private val dogRepository = FakeDogRepository()
+    private val routeRepository = FakeWalkRouteRepository()
 
     /** Lazy so viewModelScope picks up the rule's Main dispatcher. */
     private val viewModel by lazy {
         CalendarViewModel(
             ObserveWalkHistoryUseCase(repository, dogRepository),
+            ObserveWalkDistancesUseCase(routeRepository, UnconfinedTestDispatcher()),
             dogRepository,
             clock,
         )
@@ -238,6 +245,54 @@ class CalendarViewModelTest {
             assertEquals("Mira", state.activeDogName)
             assertTrue(state.isActiveDogDeleted)
             assertFalse(state.canAddWalk)
+        }
+    }
+
+    @Test
+    fun `the day's distance sums only the walks with a route`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"))
+        repository.addWalks(
+            walk(id = 1, start = today.atTime(7, 0)),
+            walk(id = 2, start = today.atTime(11, 0)),
+        )
+        addRoute(
+            1,
+            today.atTime(7, 5) to Coordinates(59.0, 18.0),
+            today.atTime(7, 20) to Coordinates(59.01, 18.0),
+        )
+        viewModel.uiState.test {
+            val state = expectMostRecentItem()
+            assertNull(state.walks.single { it.id == 2L }.distanceMeters)
+            assertEquals(1_111.95, state.totalDistanceMeters!!, 0.1)
+        }
+    }
+
+    @Test
+    fun `selecting another day shows that day's distance`() = runTest {
+        dogRepository.addDogs(Dog(id = 1, name = "Mira"))
+        val yesterday = today.minusDays(1)
+        repository.addWalks(
+            walk(id = 1, start = today.atTime(7, 0)),
+            walk(id = 2, start = yesterday.atTime(7, 0)),
+        )
+        addRoute(
+            2,
+            yesterday.atTime(7, 5) to Coordinates(59.0, 18.0),
+            yesterday.atTime(7, 20) to Coordinates(59.01, 18.0),
+        )
+        viewModel.uiState.test {
+            assertNull(expectMostRecentItem().totalDistanceMeters)
+            viewModel.selectDay(yesterday)
+            assertEquals(1_111.95, expectMostRecentItem().totalDistanceMeters!!, 0.1)
+        }
+    }
+
+    private suspend fun addRoute(walkId: Long, vararg points: Pair<LocalDateTime, Coordinates>) {
+        points.forEach { (time, coordinates) ->
+            routeRepository.addPoint(
+                walkId,
+                RoutePoint(time.toEpochSecond(ZoneOffset.UTC) * 1000, coordinates),
+            )
         }
     }
 }

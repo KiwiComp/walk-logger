@@ -5,12 +5,15 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
 import com.example.walklogger.core.common.ErrorReporter
+import com.example.walklogger.core.common.di.Dispatcher
+import com.example.walklogger.core.common.di.WalkLoggerDispatchers
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.data.DogRepository
 import com.example.walklogger.core.data.HandlerRepository
 import com.example.walklogger.core.data.WalkRepository
 import com.example.walklogger.core.data.WalkRouteRepository
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.distanceMeters
 import com.example.walklogger.core.model.within
 import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.DiscardWalkUseCase
@@ -26,11 +29,14 @@ import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
 import java.time.LocalDate
 import java.time.LocalTime
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
+import kotlinx.coroutines.flow.map
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -44,6 +50,7 @@ class FinishWalkViewModel @AssistedInject constructor(
     private val walkRepository: WalkRepository,
     walkRouteRepository: WalkRouteRepository,
     clock: Clock,
+    @param:Dispatcher(WalkLoggerDispatchers.Default) defaultDispatcher: CoroutineDispatcher,
     formFactory: WalkFormEditor.Factory,
     private val saveWalk: SaveWalkUseCase,
     private val discardWalk: DiscardWalkUseCase,
@@ -76,7 +83,7 @@ class FinishWalkViewModel @AssistedInject constructor(
         combine(walkRouteRepository.observeRoute(walkId), times.state) { points, _ ->
             val start = times.startMillis ?: return@combine emptyList()
             points.within(start, times.endMillis).map { it.coordinates }
-        }
+        }.map { it to it.distanceMeters() }.flowOn(defaultDispatcher)
 
     /** The stored walk, kept so saving preserves its id, dog and handlers. */
     private var walk: Walk? = null
@@ -111,7 +118,9 @@ class FinishWalkViewModel @AssistedInject constructor(
                 handlers = handlers.handlers,
                 selectedHandlers = handlers.selected,
             )
-        }.combine(route) { state, route -> state.copy(route = route) }
+        }.combine(route) { state, (route, distance) ->
+            state.copy(route = route, distanceMeters = distance)
+        }
             .combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
             .stateIn(
                 scope = viewModelScope,

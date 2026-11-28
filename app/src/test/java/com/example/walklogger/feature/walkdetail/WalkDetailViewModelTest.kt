@@ -26,6 +26,7 @@ import java.time.LocalDate
 import java.time.LocalTime
 import java.time.ZoneOffset
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.test.UnconfinedTestDispatcher
 import kotlinx.coroutines.test.runTest
 import org.junit.Assert.assertEquals
 import org.junit.Assert.assertFalse
@@ -53,6 +54,7 @@ class WalkDetailViewModelTest {
             walkRouteRepository = walkRouteRepository,
             dogRepository = dogRepository,
             clock = clock,
+            defaultDispatcher = UnconfinedTestDispatcher(),
             discardWalk = DiscardWalkUseCase(
                 walkRepository,
                 FakeActiveWalkLocationRepository(),
@@ -137,7 +139,9 @@ class WalkDetailViewModelTest {
             )
         }
         viewModel.uiState.test {
-            assertEquals(listOf(inside), expectMostRecentItem().route)
+            val state = expectMostRecentItem()
+            assertEquals(listOf(inside), state.route)
+            assertNull(state.distanceMeters)
         }
     }
 

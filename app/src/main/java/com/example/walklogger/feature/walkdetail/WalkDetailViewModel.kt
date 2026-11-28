@@ -5,6 +5,8 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import com.example.walklogger.R
 import com.example.walklogger.core.common.ErrorReporter
+import com.example.walklogger.core.common.di.Dispatcher
+import com.example.walklogger.core.common.di.WalkLoggerDispatchers
 import com.example.walklogger.core.common.runCatchingCancellable
 import com.example.walklogger.core.common.toLocalDateTime
 import com.example.walklogger.core.data.DogRepository
@@ -13,6 +15,7 @@ import com.example.walklogger.core.data.WalkRouteRepository
 import com.example.walklogger.core.model.Dog
 import com.example.walklogger.core.model.RoutePoint
 import com.example.walklogger.core.model.Walk
+import com.example.walklogger.core.model.distanceMeters
 import com.example.walklogger.core.model.within
 import com.example.walklogger.core.ui.message.UserMessageState
 import com.example.walklogger.domain.DiscardWalkUseCase
@@ -21,11 +24,13 @@ import dagger.assisted.AssistedFactory
 import dagger.assisted.AssistedInject
 import dagger.hilt.android.lifecycle.HiltViewModel
 import java.time.Clock
+import kotlinx.coroutines.CoroutineDispatcher
 import kotlinx.coroutines.flow.MutableStateFlow
 import kotlinx.coroutines.flow.SharingStarted
 import kotlinx.coroutines.flow.StateFlow
 import kotlinx.coroutines.flow.combine
 import kotlinx.coroutines.flow.first
+import kotlinx.coroutines.flow.flowOn
 import kotlinx.coroutines.flow.stateIn
 import kotlinx.coroutines.flow.update
 import kotlinx.coroutines.launch
@@ -38,6 +43,7 @@ class WalkDetailViewModel @AssistedInject constructor(
     walkRouteRepository: WalkRouteRepository,
     dogRepository: DogRepository,
     private val clock: Clock,
+    @param:Dispatcher(WalkLoggerDispatchers.Default) defaultDispatcher: CoroutineDispatcher,
     private val discardWalk: DiscardWalkUseCase,
     errorReporter: ErrorReporter,
 ) : ViewModel() {
@@ -71,7 +77,8 @@ class WalkDetailViewModel @AssistedInject constructor(
             } else {
                 discard.detailsOf(walk, dog = dogs.find { it.id == walk.dogId }, route = route)
             }
-        }.combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
+        }.flowOn(defaultDispatcher)
+            .combine(userMessage.message) { state, message -> state.copy(userMessage = message) }
             .stateIn(
                 scope = viewModelScope,
                 started = SharingStarted.WhileSubscribed(5_000),
@@ -103,6 +110,7 @@ class WalkDetailViewModel @AssistedInject constructor(
         route: List<RoutePoint>,
     ): WalkDetailUiState {
         val start = walk.startTime.toLocalDateTime(clock.zone)
+        val walkRoute = route.within(walk.startTime, walk.endTime).map { it.coordinates }
         return copy(
             isLoading = false,
             date = start.toLocalDate(),
@@ -119,7 +127,8 @@ class WalkDetailViewModel @AssistedInject constructor(
             behaviourIssues = walk.behaviourIssues,
             medicalConcerns = walk.medicalConcerns,
             notes = walk.notes,
-            route = route.within(walk.startTime, walk.endTime).map { it.coordinates },
+            route = walkRoute,
+            distanceMeters = walkRoute.distanceMeters(),
         )
     }
 }

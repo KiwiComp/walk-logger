@@ -34,6 +34,8 @@ data class WalkDetailUiState(
     val notes: String = "",
     /** The recorded route within the walk's stored times; empty for a walk without one. */
     val route: List<Coordinates> = emptyList(),
+    /** Length of [route]; null without one. */
+    val distanceMeters: Double? = null,
     val isDiscarding: Boolean = false,
     val isDiscarded: Boolean = false,
     @param:StringRes val userMessage: Int? = null,
